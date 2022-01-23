@@ -3,19 +3,19 @@ package main
 // import (
 // 	"testing"
 
-// 	"github.com/aws/aws-cdk-go/awscdk"
-// 	"github.com/aws/aws-cdk-go/awscdk/assertions"
+// 	"github.com/aws/aws-cdk-go/awscdk/v2"
+// 	assertions "github.com/aws/aws-cdk-go/awscdk/v2/assertions"
 // 	"github.com/aws/jsii-runtime-go"
 // )
 
 // example tests. To run these tests, uncomment this file along with the
-// example resource in clean-notes-aws-cdk_test.go
-// func TestCleanNotesAwsCdkStack(t *testing.T) {
+// example resource in take-nifty-notes_test.go
+// func TestTakeNiftyNotesStack(t *testing.T) {
 // 	// GIVEN
 // 	app := awscdk.NewApp(nil)
 
 // 	// WHEN
-// 	stack := NewCleanNotesAwsCdkStack(app, "MyStack", nil)
+// 	stack := NewTakeNiftyNotesStack(app, "MyStack", nil)
 
 // 	// THEN
 // 	template := assertions.Template_FromStack(stack)

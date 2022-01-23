@@ -1,17 +1,17 @@
 package main
 
 import (
-	"github.com/aws/aws-cdk-go/awscdk"
-	// "github.com/aws/aws-cdk-go/awscdk/awssqs"
-	"github.com/aws/constructs-go/constructs/v3"
+	"github.com/aws/aws-cdk-go/awscdk/v2"
+	// "github.com/aws/aws-cdk-go/awscdk/v2/awssqs"
+	"github.com/aws/constructs-go/constructs/v10"
 	// "github.com/aws/jsii-runtime-go"
 )
 
-type CleanNotesAwsCdkStackProps struct {
+type TakeNiftyNotesStackProps struct {
 	awscdk.StackProps
 }
 
-func NewCleanNotesAwsCdkStack(scope constructs.Construct, id string, props *CleanNotesAwsCdkStackProps) awscdk.Stack {
+func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNiftyNotesStackProps) awscdk.Stack {
 	var sprops awscdk.StackProps
 	if props != nil {
 		sprops = props.StackProps
@@ -21,7 +21,7 @@ func NewCleanNotesAwsCdkStack(scope constructs.Construct, id string, props *Clea
 	// The code that defines your stack goes here
 
 	// example resource
-	// queue := awssqs.NewQueue(stack, jsii.String("CleanNotesAwsCdkQueue"), &awssqs.QueueProps{
+	// queue := awssqs.NewQueue(stack, jsii.String("TakeNiftyNotesQueue"), &awssqs.QueueProps{
 	// 	VisibilityTimeout: awscdk.Duration_Seconds(jsii.Number(300)),
 	// })
 
@@ -31,7 +31,7 @@ func NewCleanNotesAwsCdkStack(scope constructs.Construct, id string, props *Clea
 func main() {
 	app := awscdk.NewApp(nil)
 
-	NewCleanNotesAwsCdkStack(app, "CleanNotesAwsCdkStack", &CleanNotesAwsCdkStackProps{
+	NewTakeNiftyNotesStack(app, "TakeNiftyNotesStack", &TakeNiftyNotesStackProps{
 		awscdk.StackProps{
 			Env: env(),
 		},
