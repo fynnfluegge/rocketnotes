@@ -20,8 +20,10 @@
     "@angular/platform-browser-dynamic": "~10.1.3",
     "@angular/router": "~10.1.3",
     "amazon-cognito-identity-js": "^5.2.6",
+    "angular-markdown-editor": "^2.0.2",
     "aws-amplify": "^3.4.3",
     "aws-amplify-angular": "^6.0.26",
+    "core-js": "^3.21.1",
     "rxjs": "~6.6.0",
     "tslib": "^2.0.0",
     "zone.js": "~0.10.2"

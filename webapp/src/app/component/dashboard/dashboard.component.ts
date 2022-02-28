@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Auth } from 'aws-amplify';
+import { TestServiceService } from 'src/app/service/rest/test-service.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -9,7 +10,7 @@ import { Auth } from 'aws-amplify';
 })
 export class DashboardComponent implements OnInit {
 
-  constructor(private router: Router) { }
+  constructor(private testService : TestServiceService) { }
 
   ngOnInit(): void {
   }
@@ -19,5 +20,9 @@ export class DashboardComponent implements OnInit {
       console.log(user.username)
     }))
     Auth.signOut();
+  }
+
+  onTest(): void {
+    this.testService.get("").subscribe(message => { console.log(message) })
   }
 }
