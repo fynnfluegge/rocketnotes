@@ -1,7 +1,8 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-
+import { MarkdownModule, MarkedOptions, MarkedRenderer } from 'ngx-markdown';
+import { AngularMarkdownEditorModule } from 'angular-markdown-editor';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { DashboardComponent } from './component/dashboard/dashboard.component';
@@ -17,7 +18,8 @@ import { TestServiceService } from './service/rest/test-service.service';
   imports: [
     BrowserModule,
     AppRoutingModule,
-    HttpClientModule
+    HttpClientModule,
+    AngularMarkdownEditorModule
   ],
   providers: [
     AuthGuard,
