@@ -2,28 +2,32 @@
 <button (click)="onLogout()">Log out</button>
 <button (click)="onTest()">Test</button>
 
-<!-- <div class="row">
-  <div class="col-md-6">
-      <h2>Reactive Form - Demo</h2>
-  </div>
-  <div class="col-md-6 action-buttons">
-      <button class="btn btn-info btn-sm" (click)="showFullScreen(true)">
-          Full Screen Preview
+<div style="margin: 20px">
+    <form novalidate #form="ngForm">
+      <md-editor
+        #md="ngModel"
+        name="Content"
+        (onEditorLoaded)="onEditorLoaded($event)"
+        [preRender]="preRender"
+        [postRender]="postRender"
+        (onPreviewDomChanged)="onPreviewDomChanged($event)"
+        [upload]="doUpload"
+        [(ngModel)]="content"
+        [mode]="mode"
+        [options]="options"
+        required
+        height="400px"
+      ></md-editor>
+    </form>
+    <div class="well well-sm">
+      <button class="btn btn-default btn-primary" (click)="togglePreviewPanel()">
+        {{ options?.showPreviewPanel ? 'Hide' : 'Show' }} Preview Panel
       </button>
+      &nbsp;&nbsp;
+      <button class="btn btn-default btn-primary" (click)="changeMode()">
+        Change Mode (Current: {{ mode }})
+      </button>
+    </div>
+    <br />
   </div>
-</div>
-<hr />
-
-<form [formGroup]="templateForm" novalidate>
-  <div class="editor">
-      <label>Editor</label>
-      <angular-markdown-editor textareaId="editor1" [options]="editorOptions" rows="12" formControlName="body">
-      </angular-markdown-editor>
-  </div>
-</form>
-
-<hr />
-<h3 class="text-success bold">Preview</h3>
-<div class="result-preview outline">
-  <markdown [data]="markdownText"></markdown>
-</div> -->
+  
