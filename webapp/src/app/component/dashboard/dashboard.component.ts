@@ -2,6 +2,9 @@ import { Component, OnInit} from '@angular/core';
 import { Auth } from 'aws-amplify';
 import { TestServiceService } from 'src/app/service/rest/test-service.service';
 import { UploadResult, MdEditorOption } from "ngx-markdown-editor";
+import jwt_decode from 'jwt-decode';
+import { from, Observable } from 'rxjs';
+import { catchError, switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-dashboard',
@@ -34,6 +37,11 @@ export class DashboardComponent {
    }
 
   ngOnInit() {
+
+    Auth.currentAuthenticatedUser().then((user) => {
+      localStorage.setItem("currentUserId", user.username);
+    });
+
     let contentArr = ["# Hello, Markdown Editor!"];
     contentArr.push("```javascript ");
     contentArr.push("function Test() {");
@@ -118,6 +126,18 @@ export class DashboardComponent {
   }
 
   onTest(): void {
-    this.testService.get("").subscribe(message => { console.log(message) })
+    this.testService.get("document").subscribe(message => { console.log(message) })
+  }
+
+  submit(): void{
+    this.testService.post("saveDocument", { "Detail": "{\"message\":\"Hello CDK world! du opfer!!11\"}" }).subscribe(message => { console.log(message) })
+  }
+
+  getDecodedAccessToken(token: string): any {
+    try {
+      return jwt_decode(token);
+    } catch(Error) {
+      return null;
+    }
   }
 }

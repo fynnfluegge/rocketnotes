@@ -1,7 +1,7 @@
 export class Document {
     id: string
     user: string
-    parent: string
+    parentId: string
     title: string
     content: string
 }

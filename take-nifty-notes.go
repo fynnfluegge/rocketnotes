@@ -2,7 +2,13 @@ package main
 
 import (
 	"github.com/aws/aws-cdk-go/awscdk/v2"
+	"github.com/aws/aws-cdk-go/awscdk/v2/awsapigatewayv2"
+	"github.com/aws/aws-cdk-go/awscdk/v2/awsevents"
+	"github.com/aws/aws-cdk-go/awscdk/v2/awseventstargets"
+	"github.com/aws/aws-cdk-go/awscdk/v2/awsiam"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awslambda"
+	"github.com/aws/aws-cdk-go/awscdk/v2/awslambdaeventsources"
+	"github.com/aws/aws-cdk-go/awscdk/v2/awssqs"
 	"github.com/aws/aws-cdk-go/awscdkapigatewayv2alpha/v2"
 	"github.com/aws/aws-cdk-go/awscdkapigatewayv2integrationsalpha/v2"
 	"github.com/aws/aws-cdk-go/awscdklambdagoalpha/v2"
@@ -23,22 +29,25 @@ func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNi
 
 	userPoolId := "eu-central-1_FjpoPfr51"
 
+	// GET Document Api
+
 	httpApi := awscdkapigatewayv2alpha.NewHttpApi(stack, jsii.String("MyHttpApi"), &awscdkapigatewayv2alpha.HttpApiProps{
 		ApiName: jsii.String("MyHttpApi"),
 		CorsPreflight: &awscdkapigatewayv2alpha.CorsPreflightOptions{
 			AllowOrigins: jsii.Strings("*"),
-			AllowHeaders: jsii.Strings(`*`),
+			AllowHeaders: jsii.Strings("*"),
 			AllowMethods: &[]awscdkapigatewayv2alpha.CorsHttpMethod{
 				awscdkapigatewayv2alpha.CorsHttpMethod_OPTIONS,
 				awscdkapigatewayv2alpha.CorsHttpMethod_GET,
+				awscdkapigatewayv2alpha.CorsHttpMethod_POST,
 			},
 		},
 	})
 
-	auth := awscdkapigatewayv2alpha.NewHttpAuthorizer(stack, jsii.String("MyHttpAuthorizer"), &awscdkapigatewayv2alpha.HttpAuthorizerProps{
+	authorizer := awscdkapigatewayv2alpha.NewHttpAuthorizer(stack, jsii.String("MyHttpAuthorizer"), &awscdkapigatewayv2alpha.HttpAuthorizerProps{
 		AuthorizerName: jsii.String("MyHttpAuthorizer"),
-		Type:           awscdkapigatewayv2alpha.HttpAuthorizerType_JWT,
 		HttpApi:        httpApi,
+		Type:           awscdkapigatewayv2alpha.HttpAuthorizerType_JWT,
 		JwtIssuer:      jsii.String("https://cognito-idp.eu-central-1.amazonaws.com/" + userPoolId),
 		JwtAudience:    jsii.Strings("4it9fm6jifrvov4djvep3vn9sp"),
 		IdentitySource: jsii.Strings("$request.header.Authorization"),
@@ -46,25 +55,88 @@ func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNi
 
 	getHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("myGoHandler"), &awscdklambdagoalpha.GoFunctionProps{
 		Runtime: awslambda.Runtime_GO_1_X(),
-		Entry:   jsii.String("./lambda-handler"),
+		Entry:   jsii.String("./lambda-handler/get-document-handler"),
 		Bundling: &awscdklambdagoalpha.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
 	})
 
 	httpApi.AddRoutes(&awscdkapigatewayv2alpha.AddRoutesOptions{
-		Path: jsii.String("/"),
-		Authorizer: awscdkapigatewayv2alpha.HttpAuthorizer_FromHttpAuthorizerAttributes(stack, jsii.String("MyHttpLamdaRoute"), &awscdkapigatewayv2alpha.HttpAuthorizerAttributes{
-			AuthorizerId:   auth.AuthorizerId(),
+		Path: jsii.String("/document/{userId}/{documentId}"),
+		Authorizer: awscdkapigatewayv2alpha.HttpAuthorizer_FromHttpAuthorizerAttributes(stack, jsii.String("MyHttpAuthorizer4Test"), &awscdkapigatewayv2alpha.HttpAuthorizerAttributes{
+			AuthorizerId:   authorizer.AuthorizerId(),
 			AuthorizerType: jsii.String("JWT"),
 		}),
 		Methods:     &[]awscdkapigatewayv2alpha.HttpMethod{awscdkapigatewayv2alpha.HttpMethod_GET},
 		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("MyHttpLambdaIntegration"), getHandler, &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
 	})
 
-	awscdk.NewCfnOutput(stack, jsii.String("myHttpApiEndpoint"), &awscdk.CfnOutputProps{
-		Value:       httpApi.ApiEndpoint(),
-		Description: jsii.String("HTTP API Endpoint"),
+	// POST Document Api
+
+	apiRole := awsiam.NewRole(stack, jsii.String("myEventBridgeIntegrationRole"), &awsiam.RoleProps{
+		AssumedBy: awsiam.NewServicePrincipal(jsii.String("apigateway.amazonaws.com"), &awsiam.ServicePrincipalOpts{}),
+	})
+
+	eventBus := awsevents.NewEventBus(stack, jsii.String("myEventBus"), &awsevents.EventBusProps{
+		EventBusName: jsii.String("MyEventBus"),
+	})
+
+	rule := awsevents.NewRule(stack, jsii.String("myEventBusRule"), &awsevents.RuleProps{
+		EventBus: eventBus,
+		EventPattern: &awsevents.EventPattern{
+			Source:     &[]*string{jsii.String("MyCdkApp")},
+			DetailType: &[]*string{jsii.String("message-for-queue")},
+			Region:     &[]*string{jsii.String("eu-central-1")},
+		},
+	})
+
+	apiRole.AddToPolicy(
+		awsiam.NewPolicyStatement(&awsiam.PolicyStatementProps{
+			Effect:    awsiam.Effect_ALLOW,
+			Resources: &[]*string{jsii.String(*eventBus.EventBusArn())},
+			Actions:   &[]*string{jsii.String("events:putEvents")},
+		}),
+	)
+
+	queue := awssqs.NewQueue(stack, jsii.String("EventbridgeSqsQueue"), &awssqs.QueueProps{
+		VisibilityTimeout: awscdk.Duration_Seconds(jsii.Number(300)),
+	})
+
+	rule.AddTarget(awseventstargets.NewSqsQueue(queue, &awseventstargets.SqsQueueProps{}))
+
+	integration := awscdkapigatewayv2alpha.NewHttpIntegration(stack, jsii.String("myEventBridgeHttpIntegration"), &awscdkapigatewayv2alpha.HttpIntegrationProps{
+		HttpApi:            httpApi,
+		IntegrationType:    awscdkapigatewayv2alpha.HttpIntegrationType_AWS_PROXY,
+		IntegrationSubtype: awscdkapigatewayv2alpha.HttpIntegrationSubtype_EVENTBRIDGE_PUT_EVENTS,
+		Credentials:        awscdkapigatewayv2alpha.IntegrationCredentials_FromRole(apiRole),
+		ParameterMapping: awscdkapigatewayv2alpha.ParameterMapping_FromObject(&map[string]awscdkapigatewayv2alpha.MappingValue{
+			"Source":       awscdkapigatewayv2alpha.MappingValue_Custom(jsii.String("MyCdkApp")),
+			"DetailType":   awscdkapigatewayv2alpha.MappingValue_Custom(jsii.String("message-for-queue")),
+			"Detail":       awscdkapigatewayv2alpha.MappingValue_Custom(jsii.String("$request.body")),
+			"EventBusName": awscdkapigatewayv2alpha.MappingValue_Custom(eventBus.EventBusArn()),
+		}),
+		PayloadFormatVersion: awscdkapigatewayv2alpha.PayloadFormatVersion_VERSION_1_0(),
+	})
+
+	awsapigatewayv2.NewCfnRoute(stack, jsii.String("myEventRoute"), &awsapigatewayv2.CfnRouteProps{
+		ApiId:             httpApi.HttpApiId(),
+		RouteKey:          jsii.String("POST /saveDocument"),
+		Target:            jsii.String("integrations/" + *integration.IntegrationId()),
+		AuthorizerId:      authorizer.AuthorizerId(),
+		AuthorizationType: jsii.String("JWT"),
+	})
+
+	awscdklambdagoalpha.NewGoFunction(stack, jsii.String("saveDocumentGoHandler"), &awscdklambdagoalpha.GoFunctionProps{
+		Runtime: awslambda.Runtime_GO_1_X(),
+		Entry:   jsii.String("./lambda-handler/save-document-handler"),
+		Events: &[]awslambda.IEventSource{
+			awslambdaeventsources.NewSqsEventSource(queue, &awslambdaeventsources.SqsEventSourceProps{
+				BatchSize: jsii.Number(10),
+			}),
+		},
+		Bundling: &awscdklambdagoalpha.BundlingOptions{
+			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
+		},
 	})
 
 	return stack

@@ -7,7 +7,8 @@ import { environment } from 'src/environments/environment';
 })
 export class TestServiceService {
 
-  backend_url: string =  "https://6o4c2p3kcg.execute-api.eu-central-1.amazonaws.com/"; 
+  backend_url: string =  "https://6o4c2p3kcg.execute-api.eu-central-1.amazonaws.com";
+
   token:any;
 
   constructor(public http: HttpClient) {
@@ -17,9 +18,6 @@ export class TestServiceService {
   public _addStandardHeaders(header:HttpHeaders){
     header = header.append('Content-Type','application/json');
     header = header.append('Accept','application/json');
-    header = header.append('Access-Control-Allow-Methods', 'GET');
-    // header = header.append('Access-Control-Allow-Origin', '*')
-    // header = header.append('Access-Control-Allow-Headers', 'Content-Type')
     
     return header;
   }
@@ -39,7 +37,7 @@ export class TestServiceService {
       }
     }
 
-    return this.http.get(this.backend_url + '/' + endpoint, reqOpts);
+    return this.http.get(this.backend_url + '/' + endpoint + '/' + localStorage.getItem("currentUserId") + '/' + "123", reqOpts);
   }
 
   post(endpoint: string, body: any, reqOpts?: any) {

@@ -23,9 +23,10 @@ export class JwtInterceptor implements HttpInterceptor {
 
         return from(Auth.currentSession())
             .pipe(
-                switchMap((auth: any) => { // switchMap() is used instead of map().
+                switchMap((auth: any) => {
 
                     let jwt = auth.accessToken.jwtToken;
+
                     let with_auth_request = request.clone({
                         setHeaders: {
                             Authorization: `Bearer ${jwt}`

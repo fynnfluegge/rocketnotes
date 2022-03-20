@@ -16,14 +16,19 @@ func init() {
 }
 
 func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	user := request.PathParameters["userId"]
+	document := request.PathParameters["documentId"]
 	resp := &response{
-		Message: "hello world!",
+		Message: "hello world du Opfer! " + user + " " + document,
 	}
 	body, err := json.Marshal(resp)
 	if err != nil {
 		return events.APIGatewayProxyResponse{Body: string("Error parsing payload"), StatusCode: 400}, err
 	}
-	return events.APIGatewayProxyResponse{Body: string(body), StatusCode: 200}, nil
+	return events.APIGatewayProxyResponse{
+		StatusCode: 200,
+		Body:       string(body),
+	}, nil
 }
 
 func main() {
