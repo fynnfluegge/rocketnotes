@@ -1,1 +1,54 @@
-/* You can add global styles to this file, and also import other style files */
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.mat-toolbar.mat-primary,
+.mat-drawer {
+    padding: 8px;
+    background: #282828;
+    color: #fff;
+}
+
+.mat-toolbar-row, .mat-toolbar-single-row {
+    height: 48px;
+  }
+  
+  .mat-toolbar-multiple-rows {
+    min-height: 48px;
+  }
+  
+.mat-drawer-container {
+    height: calc(100% - 48px);
+}
+
+.container {
+    height: 100%;
+    padding: 8px 8px 12px 8px;
+    overflow-x: auto;
+    overflow-y: visible;
+}
+
+.mat-button {
+  background: #282828;
+  font-size: 16px;
+  font-weight: 350;
+}
+
+.mat-icon {
+  color: white;
+}
+
+.mat-button:focus {
+  outline:0;
+}
+
+a:hover {
+  background-color: #353535;
+  color: white;
+  text-decoration: none;
+}
+
+a.whitelink:hover {
+  background-color: transparent;
+  color: white;
+  text-decoration: none;
+}

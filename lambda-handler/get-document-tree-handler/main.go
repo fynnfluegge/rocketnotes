@@ -15,11 +15,15 @@ import (
 )
 
 type Document struct {
-	ID       string `json:"id"`
-	ParentId string `json:"parentId"`
-	UserId   string `json:"userId"`
-	Title    string `json:"title"`
-	Content  string `json:"content"`
+	ID       string      `json:"id"`
+	Name     string      `json:"name"`
+	Children []*Document `json:"children"`
+}
+
+type Item struct {
+	ID        string      `json:"ID"`
+	UserId    string      `json:"userId"`
+	Documents []*Document `json:"documents"`
 }
 
 func init() {
@@ -27,7 +31,7 @@ func init() {
 
 func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 
-	id := request.PathParameters["documentId"]
+	user := request.PathParameters["userId"]
 
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
@@ -41,7 +45,7 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		TableName: aws.String(tableName),
 		Key: map[string]*dynamodb.AttributeValue{
 			"ID": {
-				S: aws.String(id),
+				S: aws.String(user),
 			},
 		},
 	})
@@ -55,7 +59,7 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		}, nil
 	}
 
-	item := Document{}
+	item := Item{}
 
 	err = dynamodbattribute.UnmarshalMap(result.Item, &item)
 	if err != nil {

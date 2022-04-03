@@ -37,7 +37,7 @@ export class TestServiceService {
       }
     }
 
-    return this.http.get(this.backend_url + '/' + endpoint + '/' + localStorage.getItem("currentUserId") + '/' + "123", reqOpts);
+    return this.http.get(this.backend_url + '/' + endpoint, reqOpts);
   }
 
   post(endpoint: string, body: any, reqOpts?: any) {

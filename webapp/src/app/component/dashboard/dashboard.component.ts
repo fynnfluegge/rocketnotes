@@ -5,6 +5,7 @@ import { UploadResult, MdEditorOption } from "ngx-markdown-editor";
 import jwt_decode from 'jwt-decode';
 import { from, Observable } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
@@ -28,13 +29,17 @@ export class DashboardComponent {
       }
     }
   };
-  public content: string;
+  
   public mode: string = "editor";
 
-  constructor(private testService : TestServiceService) {
+  private id: string;
+  public title: string;
+  public content: string;
+
+  constructor(private testService : TestServiceService, private route: ActivatedRoute) {
     this.preRender = this.preRender.bind(this);
     this.postRender = this.postRender.bind(this);
-   }
+  }
 
   ngOnInit() {
 
@@ -42,26 +47,16 @@ export class DashboardComponent {
       localStorage.setItem("currentUserId", user.username);
     });
 
-    let contentArr = ["# Hello, Markdown Editor!"];
-    contentArr.push("```javascript ");
-    contentArr.push("function Test() {");
-    contentArr.push('	console.log("Test");');
-    contentArr.push("}");
-    contentArr.push("```");
-    contentArr.push(" Name | Type");
-    contentArr.push(" ---- | ----");
-    contentArr.push(" A | Test");
-    contentArr.push(
-      "![](http://lon-yang.github.io/markdown-editor/favicon.ico)"
-    );
-    contentArr.push("");
-    contentArr.push("- [ ] Taks A");
-    contentArr.push("- [x] Taks B");
-    contentArr.push("- test");
-    contentArr.push("");
-    contentArr.push("[Link](https://www.google.com)");
-    contentArr.push("");
-    this.content = contentArr.join("\r\n");
+    this.route.paramMap.subscribe(params => { 
+      console.log("paramMap subscribe")
+      this.id = params.get('id'); 
+      this.testService.get("document/" + this.id).subscribe(message => { 
+        this.content = JSON.parse(JSON.stringify(message)).content
+        this.title = JSON.parse(JSON.stringify(message)).title
+       });
+    });
+
+    console.log(this.id);
   }
 
   togglePreviewPanel() {
@@ -94,11 +89,11 @@ export class DashboardComponent {
   }
 
   onEditorLoaded(editor) {
-    console.log(`ACE Editor Ins: `, editor);
+    // console.log(`ACE Editor Ins: `, editor);
   }
 
   preRender(mdContent) {
-    console.log(`preRender fired`);
+    // console.log(`preRender fired`);
     // return new Promise((resolve) => {
     //   setTimeout(() => {
     //     resolve(mdContent);
@@ -108,7 +103,7 @@ export class DashboardComponent {
   }
 
   postRender(html) {
-    console.log(`postRender fired`);
+    // console.log(`postRender fired`);
     return html;
   }
 
@@ -125,12 +120,16 @@ export class DashboardComponent {
     Auth.signOut();
   }
 
-  onTest(): void {
-    this.testService.get("document").subscribe(message => { console.log(message) })
-  }
-
   submit(): void{
-    this.testService.post("saveDocument", { "Detail": "{\"message\":\"Hello CDK world! du opfer!!11\"}" }).subscribe(message => { console.log(message) })
+    this.testService.post("saveDocument", 
+      { 
+        "ID": this.id,
+        "parentId": "",
+        "userId": localStorage.getItem("currentUserId"),
+        "title": this.title,
+        "content": this.content 
+      }
+    ).subscribe(message => { console.log(message) })
   }
 
   getDecodedAccessToken(token: string): any {

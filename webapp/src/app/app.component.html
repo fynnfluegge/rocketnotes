@@ -1,12 +1,35 @@
-<!-- <mat-toolbar color="primary">
+<mat-toolbar color="primary">
   <mat-toolbar-row>
+    <button mat-icon-button mat-button (click)="drawer.toggle()">
+      <mat-icon>menu</mat-icon>
+    </button>
   </mat-toolbar-row>
 </mat-toolbar>
 
 <mat-drawer-container>
-  <mat-drawer #drawer mode="over">
+  <mat-drawer #drawer mode="side">
     <div>
-      <a mat-button [routerLink]="'/test'">Test</a>
+      <mat-tree [dataSource]="dataSource" [treeControl]="treeControl" class="example-tree">
+        <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle>
+          <a mat-button [routerLink]="'/dashboard/' + node.id" style="color: white;">{{node.name}}</a>
+        </mat-tree-node>
+        <mat-nested-tree-node *matTreeNodeDef="let node; when: hasChild">
+            <div class="mat-tree-node">
+              <button mat-icon-button matTreeNodeToggle
+                      [attr.aria-label]="'Toggle ' + node.name"
+                      style="background-color: transparent;">
+                <mat-icon class="mat-icon-rtl-mirror">
+                  {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+                </mat-icon>
+              </button>
+              <a mat-button [routerLink]="'/dashboard/' + node.id" style="color: white;">{{node.name}}</a>
+            </div>
+            <div [class.example-tree-invisible]="!treeControl.isExpanded(node)"
+                role="group">
+              <ng-container matTreeNodeOutlet></ng-container>
+          </div>
+        </mat-nested-tree-node>
+      </mat-tree>
     </div>
   </mat-drawer>
 
@@ -14,8 +37,4 @@
     <router-outlet></router-outlet>
   </div>
 
-</mat-drawer-container> -->
-
-<div class="container">
-  <router-outlet></router-outlet>
-</div>
+</mat-drawer-container>
