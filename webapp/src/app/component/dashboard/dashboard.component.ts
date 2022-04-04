@@ -17,7 +17,7 @@ export class DashboardComponent {
   public options: MdEditorOption = {
     showPreviewPanel: false,
     enablePreviewContentClick: false,
-    resizable: true,
+    resizable: false,
     customRender: {
       image: function(href: string, title: string, text: string) {
         let out = `<img style="max-width: 100%; border: 20px solid red;" src="${href}" alt="${text}"`;
@@ -30,11 +30,12 @@ export class DashboardComponent {
     }
   };
   
-  public mode: string = "editor";
+  public mode: string = "preview";
 
   private id: string;
-  public title: string;
+  public title: string ;
   public content: string;
+  private typeCounter: Number;
 
   constructor(private testService : TestServiceService, private route: ActivatedRoute) {
     this.preRender = this.preRender.bind(this);
@@ -48,15 +49,14 @@ export class DashboardComponent {
     });
 
     this.route.paramMap.subscribe(params => { 
-      console.log("paramMap subscribe")
       this.id = params.get('id'); 
-      this.testService.get("document/" + this.id).subscribe(message => { 
-        this.content = JSON.parse(JSON.stringify(message)).content
-        this.title = JSON.parse(JSON.stringify(message)).title
+      this.testService.get("document/" + this.id).subscribe(message => {
+        var document = JSON.parse(JSON.stringify(message))
+        this.content = document.content
+        this.title = document.title
        });
-    });
 
-    console.log(this.id);
+    });
   }
 
   togglePreviewPanel() {
@@ -65,10 +65,10 @@ export class DashboardComponent {
   }
 
   changeMode() {
-    if (this.mode === "editor") {
-      this.mode = "preview";
-    } else {
+    if (this.mode === "preview") {
       this.mode = "editor";
+    } else {
+      this.mode = "preview";
     }
   }
 

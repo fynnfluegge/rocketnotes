@@ -66,9 +66,10 @@ func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNi
 		AuthorizerType: jsii.String("JWT"),
 	})
 
-	getDocumentHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("GET_DocumentHandler"), &awscdklambdagoalpha.GoFunctionProps{
-		Runtime: awslambda.Runtime_GO_1_X(),
-		Entry:   jsii.String("./lambda-handler/get-document-handler"),
+	getDocumentHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("GET-Document"), &awscdklambdagoalpha.GoFunctionProps{
+		FunctionName: jsii.String("GET-Document"),
+		Runtime:      awslambda.Runtime_GO_1_X(),
+		Entry:        jsii.String("./lambda-handler/get-document-handler"),
 		Bundling: &awscdklambdagoalpha.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
@@ -84,9 +85,10 @@ func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNi
 
 	// GET Document Tree Api
 
-	getDocumentTreeHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("GET_DocumentTreeHandler"), &awscdklambdagoalpha.GoFunctionProps{
-		Runtime: awslambda.Runtime_GO_1_X(),
-		Entry:   jsii.String("./lambda-handler/get-document-tree-handler"),
+	getDocumentTreeHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("GET-DocumentTree"), &awscdklambdagoalpha.GoFunctionProps{
+		FunctionName: jsii.String("GET-DocumentTree"),
+		Runtime:      awslambda.Runtime_GO_1_X(),
+		Entry:        jsii.String("./lambda-handler/get-document-tree-handler"),
 		Bundling: &awscdklambdagoalpha.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
@@ -102,7 +104,7 @@ func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNi
 
 	// POST Document Api
 
-	apiRole := awsiam.NewRole(stack, jsii.String("myEventBridgeIntegrationRole"), &awsiam.RoleProps{
+	apiRole := awsiam.NewRole(stack, jsii.String("EventBridgeIntegrationRole"), &awsiam.RoleProps{
 		AssumedBy: awsiam.NewServicePrincipal(jsii.String("apigateway.amazonaws.com"), &awsiam.ServicePrincipalOpts{}),
 	})
 
@@ -155,9 +157,10 @@ func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNi
 		AuthorizationType: jsii.String("JWT"),
 	})
 
-	awscdklambdagoalpha.NewGoFunction(stack, jsii.String("POST_DocumentHandler"), &awscdklambdagoalpha.GoFunctionProps{
-		Runtime: awslambda.Runtime_GO_1_X(),
-		Entry:   jsii.String("./lambda-handler/save-document-handler"),
+	postDocumentHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("POST-Document"), &awscdklambdagoalpha.GoFunctionProps{
+		FunctionName: jsii.String("POST-Document"),
+		Runtime:      awslambda.Runtime_GO_1_X(),
+		Entry:        jsii.String("./lambda-handler/save-document-handler"),
 		Events: &[]awslambda.IEventSource{
 			awslambdaeventsources.NewSqsEventSource(queue, &awslambdaeventsources.SqsEventSourceProps{
 				BatchSize: jsii.Number(10),
@@ -166,8 +169,15 @@ func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNi
 		Bundling: &awscdklambdagoalpha.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
-		// Role: dynamoDBRole,
 	})
+
+	postDocumentHandler.AddToRolePolicy(
+		awsiam.NewPolicyStatement(&awsiam.PolicyStatementProps{
+			Effect:    awsiam.Effect_ALLOW,
+			Resources: &[]*string{jsii.String("*")},
+			Actions:   &[]*string{jsii.String("dynamodb:*")},
+		}),
+	)
 
 	return stack
 }

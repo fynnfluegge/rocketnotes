@@ -1,9 +1,21 @@
-<!-- <h1>This is the protected dashboard</h1>
-<button (click)="onLogout()">Log out</button>
-<button (click)="onTest()">Test</button> -->
-<button (click)="submit()">SAVE</button>
+<span style="justify-content:center;align-items:center;display:flex;;font-size:24px;">{{ title }}</span>
 
-<div style="margin: 20px">
+<div class="well well-sm" style="justify-content:center;align-items:center;display:flex;">
+  <button class="btn btn-default btn-primary" (click)="togglePreviewPanel()">
+    {{ options?.showPreviewPanel ? 'Hide' : 'Show' }} Preview Panel
+  </button>
+  &nbsp;&nbsp;
+  <button class="btn btn-default btn-primary" (click)="changeMode()">
+    Change Mode (Current: {{ mode }})
+  </button>
+  &nbsp;&nbsp;
+  <button class="btn btn-default btn-primary" (click)="submit()">
+    SAVE
+  </button>
+</div>
+
+<div style="margin: 12px; height: calc(100% - 100px); overflow: scroll;">
+<!-- <div> -->
   <form novalidate #form="ngForm">
     <md-editor
       #md="ngModel"
@@ -16,17 +28,8 @@
       [(ngModel)]="content"
       [mode]="mode"
       [options]="options"
+      height="800px"
       required
-      height="400px"
     ></md-editor>
   </form>
-  <div class="well well-sm">
-    <button class="btn btn-default btn-primary" (click)="togglePreviewPanel()">
-      {{ options?.showPreviewPanel ? 'Hide' : 'Show' }} Preview Panel
-    </button>
-    &nbsp;&nbsp;
-    <button class="btn btn-default btn-primary" (click)="changeMode()">
-      Change Mode (Current: {{ mode }})
-    </button>
-  </div>
 </div>

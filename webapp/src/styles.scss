@@ -8,23 +8,27 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     color: #fff;
 }
 
+.mat-drawer {
+  min-width: 164px;
+}
+
 .mat-toolbar-row, .mat-toolbar-single-row {
-    height: 48px;
-  }
-  
-  .mat-toolbar-multiple-rows {
-    min-height: 48px;
-  }
+  height: 48px;
+}
+
+.mat-toolbar-multiple-rows {
+  min-height: 48px;
+}
   
 .mat-drawer-container {
-    height: calc(100% - 48px);
+    height: calc(100% - 64px);
 }
 
 .container {
-    height: 100%;
-    padding: 8px 8px 12px 8px;
-    overflow-x: auto;
-    overflow-y: visible;
+  height: 100%;
+  padding: 8px 8px 12px 8px;
+  overflow-x: auto;
+  overflow-y: visible;
 }
 
 .mat-button {
