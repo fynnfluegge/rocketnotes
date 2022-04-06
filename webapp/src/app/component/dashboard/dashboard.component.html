@@ -12,24 +12,18 @@
   <button class="btn btn-default btn-primary" (click)="submit()">
     SAVE
   </button>
+  &nbsp;&nbsp;
+  <button class="btn btn-default btn-primary" (click)="onFullscreen()">
+    Fullscreen
+  </button>
 </div>
 
-<div style="margin: 12px; height: calc(100% - 100px); overflow: scroll;">
-<!-- <div> -->
-  <form novalidate #form="ngForm">
-    <md-editor
-      #md="ngModel"
-      name="Content"
-      (onEditorLoaded)="onEditorLoaded($event)"
-      [preRender]="preRender"
-      [postRender]="postRender"
-      (onPreviewDomChanged)="onPreviewDomChanged($event)"
-      [upload]="doUpload"
-      [(ngModel)]="content"
-      [mode]="mode"
-      [options]="options"
-      height="800px"
-      required
-    ></md-editor>
-  </form>
+<div style="margin: 12px; height: calc(100% - 100px);">
+
+  <textarea *ngIf="editorMode && showPreview" class="variable-textarea" [(ngModel)]="markdown" style="resize:none;"></textarea>
+  <textarea *ngIf="editorMode && !showPreview" class="variable-textarea" [(ngModel)]="markdown" style="width:100%;resize:none;"></textarea>
+  <markdown *ngIf="showPreview && editorMode" class="variable-binding" [data]="markdown" style="height: 100%; overflow-y: scroll;"></markdown>
+
+  <markdown *ngIf="!editorMode" class="variable-binding" [data]="markdown" style="width: 100%;height: 100%; overflow-y: scroll;"></markdown>
+
 </div>

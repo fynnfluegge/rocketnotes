@@ -24,3 +24,26 @@ textarea.md-input {
 .md-editor-container {
   height: 400px !important;
 }
+
+.variable-binding,
+.variable-textarea {
+  width: 49%;
+  height: 100%; //calc(100% - 32px);
+}
+
+.variable-textarea {
+  border-radius: 5px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.07);
+  padding: 8px;
+  transition: all 300ms ease-out;
+}
+
+.variable-textarea:hover {
+  box-shadow: 0 6px 12px 3px rgba(0,0,0,.09),
+    0 2px 3px 1px rgba(0,0,0,.06);
+}
+
+.variable-binding {
+  display: block;
+  float: right;
+}

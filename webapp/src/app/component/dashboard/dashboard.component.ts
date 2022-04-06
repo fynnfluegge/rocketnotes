@@ -1,4 +1,4 @@
-import { Component, OnInit} from '@angular/core';
+import { Component, VERSION, OnInit} from '@angular/core';
 import { Auth } from 'aws-amplify';
 import { TestServiceService } from 'src/app/service/rest/test-service.service';
 import { UploadResult, MdEditorOption } from "ngx-markdown-editor";
@@ -13,6 +13,10 @@ import { ActivatedRoute } from '@angular/router';
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent {
+
+  public showPreview: Boolean = false;
+  public editorMode: Boolean = false;
+  public fullscreen: Boolean = false;
 
   public options: MdEditorOption = {
     showPreviewPanel: false,
@@ -29,6 +33,56 @@ export class DashboardComponent {
       }
     }
   };
+
+  angularVersion = VERSION.full;
+  ngxMarkdownVersion = '12.0.1';
+
+  markdown = `## Markdown __rulez__!
+---
+
+### Syntax highlight
+\`\`\`typescript
+const language = 'typescript';
+\`\`\`
+
+### Lists
+1. Ordered list
+2. Another bullet point
+   - Unordered list
+   - Another unordered bullet
+
+### Blockquote
+> Blockquote to the max
+
+g
+
+h
+
+k
+
+f
+
+d
+
+z
+
+i
+
+o
+
+s
+
+t
+
+h
+
+m
+
+x
+
+u
+
+i`;
   
   public mode: string = "preview";
 
@@ -62,13 +116,16 @@ export class DashboardComponent {
   togglePreviewPanel() {
     this.options.showPreviewPanel = !this.options.showPreviewPanel;
     this.options = Object.assign({}, this.options);
+    this.showPreview = !this.showPreview;
   }
 
   changeMode() {
     if (this.mode === "preview") {
       this.mode = "editor";
+      this.editorMode = true;
     } else {
       this.mode = "preview";
+      this.editorMode = false;
     }
   }
 
@@ -111,6 +168,10 @@ export class DashboardComponent {
     // console.log(dom);
     // console.log(dom.innerHTML);
     // console.log(this.content)
+  }
+
+  onFullscreen(): void {
+
   }
 
   onLogout(): void {
