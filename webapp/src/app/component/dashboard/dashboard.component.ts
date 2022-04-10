@@ -18,22 +18,6 @@ export class DashboardComponent {
   public editorMode: Boolean = false;
   public fullscreen: Boolean = false;
 
-  public options: MdEditorOption = {
-    showPreviewPanel: false,
-    enablePreviewContentClick: false,
-    resizable: false,
-    customRender: {
-      image: function(href: string, title: string, text: string) {
-        let out = `<img style="max-width: 100%; border: 20px solid red;" src="${href}" alt="${text}"`;
-        if (title) {
-          out += ` title="${title}"`;
-        }
-        out += (<any>this.options).xhtml ? "/>" : ">";
-        return out;
-      }
-    }
-  };
-
   angularVersion = VERSION.full;
   ngxMarkdownVersion = '12.0.1';
 
@@ -114,8 +98,6 @@ i`;
   }
 
   togglePreviewPanel() {
-    this.options.showPreviewPanel = !this.options.showPreviewPanel;
-    this.options = Object.assign({}, this.options);
     this.showPreview = !this.showPreview;
   }
 

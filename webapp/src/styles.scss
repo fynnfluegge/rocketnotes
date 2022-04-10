@@ -6,34 +6,12 @@
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
-.mat-toolbar.mat-primary,
-.mat-drawer {
-    padding: 8px;
-    background: #282828;
-    color: #fff;
-}
-
-.mat-drawer {
-  min-width: 164px;
-}
-
-.mat-toolbar-row, .mat-toolbar-single-row {
-  height: 48px;
-}
-
-.mat-toolbar-multiple-rows {
-  min-height: 48px;
-}
-  
-.mat-drawer-container {
-    height: calc(100% - 64px);
-}
-
-.container {
+.container-t {
   height: 100%;
   padding: 8px 8px 12px 8px;
   overflow-x: auto;
   overflow-y: visible;
+  transition: 0.3s;
 }
 
 .mat-button {

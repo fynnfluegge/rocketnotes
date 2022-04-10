@@ -1,40 +1,42 @@
-<mat-toolbar color="primary">
-  <mat-toolbar-row>
-    <button mat-icon-button mat-button (click)="drawer.toggle()">
+<div [ngClass]="showSidebar ? 'sidebar-fixed' : 'sidebar'">
+  <div>
+    <button mat-icon-button mat-button (click)="onMenuToggle()" style="margin: auto;">
       <mat-icon>menu</mat-icon>
     </button>
-  </mat-toolbar-row>
-</mat-toolbar>
-
-<mat-drawer-container>
-  <mat-drawer #drawer mode="side">
-    <div>
-      <mat-tree [dataSource]="dataSource" [treeControl]="treeControl" class="example-tree">
-        <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle>
-          <a mat-button [routerLink]="'/dashboard/' + node.id" style="color: white;">{{node.name}}</a>
-        </mat-tree-node>
-        <mat-nested-tree-node *matTreeNodeDef="let node; when: hasChild">
-            <div class="mat-tree-node">
-              <button mat-icon-button matTreeNodeToggle
-                      [attr.aria-label]="'Toggle ' + node.name"
-                      style="background-color:transparent;width:24px;">
-                <mat-icon class="mat-icon-rtl-mirror">
-                  {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
-                </mat-icon>
-              </button>
-              <a mat-button [routerLink]="'/dashboard/' + node.id" style="color: white;">{{node.name}}</a>
-            </div>
-            <div [class.example-tree-invisible]="!treeControl.isExpanded(node)"
-                role="group">
-              <ng-container matTreeNodeOutlet></ng-container>
+    <button mat-icon-button mat-button (click)="onAddNote()" style="margin: auto;">
+      <mat-icon>note_add</mat-icon>
+    </button>
+    <mat-tree [dataSource]="dataSource" [treeControl]="treeControl" class="example-tree">
+      <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle>
+        <a mat-button [routerLink]="'/dashboard/' + node.id" style="color: white;">{{node.name}}</a>
+      </mat-tree-node>
+      <mat-nested-tree-node *matTreeNodeDef="let node; when: hasChild">
+          <div class="mat-tree-node">
+            <button mat-icon-button matTreeNodeToggle
+                    [attr.aria-label]="'Toggle ' + node.name"
+                    style="background-color:transparent;width:24px;">
+              <mat-icon class="mat-icon-rtl-mirror">
+                {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+              </mat-icon>
+            </button>
+            <a mat-button [routerLink]="'/dashboard/' + node.id" style="color: white;">{{node.name}}</a>
           </div>
-        </mat-nested-tree-node>
-      </mat-tree>
-    </div>
-  </mat-drawer>
-
-  <div class="container">
-    <router-outlet></router-outlet>
+          <div [class.example-tree-invisible]="!treeControl.isExpanded(node)"
+              role="group">
+            <ng-container matTreeNodeOutlet></ng-container>
+        </div>
+      </mat-nested-tree-node>
+    </mat-tree>
   </div>
+</div>
 
-</mat-drawer-container>
+<ul>
+  <li><a class="active" href="#home">Home</a></li>
+  <li><a href="#news">News</a></li>
+  <li><a href="#contact">Contact</a></li>
+  <li><a href="#about">About</a></li>
+</ul>
+
+<div class="container-t" [style.margin-left.px]="showSidebar ? '220' : '100'" [style.width]="showSidebar ? 'calc(100% - 240px)' : 'calc(100% - 120px)'">
+  <router-outlet></router-outlet>
+</div>

@@ -1,8 +1,10 @@
-<span style="justify-content:center;align-items:center;display:flex;;font-size:24px;">{{ title }}</span>
+<div style="margin-top: 50px; height:calc(100% - 120px);">
+
+  <span style="justify-content:center;align-items:center;display:flex;;font-size:24px;">{{ title }}</span>
 
 <div class="well well-sm" style="justify-content:center;align-items:center;display:flex;">
-  <button class="btn btn-default btn-primary" (click)="togglePreviewPanel()">
-    {{ options?.showPreviewPanel ? 'Hide' : 'Show' }} Preview Panel
+  <button *ngIf="editorMode" class="btn btn-default btn-primary" (click)="togglePreviewPanel()">
+    Show Preview Panel
   </button>
   &nbsp;&nbsp;
   <button class="btn btn-default btn-primary" (click)="changeMode()">
@@ -13,17 +15,15 @@
     SAVE
   </button>
   &nbsp;&nbsp;
-  <button class="btn btn-default btn-primary" (click)="onFullscreen()">
-    Fullscreen
-  </button>
+  <!-- <button *ngIf="editorMode" class="btn btn-default btn-primary" (click)="onFullscreen()" style="height:38px;width:38px;padding: 6px 0px;">
+    <mat-icon>fullscreen</mat-icon>
+  </button> -->
 </div>
 
-<div style="margin: 12px; height: calc(100% - 100px);">
+  <textarea *ngIf="editorMode && showPreview" class="variable-textarea" [(ngModel)]="content" style="resize:none;"></textarea>
+  <textarea *ngIf="editorMode && !showPreview" class="variable-textarea" [(ngModel)]="content" style="width:100%;resize:none;"></textarea>
+  <markdown *ngIf="showPreview && editorMode" class="variable-binding" [data]="content" style="height: 100%; overflow-y: scroll;"></markdown>
 
-  <textarea *ngIf="editorMode && showPreview" class="variable-textarea" [(ngModel)]="markdown" style="resize:none;"></textarea>
-  <textarea *ngIf="editorMode && !showPreview" class="variable-textarea" [(ngModel)]="markdown" style="width:100%;resize:none;"></textarea>
-  <markdown *ngIf="showPreview && editorMode" class="variable-binding" [data]="markdown" style="height: 100%; overflow-y: scroll;"></markdown>
-
-  <markdown *ngIf="!editorMode" class="variable-binding" [data]="markdown" style="width: 100%;height: 100%; overflow-y: scroll;"></markdown>
+  <markdown *ngIf="!editorMode" class="variable-binding" [data]="content" style="width: 100%;height: 100%; overflow-y: scroll;"></markdown>
 
 </div>

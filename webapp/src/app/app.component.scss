@@ -34,3 +34,74 @@
 .mat-tree-node {
   height: 32px;
 }
+
+//--- sidenav bar ---//
+
+.sidebar {
+	position: absolute;
+  left: -120px;
+  transition: 0.3s;
+  margin: 0;
+  padding: 0;
+  width: 200px;
+  background: #282828;
+  color: #fff;
+  position: fixed;
+  height: 100%;
+  overflow: auto;
+  z-index: 2;
+}
+
+.sidebar-fixed {
+  position: absolute;
+  left: 0px;
+  transition: 0.3s;
+  margin: 0;
+  padding: 0;
+  width: 200px;
+  background: #282828;
+  color: #fff;
+  position: fixed;
+  height: 100%;
+  overflow: auto;
+  z-index: 2;
+}
+
+.sidebar:hover {
+  left: 0;
+}
+//------------------------//
+
+//--- navigsation bar ---//
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #333;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1;
+}
+
+li {
+  float: left;
+}
+
+li a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+li a:hover:not(.active) {
+  background-color: #111;
+}
+
+.active {
+  background-color: #04AA6D;
+}
+//------------------------//
