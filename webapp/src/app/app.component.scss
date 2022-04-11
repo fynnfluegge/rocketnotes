@@ -1,30 +1,3 @@
-.example-tree-invisible {
-  display: none;
-}
-
-.example-tree ul,
-.example-tree li {
-  margin-top: 0;
-  margin-bottom: 0;
-  list-style-type: none;
-}
-
-/*
-  * This padding sets alignment of the nested nodes.
-  */
-.example-tree .mat-nested-tree-node div[role=group] {
-  padding-left: 12px;
-}
-
-/*
-  * Padding for leaf nodes.
-  * Leaf nodes need to have padding so as to align with other non-leaf nodes
-  * under the same parent.
-  */
-.example-tree div[role=group] > .mat-tree-node {
-  padding-left: 12px;
-}
-
 .mat-button {
   min-width: 0px !important;
   padding: 0;
@@ -42,33 +15,19 @@
   left: -120px;
   transition: 0.3s;
   margin: 0;
+  margin-top: 52px;
   padding: 0;
-  width: 200px;
+  width: 400px;
   background: #282828;
   color: #fff;
   position: fixed;
-  height: 100%;
-  overflow: auto;
-  z-index: 2;
-}
-
-.sidebar-fixed {
-  position: absolute;
-  left: 0px;
-  transition: 0.3s;
-  margin: 0;
-  padding: 0;
-  width: 200px;
-  background: #282828;
-  color: #fff;
-  position: fixed;
-  height: 100%;
+  height: calc(100% - 52px);
   overflow: auto;
   z-index: 2;
 }
 
 .sidebar:hover {
-  left: 0;
+  left: 0 !important;
 }
 //------------------------//
 
