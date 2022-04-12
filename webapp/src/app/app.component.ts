@@ -5,6 +5,7 @@ import { FlatTreeControl } from '@angular/cdk/tree';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
 import { of as ofObservable, Observable, BehaviorSubject } from 'rxjs';
 import * as uuid from 'uuid';
+import { TestServiceService } from 'src/app/service/rest/test-service.service';
 
 /**
  * Node for to-do item
@@ -28,9 +29,10 @@ export class TodoItemFlatNode {
  * Each node in Json object represents a to-do item or a category.
  * If a node is a category, it has children items and new items can be added under the category.
  */
- @Injectable()
- export class ChecklistDatabase {
+@Injectable()
+export class ChecklistDatabase {
   backend_url: string =  "https://6o4c2p3kcg.execute-api.eu-central-1.amazonaws.com";
+  id: string
 
    dataChange: BehaviorSubject<TodoItemNode[]> = new BehaviorSubject<TodoItemNode[]>([]);
  
@@ -38,7 +40,7 @@ export class TodoItemFlatNode {
      return this.dataChange.value;
    }
  
-   constructor(public http: HttpClient) {
+   constructor(public http: HttpClient, private testService : TestServiceService) {
      this.initialize();
    }
  
@@ -48,14 +50,14 @@ export class TodoItemFlatNode {
 
      this.http.get(this.backend_url + '/documentTree/' + localStorage.getItem("currentUserId")).subscribe(message => { 
         // Notify the change.
-        console.log(message);
+        this.id = JSON.parse(JSON.stringify(message)).ID
         this.dataChange.next(JSON.parse(JSON.stringify(message)).documents);
       })
    }
  
    /** Add an item to to-do list */
    insertItem(parent: TodoItemNode, vName: string) {
-     const child = <TodoItemNode>{ name: vName };
+     const child = <TodoItemNode>{ id: uuid.v4(), name: vName };
      if (parent.children) {
        // parent already has children
        parent.children.push(child);
@@ -75,10 +77,27 @@ export class TodoItemFlatNode {
    }
  
    updateItem(node: TodoItemNode, vName: string) {
-     node.name = vName;
-     node.children = null;
-     this.dataChange.next(this.data);
-     console.log(JSON.stringify(this.data));
+    node.name = vName;
+    node.children = null;
+    this.dataChange.next(this.data);
+
+    this.testService.post("saveDocumentTree", 
+      { 
+        "ID": this.id,
+        "userId": localStorage.getItem("currentUserId"),
+        "documents": JSON.parse(JSON.stringify(this.data))
+      }
+    ).subscribe(message => { 
+      console.log(message)
+      this.testService.post("saveDocument", 
+      { 
+        "ID": node.id,
+        "parentId": "",
+        "userId": localStorage.getItem("currentUserId"),
+        "title": vName,
+        "content": "new document"
+      }).subscribe(message => { console.log(message) })
+    })
    }
  }
 
@@ -93,16 +112,10 @@ export class AppComponent {
   showSidebar = true
 
   /** Map from flat node to nested node. This helps us finding the nested node to be modified */
-  flatNodeMap: Map<TodoItemFlatNode, TodoItemNode> = new Map<
-    TodoItemFlatNode,
-    TodoItemNode
-  >();
+  flatNodeMap: Map<TodoItemFlatNode, TodoItemNode> = new Map<TodoItemFlatNode,TodoItemNode>();
 
   /** Map from nested node to flattened node. This helps us to keep the same object for selection */
-  nestedNodeMap: Map<TodoItemNode, TodoItemFlatNode> = new Map<
-    TodoItemNode,
-    TodoItemFlatNode
-  >();
+  nestedNodeMap: Map<TodoItemNode, TodoItemFlatNode> = new Map<TodoItemNode,TodoItemFlatNode>();
 
   /** A selected parent node to be inserted */
   selectedParent: TodoItemFlatNode | null = null;
@@ -180,39 +193,11 @@ export class AppComponent {
     return flatNode;
   };
 
-  /** Whether all the descendants of the node are selected */
-  descendantsAllSelected(node: TodoItemFlatNode): boolean {
-    const descendants = this.treeControl.getDescendants(node);
-    return descendants.every((child) =>
-      this.checklistSelection.isSelected(child)
-    );
-  }
-
-  /** Whether part of the descendants are selected */
-  descendantsPartiallySelected(node: TodoItemFlatNode): boolean {
-    const descendants = this.treeControl.getDescendants(node);
-    const result = descendants.some((child) =>
-      this.checklistSelection.isSelected(child)
-    );
-    return result && !this.descendantsAllSelected(node);
-  }
-
-  /** Toggle the to-do item selection. Select/deselect all the descendants node */
-  todoItemSelectionToggle(node: TodoItemFlatNode): void {
-    this.checklistSelection.toggle(node);
-    const descendants = this.treeControl.getDescendants(node);
-    this.checklistSelection.isSelected(node)
-      ? this.checklistSelection.select(...descendants)
-      : this.checklistSelection.deselect(...descendants);
-  }
-
   /** Select the category so we can insert the new item. */
   addNewItem(node: TodoItemFlatNode) {
     const parentNode = this.flatNodeMap.get(node);
-    //
     let isParentHasChildren: boolean = false;
     if (parentNode.children) isParentHasChildren = true;
-    //
     this.database.insertItem(parentNode!, '');
     // expand the subtree only if the parent has children (parent is not a leaf node)
     if (isParentHasChildren) this.treeControl.expand(node);
@@ -222,6 +207,14 @@ export class AppComponent {
   saveNode(node: TodoItemFlatNode, itemValue: string) {
     const nestedNode = this.flatNodeMap.get(node);
     this.database.updateItem(nestedNode!, itemValue);
+    this.treeControl.dataNodes.forEach(element => {
+      if (element.level === 0 && this.treeControl.isExpanded(element)) {
+        // does not work for root nodes that had no children before
+        console.log(element)
+        this.treeControl.collapse(element);
+        this.treeControl.expand(element);
+      }
+    })
   }
 
   removeNode(node: TodoItemFlatNode) {

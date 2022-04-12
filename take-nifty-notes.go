@@ -102,23 +102,14 @@ func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNi
 		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("MyHttpLambdaIntegration"), getDocumentTreeHandler, &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
 	})
 
-	// POST Document Api
-
-	apiRole := awsiam.NewRole(stack, jsii.String("EventBridgeIntegrationRole"), &awsiam.RoleProps{
-		AssumedBy: awsiam.NewServicePrincipal(jsii.String("apigateway.amazonaws.com"), &awsiam.ServicePrincipalOpts{}),
-	})
+	// Eventbridge
 
 	eventBus := awsevents.NewEventBus(stack, jsii.String("myEventBus"), &awsevents.EventBusProps{
 		EventBusName: jsii.String("MyEventBus"),
 	})
 
-	rule := awsevents.NewRule(stack, jsii.String("myEventBusRule"), &awsevents.RuleProps{
-		EventBus: eventBus,
-		EventPattern: &awsevents.EventPattern{
-			Source:     &[]*string{jsii.String("MyCdkApp")},
-			DetailType: &[]*string{jsii.String("message-for-queue")},
-			Region:     &[]*string{jsii.String("eu-central-1")},
-		},
+	apiRole := awsiam.NewRole(stack, jsii.String("EventBridgeIntegrationRole"), &awsiam.RoleProps{
+		AssumedBy: awsiam.NewServicePrincipal(jsii.String("apigateway.amazonaws.com"), &awsiam.ServicePrincipalOpts{}),
 	})
 
 	apiRole.AddToPolicy(
@@ -128,6 +119,17 @@ func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNi
 			Actions:   &[]*string{jsii.String("events:putEvents")},
 		}),
 	)
+
+	// POST Document Api
+
+	rule := awsevents.NewRule(stack, jsii.String("myEventBusRule"), &awsevents.RuleProps{
+		EventBus: eventBus,
+		EventPattern: &awsevents.EventPattern{
+			Source:     &[]*string{jsii.String("MyCdkApp")},
+			DetailType: &[]*string{jsii.String("message-for-queue")},
+			Region:     &[]*string{jsii.String("eu-central-1")},
+		},
+	})
 
 	queue := awssqs.NewQueue(stack, jsii.String("EventbridgeSqsQueue"), &awssqs.QueueProps{
 		VisibilityTimeout: awscdk.Duration_Seconds(jsii.Number(300)),
@@ -178,6 +180,25 @@ func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNi
 			Actions:   &[]*string{jsii.String("dynamodb:*")},
 		}),
 	)
+
+	// POST DocumentTree Api
+
+	postDocumentTreeHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("POST-DocumentTree"), &awscdklambdagoalpha.GoFunctionProps{
+		FunctionName: jsii.String("POST-DocumentTree"),
+		Runtime:      awslambda.Runtime_GO_1_X(),
+		Entry:        jsii.String("./lambda-handler/save-document-tree-handler"),
+		Bundling: &awscdklambdagoalpha.BundlingOptions{
+			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
+		},
+		Role: dynamoDBRole,
+	})
+
+	httpApi.AddRoutes(&awscdkapigatewayv2alpha.AddRoutesOptions{
+		Path:        jsii.String("/saveDocumentTree"),
+		Authorizer:  httpApiAuthorizer,
+		Methods:     &[]awscdkapigatewayv2alpha.HttpMethod{awscdkapigatewayv2alpha.HttpMethod_POST},
+		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("postDocumentTreeLambdaIntegration"), postDocumentTreeHandler, &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
+	})
 
 	return stack
 }

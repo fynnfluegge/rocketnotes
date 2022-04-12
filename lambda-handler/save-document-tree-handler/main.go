@@ -15,15 +15,15 @@ import (
 )
 
 type Document struct {
-	ID       string     `json:"id"`
-	Name     string     `json:"name"`
-	Children []Document `json:"children"`
+	ID       string      `json:"id"`
+	Name     string      `json:"name"`
+	Children []*Document `json:"children"`
 }
 
 type Item struct {
-	ID        string     `json:"ID"`
-	UserId    string     `json:"userId"`
-	Documents []Document `json:"documents"`
+	ID        string      `json:"ID"`
+	UserId    string      `json:"userId"`
+	Documents []*Document `json:"documents"`
 }
 
 func init() {
@@ -31,7 +31,12 @@ func init() {
 
 func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 
-	user := request.PathParameters["userId"]
+	fmt.Printf("Processing request data for request %s.\n", request.RequestContext.RequestID)
+	fmt.Printf("Body size = %d.\n", len(request.Body))
+
+	item := Item{}
+
+	json.Unmarshal([]byte(request.Body), &item)
 
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
@@ -39,41 +44,27 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 
 	svc := dynamodb.New(sess)
 
+	av, err := dynamodbattribute.MarshalMap(item)
+	if err != nil {
+		log.Fatalf("Got error marshalling new movie item: %s", err)
+	}
+
 	tableName := "MyDynamoDB"
 
-	result, err := svc.GetItem(&dynamodb.GetItemInput{
+	input := &dynamodb.PutItemInput{
+		Item:      av,
 		TableName: aws.String(tableName),
-		Key: map[string]*dynamodb.AttributeValue{
-			"ID": {
-				S: aws.String(user),
-			},
-		},
-	})
-	if err != nil {
-		log.Fatalf("Got error calling GetItem: %s", err)
 	}
 
-	if result.Item == nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 404,
-		}, nil
-	}
-
-	item := Item{}
-
-	err = dynamodbattribute.UnmarshalMap(result.Item, &item)
+	_, err = svc.PutItem(input)
 	if err != nil {
-		panic(fmt.Sprintf("Failed to unmarshal Record, %v", err))
-	}
-
-	b, err := json.Marshal(item)
-	if err != nil {
-		fmt.Println(err)
+		log.Fatalf("Got error calling PutItem: %s", err)
+	} else {
+		log.Println("Successfully added '" + request.Body + "' to table " + tableName)
 	}
 
 	return events.APIGatewayProxyResponse{
 		StatusCode: 200,
-		Body:       string(b),
 	}, nil
 }
 
