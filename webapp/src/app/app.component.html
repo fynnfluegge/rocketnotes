@@ -16,16 +16,29 @@
     <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
 
       <mat-tree-node *matTreeNodeDef="let node; when: isRoot" matTreeNodePadding matTreeNodePaddingIndent="12">
-        <button mat-icon-button (click)="addNewItem(node)" style="background-color:transparent;width:24px;">
-          ADD new Document
-          <mat-icon>note_add</mat-icon></button>
+        <button mat-button (click)="addNewItem(node)" style="background-color:transparent;width:24px;">
+          <mat-icon>note_add</mat-icon>
+          add new Document
+        </button>
+      </mat-tree-node>
+
+      <mat-tree-node *matTreeNodeDef="let node; when: isTrash" matTreeNodePadding matTreeNodePaddingIndent="12">
+        <mat-icon>delete</mat-icon>
+        <button mat-icon-button matTreeNodeToggle style="background-color:transparent;width:24px;" *ngIf="node.expandable">
+          <mat-icon class="mat-icon-rtl-mirror">
+            {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+          </mat-icon>
+        </button>
+        TRASH
       </mat-tree-node>
 
       <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle matTreeNodePadding matTreeNodePaddingIndent="12">
         <button mat-icon-button disabled style="background-color:transparent;width:24px;"></button>
-        <a mat-button [routerLink]="'/dashboard/' + node.id" style="color: white;">{{node.name}}</a>
-        <button mat-icon-button (click)="addNewItem(node)" style="background-color:transparent;width:24px;"><mat-icon>add</mat-icon></button>
-        <button mat-icon-button (click)="removeItem(node)" style="background-color:transparent;width:24px;"><mat-icon>remove</mat-icon></button>
+        <a mat-button [routerLink]="'/dashboard/' + node.id">{{node.name}}</a>
+        <button *ngIf="!node.deleted" mat-icon-button (click)="addNewItem(node)" style="background-color:transparent;width:24px;float:right;"><mat-icon>add_circle_outline</mat-icon></button>
+        <button *ngIf="!node.deleted" mat-icon-button (click)="removeItem(node)" style="background-color:transparent;width:24px;float:right;"><mat-icon>remove_circle_outline</mat-icon></button>
+        <button *ngIf="node.deleted" mat-icon-button (click)="restoreItem(node)" style="background-color:transparent;width:24px;float:right;"><mat-icon>delete_forever</mat-icon></button>
+        <button *ngIf="node.deleted" mat-icon-button (click)="restoreItem(node)" style="background-color:transparent;width:24px;float:right;"><mat-icon>restore_from_trash</mat-icon></button>
       </mat-tree-node>
     
       <mat-tree-node *matTreeNodeDef="let node; when: hasNoContent" matTreeNodePadding matTreeNodePaddingIndent="12">
@@ -33,27 +46,23 @@
         <mat-form-field>
           <input matInput #itemValue placeholder="New item...">
         </mat-form-field>
-        <button mat-button (click)="saveNode(node, itemValue.value)" style="color: white;">Save</button>
+        <button mat-button (click)="saveNode(node, itemValue.value)">Save</button>
       </mat-tree-node>
     
       <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding matTreeNodePaddingIndent="12">
-        <button mat-icon-button matTreeNodeToggle
-                [attr.aria-label]="'toggle ' + node.filename" style="background-color:transparent;width:24px;">
+        <button mat-icon-button matTreeNodeToggle style="background-color:transparent;width:24px;">
           <mat-icon class="mat-icon-rtl-mirror">
             {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
           </mat-icon>
         </button>
-        <a mat-button [routerLink]="'/dashboard/' + node.id" style="color: white;">{{node.name}}</a>
-        <button mat-icon-button (click)="addNewItem(node)" style="background-color:transparent;width:24px;"><mat-icon>add</mat-icon></button>
-        <button mat-icon-button (click)="removeItem(node)" style="background-color:transparent;width:24px;"><mat-icon>remove</mat-icon></button>
+        <a mat-button [routerLink]="'/dashboard/' + node.id">{{node.name}}</a>
+        <button *ngIf="!node.deleted" mat-icon-button (click)="addNewItem(node)" style="background-color:transparent;width:24px;"><mat-icon>add_circle_outline</mat-icon></button>
+        <button *ngIf="!node.deleted" mat-icon-button (click)="removeItem(node)" style="background-color:transparent;width:24px;"><mat-icon>remove_circle_outline</mat-icon></button>
+        <button *ngIf="node.deleted" mat-icon-button (click)="restoreItem(node)" style="background-color:transparent;width:24px;float:right;"><mat-icon>delete_forever</mat-icon></button>
+        <button *ngIf="node.deleted" mat-icon-button (click)="restoreItem(node)" style="background-color:transparent;width:24px;float:right;"><mat-icon>restore_from_trash</mat-icon></button>
       </mat-tree-node>
-    </mat-tree>
 
-    <!-- <mat-tree-node *matTreeNodeDef="let node; when: isTrash" matTreeNodePadding matTreeNodePaddingIndent="12">
-      <button mat-icon-button (click)="addNewItem(node)" style="background-color:transparent;width:24px;">
-        TRASH
-        <mat-icon>note_add</mat-icon></button>
-    </mat-tree-node> -->
+    </mat-tree>
 
   </div>
 </div>

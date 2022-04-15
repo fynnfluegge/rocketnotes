@@ -2,10 +2,18 @@
   min-width: 0px !important;
   padding: 0;
   margin-right: 12px;
+  color: lightgray;
+  background-color:transparent;
 }
 
 .mat-tree-node {
   height: 32px;
+  border-bottom: 1px solid grey;
+}
+
+.mat-icon {
+  height: 28px;
+  color: lightgray;
 }
 
 //--- sidenav bar ---//
@@ -19,7 +27,7 @@
   padding: 0;
   width: 200px;
   background: #282828;
-  color: #fff;
+  color: lightgray;
   position: fixed;
   height: calc(100% - 52px);
   overflow: auto;
@@ -37,7 +45,7 @@ ul {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  background-color: #333;
+  background: #282828;
   position: fixed;
   top: 0;
   width: 100%;

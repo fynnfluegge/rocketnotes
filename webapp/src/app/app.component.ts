@@ -14,6 +14,7 @@ import { TestServiceService } from 'src/app/service/rest/test-service.service';
   id: string;
   name: string;
   parent: string;
+  deleted: boolean;
   children?: TodoItemNode[];
 }
 
@@ -22,6 +23,7 @@ export class TodoItemFlatNode {
   id: string;
   name: string;
   parent: string;
+  deleted: boolean;
   level: number;
   expandable: boolean;
 }
@@ -51,12 +53,29 @@ export class ChecklistDatabase {
   initialize() {
 
     this.http.get(this.backend_url + '/documentTree/' + localStorage.getItem("currentUserId")).subscribe(message => { 
-        this.id = JSON.parse(JSON.stringify(message)).ID
-        this.rootNode = <TodoItemNode>{ id: "root", name: "root", children: JSON.parse(JSON.stringify(message)).documents };
-        // Notify the change.
-        this.dataChange.next([this.rootNode]);
+        if (message) {
+          const jsonObject = JSON.parse(JSON.stringify(message))
+          this.id = jsonObject.ID
+          this.rootNode = <TodoItemNode>{ id: "root", name: "root", children: jsonObject.documents };
+          if (jsonObject.trash) {
+            jsonObject.trash.forEach(v => { this.setDeleted(v) })
+          }
+          this.trashNode = <TodoItemNode>{ id: "trash", name: "trash", children: jsonObject.trash };
+          this.dataChange.next([this.rootNode, this.trashNode]);
+        }
+        else {
+          this.id = uuid.v4()
+          this.rootNode = <TodoItemNode>{ id: "root", name: "root", children: null };
+          this.trashNode = <TodoItemNode>{ id: "trash", name: "trash", children: null };
+          this.dataChange.next([this.rootNode, this.trashNode]);
+        }
       })
-  }
+    }
+
+    setDeleted(node: TodoItemNode) {
+      node.deleted = true
+      if (node.children) node.children.forEach(v => { this.setDeleted(v) })
+    }
  
    insertItem(parent: TodoItemNode, vName: string) {
      const child = <TodoItemNode>{ id: uuid.v4(), name: vName, parent: parent.id };
@@ -71,14 +90,18 @@ export class ChecklistDatabase {
    }
 
    removeItem(parent: TodoItemNode, node: TodoItemNode) {
+     node.deleted = true
      parent.children = parent.children.filter(c => c.id !== node.id);
      if (parent.children.length === 0 ) parent.children = null;
+     if (!this.trashNode.children) this.trashNode.children = [];
+     this.trashNode.children.push(node);
      this.dataChange.next(this.data);
       this.testService.post("saveDocumentTree", 
       { 
         "ID": this.id,
         "userId": localStorage.getItem("currentUserId"),
-        "documents": JSON.parse(JSON.stringify(this.rootNode.children))
+        "documents": JSON.parse(JSON.stringify(this.rootNode.children)),
+        "trash": JSON.parse(JSON.stringify(this.trashNode.children))
       }).subscribe()
    }
  
@@ -91,7 +114,8 @@ export class ChecklistDatabase {
       { 
         "ID": this.id,
         "userId": localStorage.getItem("currentUserId"),
-        "documents": JSON.parse(JSON.stringify(this.rootNode.children))
+        "documents": JSON.parse(JSON.stringify(this.rootNode.children)),
+        "trash": JSON.parse(JSON.stringify(this.trashNode.children))
       }
     ).subscribe(() => { 
       this.testService.post("saveDocument", 
@@ -103,6 +127,21 @@ export class ChecklistDatabase {
         "content": "new document"
       }).subscribe()
     })
+   }
+
+   restoreItem(node: TodoItemNode, parent: TodoItemNode) {
+      node.deleted = false
+      if (!parent.children) parent.children = [];
+      this.trashNode.children = this.trashNode.children.filter(c => c.id !== node.id);
+      parent.children.push(node)
+      this.dataChange.next(this.data);
+      this.testService.post("saveDocumentTree", 
+      { 
+        "ID": this.id,
+        "userId": localStorage.getItem("currentUserId"),
+        "documents": JSON.parse(JSON.stringify(this.rootNode.children)),
+        "trash": JSON.parse(JSON.stringify(this.trashNode.children))
+      }).subscribe()
    }
  }
 
@@ -176,7 +215,11 @@ export class AppComponent {
   };
 
   isRoot = (_: number, _nodeData: TodoItemFlatNode) => {
-    return _nodeData.level === 0;
+    return _nodeData.id === "root";
+  };
+
+  isTrash = (_: number, _nodeData: TodoItemFlatNode) => {
+    return _nodeData.id === "trash";
   };
 
   hasChild = (_: number, _nodeData: TodoItemFlatNode) => {
@@ -200,6 +243,7 @@ export class AppComponent {
     flatNode.id = node.id;
     flatNode.parent = node.parent;
     flatNode.level = level;
+    flatNode.deleted = node.deleted;
     flatNode.expandable = !!node.children;
     this.flatNodeMap.set(flatNode, node);
     this.nestedNodeMap.set(node, flatNode);
@@ -217,14 +261,17 @@ export class AppComponent {
   }
 
   removeItem(node: TodoItemFlatNode) {
-    this.flatNodeMap.forEach( element => {
+    this.flatNodeMap.forEach(element => {
       if (element.id === node.parent) {
-        this.database.removeItem(element, node);
+        this.database.removeItem(element, this.flatNodeMap.get(node));
       }
     })
 
     this.treeControl.collapse(this.nestedNodeMap.get(this.database.rootNode));
     this.treeControl.expand(this.nestedNodeMap.get(this.database.rootNode));
+
+    this.treeControl.collapse(this.nestedNodeMap.get(this.database.trashNode));
+    this.treeControl.expand(this.nestedNodeMap.get(this.database.trashNode));
   }
 
   /** Save the node to database */
@@ -233,6 +280,21 @@ export class AppComponent {
     this.database.updateItem(nestedNode!, itemValue);
     this.treeControl.collapse(this.nestedNodeMap.get(this.database.rootNode));
     this.treeControl.expand(this.nestedNodeMap.get(this.database.rootNode));
+  }
+
+  restoreItem(node: TodoItemFlatNode) {
+    const nodeToRestore = this.flatNodeMap.get(node);
+    this.flatNodeMap.forEach(element => {
+      if (element.id === node.parent) {
+        this.database.restoreItem(nodeToRestore, element)
+      }
+    })
+
+    this.treeControl.collapse(this.nestedNodeMap.get(this.database.rootNode));
+    this.treeControl.expand(this.nestedNodeMap.get(this.database.rootNode));
+
+    this.treeControl.collapse(this.nestedNodeMap.get(this.database.trashNode));
+    this.treeControl.expand(this.nestedNodeMap.get(this.database.trashNode));
   }
 
   onMenuToggle(): void {
