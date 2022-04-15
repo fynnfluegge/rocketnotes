@@ -33,6 +33,7 @@ export class TodoItemFlatNode {
 export class ChecklistDatabase {
   backend_url: string =  "https://6o4c2p3kcg.execute-api.eu-central-1.amazonaws.com";
   id: string
+  rootNode: TodoItemNode;
 
    dataChange: BehaviorSubject<TodoItemNode[]> = new BehaviorSubject<TodoItemNode[]>([]);
  
@@ -51,12 +52,14 @@ export class ChecklistDatabase {
      this.http.get(this.backend_url + '/documentTree/' + localStorage.getItem("currentUserId")).subscribe(message => { 
         // Notify the change.
         this.id = JSON.parse(JSON.stringify(message)).ID
-        this.dataChange.next(JSON.parse(JSON.stringify(message)).documents);
+        this.rootNode = <TodoItemNode>{ id: "root", name: "root", children: JSON.parse(JSON.stringify(message)).documents };
+        this.dataChange.next([this.rootNode]);
       })
    }
  
    /** Add an item to to-do list */
    insertItem(parent: TodoItemNode, vName: string) {
+     console.log(parent.id)
      const child = <TodoItemNode>{ id: uuid.v4(), name: vName };
      if (parent.children) {
        // parent already has children
@@ -69,12 +72,6 @@ export class ChecklistDatabase {
        this.dataChange.next(this.data);
      }
    }
-
-   insertRootItem() {
-    const child = <TodoItemNode>{ id: uuid.v4(), name: "" };
-    this.data.push(child);
-    this.dataChange.next(this.data);
-   }
  
    updateItem(node: TodoItemNode, vName: string) {
     node.name = vName;
@@ -85,7 +82,7 @@ export class ChecklistDatabase {
       { 
         "ID": this.id,
         "userId": localStorage.getItem("currentUserId"),
-        "documents": JSON.parse(JSON.stringify(this.data))
+        "documents": JSON.parse(JSON.stringify(this.rootNode.children))
       }
     ).subscribe(message => { 
       console.log(message)
@@ -152,6 +149,9 @@ export class AppComponent {
 
     database.dataChange.subscribe((data) => {
       this.dataSource.data = data;
+
+      this.treeControl.collapse(this.nestedNodeMap.get(this.database.rootNode));
+      this.treeControl.expand(this.nestedNodeMap.get(this.database.rootNode));
     });
   }
 
@@ -165,6 +165,10 @@ export class AppComponent {
 
   getChildren = (node: TodoItemNode): Observable<TodoItemNode[]> => {
     return ofObservable(node.children);
+  };
+
+  isRoot = (_: number, _nodeData: TodoItemFlatNode) => {
+    return _nodeData.level === 0;
   };
 
   hasChild = (_: number, _nodeData: TodoItemFlatNode) => {
@@ -199,29 +203,25 @@ export class AppComponent {
     let isParentHasChildren: boolean = false;
     if (parentNode.children) isParentHasChildren = true;
     this.database.insertItem(parentNode!, '');
-    // expand the subtree only if the parent has children (parent is not a leaf node)
-    if (isParentHasChildren) this.treeControl.expand(node);
+
+    this.treeControl.expand(node);
+    this.treeControl.collapse(this.nestedNodeMap.get(this.database.rootNode));
+    this.treeControl.expand(this.nestedNodeMap.get(this.database.rootNode));
+  }
+
+  removeItem(node: TodoItemFlatNode) {
+    
   }
 
   /** Save the node to database */
   saveNode(node: TodoItemFlatNode, itemValue: string) {
     const nestedNode = this.flatNodeMap.get(node);
     this.database.updateItem(nestedNode!, itemValue);
-    this.treeControl.dataNodes.forEach(element => {
-      if (element.level === 0 && this.treeControl.isExpanded(element)) {
-        // does not work for root nodes that had no children before
-        console.log(element)
-        this.treeControl.collapse(element);
-        this.treeControl.expand(element);
-      }
-    })
+    this.treeControl.collapse(this.nestedNodeMap.get(this.database.rootNode));
+    this.treeControl.expand(this.nestedNodeMap.get(this.database.rootNode));
   }
 
   removeNode(node: TodoItemFlatNode) {
-  }
-
-  onAddNote(): void {
-    this.database.insertRootItem();
   }
 
   onMenuToggle(): void {
