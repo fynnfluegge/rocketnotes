@@ -172,7 +172,7 @@ i`;
         "title": this.title,
         "content": this.content 
       }
-    ).subscribe(message => { console.log(message) })
+    ).subscribe()
   }
 
   getDecodedAccessToken(token: string): any {

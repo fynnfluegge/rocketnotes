@@ -17,6 +17,7 @@ import (
 type Document struct {
 	ID       string      `json:"id"`
 	Name     string      `json:"name"`
+	Parent   string      `json:"parent"`
 	Children []*Document `json:"children"`
 }
 

@@ -13,6 +13,7 @@ import { TestServiceService } from 'src/app/service/rest/test-service.service';
  export class TodoItemNode {
   id: string;
   name: string;
+  parent: string;
   children?: TodoItemNode[];
 }
 
@@ -20,6 +21,7 @@ import { TestServiceService } from 'src/app/service/rest/test-service.service';
 export class TodoItemFlatNode {
   id: string;
   name: string;
+  parent: string;
   level: number;
   expandable: boolean;
 }
@@ -34,43 +36,50 @@ export class ChecklistDatabase {
   backend_url: string =  "https://6o4c2p3kcg.execute-api.eu-central-1.amazonaws.com";
   id: string
   rootNode: TodoItemNode;
+  trashNode: TodoItemNode;
 
-   dataChange: BehaviorSubject<TodoItemNode[]> = new BehaviorSubject<TodoItemNode[]>([]);
- 
-   get data(): TodoItemNode[] {
-     return this.dataChange.value;
-   }
- 
-   constructor(public http: HttpClient, private testService : TestServiceService) {
-     this.initialize();
-   }
- 
-   initialize() {
-     // Build the tree nodes from Json object. The result is a list of `TodoItemNode` with nested
-     //     file node as children.
+  dataChange: BehaviorSubject<TodoItemNode[]> = new BehaviorSubject<TodoItemNode[]>([]);
 
-     this.http.get(this.backend_url + '/documentTree/' + localStorage.getItem("currentUserId")).subscribe(message => { 
-        // Notify the change.
+  get data(): TodoItemNode[] {
+    return this.dataChange.value;
+  }
+
+  constructor(public http: HttpClient, private testService : TestServiceService) {
+    this.initialize();
+  }
+
+  initialize() {
+
+    this.http.get(this.backend_url + '/documentTree/' + localStorage.getItem("currentUserId")).subscribe(message => { 
         this.id = JSON.parse(JSON.stringify(message)).ID
         this.rootNode = <TodoItemNode>{ id: "root", name: "root", children: JSON.parse(JSON.stringify(message)).documents };
+        // Notify the change.
         this.dataChange.next([this.rootNode]);
       })
-   }
+  }
  
-   /** Add an item to to-do list */
    insertItem(parent: TodoItemNode, vName: string) {
-     console.log(parent.id)
-     const child = <TodoItemNode>{ id: uuid.v4(), name: vName };
+     const child = <TodoItemNode>{ id: uuid.v4(), name: vName, parent: parent.id };
      if (parent.children) {
-       // parent already has children
        parent.children.push(child);
        this.dataChange.next(this.data);
      } else {
-       // if parent is a leaf node
        parent.children = [];
        parent.children.push(child);
        this.dataChange.next(this.data);
      }
+   }
+
+   removeItem(parent: TodoItemNode, node: TodoItemNode) {
+     parent.children = parent.children.filter(c => c.id !== node.id);
+     if (parent.children.length === 0 ) parent.children = null;
+     this.dataChange.next(this.data);
+      this.testService.post("saveDocumentTree", 
+      { 
+        "ID": this.id,
+        "userId": localStorage.getItem("currentUserId"),
+        "documents": JSON.parse(JSON.stringify(this.rootNode.children))
+      }).subscribe()
    }
  
    updateItem(node: TodoItemNode, vName: string) {
@@ -84,16 +93,15 @@ export class ChecklistDatabase {
         "userId": localStorage.getItem("currentUserId"),
         "documents": JSON.parse(JSON.stringify(this.rootNode.children))
       }
-    ).subscribe(message => { 
-      console.log(message)
+    ).subscribe(() => { 
       this.testService.post("saveDocument", 
       { 
         "ID": node.id,
-        "parentId": "",
+        "parentId": node.parent,
         "userId": localStorage.getItem("currentUserId"),
         "title": vName,
         "content": "new document"
-      }).subscribe(message => { console.log(message) })
+      }).subscribe()
     })
    }
  }
@@ -190,6 +198,7 @@ export class AppComponent {
         : new TodoItemFlatNode();
     flatNode.name = node.name;
     flatNode.id = node.id;
+    flatNode.parent = node.parent;
     flatNode.level = level;
     flatNode.expandable = !!node.children;
     this.flatNodeMap.set(flatNode, node);
@@ -200,8 +209,6 @@ export class AppComponent {
   /** Select the category so we can insert the new item. */
   addNewItem(node: TodoItemFlatNode) {
     const parentNode = this.flatNodeMap.get(node);
-    let isParentHasChildren: boolean = false;
-    if (parentNode.children) isParentHasChildren = true;
     this.database.insertItem(parentNode!, '');
 
     this.treeControl.expand(node);
@@ -210,7 +217,14 @@ export class AppComponent {
   }
 
   removeItem(node: TodoItemFlatNode) {
-    
+    this.flatNodeMap.forEach( element => {
+      if (element.id === node.parent) {
+        this.database.removeItem(element, node);
+      }
+    })
+
+    this.treeControl.collapse(this.nestedNodeMap.get(this.database.rootNode));
+    this.treeControl.expand(this.nestedNodeMap.get(this.database.rootNode));
   }
 
   /** Save the node to database */
@@ -219,9 +233,6 @@ export class AppComponent {
     this.database.updateItem(nestedNode!, itemValue);
     this.treeControl.collapse(this.nestedNodeMap.get(this.database.rootNode));
     this.treeControl.expand(this.nestedNodeMap.get(this.database.rootNode));
-  }
-
-  removeNode(node: TodoItemFlatNode) {
   }
 
   onMenuToggle(): void {

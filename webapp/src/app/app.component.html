@@ -33,7 +33,7 @@
         <mat-form-field>
           <input matInput #itemValue placeholder="New item...">
         </mat-form-field>
-        <button mat-button (click)="saveNode(node, itemValue.value)">Save</button>
+        <button mat-button (click)="saveNode(node, itemValue.value)" style="color: white;">Save</button>
       </mat-tree-node>
     
       <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding matTreeNodePaddingIndent="12">
@@ -45,8 +45,15 @@
         </button>
         <a mat-button [routerLink]="'/dashboard/' + node.id" style="color: white;">{{node.name}}</a>
         <button mat-icon-button (click)="addNewItem(node)" style="background-color:transparent;width:24px;"><mat-icon>add</mat-icon></button>
+        <button mat-icon-button (click)="removeItem(node)" style="background-color:transparent;width:24px;"><mat-icon>remove</mat-icon></button>
       </mat-tree-node>
     </mat-tree>
+
+    <!-- <mat-tree-node *matTreeNodeDef="let node; when: isTrash" matTreeNodePadding matTreeNodePaddingIndent="12">
+      <button mat-icon-button (click)="addNewItem(node)" style="background-color:transparent;width:24px;">
+        TRASH
+        <mat-icon>note_add</mat-icon></button>
+    </mat-tree-node> -->
 
   </div>
 </div>
