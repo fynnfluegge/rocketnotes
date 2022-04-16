@@ -76,6 +76,11 @@ export class ChecklistDatabase {
       node.deleted = true
       if (node.children) node.children.forEach(v => { this.setDeleted(v) })
     }
+
+    setNotDeleted(node: TodoItemNode) {
+      node.deleted = false
+      if (node.children) node.children.forEach(v => { this.setNotDeleted(v) })
+    }
  
    insertItem(parent: TodoItemNode, vName: string) {
      const child = <TodoItemNode>{ id: uuid.v4(), name: vName, parent: parent.id };
@@ -90,7 +95,7 @@ export class ChecklistDatabase {
    }
 
    removeItem(parent: TodoItemNode, node: TodoItemNode) {
-     node.deleted = true
+    this.setDeleted(node)
      parent.children = parent.children.filter(c => c.id !== node.id);
      if (parent.children.length === 0 ) parent.children = null;
      if (!this.trashNode.children) this.trashNode.children = [];
@@ -129,12 +134,23 @@ export class ChecklistDatabase {
     })
    }
 
-   restoreItem(node: TodoItemNode, parent: TodoItemNode) {
-      node.deleted = false
-      if (!parent.children) parent.children = [];
-      this.trashNode.children = this.trashNode.children.filter(c => c.id !== node.id);
-      parent.children.push(node)
+   restoreItem(node: TodoItemNode, parentToInsert: TodoItemNode, parent: TodoItemNode) {
+      this.setNotDeleted(node)
+      if (!parentToInsert.children) parentToInsert.children = [];
+      parentToInsert.children.push(node)
+
+      if (parentToInsert.id === parent.id) {
+        // parent not deleted, remove node from trash
+        this.trashNode.children = this.trashNode.children.filter(c => c.id !== node.id);
+      }
+      else {
+        // parent also deleted, remove node from children of parent in trash
+        parent.children = parent.children.filter(c => c.id !== node.id);
+        if (parent.children.length === 0) parent.children = null;
+      }
+
       this.dataChange.next(this.data);
+
       this.testService.post("saveDocumentTree", 
       { 
         "ID": this.id,
@@ -284,17 +300,45 @@ export class AppComponent {
 
   restoreItem(node: TodoItemFlatNode) {
     const nodeToRestore = this.flatNodeMap.get(node);
+    var parent
+    var parentToInsert
     this.flatNodeMap.forEach(element => {
       if (element.id === node.parent) {
-        this.database.restoreItem(nodeToRestore, element)
+        parent = element
       }
     })
+    if (parent.deleted) {
+      parentToInsert = this.getNearestParentThatIsNotDeleted(nodeToRestore)
+    } else {
+      parentToInsert = parent
+    }
+
+    nodeToRestore.parent = parentToInsert.id
+
+    this.database.restoreItem(nodeToRestore, parentToInsert, parent)
 
     this.treeControl.collapse(this.nestedNodeMap.get(this.database.rootNode));
     this.treeControl.expand(this.nestedNodeMap.get(this.database.rootNode));
 
     this.treeControl.collapse(this.nestedNodeMap.get(this.database.trashNode));
     this.treeControl.expand(this.nestedNodeMap.get(this.database.trashNode));
+  }
+
+  getNearestParentThatIsNotDeleted(node: TodoItemNode): TodoItemNode {
+    var parentNode;
+    this.flatNodeMap.forEach(element => {
+      if (element.id === node.parent) {
+        if (element.deleted) {
+          parentNode = this.getNearestParentThatIsNotDeleted(element)
+          return;
+        }
+        else {
+          parentNode = element
+          return;
+        }
+      }
+    })
+    return parentNode;
   }
 
   onMenuToggle(): void {
