@@ -1,17 +1,18 @@
 <ul>
   <li>
-    <button mat-icon-button mat-button (click)="onMenuToggle()" style="margin: auto;; width: 52px; height: 52px;">
+    <a (click)="onMenuToggle()">
       <mat-icon>menu</mat-icon>
-    </button>
+    </a>
+  </li>
 </ul>
 
-<div class="sidebar" [style.left.px]="showSidebar ? '0' : '-120'">
+<div class="sidebar" [style.left.px]="showSidebar ? '0' : '-160'">
   <div>
     
     <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
 
       <mat-tree-node *matTreeNodeDef="let node; when: isRoot" matTreeNodePadding matTreeNodePaddingIndent="12">
-        <button mat-button (click)="addNewItem(node)" style="background-color:transparent;width:24px;">
+        <button mat-button (click)="addNewItem(node)">
           <mat-icon>note_add</mat-icon>
           add new Document
         </button>
@@ -19,42 +20,44 @@
 
       <mat-tree-node *matTreeNodeDef="let node; when: isTrash" matTreeNodePadding matTreeNodePaddingIndent="12">
         <mat-icon>delete</mat-icon>
-        <button mat-icon-button matTreeNodeToggle style="background-color:transparent;width:24px;" *ngIf="node.expandable">
+        <button mat-icon-button matTreeNodeToggle *ngIf="node.expandable">
           <mat-icon class="mat-icon-rtl-mirror">
             {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
           </mat-icon>
         </button>
-        TRASH
+        Trash
       </mat-tree-node>
 
-      <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle matTreeNodePadding matTreeNodePaddingIndent="12">
-        <button mat-icon-button disabled style="background-color:transparent;width:24px;"></button>
-        <a mat-button [routerLink]="'/dashboard/' + node.id">{{node.name}}</a>
-        <button *ngIf="!node.deleted" mat-icon-button (click)="addNewItem(node)" style="background-color:transparent;width:24px;float:right;"><mat-icon>add_circle_outline</mat-icon></button>
-        <button *ngIf="!node.deleted" mat-icon-button (click)="removeItem(node)" style="background-color:transparent;width:24px;float:right;"><mat-icon>remove_circle_outline</mat-icon></button>
-        <button *ngIf="node.deleted" mat-icon-button (click)="restoreItem(node)" style="background-color:transparent;width:24px;float:right;"><mat-icon>delete_forever</mat-icon></button>
-        <button *ngIf="node.deleted" mat-icon-button (click)="restoreItem(node)" style="background-color:transparent;width:24px;float:right;"><mat-icon>restore_from_trash</mat-icon></button>
+      <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle matTreeNodePadding matTreeNodePaddingIndent="12" [routerLink]="'/dashboard/' + node.id">
+        <button mat-icon-button disabled></button>
+        <span>{{node.name}}</span>
+        <button *ngIf="!node.deleted" class="icon-button-fade" mat-icon-button (click)="addNewItem(node)"><mat-icon>note_add</mat-icon></button>
+        <button *ngIf="!node.deleted" class="icon-button-fade" mat-icon-button (click)="removeItem(node)"><mat-icon>delete</mat-icon></button>
+        <button *ngIf="node.deleted" class="icon-button-fade" mat-icon-button><mat-icon>delete_forever</mat-icon></button>
+        <button *ngIf="node.deleted" class="icon-button-fade" mat-icon-button (click)="restoreItem(node)"><mat-icon>restore_from_trash</mat-icon></button>
       </mat-tree-node>
     
       <mat-tree-node *matTreeNodeDef="let node; when: hasNoContent" matTreeNodePadding matTreeNodePaddingIndent="12">
         <button mat-icon-button disabled style="background-color:transparent;width:24px;"></button>
         <mat-form-field>
-          <input matInput #itemValue placeholder="New item...">
+          <input matInput #itemValue placeholder="New item..." style="width:140px;height:24px;">
         </mat-form-field>
-        <button mat-button (click)="saveNode(node, itemValue.value)">Save</button>
+        <button mat-icon-button (click)="saveNode(node, itemValue.value)">
+          <mat-icon>save</mat-icon>
+        </button>
       </mat-tree-node>
     
-      <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding matTreeNodePaddingIndent="12">
-        <button mat-icon-button matTreeNodeToggle style="background-color:transparent;width:24px;">
+      <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding matTreeNodePaddingIndent="12" [routerLink]="'/dashboard/' + node.id">
+        <button mat-icon-button matTreeNodeToggle>
           <mat-icon class="mat-icon-rtl-mirror">
             {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
           </mat-icon>
         </button>
-        <a mat-button [routerLink]="'/dashboard/' + node.id">{{node.name}}</a>
-        <button *ngIf="!node.deleted" mat-icon-button (click)="addNewItem(node)" style="background-color:transparent;width:24px;"><mat-icon>add_circle_outline</mat-icon></button>
-        <button *ngIf="!node.deleted" mat-icon-button (click)="removeItem(node)" style="background-color:transparent;width:24px;"><mat-icon>remove_circle_outline</mat-icon></button>
-        <button *ngIf="node.deleted" mat-icon-button (click)="restoreItem(node)" style="background-color:transparent;width:24px;float:right;"><mat-icon>delete_forever</mat-icon></button>
-        <button *ngIf="node.deleted" mat-icon-button (click)="restoreItem(node)" style="background-color:transparent;width:24px;float:right;"><mat-icon>restore_from_trash</mat-icon></button>
+        <span>{{node.name}}</span>
+        <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="addNewItem(node)"><mat-icon>note_add</mat-icon></button>
+        <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="removeItem(node)"><mat-icon>delete</mat-icon></button>
+        <button *ngIf="node.deleted" mat-icon-button class="icon-button-fade"><mat-icon>delete_forever</mat-icon></button>
+        <button *ngIf="node.deleted" mat-icon-button class="icon-button-fade" (click)="restoreItem(node)"><mat-icon>restore_from_trash</mat-icon></button>
       </mat-tree-node>
 
     </mat-tree>
@@ -62,6 +65,6 @@
   </div>
 </div>
 
-<div class="container-t" [style.margin-left.px]="showSidebar ? '220' : '100'" [style.width]="showSidebar ? 'calc(100% - 240px)' : 'calc(100% - 120px)'">
+<div class="container-t" [style.margin-left.px]="showSidebar ? '260' : '120'" [style.width]="showSidebar ? 'calc(100% - 280px)' : 'calc(100% - 140px)'">
   <router-outlet></router-outlet>
 </div>
