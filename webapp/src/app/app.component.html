@@ -11,45 +11,46 @@
     
     <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
 
-      <mat-tree-node *matTreeNodeDef="let node; when: isRoot" matTreeNodePadding matTreeNodePaddingIndent="12">
+      <mat-tree-node *matTreeNodeDef="let node; when: isRoot" matTreeNodePadding matTreeNodePaddingIndent="4">
         <button mat-button (click)="addNewItem(node)">
           <mat-icon>note_add</mat-icon>
           add new Document
         </button>
       </mat-tree-node>
 
-      <mat-tree-node *matTreeNodeDef="let node; when: isTrash" matTreeNodePadding matTreeNodePaddingIndent="12">
+      <mat-tree-node *matTreeNodeDef="let node; when: isTrash" matTreeNodePadding matTreeNodePaddingIndent="4">
         <mat-icon>delete</mat-icon>
-        <button mat-icon-button matTreeNodeToggle *ngIf="node.expandable">
-          <mat-icon class="mat-icon-rtl-mirror">
+        <button mat-icon-button matTreeNodeToggle *ngIf="node.expandable" class="icon-button-chevron">
+          <mat-icon>
             {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
           </mat-icon>
         </button>
         Trash
       </mat-tree-node>
 
-      <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle matTreeNodePadding matTreeNodePaddingIndent="12" [routerLink]="'/dashboard/' + node.id">
-        <button mat-icon-button disabled></button>
-        <span>{{node.name}}</span>
+      <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle matTreeNodePadding matTreeNodePaddingIndent="4" [routerLink]="'/dashboard/' + node.id">
+        <span style="padding-left: 24px;">{{node.name}}</span>
         <button *ngIf="!node.deleted" class="icon-button-fade" mat-icon-button (click)="addNewItem(node)"><mat-icon>note_add</mat-icon></button>
         <button *ngIf="!node.deleted" class="icon-button-fade" mat-icon-button (click)="removeItem(node)"><mat-icon>delete</mat-icon></button>
         <button *ngIf="node.deleted" class="icon-button-fade" mat-icon-button><mat-icon>delete_forever</mat-icon></button>
         <button *ngIf="node.deleted" class="icon-button-fade" mat-icon-button (click)="restoreItem(node)"><mat-icon>restore_from_trash</mat-icon></button>
       </mat-tree-node>
     
-      <mat-tree-node *matTreeNodeDef="let node; when: hasNoContent" matTreeNodePadding matTreeNodePaddingIndent="12">
-        <button mat-icon-button disabled style="background-color:transparent;width:24px;"></button>
-        <mat-form-field>
+      <mat-tree-node *matTreeNodeDef="let node; when: hasNoContent" matTreeNodePadding matTreeNodePaddingIndent="4">
+        <mat-form-field style="padding-left: 24px;">
           <input matInput #itemValue placeholder="New item..." style="width:140px;height:24px;">
         </mat-form-field>
-        <button mat-icon-button (click)="saveNode(node, itemValue.value)">
+        <button mat-icon-button (click)="saveNode(node, itemValue.value)" style="width: 24px;">
           <mat-icon>save</mat-icon>
+        </button>
+        <button mat-icon-button (click)="deleteItem(node)" style="width: 24px;">
+          <mat-icon>delete</mat-icon>
         </button>
       </mat-tree-node>
     
-      <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding matTreeNodePaddingIndent="12" [routerLink]="'/dashboard/' + node.id">
-        <button mat-icon-button matTreeNodeToggle>
-          <mat-icon class="mat-icon-rtl-mirror">
+      <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding matTreeNodePaddingIndent="4" [routerLink]="'/dashboard/' + node.id">
+        <button mat-icon-button matTreeNodeToggle class="icon-button-chevron">
+          <mat-icon>
             {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
           </mat-icon>
         </button>

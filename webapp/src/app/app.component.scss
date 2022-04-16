@@ -42,10 +42,15 @@ span:hover {
 .icon-button-fade {
   opacity: 0.2;
   width: 24px;
-  background-color:transparent;
 }
 
-.icon-button-fade:hover {
+.icon-button-chevron {
+  opacity: 0.5;
+  width: 24px;
+}
+
+.icon-button-fade:hover,
+.icon-button-chevron:hover {
   opacity: 1;
 }
 

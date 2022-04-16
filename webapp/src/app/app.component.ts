@@ -94,6 +94,13 @@ export class ChecklistDatabase {
      }
    }
 
+   deleteItem(parent: TodoItemNode, node: TodoItemFlatNode) {
+     console.log(parent)
+     parent.children = parent.children.filter(c => c.id !== node.id);
+     if (parent.children.length === 0 ) parent.children = null;
+     this.dataChange.next(this.data);
+   }
+
    removeItem(parent: TodoItemNode, node: TodoItemNode) {
     this.setDeleted(node)
      parent.children = parent.children.filter(c => c.id !== node.id);
@@ -266,12 +273,24 @@ export class AppComponent {
     return flatNode;
   };
 
-  /** Select the category so we can insert the new item. */
   addNewItem(node: TodoItemFlatNode) {
     const parentNode = this.flatNodeMap.get(node);
     this.database.insertItem(parentNode!, '');
 
     this.treeControl.expand(node);
+    this.treeControl.collapse(this.nestedNodeMap.get(this.database.rootNode));
+    this.treeControl.expand(this.nestedNodeMap.get(this.database.rootNode));
+  }
+
+  deleteItem(node: TodoItemFlatNode) {
+    var parentNode;
+    this.flatNodeMap.forEach(element => {
+      if (element.id === node.parent) {
+        parentNode = element
+      }
+    })
+    this.database.deleteItem(parentNode!, node);
+
     this.treeControl.collapse(this.nestedNodeMap.get(this.database.rootNode));
     this.treeControl.expand(this.nestedNodeMap.get(this.database.rootNode));
   }
