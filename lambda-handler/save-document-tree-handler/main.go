@@ -23,9 +23,9 @@ type Document struct {
 
 type Item struct {
 	ID        string      `json:"ID"`
-	UserId    string      `json:"userId"`
 	Documents []*Document `json:"documents"`
 	Trash     []*Document `json:"trash"`
+	Pinned    []*Document `json:"pinned"`
 }
 
 func init() {

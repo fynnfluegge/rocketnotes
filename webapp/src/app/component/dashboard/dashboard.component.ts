@@ -93,7 +93,6 @@ i`;
         this.content = document.content
         this.title = document.title
        });
-
     });
   }
 
@@ -154,13 +153,6 @@ i`;
 
   onFullscreen(): void {
 
-  }
-
-  onLogout(): void {
-    console.log(Auth.currentUserInfo().then((user: any ) => {
-      console.log(user.username)
-    }))
-    Auth.signOut();
   }
 
   submit(): void{

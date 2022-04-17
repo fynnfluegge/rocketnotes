@@ -6,6 +6,7 @@ import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree'
 import { of as ofObservable, Observable, BehaviorSubject } from 'rxjs';
 import * as uuid from 'uuid';
 import { TestServiceService } from 'src/app/service/rest/test-service.service';
+import { Auth } from 'aws-amplify';
 
 /**
  * Node for to-do item
@@ -15,6 +16,7 @@ import { TestServiceService } from 'src/app/service/rest/test-service.service';
   name: string;
   parent: string;
   deleted: boolean;
+  pinned: boolean;
   children?: TodoItemNode[];
 }
 
@@ -24,6 +26,8 @@ export class TodoItemFlatNode {
   name: string;
   parent: string;
   deleted: boolean;
+  pinned: boolean;
+  editNode: boolean;
   level: number;
   expandable: boolean;
 }
@@ -36,9 +40,9 @@ export class TodoItemFlatNode {
 @Injectable()
 export class ChecklistDatabase {
   backend_url: string =  "https://6o4c2p3kcg.execute-api.eu-central-1.amazonaws.com";
-  id: string
   rootNode: TodoItemNode;
   trashNode: TodoItemNode;
+  pinnedNode: TodoItemNode;
 
   dataChange: BehaviorSubject<TodoItemNode[]> = new BehaviorSubject<TodoItemNode[]>([]);
 
@@ -52,25 +56,30 @@ export class ChecklistDatabase {
 
   initialize() {
 
-    this.http.get(this.backend_url + '/documentTree/' + localStorage.getItem("currentUserId")).subscribe(message => { 
-        if (message) {
-          const jsonObject = JSON.parse(JSON.stringify(message))
-          this.id = jsonObject.ID
-          this.rootNode = <TodoItemNode>{ id: "root", name: "root", children: jsonObject.documents };
-          if (jsonObject.trash) {
-            jsonObject.trash.forEach(v => { this.setDeleted(v) })
-          }
-          this.trashNode = <TodoItemNode>{ id: "trash", name: "trash", children: jsonObject.trash };
-          this.dataChange.next([this.rootNode, this.trashNode]);
+    this.http.get(this.backend_url + '/documentTree/' + localStorage.getItem("currentUserId")).subscribe({
+      next: (res) => {
+        const jsonObject = JSON.parse(JSON.stringify(res))
+        this.rootNode = <TodoItemNode>{ id: "root", name: "root", children: jsonObject.documents };
+        if (jsonObject.trash) {
+          jsonObject.trash.forEach(v => { this.setDeleted(v) })
         }
-        else {
-          this.id = uuid.v4()
-          this.rootNode = <TodoItemNode>{ id: "root", name: "root", children: null };
-          this.trashNode = <TodoItemNode>{ id: "trash", name: "trash", children: null };
-          this.dataChange.next([this.rootNode, this.trashNode]);
+        if (jsonObject.pinned) {
+          jsonObject.pinned.forEach(v => { v.pinned = true })
         }
-      })
-    }
+        this.trashNode = <TodoItemNode>{ id: "trash", name: "trash", children: jsonObject.trash };
+        this.pinnedNode = <TodoItemNode>{ id: "pinned", name: "pinned", children: jsonObject.pinned };
+        this.dataChange.next([this.pinnedNode, this.rootNode, this.trashNode]);
+      },
+      error: (e) => {
+        console.log("ERROR")
+        console.log(e)
+        this.rootNode = <TodoItemNode>{ id: "root", name: "root", children: null };
+        this.trashNode = <TodoItemNode>{ id: "trash", name: "trash", children: null };
+        this.pinnedNode = <TodoItemNode>{ id: "pinned", name: "pinned", children: null };
+        this.dataChange.next([this.pinnedNode, this.rootNode, this.trashNode]);
+      }
+    })
+  }
 
     setDeleted(node: TodoItemNode) {
       node.deleted = true
@@ -110,10 +119,10 @@ export class ChecklistDatabase {
      this.dataChange.next(this.data);
       this.testService.post("saveDocumentTree", 
       { 
-        "ID": this.id,
-        "userId": localStorage.getItem("currentUserId"),
+        "ID": localStorage.getItem("currentUserId"),
         "documents": JSON.parse(JSON.stringify(this.rootNode.children)),
-        "trash": JSON.parse(JSON.stringify(this.trashNode.children))
+        "trash": JSON.parse(JSON.stringify(this.trashNode.children)),
+        "pinned": JSON.parse(JSON.stringify(this.pinnedNode.children))
       }).subscribe()
    }
  
@@ -124,10 +133,10 @@ export class ChecklistDatabase {
 
     this.testService.post("saveDocumentTree", 
       { 
-        "ID": this.id,
-        "userId": localStorage.getItem("currentUserId"),
+        "ID": localStorage.getItem("currentUserId"),
         "documents": JSON.parse(JSON.stringify(this.rootNode.children)),
-        "trash": JSON.parse(JSON.stringify(this.trashNode.children))
+        "trash": JSON.parse(JSON.stringify(this.trashNode.children)),
+        "pinned": JSON.parse(JSON.stringify(this.pinnedNode.children))
       }
     ).subscribe(() => { 
       this.testService.post("saveDocument", 
@@ -149,6 +158,7 @@ export class ChecklistDatabase {
       if (parentToInsert.id === parent.id) {
         // parent not deleted, remove node from trash
         this.trashNode.children = this.trashNode.children.filter(c => c.id !== node.id);
+        if (this.trashNode.children.length == 0) this.trashNode.children = null;
       }
       else {
         // parent also deleted, remove node from children of parent in trash
@@ -160,12 +170,31 @@ export class ChecklistDatabase {
 
       this.testService.post("saveDocumentTree", 
       { 
-        "ID": this.id,
-        "userId": localStorage.getItem("currentUserId"),
+        "ID": localStorage.getItem("currentUserId"),
         "documents": JSON.parse(JSON.stringify(this.rootNode.children)),
-        "trash": JSON.parse(JSON.stringify(this.trashNode.children))
+        "trash": JSON.parse(JSON.stringify(this.trashNode.children)),
+        "pinned": JSON.parse(JSON.stringify(this.pinnedNode.children))
       }).subscribe()
    }
+
+  pinItem(node: TodoItemNode) {
+    node.pinned = !node.pinned
+    if (node.pinned) {
+      if (!this.pinnedNode.children) this.pinnedNode.children = [];
+      this.pinnedNode.children.push(node);
+    } else if (this.pinnedNode.children){
+      this.pinnedNode.children = this.pinnedNode.children.filter(c => c.id !== node.id);
+      if (this.pinnedNode.children.length === 0) this.pinnedNode.children = null;
+    }
+    this.dataChange.next(this.data);
+    this.testService.post("saveDocumentTree", 
+    { 
+      "ID": localStorage.getItem("currentUserId"),
+      "documents": JSON.parse(JSON.stringify(this.rootNode.children)),
+      "trash": JSON.parse(JSON.stringify(this.trashNode.children)),
+      "pinned": JSON.parse(JSON.stringify(this.pinnedNode.children))
+    }).subscribe()
+  }
  }
 
 
@@ -245,6 +274,14 @@ export class AppComponent {
     return _nodeData.id === "trash";
   };
 
+  isPinned = (_: number, _nodeData: TodoItemFlatNode) => {
+    return _nodeData.id === "pinned";
+  };
+
+  editNode = (_: number, _nodeData: TodoItemFlatNode) => {
+    return _nodeData.editNode;
+  };
+
   hasChild = (_: number, _nodeData: TodoItemFlatNode) => {
     return _nodeData.expandable;
   };
@@ -267,6 +304,7 @@ export class AppComponent {
     flatNode.parent = node.parent;
     flatNode.level = level;
     flatNode.deleted = node.deleted;
+    flatNode.pinned = node.pinned;
     flatNode.expandable = !!node.children;
     this.flatNodeMap.set(flatNode, node);
     this.nestedNodeMap.set(node, flatNode);
@@ -278,6 +316,18 @@ export class AppComponent {
     this.database.insertItem(parentNode!, '');
 
     this.treeControl.expand(node);
+    this.treeControl.collapse(this.nestedNodeMap.get(this.database.rootNode));
+    this.treeControl.expand(this.nestedNodeMap.get(this.database.rootNode));
+  }
+
+  editItem(node: TodoItemFlatNode) {
+    node.editNode = true;
+    this.treeControl.collapse(this.nestedNodeMap.get(this.database.rootNode));
+    this.treeControl.expand(this.nestedNodeMap.get(this.database.rootNode));
+  }
+
+  cancelEditItem(node: TodoItemFlatNode) {
+    node.editNode = false;
     this.treeControl.collapse(this.nestedNodeMap.get(this.database.rootNode));
     this.treeControl.expand(this.nestedNodeMap.get(this.database.rootNode));
   }
@@ -309,7 +359,6 @@ export class AppComponent {
     this.treeControl.expand(this.nestedNodeMap.get(this.database.trashNode));
   }
 
-  /** Save the node to database */
   saveNode(node: TodoItemFlatNode, itemValue: string) {
     const nestedNode = this.flatNodeMap.get(node);
     this.database.updateItem(nestedNode!, itemValue);
@@ -343,6 +392,13 @@ export class AppComponent {
     this.treeControl.expand(this.nestedNodeMap.get(this.database.trashNode));
   }
 
+  pinItem(node: TodoItemFlatNode) {
+    const nestedNode = this.flatNodeMap.get(node);
+    this.database.pinItem(nestedNode);
+    this.treeControl.collapse(this.nestedNodeMap.get(this.database.pinnedNode));
+    this.treeControl.expand(this.nestedNodeMap.get(this.database.pinnedNode));
+  }
+
   getNearestParentThatIsNotDeleted(node: TodoItemNode): TodoItemNode {
     var parentNode;
     this.flatNodeMap.forEach(element => {
@@ -362,5 +418,12 @@ export class AppComponent {
 
   onMenuToggle(): void {
     this.showSidebar = !this.showSidebar;
+  }
+
+  onLogout(): void {
+    console.log(Auth.currentUserInfo().then((user: any ) => {
+      console.log(user.username)
+    }))
+    Auth.signOut();
   }
 }
