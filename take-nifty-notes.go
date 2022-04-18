@@ -34,6 +34,7 @@ func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNi
 		AssumedBy: awsiam.NewServicePrincipal(aws.String("lambda.amazonaws.com"), &awsiam.ServicePrincipalOpts{}),
 		ManagedPolicies: &[]awsiam.IManagedPolicy{
 			awsiam.ManagedPolicy_FromManagedPolicyArn(stack, aws.String("AmazonDynamoDBFullAccess"), aws.String("arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess")),
+			awsiam.ManagedPolicy_FromManagedPolicyArn(stack, aws.String("AWSLambdaBasicExecutionRole"), aws.String("arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole")),
 		},
 	})
 
@@ -198,6 +199,25 @@ func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNi
 		Authorizer:  httpApiAuthorizer,
 		Methods:     &[]awscdkapigatewayv2alpha.HttpMethod{awscdkapigatewayv2alpha.HttpMethod_POST},
 		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("postDocumentTreeLambdaIntegration"), postDocumentTreeHandler, &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
+	})
+
+	// POST Document Title Api
+
+	postDocumentTitleHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("POST-DocumentTitle"), &awscdklambdagoalpha.GoFunctionProps{
+		FunctionName: jsii.String("POST-DocumentTitle"),
+		Runtime:      awslambda.Runtime_GO_1_X(),
+		Entry:        jsii.String("./lambda-handler/save-document-title-handler"),
+		Bundling: &awscdklambdagoalpha.BundlingOptions{
+			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
+		},
+		Role: dynamoDBRole,
+	})
+
+	httpApi.AddRoutes(&awscdkapigatewayv2alpha.AddRoutesOptions{
+		Path:        jsii.String("/saveDocumentTitle"),
+		Authorizer:  httpApiAuthorizer,
+		Methods:     &[]awscdkapigatewayv2alpha.HttpMethod{awscdkapigatewayv2alpha.HttpMethod_POST},
+		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("postDocumentTitleLambdaIntegration"), postDocumentTitleHandler, &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
 	})
 
 	return stack

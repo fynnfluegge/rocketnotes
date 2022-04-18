@@ -148,7 +148,7 @@ export class ChecklistDatabase {
       }).subscribe()
    }
  
-   updateItem(node: TodoItemNode, vName: string) {
+   saveItem(node: TodoItemNode, vName: string, newItem: boolean) {
     node.name = vName;
     this.dataChange.next(this.data);
 
@@ -159,15 +159,23 @@ export class ChecklistDatabase {
         "trash": JSON.parse(JSON.stringify(this.trashNode.children)),
         "pinned": JSON.parse(JSON.stringify(this.pinnedNode.children))
       }
-    ).subscribe(() => { 
-      this.testService.post("saveDocument", 
-      { 
-        "ID": node.id,
-        "parentId": node.parent,
-        "userId": localStorage.getItem("currentUserId"),
-        "title": vName,
-        "content": "new document"
-      }).subscribe()
+    ).subscribe(() => {
+      if (newItem) {
+        this.testService.post("saveDocument", 
+        { 
+          "ID": node.id,
+          "parentId": node.parent,
+          "userId": localStorage.getItem("currentUserId"),
+          "title": vName,
+          "content": "new document"
+        }).subscribe()
+      } else {
+        this.testService.post("saveDocumentTitle", 
+        { 
+          "id": node.id,
+          "title": vName
+        }).subscribe()
+      }
     })
    }
 
@@ -421,10 +429,11 @@ export class AppComponent {
     this.treeControl.expand(this.nestedNodeMap.get(this.database.rootNode));
   }
 
-  removeItem(node: TodoItemFlatNode) {
+  moveToTrash(node: TodoItemFlatNode) {
     this.flatNodeMap.forEach(element => {
       if (element.id === node.parent) {
         this.database.removeItem(element, this.flatNodeMap.get(node));
+        return;
       }
     })
 
@@ -435,9 +444,9 @@ export class AppComponent {
     this.treeControl.expand(this.nestedNodeMap.get(this.database.trashNode));
   }
 
-  saveNode(node: TodoItemFlatNode, itemValue: string) {
+  saveNode(node: TodoItemFlatNode, itemValue: string, newItem: boolean) {
     const nestedNode = this.flatNodeMap.get(node);
-    this.database.updateItem(nestedNode!, itemValue);
+    this.database.saveItem(nestedNode!, itemValue, newItem);
     this.treeControl.collapse(this.nestedNodeMap.get(this.database.rootNode));
     this.treeControl.expand(this.nestedNodeMap.get(this.database.rootNode));
   }

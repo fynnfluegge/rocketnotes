@@ -55,10 +55,7 @@ func handleRequest(ctx context.Context, event events.SQSEvent) {
 	_, err = svc.PutItem(input)
 	if err != nil {
 		log.Fatalf("Got error calling PutItem: %s", err)
-	} else {
-		log.Println("Successfully added '" + event.Records[0].Body + "' to table " + tableName)
 	}
-
 }
 
 func main() {

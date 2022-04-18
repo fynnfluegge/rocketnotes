@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -14,18 +15,16 @@ import (
 )
 
 type Document struct {
-	ID       string      `json:"id"`
-	Name     string      `json:"name"`
-	Parent   string      `json:"parent"`
-	Pinned   bool        `json:"pinned"`
-	Children []*Document `json:"children"`
+	ID       string `json:"ID"`
+	ParentId string `json:"parentId"`
+	UserId   string `json:"userId"`
+	Title    string `json:"title"`
+	Content  string `json:"content"`
 }
 
-type Item struct {
-	ID        string      `json:"ID"`
-	Documents []*Document `json:"documents"`
-	Trash     []*Document `json:"trash"`
-	Pinned    []*Document `json:"pinned"`
+type RequestBody struct {
+	ID    string `json:"id"`
+	Title string `json:"title"`
 }
 
 func init() {
@@ -33,9 +32,9 @@ func init() {
 
 func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 
-	item := Item{}
+	requestBody := RequestBody{}
 
-	json.Unmarshal([]byte(request.Body), &item)
+	json.Unmarshal([]byte(request.Body), &requestBody)
 
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
@@ -43,12 +42,41 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 
 	svc := dynamodb.New(sess)
 
+	tableName := "MyDynamoDB"
+
+	result, err := svc.GetItem(&dynamodb.GetItemInput{
+		TableName: aws.String(tableName),
+		Key: map[string]*dynamodb.AttributeValue{
+			"ID": {
+				S: aws.String(requestBody.ID),
+			},
+		},
+	})
+	if err != nil {
+		log.Fatalf("Got error calling GetItem: %s", err)
+	}
+
+	if result.Item == nil {
+		return events.APIGatewayProxyResponse{
+			StatusCode: 404,
+		}, nil
+	}
+
+	item := Document{}
+
+	err = dynamodbattribute.UnmarshalMap(result.Item, &item)
+	if err != nil {
+		panic(fmt.Sprintf("Failed to unmarshal Record, %v", err))
+	}
+
+	item.Title = requestBody.Title
+
+	log.Println(item)
+
 	av, err := dynamodbattribute.MarshalMap(item)
 	if err != nil {
 		log.Fatalf("Got error marshalling new movie item: %s", err)
 	}
-
-	tableName := "MyDynamoDB"
 
 	input := &dynamodb.PutItemInput{
 		Item:      av,

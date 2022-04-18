@@ -54,7 +54,7 @@
         <button *ngIf="!node.deleted" mat-icon-button [ngClass]="node.pinned ? 'icon-button-star' : 'icon-button-fade'" (click)="pinItem(node)"><mat-icon [style.color] = "node.pinned ? 'gold' : 'lightgray'">star</mat-icon></button>
         <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="addNewItem(node)"><mat-icon>note_add</mat-icon></button>
         <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="editItem(node)"><mat-icon>edit</mat-icon></button>
-        <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="removeItem(node)"><mat-icon>delete</mat-icon></button>
+        <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="moveToTrash(node)"><mat-icon>delete</mat-icon></button>
         <button *ngIf="node.deleted" mat-icon-button class="icon-button-fade"><mat-icon>delete_forever</mat-icon></button>
         <button *ngIf="node.deleted" mat-icon-button class="icon-button-fade" (click)="restoreItem(node)"><mat-icon>restore_from_trash</mat-icon></button>
       </mat-tree-node>
@@ -63,7 +63,7 @@
         <mat-form-field style="padding-left: 24px;">
           <input matInput #itemValue placeholder="New document..." style="width:140px;height:24px;">
         </mat-form-field>
-        <button mat-icon-button (click)="saveNode(node, itemValue.value)" style="width: 24px;">
+        <button mat-icon-button (click)="saveNode(node, itemValue.value, true)" style="width: 24px;">
           <mat-icon>save</mat-icon>
         </button>
         <button mat-icon-button (click)="deleteItem(node)" style="width: 24px;">
@@ -75,7 +75,7 @@
         <mat-form-field style="padding-left: 24px;">
           <input matInput #itemValue value="{{node.name}}" style="width:140px;height:24px;">
         </mat-form-field>
-        <button mat-icon-button (click)="saveNode(node, itemValue.value)" style="width: 24px;">
+        <button mat-icon-button (click)="saveNode(node, itemValue.value, false)" style="width: 24px;">
           <mat-icon>save</mat-icon>
         </button>
         <button mat-icon-button (click)="cancelEditItem(node, itemValue.value)" style="width: 24px;">
@@ -93,7 +93,7 @@
         <button *ngIf="!node.deleted" mat-icon-button [ngClass]="node.pinned ? 'icon-button-star' : 'icon-button-fade'" (click)="pinItem(node)"><mat-icon [style.color] = "node.pinned ? 'gold' : 'lightgray'">star</mat-icon></button>
         <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="addNewItem(node)"><mat-icon>note_add</mat-icon></button>
         <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="editItem(node)"><mat-icon>edit</mat-icon></button>
-        <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="removeItem(node)"><mat-icon>delete</mat-icon></button>
+        <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="moveToTrash(node)"><mat-icon>delete</mat-icon></button>
         <button *ngIf="node.deleted" mat-icon-button class="icon-button-fade"><mat-icon>delete_forever</mat-icon></button>
         <button *ngIf="node.deleted" mat-icon-button class="icon-button-fade" (click)="restoreItem(node)"><mat-icon>restore_from_trash</mat-icon></button>
       </mat-tree-node>
