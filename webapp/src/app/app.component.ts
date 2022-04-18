@@ -210,7 +210,7 @@ export class ChecklistDatabase {
 
       // check if pinned node already exists as a child in this.pinnedNodeMap and mark it as pinned
       if (this.pinnedNodeMap.has(node.id)) 
-        this.pinItemDeep(this.pinnedNode, node.id);
+        this.pinItemDeep(this.pinnedNode, node.id, true);
 
       // add deep copy of pinned node to pinnedNodeMap
       this.pinnedNodeMap.set(node.id, nodeCopy);
@@ -234,13 +234,11 @@ export class ChecklistDatabase {
         this.pinnedNode.children = null;
       else {
         // if unpinned node is child of a pinned node unpin it
-        this.unPinItemDeep(this.pinnedNode, node.id);
+        this.pinItemDeep(this.pinnedNode, node.id, false);
       }
 
       this.rootNodeMap.get(node.id).pinned = false
     }
-
-    console.log(this.pinnedNode)
 
     this.dataChange.next(this.data);
     this.testService.post("saveDocumentTree", 
@@ -252,33 +250,17 @@ export class ChecklistDatabase {
     }).subscribe()
   }
 
-  unPinItemDeep(node: TodoItemNode, id: string) {
+  pinItemDeep(node: TodoItemNode, id: string, pin: boolean) {
     if (node.id === id) {
-      node.pinned = false;
+      node.pinned = pin;
     } else if (node.children) {
       node.children.forEach(v => {
         if (v.id === id) {
-          v.pinned = false;
+          v.pinned = pin;
           return;
         }
         else {
-          this.unPinItemDeep(v, id);
-        }
-      })
-    }
-  }
-
-  pinItemDeep(node: TodoItemNode, id: string) {
-    if (node.id === id) {
-      node.pinned = true;
-    } else if (node.children) {
-      node.children.forEach(v => {
-        if (v.id === id) {
-          v.pinned = true;
-          return;
-        }
-        else {
-          this.pinItemDeep(v, id);
+          this.pinItemDeep(v, id, pin);
         }
       })
     }
