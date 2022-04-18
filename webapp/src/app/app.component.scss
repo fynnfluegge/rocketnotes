@@ -49,8 +49,14 @@ span:hover {
   width: 24px;
 }
 
+.icon-button-star {
+  opacity: 1;
+  width: 24px;
+}
+
 .icon-button-fade:hover,
-.icon-button-chevron:hover {
+.icon-button-chevron:hover,
+.icon-button-star:hover {
   opacity: 1;
 }
 

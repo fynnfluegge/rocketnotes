@@ -18,6 +18,7 @@ type Document struct {
 	ID       string      `json:"id"`
 	Name     string      `json:"name"`
 	Parent   string      `json:"parent"`
+	Pinned   bool        `json:"pinned"`
 	Children []*Document `json:"children"`
 }
 

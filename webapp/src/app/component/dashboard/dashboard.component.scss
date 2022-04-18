@@ -47,3 +47,7 @@ textarea.md-input {
   display: block;
   float: right;
 }
+
+.btn:focus {
+  box-shadow: none;
+}

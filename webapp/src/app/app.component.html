@@ -27,7 +27,7 @@
       </mat-tree-node>
 
       <mat-tree-node *matTreeNodeDef="let node; when: isRoot" matTreeNodePadding matTreeNodePaddingIndent="4">
-        <mat-icon>note</mat-icon>
+        <mat-icon>insert_drive_file</mat-icon>
         <button mat-icon-button matTreeNodeToggle *ngIf="node.expandable" class="icon-button-chevron">
           <mat-icon>
             {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
@@ -51,7 +51,7 @@
 
       <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle matTreeNodePadding matTreeNodePaddingIndent="4" [routerLink]="'/dashboard/' + node.id">
         <span style="padding-left: 24px;">{{node.name}}</span>
-        <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="pinItem(node)"><mat-icon [style.color] = "node.pinned ? 'gold' : 'lightgray'">star</mat-icon></button>
+        <button *ngIf="!node.deleted" mat-icon-button [ngClass]="node.pinned ? 'icon-button-star' : 'icon-button-fade'" (click)="pinItem(node)"><mat-icon [style.color] = "node.pinned ? 'gold' : 'lightgray'">star</mat-icon></button>
         <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="addNewItem(node)"><mat-icon>note_add</mat-icon></button>
         <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="editItem(node)"><mat-icon>edit</mat-icon></button>
         <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="removeItem(node)"><mat-icon>delete</mat-icon></button>
@@ -90,7 +90,7 @@
           </mat-icon>
         </button>
         <span>{{node.name}}</span>
-        <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="pinItem(node)"><mat-icon [style.color] = "node.pinned ? 'gold' : 'lightgray'" [style.opacity] = "node.pinned ? '0.5' : '0.2'">star</mat-icon></button>
+        <button *ngIf="!node.deleted" mat-icon-button [ngClass]="node.pinned ? 'icon-button-star' : 'icon-button-fade'" (click)="pinItem(node)"><mat-icon [style.color] = "node.pinned ? 'gold' : 'lightgray'">star</mat-icon></button>
         <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="addNewItem(node)"><mat-icon>note_add</mat-icon></button>
         <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="editItem(node)"><mat-icon>edit</mat-icon></button>
         <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="removeItem(node)"><mat-icon>delete</mat-icon></button>

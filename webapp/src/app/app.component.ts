@@ -71,8 +71,6 @@ export class ChecklistDatabase {
         this.dataChange.next([this.pinnedNode, this.rootNode, this.trashNode]);
       },
       error: (e) => {
-        console.log("ERROR")
-        console.log(e)
         this.rootNode = <TodoItemNode>{ id: "root", name: "root", children: null };
         this.trashNode = <TodoItemNode>{ id: "trash", name: "trash", children: null };
         this.pinnedNode = <TodoItemNode>{ id: "pinned", name: "pinned", children: null };
@@ -185,6 +183,7 @@ export class ChecklistDatabase {
     } else if (this.pinnedNode.children){
       this.pinnedNode.children = this.pinnedNode.children.filter(c => c.id !== node.id);
       if (this.pinnedNode.children.length === 0) this.pinnedNode.children = null;
+      this.rootNode.children.forEach(v => this.unPinItem(v, node.id))
     }
     this.dataChange.next(this.data);
     this.testService.post("saveDocumentTree", 
@@ -195,7 +194,24 @@ export class ChecklistDatabase {
       "pinned": JSON.parse(JSON.stringify(this.pinnedNode.children))
     }).subscribe()
   }
- }
+
+  unPinItem(node: TodoItemNode, id: string) {
+    if (node.id === id) {
+      node.pinned = false
+    }
+    else if (node.children) {
+      node.children.forEach(v => {
+        if (v.id === id) {
+          v.pinned = false
+          return
+        }
+        else {
+          this.unPinItem(v, id);
+        }
+      })
+    }
+  }
+}
 
 
 @Component({
