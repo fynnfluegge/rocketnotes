@@ -15,9 +15,11 @@ import { Auth } from 'aws-amplify';
   id: string;
   name: string;
   parent: string;
+  children?: TodoItemNode[];
+
   deleted: boolean;
   pinned: boolean;
-  children?: TodoItemNode[];
+  inPinnedTree: boolean;
 }
 
 /** Flat to-do item node with expandable and level information */
@@ -83,6 +85,7 @@ export class ChecklistDatabase {
             this.pinnedNodeMap.set(v.id, v);
             this.addFlatToMap(this.pinnedNodeMap, v)
           })
+          this.setInPinnedTree(this.pinnedNode)
         }
       },
       error: (e) => {
@@ -102,6 +105,11 @@ export class ChecklistDatabase {
       })
     }
   }
+
+  setInPinnedTree(node: TodoItemNode) {
+    node.inPinnedTree = true
+    if (node.children) node.children.forEach(v => { this.setInPinnedTree(v) })
+  }
   
   setDeleted(node: TodoItemNode) {
     node.deleted = true
@@ -114,7 +122,7 @@ export class ChecklistDatabase {
   }
  
   insertItem(parent: TodoItemNode, vName: string) {
-    const child = <TodoItemNode>{ id: uuid.v4(), name: vName, parent: parent.id };
+    const child = <TodoItemNode>{ id: uuid.v4(), name: vName, parent: parent.id, pinned: false, inPinnedTree: false, deleted: false };
     if (parent.children) {
       parent.children.push(child);
       this.dataChange.next(this.data);
@@ -132,21 +140,26 @@ export class ChecklistDatabase {
      this.dataChange.next(this.data);
    }
 
-   removeItem(parent: TodoItemNode, node: TodoItemNode) {
+  removeFromParent(parent: TodoItemNode, node: TodoItemNode) {
+    parent.children = parent.children.filter(c => c.id !== node.id);
+    if (parent.children.length === 0 ) parent.children = null;
+    this.dataChange.next(this.data);
+  }
+
+  moveToTrash(node: TodoItemNode) {
     this.setDeleted(node)
-     parent.children = parent.children.filter(c => c.id !== node.id);
-     if (parent.children.length === 0 ) parent.children = null;
-     if (!this.trashNode.children) this.trashNode.children = [];
-     this.trashNode.children.push(node);
-     this.dataChange.next(this.data);
-      this.testService.post("saveDocumentTree", 
-      { 
-        "ID": localStorage.getItem("currentUserId"),
-        "documents": JSON.parse(JSON.stringify(this.rootNode.children)),
-        "trash": JSON.parse(JSON.stringify(this.trashNode.children)),
-        "pinned": JSON.parse(JSON.stringify(this.pinnedNode.children))
-      }).subscribe()
-   }
+    if (!this.trashNode.children) this.trashNode.children = [];
+    this.trashNode.children.push(node);
+
+    this.dataChange.next(this.data);
+    this.testService.post("saveDocumentTree", 
+    { 
+      "ID": localStorage.getItem("currentUserId"),
+      "documents": JSON.parse(JSON.stringify(this.rootNode.children)),
+      "trash": JSON.parse(JSON.stringify(this.trashNode.children)),
+      "pinned": JSON.parse(JSON.stringify(this.pinnedNode.children))
+    }).subscribe()
+  }
  
    saveItem(node: TodoItemNode, vName: string, newItem: boolean) {
     node.name = vName;
@@ -208,12 +221,13 @@ export class ChecklistDatabase {
 
   pinItem(node: TodoItemNode) {
     node.pinned = !node.pinned
+    node.inPinnedTree = !node.inPinnedTree
     // PIN Node
     if (node.pinned) {
       if (!this.pinnedNode.children) this.pinnedNode.children = [];
 
       // add deep copy of pinned node to pinnedNodeTree
-      var nodeCopy = <TodoItemNode>{ id: node.id, name: node.name, parent: node.parent, children: this.deepCopy(node.children), pinned: true }
+      var nodeCopy = <TodoItemNode>{ id: node.id, name: node.name, parent: node.parent, children: this.deepCopy(node.children), pinned: true, inPinnedTree: true }
       this.pinnedNode.children.push(nodeCopy);
 
       // check if pinned node already exists as a child in this.pinnedNodeMap and mark it as pinned
@@ -430,12 +444,23 @@ export class AppComponent {
   }
 
   moveToTrash(node: TodoItemFlatNode) {
+    var nestedNode = this.flatNodeMap.get(node);
+    // remove from documents and pinned
     this.flatNodeMap.forEach(element => {
-      if (element.id === node.parent) {
-        this.database.removeItem(element, this.flatNodeMap.get(node));
-        return;
+      if (element.id === "pinned" && node.pinned) {
+        this.database.removeFromParent(element, nestedNode);
+      }
+      else if (element.id === node.parent) {
+        this.database.removeFromParent(element, nestedNode);
       }
     })
+
+    // move node to trash
+    nestedNode.pinned = false
+    this.database.moveToTrash(nestedNode);
+
+    this.treeControl.collapse(this.nestedNodeMap.get(this.database.pinnedNode));
+    this.treeControl.expand(this.nestedNodeMap.get(this.database.pinnedNode));
 
     this.treeControl.collapse(this.nestedNodeMap.get(this.database.rootNode));
     this.treeControl.expand(this.nestedNodeMap.get(this.database.rootNode));
@@ -456,7 +481,7 @@ export class AppComponent {
     var parent
     var parentToInsert
     this.flatNodeMap.forEach(element => {
-      if (element.id === node.parent) {
+      if (!element.inPinnedTree && element.id === node.parent) {
         parent = element
       }
     })
@@ -487,7 +512,7 @@ export class AppComponent {
   getNearestParentThatIsNotDeleted(node: TodoItemNode): TodoItemNode {
     var parentNode;
     this.flatNodeMap.forEach(element => {
-      if (element.id === node.parent) {
+      if (element.inPinnedTree && element.id === node.parent) {
         if (element.deleted) {
           parentNode = this.getNearestParentThatIsNotDeleted(element)
           return;
