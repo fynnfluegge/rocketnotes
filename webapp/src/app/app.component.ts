@@ -141,7 +141,7 @@ export class ChecklistDatabase {
    }
 
   removeFromParent(parent: TodoItemNode, node: TodoItemNode) {
-    parent.children = parent.children.filter(c => c.id !== node.id);
+    if (parent.children) parent.children = parent.children.filter(c => c.id !== node.id);
     if (parent.children.length === 0 ) parent.children = null;
     this.dataChange.next(this.data);
   }
@@ -199,13 +199,17 @@ export class ChecklistDatabase {
 
       if (parentToInsert.id === parent.id) {
         // parent not deleted, remove node from trash
-        this.trashNode.children = this.trashNode.children.filter(c => c.id !== node.id);
-        if (this.trashNode.children.length == 0) this.trashNode.children = null;
+        if (this.trashNode.children) {
+          this.trashNode.children = this.trashNode.children.filter(c => c.id !== node.id);
+          if (this.trashNode.children.length == 0) this.trashNode.children = null;
+        }
       }
       else {
         // parent also deleted, remove node from children of parent in trash
-        parent.children = parent.children.filter(c => c.id !== node.id);
-        if (parent.children.length === 0) parent.children = null;
+        if (parent.children) {
+          parent.children = parent.children.filter(c => c.id !== node.id);
+          if (parent.children.length === 0) parent.children = null;
+        }
       }
 
       this.dataChange.next(this.data);
@@ -481,22 +485,33 @@ export class AppComponent {
     var parent
     var parentToInsert
     this.flatNodeMap.forEach(element => {
-      if (!element.inPinnedTree && element.id === node.parent) {
+      if (element.id === node.parent) {
+        console.log("Restore")
         parent = element
+
+        if (parent.deleted) {
+          parentToInsert = this.getNearestParentThatIsNotDeleted(nodeToRestore)
+        } else {
+          parentToInsert = parent
+        }
+    
+        nodeToRestore.parent = parentToInsert.id
+    
+        this.database.restoreItem(nodeToRestore, parentToInsert, parent)
       }
     })
-    if (parent.deleted) {
-      parentToInsert = this.getNearestParentThatIsNotDeleted(nodeToRestore)
-    } else {
-      parentToInsert = parent
-    }
 
-    nodeToRestore.parent = parentToInsert.id
+    // restore to pinned nodes
 
-    this.database.restoreItem(nodeToRestore, parentToInsert, parent)
+    // flag to check if needed to restore in pinned?
+    // or iterate through pinned tree and search for parents?
+    // (x) or move to this.flatNodeMap.forEach(element => { and remove !element.inPinnedTree to insert in every parent?
 
     this.treeControl.collapse(this.nestedNodeMap.get(this.database.rootNode));
     this.treeControl.expand(this.nestedNodeMap.get(this.database.rootNode));
+
+    this.treeControl.collapse(this.nestedNodeMap.get(this.database.pinnedNode));
+    this.treeControl.expand(this.nestedNodeMap.get(this.database.pinnedNode));
 
     this.treeControl.collapse(this.nestedNodeMap.get(this.database.trashNode));
     this.treeControl.expand(this.nestedNodeMap.get(this.database.trashNode));
