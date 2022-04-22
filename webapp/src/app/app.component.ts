@@ -7,6 +7,7 @@ import { of as ofObservable, Observable, BehaviorSubject } from 'rxjs';
 import * as uuid from 'uuid';
 import { TestServiceService } from 'src/app/service/rest/test-service.service';
 import { Auth } from 'aws-amplify';
+import { ConsoleLogger } from '@aws-amplify/core';
 
 /**
  * Node for to-do item
@@ -19,7 +20,6 @@ import { Auth } from 'aws-amplify';
 
   deleted: boolean;
   pinned: boolean;
-  inPinnedTree: boolean;
 }
 
 /** Flat to-do item node with expandable and level information */
@@ -66,11 +66,11 @@ export class ChecklistDatabase {
       next: (res) => {
         const jsonObject = JSON.parse(JSON.stringify(res))
         this.rootNode = <TodoItemNode>{ id: "root", name: "root", children: jsonObject.documents };
-        if (jsonObject.trash) {
-          jsonObject.trash.forEach(v => { this.setDeleted(v) })
-        }
-        this.trashNode = <TodoItemNode>{ id: "trash", name: "trash", children: jsonObject.trash };
         this.pinnedNode = <TodoItemNode>{ id: "pinned", name: "pinned", children: jsonObject.pinned };
+        this.trashNode = <TodoItemNode>{ id: "trash", name: "trash", children: jsonObject.trash };
+        if (jsonObject.trash) {
+          jsonObject.trash.forEach(v => { this.setDeletedandUnpin(v) })
+        }
         this.dataChange.next([this.pinnedNode, this.rootNode, this.trashNode]);
 
         if (jsonObject.documents) {
@@ -85,7 +85,6 @@ export class ChecklistDatabase {
             this.pinnedNodeMap.set(v.id, v);
             this.addFlatToMap(this.pinnedNodeMap, v)
           })
-          this.setInPinnedTree(this.pinnedNode)
         }
       },
       error: (e) => {
@@ -105,15 +104,18 @@ export class ChecklistDatabase {
       })
     }
   }
-
-  setInPinnedTree(node: TodoItemNode) {
-    node.inPinnedTree = true
-    if (node.children) node.children.forEach(v => { this.setInPinnedTree(v) })
-  }
   
-  setDeleted(node: TodoItemNode) {
+  setDeletedandUnpin(node: TodoItemNode) {
     node.deleted = true
-    if (node.children) node.children.forEach(v => { this.setDeleted(v) })
+    if (node.pinned) {
+      node.pinned = false;
+      if (this.pinnedNode.children) {
+        this.pinnedNode.children = this.pinnedNode.children.filter(c => c.id !== node.id);
+        if (this.pinnedNode.children.length === 0) this.pinnedNode.children = null;
+      }
+      this.pinnedNodeMap.delete(node.id);
+    }
+    if (node.children) node.children.forEach(v => { this.setDeletedandUnpin(v) })
   }
 
   setNotDeleted(node: TodoItemNode) {
@@ -122,7 +124,7 @@ export class ChecklistDatabase {
   }
  
   insertItem(parent: TodoItemNode, vName: string) {
-    const child = <TodoItemNode>{ id: uuid.v4(), name: vName, parent: parent.id, pinned: false, inPinnedTree: false, deleted: false };
+    const child = <TodoItemNode>{ id: uuid.v4(), name: vName, parent: parent.id, pinned: false, deleted: false };
     if (parent.children) {
       parent.children.push(child);
       this.dataChange.next(this.data);
@@ -134,20 +136,20 @@ export class ChecklistDatabase {
   }
 
    deleteItem(parent: TodoItemNode, node: TodoItemFlatNode) {
-     console.log(parent)
      parent.children = parent.children.filter(c => c.id !== node.id);
      if (parent.children.length === 0 ) parent.children = null;
      this.dataChange.next(this.data);
    }
 
   removeFromParent(parent: TodoItemNode, node: TodoItemNode) {
-    if (parent.children) parent.children = parent.children.filter(c => c.id !== node.id);
-    if (parent.children.length === 0 ) parent.children = null;
-    this.dataChange.next(this.data);
+    if (parent.children) {
+      parent.children = parent.children.filter(c => c.id !== node.id);
+      if (parent.children.length === 0 ) parent.children = null; 
+      this.dataChange.next(this.data);
+    }
   }
 
   moveToTrash(node: TodoItemNode) {
-    this.setDeleted(node)
     if (!this.trashNode.children) this.trashNode.children = [];
     this.trashNode.children.push(node);
 
@@ -164,6 +166,8 @@ export class ChecklistDatabase {
    saveItem(node: TodoItemNode, vName: string, newItem: boolean) {
     node.name = vName;
     this.dataChange.next(this.data);
+
+    this.rootNodeMap.set(node.id, node);
 
     this.testService.post("saveDocumentTree", 
       { 
@@ -193,7 +197,11 @@ export class ChecklistDatabase {
    }
 
    restoreItem(node: TodoItemNode, parentToInsert: TodoItemNode, parent: TodoItemNode) {
+
       this.setNotDeleted(node)
+
+      if (node.parent === "root") parentToInsert = this.rootNode
+
       if (!parentToInsert.children) parentToInsert.children = [];
       parentToInsert.children.push(node)
 
@@ -212,6 +220,8 @@ export class ChecklistDatabase {
         }
       }
 
+      this.rootNodeMap.set(node.id, node);
+
       this.dataChange.next(this.data);
 
       this.testService.post("saveDocumentTree", 
@@ -225,29 +235,16 @@ export class ChecklistDatabase {
 
   pinItem(node: TodoItemNode) {
     node.pinned = !node.pinned
-    node.inPinnedTree = !node.inPinnedTree
     // PIN Node
     if (node.pinned) {
       if (!this.pinnedNode.children) this.pinnedNode.children = [];
 
-      // add deep copy of pinned node to pinnedNodeTree
-      var nodeCopy = <TodoItemNode>{ id: node.id, name: node.name, parent: node.parent, children: this.deepCopy(node.children), pinned: true, inPinnedTree: true }
+      // add copy of pinned node to pinnedNodeTree
+      var nodeCopy = <TodoItemNode>{ id: node.id, name: node.name, parent: node.parent, children: null, pinned: true }
       this.pinnedNode.children.push(nodeCopy);
 
-      // check if pinned node already exists as a child in this.pinnedNodeMap and mark it as pinned
-      if (this.pinnedNodeMap.has(node.id)) 
-        this.pinItemDeep(this.pinnedNode, node.id, true);
-
-      // add deep copy of pinned node to pinnedNodeMap
+      // add copy of pinned node to pinnedNodeMap
       this.pinnedNodeMap.set(node.id, nodeCopy);
-
-      // add children of pinned Node to pinnedNodeMap
-      if (nodeCopy.children) {
-        nodeCopy.children.forEach(v => {
-          this.pinnedNodeMap.set(v.id, v);
-          this.addFlatToMap(this.pinnedNodeMap, nodeCopy)
-        })
-      }
 
       // pin node in rootNodeMap if node was pinned on pinnedNodeTree
       this.rootNodeMap.get(node.id).pinned = true;
@@ -258,12 +255,9 @@ export class ChecklistDatabase {
 
       if (this.pinnedNode.children.length === 0)
         this.pinnedNode.children = null;
-      else {
-        // if unpinned node is child of a pinned node unpin it
-        this.pinItemDeep(this.pinnedNode, node.id, false);
-      }
 
       this.rootNodeMap.get(node.id).pinned = false
+      this.pinnedNodeMap.delete(node.id)
     }
 
     this.dataChange.next(this.data);
@@ -274,36 +268,6 @@ export class ChecklistDatabase {
       "trash": JSON.parse(JSON.stringify(this.trashNode.children)),
       "pinned": JSON.parse(JSON.stringify(this.pinnedNode.children))
     }).subscribe()
-  }
-
-  pinItemDeep(node: TodoItemNode, id: string, pin: boolean) {
-    if (node.id === id) {
-      node.pinned = pin;
-    } else if (node.children) {
-      node.children.forEach(v => {
-        if (v.id === id) {
-          v.pinned = pin;
-          return;
-        }
-        else {
-          this.pinItemDeep(v, id, pin);
-        }
-      })
-    }
-  }
-
-  deepCopy(list?: TodoItemNode[]): TodoItemNode[] {
-    if (list) {
-      var listCopy = []
-      list.forEach(v => {
-        var nodeCopy = <TodoItemNode>{ id: v.id, name: v.name, parent: v.parent, pinned: v.pinned }
-        if (v.children) nodeCopy.children = this.deepCopy(v.children)
-        listCopy.push(nodeCopy)
-      })
-      return listCopy;
-    } else {
-      return null;
-    }
   }
 }
 
@@ -449,18 +413,20 @@ export class AppComponent {
 
   moveToTrash(node: TodoItemFlatNode) {
     var nestedNode = this.flatNodeMap.get(node);
+
     // remove from documents and pinned
     this.flatNodeMap.forEach(element => {
-      if (element.id === "pinned" && node.pinned) {
-        this.database.removeFromParent(element, nestedNode);
-      }
-      else if (element.id === node.parent) {
+      // if (element.id === "pinned" && node.pinned) {
+      //   this.database.removeFromParent(element, nestedNode);
+      // }
+      if (element.id === node.parent) {
         this.database.removeFromParent(element, nestedNode);
       }
     })
 
+    this.database.setDeletedandUnpin(nestedNode);
+
     // move node to trash
-    nestedNode.pinned = false
     this.database.moveToTrash(nestedNode);
 
     this.treeControl.collapse(this.nestedNodeMap.get(this.database.pinnedNode));
@@ -486,7 +452,6 @@ export class AppComponent {
     var parentToInsert
     this.flatNodeMap.forEach(element => {
       if (element.id === node.parent) {
-        console.log("Restore")
         parent = element
 
         if (parent.deleted) {
@@ -494,18 +459,15 @@ export class AppComponent {
         } else {
           parentToInsert = parent
         }
-    
-        nodeToRestore.parent = parentToInsert.id
+        
+        if (parentToInsert)
+          nodeToRestore.parent = parentToInsert.id
+        else
+          nodeToRestore.parent = "root"
     
         this.database.restoreItem(nodeToRestore, parentToInsert, parent)
       }
     })
-
-    // restore to pinned nodes
-
-    // flag to check if needed to restore in pinned?
-    // or iterate through pinned tree and search for parents?
-    // (x) or move to this.flatNodeMap.forEach(element => { and remove !element.inPinnedTree to insert in every parent?
 
     this.treeControl.collapse(this.nestedNodeMap.get(this.database.rootNode));
     this.treeControl.expand(this.nestedNodeMap.get(this.database.rootNode));
@@ -527,7 +489,7 @@ export class AppComponent {
   getNearestParentThatIsNotDeleted(node: TodoItemNode): TodoItemNode {
     var parentNode;
     this.flatNodeMap.forEach(element => {
-      if (element.inPinnedTree && element.id === node.parent) {
+      if (element.id === node.parent) {
         if (element.deleted) {
           parentNode = this.getNearestParentThatIsNotDeleted(element)
           return;
