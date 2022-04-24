@@ -190,11 +190,17 @@ export class ChecklistDatabase {
     }).subscribe()
   }
  
-   saveItem(node: TodoItemNode, vName: string, newItem: boolean) {
-    node.name = vName;
-    this.dataChange.next(this.data);
+   saveItem(node: TodoItemNode, newName: string, newItem: boolean) {
+    node.name = newName;
 
     this.rootNodeMap.set(node.id, node);
+
+    if (node.pinned) {
+      var pinnedNode = this.pinnedNodeMap.get(node.id)
+      pinnedNode.name = newName
+    }
+
+    this.dataChange.next(this.data);
 
     this.testService.post("saveDocumentTree", 
       { 
@@ -210,14 +216,14 @@ export class ChecklistDatabase {
           "ID": node.id,
           "parentId": node.parent,
           "userId": localStorage.getItem("currentUserId"),
-          "title": vName,
+          "title": newName,
           "content": "new document"
         }).subscribe()
       } else {
         this.testService.post("saveDocumentTitle", 
         { 
           "id": node.id,
-          "title": vName
+          "title": newName
         }).subscribe()
       }
     })
@@ -461,8 +467,6 @@ export class AppComponent {
   restoreItem(node: TodoItemFlatNode) {
     const nodeToRestore = this.flatNodeMap.get(node);
     const parentToRemoveId = `${nodeToRestore.parent}`;
-
-    console.log("parentToRemoveId: " + parentToRemoveId)
 
     if (node.parent === "root") {
       this.database.restoreItem(nodeToRestore, node.parent)
