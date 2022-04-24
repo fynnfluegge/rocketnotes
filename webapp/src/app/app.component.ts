@@ -47,8 +47,7 @@ export class ChecklistDatabase {
   pinnedNode: TodoItemNode;
 
   rootNodeMap: Map<string, TodoItemNode> = new Map(); 
-  pinnedNodeMap: Map<string, TodoItemNode> = new Map(); 
-
+  pinnedNodeMap: Map<string, TodoItemNode> = new Map();
 
   dataChange: BehaviorSubject<TodoItemNode[]> = new BehaviorSubject<TodoItemNode[]>([]);
 
@@ -68,10 +67,14 @@ export class ChecklistDatabase {
         this.rootNode = <TodoItemNode>{ id: "root", name: "root", children: jsonObject.documents };
         this.pinnedNode = <TodoItemNode>{ id: "pinned", name: "pinned", children: jsonObject.pinned };
         this.trashNode = <TodoItemNode>{ id: "trash", name: "trash", children: jsonObject.trash };
+
         if (jsonObject.trash) {
           jsonObject.trash.forEach(v => { this.setDeletedandUnpin(v) })
         }
         this.dataChange.next([this.pinnedNode, this.rootNode, this.trashNode]);
+
+        this.rootNodeMap.set(this.rootNode.id, this.rootNode);
+        this.rootNodeMap.set(this.trashNode.id, this.trashNode);
 
         if (jsonObject.documents) {
           jsonObject.documents.forEach(v => {
@@ -86,11 +89,20 @@ export class ChecklistDatabase {
             this.addFlatToMap(this.pinnedNodeMap, v)
           })
         }
+
+        if (jsonObject.trash) {
+          jsonObject.trash.forEach(v => {
+            this.rootNodeMap.set(v.id, v);
+            this.addFlatToMap(this.rootNodeMap, v)
+          })
+        }
       },
       error: (e) => {
         this.rootNode = <TodoItemNode>{ id: "root", name: "root", children: null };
         this.trashNode = <TodoItemNode>{ id: "trash", name: "trash", children: null };
         this.pinnedNode = <TodoItemNode>{ id: "pinned", name: "pinned", children: null };
+        this.rootNodeMap.set(this.rootNode.id, this.rootNode);
+        this.rootNodeMap.set(this.trashNode.id, this.trashNode);
         this.dataChange.next([this.pinnedNode, this.rootNode, this.trashNode]);
       }
     })
@@ -104,25 +116,30 @@ export class ChecklistDatabase {
       })
     }
   }
-  
-  setDeletedandUnpin(node: TodoItemNode) {
-    node.deleted = true
-    if (node.pinned) {
-      node.pinned = false;
-      if (this.pinnedNode.children) {
-        this.pinnedNode.children = this.pinnedNode.children.filter(c => c.id !== node.id);
-        if (this.pinnedNode.children.length === 0) this.pinnedNode.children = null;
-      }
-      this.pinnedNodeMap.delete(node.id);
-    }
-    if (node.children) node.children.forEach(v => { this.setDeletedandUnpin(v) })
-  }
 
   setNotDeleted(node: TodoItemNode) {
     node.deleted = false
     if (node.children) node.children.forEach(v => { this.setNotDeleted(v) })
   }
- 
+  
+  setDeletedandUnpin(node: TodoItemNode) {
+    node.deleted = true
+    this.rootNodeMap.set(node.id, node)
+    if (node.pinned) {
+      node.pinned = false;
+      this.pinnedNodeMap.delete(node.id)
+      this.removeFromParent(this.pinnedNode, node.id)
+    }
+    if (node.children) node.children.forEach(v => { this.setDeletedandUnpin(v) })
+  }
+
+  removeFromParent(parent: TodoItemNode, id: string) {
+    if (parent.children) {
+      parent.children = parent.children.filter(c => c.id !== id);
+      if (parent.children.length === 0) parent.children = null;
+    }
+  }
+
   insertItem(parent: TodoItemNode, vName: string) {
     const child = <TodoItemNode>{ id: uuid.v4(), name: vName, parent: parent.id, pinned: false, deleted: false };
     if (parent.children) {
@@ -135,18 +152,28 @@ export class ChecklistDatabase {
     }
   }
 
-   deleteItem(parent: TodoItemNode, node: TodoItemFlatNode) {
-     parent.children = parent.children.filter(c => c.id !== node.id);
-     if (parent.children.length === 0 ) parent.children = null;
-     this.dataChange.next(this.data);
+   deleteEmptyItem(node: TodoItemFlatNode) {
+    const parent = this.rootNodeMap.get(node.parent)
+    parent.children = parent.children.filter(c => c.id !== node.id);
+    if (parent.children.length === 0 ) parent.children = null;
+    this.dataChange.next(this.data);
+    this.testService.post("saveDocumentTree", 
+    { 
+      "ID": localStorage.getItem("currentUserId"),
+      "documents": JSON.parse(JSON.stringify(this.rootNode.children)),
+      "trash": JSON.parse(JSON.stringify(this.trashNode.children)),
+      "pinned": JSON.parse(JSON.stringify(this.pinnedNode.children))
+    }).subscribe()
    }
 
-  removeFromParent(parent: TodoItemNode, node: TodoItemNode) {
-    if (parent.children) {
-      parent.children = parent.children.filter(c => c.id !== node.id);
-      if (parent.children.length === 0 ) parent.children = null; 
-      this.dataChange.next(this.data);
+  removeFromDocuments(node: TodoItemNode) {
+    if (node.parent === "root") {
+      this.removeFromParent(this.rootNode, node.id)
+    } else {
+      const parent = this.rootNodeMap.get(node.parent)
+      this.removeFromParent(parent, node.id)
     }
+    this.dataChange.next(this.data);
   }
 
   moveToTrash(node: TodoItemNode) {
@@ -196,29 +223,25 @@ export class ChecklistDatabase {
     })
    }
 
-   restoreItem(node: TodoItemNode, parentToInsert: TodoItemNode, parentToRemove: TodoItemNode = null) {
+   restoreItem(node: TodoItemNode, parentToInsertId: string, parentToRemoveId: string = null) {
 
       this.setNotDeleted(node)
+
+      const parentToInsert = this.rootNodeMap.get(parentToInsertId)
 
       if (!parentToInsert.children) parentToInsert.children = [];
 
       // insert node
       parentToInsert.children.push(node)
 
-      if (!parentToRemove) {
-        console.log("remove from trash")
+      if (!parentToRemoveId) {
         // parent not deleted, remove node from trash
-        if (this.trashNode.children) {
-          this.trashNode.children = this.trashNode.children.filter(c => c.id !== node.id);
-          if (this.trashNode.children.length == 0) this.trashNode.children = null;
-        }
+        this.removeFromParent(this.trashNode, node.id)
       }
       else {
+        const parentToRemove = this.rootNodeMap.get(parentToRemoveId)
         // parent in trash, remove node from parent.children
-        if (parentToRemove.children) {
-          parentToRemove.children = parentToRemove.children.filter(c => c.id !== node.id);
-          if (parentToRemove.children.length === 0) parentToRemove.children = null;
-        }
+        this.removeFromParent(parentToRemove, node.id)
       }
 
       this.rootNodeMap.set(node.id, node);
@@ -379,8 +402,7 @@ export class AppComponent {
   };
 
   addNewItem(node: TodoItemFlatNode) {
-    const parentNode = this.flatNodeMap.get(node);
-    this.database.insertItem(parentNode!, '');
+    this.database.insertItem(this.flatNodeMap.get(node), '');
 
     this.treeControl.expand(node);
     this.treeControl.collapse(this.nestedNodeMap.get(this.database.rootNode));
@@ -399,14 +421,8 @@ export class AppComponent {
     this.treeControl.expand(this.nestedNodeMap.get(this.database.rootNode));
   }
 
-  deleteItem(node: TodoItemFlatNode) {
-    var parentNode;
-    this.flatNodeMap.forEach(element => {
-      if (element.id === node.parent) {
-        parentNode = element
-      }
-    })
-    this.database.deleteItem(parentNode!, node);
+  deleteEmptyItem(node: TodoItemFlatNode) {
+    this.database.deleteEmptyItem(node);
 
     this.treeControl.collapse(this.nestedNodeMap.get(this.database.rootNode));
     this.treeControl.expand(this.nestedNodeMap.get(this.database.rootNode));
@@ -415,13 +431,11 @@ export class AppComponent {
   moveToTrash(node: TodoItemFlatNode) {
     var nestedNode = this.flatNodeMap.get(node);
 
-    // remove from documents and pinned
-    this.flatNodeMap.forEach(element => {
-      if (element.id === node.parent) {
-        this.database.removeFromParent(element, nestedNode);
-      }
-    })
-
+    // remove from parent in documents
+    this.database.removeFromDocuments(nestedNode);
+    
+    // set node and children as deleted
+    // unpin node and children
     this.database.setDeletedandUnpin(nestedNode);
 
     // move node to trash
@@ -446,33 +460,22 @@ export class AppComponent {
 
   restoreItem(node: TodoItemFlatNode) {
     const nodeToRestore = this.flatNodeMap.get(node);
-    
-    for (let element of this.flatNodeMap.values()) {
-      if (element.id === node.parent /*&& !element.isInPinnedTree*/) {
-        console.log("parent found")
-        if (element.id === "root") {
-          console.log("parent root")
-          this.database.restoreItem(nodeToRestore, element)
-        } else {
-          console.log("parent not root")
-          console.log(element.id)
+    const parentToRemoveId = `${nodeToRestore.parent}`;
 
-          var parentToInsert: TodoItemNode = element;
+    console.log("parentToRemoveId: " + parentToRemoveId)
 
-          if (element.deleted) {
-            parentToInsert = this.getNearestParentThatIsNotDeleted(nodeToRestore)
-            console.log("new parent")
-            console.log(parentToInsert.id)
-            if (parentToInsert)
-              nodeToRestore.parent = parentToInsert.id
-            else
-              nodeToRestore.parent = "root"
-          }
-          
-          this.database.restoreItem(nodeToRestore, parentToInsert, parentToInsert.id === element.id ? null : element)
-        }
-        break;
+    if (node.parent === "root") {
+      this.database.restoreItem(nodeToRestore, node.parent)
+    } else {
+      var parentToInsert: TodoItemNode = this.database.rootNodeMap.get(node.parent);
+      if (parentToInsert.deleted) {
+        parentToInsert = this.getNearestParentThatIsNotDeleted(nodeToRestore)
+        if (parentToInsert)
+          nodeToRestore.parent = parentToInsert.id
+        else
+          nodeToRestore.parent = "root"
       }
+      this.database.restoreItem(nodeToRestore, parentToInsert.id, parentToInsert.id === parentToRemoveId ? null : parentToRemoveId)
     }
 
     this.treeControl.collapse(this.nestedNodeMap.get(this.database.rootNode));
@@ -494,18 +497,18 @@ export class AppComponent {
 
   getNearestParentThatIsNotDeleted(node: TodoItemNode): TodoItemNode {
     var parentNode;
-    this.flatNodeMap.forEach(element => {
+    for (let element of this.flatNodeMap.values()) {
       if (element.id === node.parent) {
         if (element.deleted) {
           parentNode = this.getNearestParentThatIsNotDeleted(element)
-          return;
+          break;
         }
         else {
           parentNode = element
-          return;
+          break;
         }
       }
-    })
+    }
     return parentNode;
   }
 
