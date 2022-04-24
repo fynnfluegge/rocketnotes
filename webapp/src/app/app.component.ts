@@ -154,8 +154,8 @@ export class ChecklistDatabase {
 
    deleteEmptyItem(node: TodoItemFlatNode) {
     const parent = this.rootNodeMap.get(node.parent)
-    parent.children = parent.children.filter(c => c.id !== node.id);
-    if (parent.children.length === 0 ) parent.children = null;
+    this.removeFromParent(parent, node.id)
+    
     this.dataChange.next(this.data);
     this.testService.post("saveDocumentTree", 
     { 
