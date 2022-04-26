@@ -23,6 +23,10 @@
   background-color:transparent;
 }
 
+mat-tree-node {
+  display: flex;
+}
+
 mat-tree-node:hover {
   background-color: #111;
 }
@@ -76,8 +80,8 @@ span:hover {
   height: calc(100% - 52px);
   overflow: auto;
   z-index: 2;
-  box-shadow: 0 0 15px rgba(0,0,0,0.75);
-  clip-path: inset(0px -15px 0px 0px);
+  box-shadow: 0 0 10px rgba(0,0,0,0.75);
+  clip-path: inset(0px -20px 0px 0px);
 }
 
 .sidebar:hover {
@@ -87,6 +91,7 @@ span:hover {
 
 //--- navigsation bar ---//
 ul {
+  display: flex;
   list-style-type: none;
   margin: 0;
   padding: 0;
@@ -99,10 +104,6 @@ ul {
   z-index: 1;
 }
 
-li {
-  float: left;
-}
-
 li a {
   display: block;
   color: white;
@@ -113,6 +114,7 @@ li a {
 }
 
 li a:hover {
+  color: white;
   background-color: #111;
   cursor: pointer;
 }

@@ -191,14 +191,15 @@ export class ChecklistDatabase {
   }
  
    saveItem(node: TodoItemNode, newName: string, newItem: boolean) {
-    node.name = newName;
-
-    this.rootNodeMap.set(node.id, node);
+    var node_ = this.rootNodeMap.get(node.id)
+    node_.name = newName
 
     if (node.pinned) {
       var pinnedNode = this.pinnedNodeMap.get(node.id)
       pinnedNode.name = newName
     }
+
+    if (newItem) this.rootNodeMap.set(node.id, node);
 
     this.dataChange.next(this.data);
 
@@ -419,12 +420,16 @@ export class AppComponent {
     node.editNode = true;
     this.treeControl.collapse(this.nestedNodeMap.get(this.database.rootNode));
     this.treeControl.expand(this.nestedNodeMap.get(this.database.rootNode));
+    this.treeControl.collapse(this.nestedNodeMap.get(this.database.pinnedNode));
+    this.treeControl.expand(this.nestedNodeMap.get(this.database.pinnedNode));
   }
 
   cancelEditItem(node: TodoItemFlatNode) {
     node.editNode = false;
     this.treeControl.collapse(this.nestedNodeMap.get(this.database.rootNode));
     this.treeControl.expand(this.nestedNodeMap.get(this.database.rootNode));
+    this.treeControl.collapse(this.nestedNodeMap.get(this.database.pinnedNode));
+    this.treeControl.expand(this.nestedNodeMap.get(this.database.pinnedNode));
   }
 
   deleteEmptyItem(node: TodoItemFlatNode) {
