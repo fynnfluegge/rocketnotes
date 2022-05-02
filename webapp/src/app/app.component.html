@@ -49,7 +49,7 @@
         Trash
       </mat-tree-node>
 
-      <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle matTreeNodePadding matTreeNodePaddingIndent="8" [routerLink]="'/dashboard/' + node.id">
+      <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle matTreeNodePadding matTreeNodePaddingIndent="8" [routerLink]="'/' + node.id">
         <span style="padding-left:24px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{node.name}}</span>
         <button *ngIf="!node.deleted" mat-icon-button [ngClass]="node.pinned ? 'icon-button-star' : 'icon-button-fade'" (click)="pinItem(node)" style="margin-left:auto;"><mat-icon [style.color] = "node.pinned ? 'gold' : 'lightgray'">star</mat-icon></button>
         <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="addNewItem(node)"><mat-icon>note_add</mat-icon></button>
@@ -83,7 +83,7 @@
         </button>
       </mat-tree-node>
     
-      <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding matTreeNodePaddingIndent="8" [routerLink]="'/dashboard/' + node.id">
+      <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding matTreeNodePaddingIndent="8" [routerLink]="'/' + node.id">
         <button mat-icon-button matTreeNodeToggle class="icon-button-chevron">
           <mat-icon>
             {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}

@@ -1,13 +1,12 @@
-import { Component, OnInit, Injectable } from '@angular/core';
-import { SelectionModel } from '@angular/cdk/collections';
-import { HttpClient, HttpParams, HttpHeaders  } from '@angular/common/http';
+import { Component, Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { FlatTreeControl } from '@angular/cdk/tree';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
 import { of as ofObservable, Observable, BehaviorSubject } from 'rxjs';
 import * as uuid from 'uuid';
 import { TestServiceService } from 'src/app/service/rest/test-service.service';
 import { Auth } from 'aws-amplify';
-import { ConsoleLogger } from '@aws-amplify/core';
+import { environment } from 'src/environments/environment';
 
 /**
  * Node for to-do item
@@ -41,7 +40,7 @@ export class TodoItemFlatNode {
  */
 @Injectable()
 export class ChecklistDatabase {
-  backend_url: string =  "https://6o4c2p3kcg.execute-api.eu-central-1.amazonaws.com";
+  backend_url = environment.apiUrl;
   rootNode: TodoItemNode;
   trashNode: TodoItemNode;
   pinnedNode: TodoItemNode;
@@ -142,6 +141,7 @@ export class ChecklistDatabase {
 
   insertItem(parent: TodoItemNode, vName: string) {
     const child = <TodoItemNode>{ id: uuid.v4(), name: vName, parent: parent.id, pinned: false, deleted: false };
+    this.rootNodeMap.set(child.id, child);
     if (parent.children) {
       parent.children.push(child);
       this.dataChange.next(this.data);

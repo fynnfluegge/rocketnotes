@@ -7,7 +7,7 @@ import { environment } from 'src/environments/environment';
 })
 export class TestServiceService {
 
-  backend_url: string =  "https://6o4c2p3kcg.execute-api.eu-central-1.amazonaws.com";
+  backend_url = environment.apiUrl;
 
   token:any;
 
