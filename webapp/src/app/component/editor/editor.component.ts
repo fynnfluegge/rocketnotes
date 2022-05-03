@@ -1,18 +1,16 @@
-import { Component, VERSION, OnInit} from '@angular/core';
+import { Component, VERSION } from '@angular/core';
 import { Auth } from 'aws-amplify';
 import { TestServiceService } from 'src/app/service/rest/test-service.service';
 import { UploadResult, MdEditorOption } from "ngx-markdown-editor";
 import jwt_decode from 'jwt-decode';
-import { from, Observable } from 'rxjs';
-import { catchError, switchMap } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
-  selector: 'app-dashboard',
-  templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.scss']
+  selector: 'app-editor',
+  templateUrl: './editor.component.html',
+  styleUrls: ['./editor.component.scss']
 })
-export class DashboardComponent {
+export class EditorComponent {
 
   public showPreview: Boolean = false;
   public editorMode: Boolean = false;
@@ -20,53 +18,6 @@ export class DashboardComponent {
 
   angularVersion = VERSION.full;
   ngxMarkdownVersion = '12.0.1';
-
-  markdown = `## Markdown __rulez__!
----
-
-### Syntax highlight
-\`\`\`typescript
-const language = 'typescript';
-\`\`\`
-
-### Lists
-1. Ordered list
-2. Another bullet point
-   - Unordered list
-   - Another unordered bullet
-
-### Blockquote
-> Blockquote to the max
-
-g
-
-h
-
-k
-
-f
-
-d
-
-z
-
-i
-
-o
-
-s
-
-t
-
-h
-
-m
-
-x
-
-u
-
-i`;
   
   public mode: string = "preview";
 

@@ -1,0 +1,108 @@
+<ul>
+  <li>
+    <a (click)="onMenuToggle()">
+      <mat-icon>menu</mat-icon>
+    </a>
+  </li>
+  <li style="margin-left:auto;">
+    <a (click)="onLogout()">
+      Logout
+    </a>
+  </li>
+</ul>
+
+<div class="sidebar" [style.left.px]="showSidebar ? '0' : '-160'">
+    <div>
+      
+      <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
+  
+        <mat-tree-node *matTreeNodeDef="let node; when: isPinned" matTreeNodePadding matTreeNodePaddingIndent="6">
+          <mat-icon>star</mat-icon>
+          <button mat-icon-button matTreeNodeToggle *ngIf="node.expandable" class="icon-button-chevron">
+            <mat-icon>
+              {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+            </mat-icon>
+          </button>
+          Pinned
+        </mat-tree-node>
+  
+        <mat-tree-node *matTreeNodeDef="let node; when: isRoot" matTreeNodePadding matTreeNodePaddingIndent="8">
+          <mat-icon>insert_drive_file</mat-icon>
+          <button mat-icon-button matTreeNodeToggle *ngIf="node.expandable" class="icon-button-chevron">
+            <mat-icon>
+              {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+            </mat-icon>
+          </button>
+          <span>My Documents</span>
+          <button mat-icon-button class="icon-button-fade" (click)="addNewItem(node)" style="margin-left:auto;">
+            <mat-icon>note_add</mat-icon>
+          </button>
+        </mat-tree-node>
+  
+        <mat-tree-node *matTreeNodeDef="let node; when: isTrash" matTreeNodePadding matTreeNodePaddingIndent="matTreeNodePaddingIndent">
+          <mat-icon>delete</mat-icon>
+          <button mat-icon-button matTreeNodeToggle *ngIf="node.expandable" class="icon-button-chevron">
+            <mat-icon>
+              {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+            </mat-icon>
+          </button>
+          Trash
+        </mat-tree-node>
+  
+        <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle matTreeNodePadding matTreeNodePaddingIndent="8" [routerLink]="'/app/' + node.id">
+          <span style="padding-left:24px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{node.name}}</span>
+          <button *ngIf="!node.deleted" mat-icon-button [ngClass]="node.pinned ? 'icon-button-star' : 'icon-button-fade'" (click)="pinItem(node)" style="margin-left:auto;"><mat-icon [style.color] = "node.pinned ? 'gold' : 'lightgray'">star</mat-icon></button>
+          <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="addNewItem(node)"><mat-icon>note_add</mat-icon></button>
+          <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="editItem(node)"><mat-icon>edit</mat-icon></button>
+          <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="moveToTrash(node)"><mat-icon>delete</mat-icon></button>
+          <button *ngIf="node.deleted" mat-icon-button class="icon-button-fade" style="margin-left:auto;"><mat-icon>delete_forever</mat-icon></button>
+          <button *ngIf="node.deleted" mat-icon-button class="icon-button-fade" (click)="restoreItem(node)"><mat-icon>restore_from_trash</mat-icon></button>
+        </mat-tree-node>
+  
+        <mat-tree-node *matTreeNodeDef="let node; when: hasNoContent" matTreeNodePadding matTreeNodePaddingIndent="8">
+          <mat-form-field style="padding-left:24px;">
+            <input matInput #itemValue placeholder="New document..." style="width:140px;height:24px;">
+          </mat-form-field>
+          <button mat-icon-button (click)="saveNode(node, itemValue.value, true)" style="width: 24px;">
+            <mat-icon>save</mat-icon>
+          </button>
+          <button mat-icon-button (click)="deleteEmptyItem(node)" style="width: 24px;">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </mat-tree-node>
+  
+        <mat-tree-node *matTreeNodeDef="let node; when: editNode" matTreeNodePadding matTreeNodePaddingIndent="8">
+          <mat-form-field style="padding-left:24px;">
+            <input matInput #itemValue value="{{node.name}}" style="width:140px;height:24px;">
+          </mat-form-field>
+          <button mat-icon-button (click)="saveNode(node, itemValue.value, false)" style="width:24px;">
+            <mat-icon>save</mat-icon>
+          </button>
+          <button mat-icon-button (click)="cancelEditItem(node, itemValue.value)" style="width:24px;">
+            <mat-icon>cancel</mat-icon>
+          </button>
+        </mat-tree-node>
+      
+        <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding matTreeNodePaddingIndent="8" [routerLink]="'/app/' + node.id">
+          <button mat-icon-button matTreeNodeToggle class="icon-button-chevron">
+            <mat-icon>
+              {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+            </mat-icon>
+          </button>
+          <span style="overflow:hidden;text-overflow: ellipsis;">{{node.name}}</span>
+          <button *ngIf="!node.deleted" mat-icon-button [ngClass]="node.pinned ? 'icon-button-star' : 'icon-button-fade'" (click)="pinItem(node)" style="margin-left:auto;"><mat-icon [style.color] = "node.pinned ? 'gold' : 'lightgray'">star</mat-icon></button>
+          <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="addNewItem(node)"><mat-icon>note_add</mat-icon></button>
+          <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="editItem(node)"><mat-icon>edit</mat-icon></button>
+          <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="moveToTrash(node)"><mat-icon>delete</mat-icon></button>
+          <button *ngIf="node.deleted" mat-icon-button class="icon-button-fade"><mat-icon>delete_forever</mat-icon></button>
+          <button *ngIf="node.deleted" mat-icon-button class="icon-button-fade" (click)="restoreItem(node)"><mat-icon>restore_from_trash</mat-icon></button>
+        </mat-tree-node>
+  
+      </mat-tree>
+  
+    </div>
+  </div>
+
+  <div class="container-t" [style.margin-left.px]="showSidebar ? '260' : '120'" [style.width]="showSidebar ? 'calc(100% - 280px)' : 'calc(100% - 140px)'">
+      <app-editor></app-editor>
+  </div>

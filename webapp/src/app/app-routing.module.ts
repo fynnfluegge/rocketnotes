@@ -1,13 +1,16 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { DashboardComponent } from './component/dashboard/dashboard.component';
+import { EditorComponent } from './component/editor/editor.component';
 import { AuthGuard } from './component/auth/auth-guard.guard'
 import { AppComponent } from './app.component';
+import { SidenavComponent } from './component/sidenav/sidenav.component';
+import { LandingComponent } from './component/landing/landing.component';
 
 const routes: Routes = [
-  { path: ':id', component: DashboardComponent, canActivate: [AuthGuard] },
-  { path: '', component: DashboardComponent, canActivate: [AuthGuard] },
-  { path: 'logout', component: AppComponent },
+  { path: 'app/:id', component: SidenavComponent, canActivate: [AuthGuard] },
+  { path: 'app', component: SidenavComponent, canActivate: [AuthGuard] },
+  { path: 'logout', component: LandingComponent },
+  { path: '', component: LandingComponent }
 ];
 
 @NgModule({

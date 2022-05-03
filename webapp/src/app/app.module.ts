@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { DashboardComponent } from './component/dashboard/dashboard.component';
+import { EditorComponent } from './component/editor/editor.component';
 import { AuthGuard } from './component/auth/auth-guard.guard';
 import { JwtInterceptor } from './component/auth/jwt-intercepter';
 import { TestServiceService } from './service/rest/test-service.service';
@@ -23,12 +23,16 @@ import 'prismjs';
 import 'prismjs/components/prism-typescript.min.js';
 import 'prismjs/plugins/line-numbers/prism-line-numbers.js';
 import 'prismjs/plugins/line-highlight/prism-line-highlight.js';
+import { SidenavComponent } from './component/sidenav/sidenav.component';
+import { LandingComponent } from './component/landing/landing.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
-    DashboardComponent
+    EditorComponent,
+    SidenavComponent,
+    LandingComponent
   ],
   imports: [
     BrowserModule,
