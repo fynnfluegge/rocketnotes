@@ -1,4 +1,4 @@
-<div style="margin-top: 50px; height:calc(100% - 120px);">
+<div style="margin-top: 50px; height:calc(100% - 160px);">
 
   <div class="well well-sm" style="justify-content:center;align-items:center;display:flex;">
     <button *ngIf="editorMode" class="btn btn-default btn-primary" (click)="togglePreviewPanel()">
@@ -15,7 +15,7 @@
     &nbsp;&nbsp;
   </div>
 
-  <span style="justify-content:center;align-items:center;display:flex;;font-size:28px;margin: 6px 0px 6px 0px;">{{ title }}</span>
+  <span style="justify-content:center;align-items:center;display:flex;font-size:28px;margin: 6px 0px 6px 0px;">{{ title }}</span>
 
   <textarea *ngIf="editorMode && showPreview" class="variable-textarea" [(ngModel)]="content" style="resize:none;margin-top:4px;"></textarea>
   <textarea *ngIf="editorMode && !showPreview" class="variable-textarea" [(ngModel)]="content" style="width:100%;resize:none;margin-top:4px;"></textarea>
