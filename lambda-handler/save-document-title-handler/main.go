@@ -15,11 +15,12 @@ import (
 )
 
 type Document struct {
-	ID       string `json:"ID"`
-	ParentId string `json:"parentId"`
-	UserId   string `json:"userId"`
-	Title    string `json:"title"`
-	Content  string `json:"content"`
+	ID           string `json:"ID"`
+	ParentId     string `json:"parentId"`
+	UserId       string `json:"userId"`
+	Title        string `json:"title"`
+	Content      string `json:"content"`
+	LastModified string `json:"lastModified"`
 }
 
 type RequestBody struct {
@@ -42,12 +43,12 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 
 	svc := dynamodb.New(sess)
 
-	tableName := "MyDynamoDB"
+	tableName := "tnn-documents"
 
 	result, err := svc.GetItem(&dynamodb.GetItemInput{
 		TableName: aws.String(tableName),
 		Key: map[string]*dynamodb.AttributeValue{
-			"ID": {
+			"id": {
 				S: aws.String(requestBody.ID),
 			},
 		},

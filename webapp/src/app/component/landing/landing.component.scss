@@ -1,30 +1,70 @@
-//--- navigation bar ---//
-ul {
-    display: flex;
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    background: #282828;
-    position: fixed;
-    top: 0;
-    width: 100%;
-    height: 52px;
-    z-index: 1;
+html,
+body,
+header,
+.carousel {
+  height: 60vh;
+}
+
+@media (max-width: 740px) {
+  html,
+  body,
+  header,
+  .carousel {
+    height: 100vh;
   }
-  
-  li a {
-    display: block;
-    color: white;
-    text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
-    transition: 0.3s;
+}
+
+@media (min-width: 800px) and (max-width: 850px) {
+  html,
+  body,
+  header,
+  .carousel {
+    height: 100vh;
   }
-  
-  li a:hover {
-    color: white;
-    background-color: #111;
-    cursor: pointer;
+}
+
+@media (min-width: 800px) and (max-width: 850px) {
+  .navbar:not(.top-nav-collapse) {
+      background: red !important;
   }
-  //------------------------//
+}
+
+.view,body,html{
+  height:100%
+}
+
+@media (max-width:740px){
+  .full-page-intro{
+    height:1000px
+  }
+}
+
+.carousel{
+  height:50%
+}
+
+.carousel .carousel-inner,
+.carousel .carousel-inner .active,.carousel .carousel-inner .carousel-item{
+  height:100%
+}
+
+@media (max-width:776px){
+  .carousel{
+    height:100%
+  }
+}
+
+.navbar{
+  background-color:#282828
+}
+
+.page-footer,
+.top-nav-collapse{
+  background-color:#1C2331
+}
+
+@media only screen and (max-width:768px){
+  .navbar{
+    background-color:#1C2331
+  }
+}

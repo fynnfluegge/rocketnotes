@@ -4,7 +4,10 @@
 @import 'prismjs/plugins/line-highlight/prism-line-highlight.css';
 
 html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+body { 
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
 
 .container-t {
   height: 100%;
@@ -17,7 +20,6 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 .mat-button {
   background: #282828;
   font-size: 16px;
-  font-weight: 350;
 }
 
 .mat-icon {

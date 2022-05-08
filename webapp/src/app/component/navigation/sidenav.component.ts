@@ -1,8 +1,8 @@
-import { Component, Injectable } from '@angular/core';
+import { AfterViewInit, Component, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FlatTreeControl } from '@angular/cdk/tree';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
-import { of as ofObservable, Observable, BehaviorSubject } from 'rxjs';
+import { of as ofObservable, Observable, BehaviorSubject, Subject } from 'rxjs';
 import * as uuid from 'uuid';
 import { TestServiceService } from 'src/app/service/rest/test-service.service';
 import { Auth } from 'aws-amplify';
@@ -50,6 +50,8 @@ export class ChecklistDatabase {
 
   dataChange: BehaviorSubject<TodoItemNode[]> = new BehaviorSubject<TodoItemNode[]>([]);
 
+  initContentChange: Subject<any> = new Subject<any>();
+
   get data(): TodoItemNode[] {
     return this.dataChange.value;
   }
@@ -59,6 +61,8 @@ export class ChecklistDatabase {
   }
 
   initialize() {
+
+    console.log("dsjdhfgjkh")
 
     this.http.get(this.backend_url + '/documentTree/' + localStorage.getItem("currentUserId")).subscribe({
       next: (res) => {
@@ -95,14 +99,52 @@ export class ChecklistDatabase {
             this.addFlatToMap(this.rootNodeMap, v)
           })
         }
+
+        // get latest document and push to event emitter subject
+        // this.testService.get("document/" + environment.welcomeDocumentId).subscribe(message => {
+        // });
+        if (this.pinnedNode.children) {
+          this.testService.get("document/" + this.pinnedNode.children[0].id).subscribe(result => {
+            var document = JSON.parse(JSON.stringify(result));
+            this.initContentChange.next({ id: document.id, title: document.title, content: document.content });
+          });
+        } else if (this.rootNode.children) {
+          this.testService.get("document/" + this.rootNode.children[0].id).subscribe(result => {
+            var document = JSON.parse(JSON.stringify(result));
+            this.initContentChange.next({ id: document.id, title: document.title, content: document.content });
+          });
+        }
       },
       error: (e) => {
-        this.rootNode = <TodoItemNode>{ id: "root", name: "root", children: null };
+        this.rootNode = <TodoItemNode>{ id: "root", name: "root", children: [] };
         this.trashNode = <TodoItemNode>{ id: "trash", name: "trash", children: null };
         this.pinnedNode = <TodoItemNode>{ id: "pinned", name: "pinned", children: null };
         this.rootNodeMap.set(this.rootNode.id, this.rootNode);
         this.rootNodeMap.set(this.trashNode.id, this.trashNode);
-        this.dataChange.next([this.pinnedNode, this.rootNode, this.trashNode]);
+
+        this.testService.get("document/" + environment.welcomeDocumentId).subscribe(message => {
+          var document = JSON.parse(JSON.stringify(message));
+          const cheatSheet = <TodoItemNode>{ id: uuid.v4(), name: document.title, parent: this.rootNode.id, pinned: false, deleted: false };
+          this.initContentChange.next({ id: cheatSheet.id, title: cheatSheet.name, content: document.content });
+          this.rootNode.children.push(cheatSheet);
+          this.dataChange.next([this.pinnedNode, this.rootNode, this.trashNode]);
+          this.testService.post("saveDocument", 
+            { 
+              "ID": cheatSheet.id,
+              "parentId": "",
+              "userId": localStorage.getItem("currentUserId"),
+              "title": cheatSheet.name,
+              "content": document.content
+            }).subscribe(() => {
+              this.testService.post("saveDocumentTree", 
+              { 
+                "ID": localStorage.getItem("currentUserId"),
+                "documents": JSON.parse(JSON.stringify(this.rootNode.children)),
+                "trash": JSON.parse(JSON.stringify(this.trashNode.children)),
+                "pinned": JSON.parse(JSON.stringify(this.pinnedNode.children))
+              }).subscribe();
+            });
+        });
       }
     })
   }
@@ -219,7 +261,9 @@ export class ChecklistDatabase {
           "userId": localStorage.getItem("currentUserId"),
           "title": newName,
           "content": "new document"
-        }).subscribe()
+        }).subscribe(() => {
+          this.initContentChange.next({ id: node.id, title: newName, content: "new document" });
+        })
       } else {
         this.testService.post("saveDocumentTitle", 
         { 
@@ -309,6 +353,8 @@ export class ChecklistDatabase {
   providers: [ChecklistDatabase],
 })
 export class SidenavComponent {
+
+  initContent: string;
 
   showSidebar = true
 

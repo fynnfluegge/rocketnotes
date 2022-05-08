@@ -1,9 +1,10 @@
-import { Component, VERSION } from '@angular/core';
+import { Component, Input, VERSION } from '@angular/core';
 import { Auth } from 'aws-amplify';
 import { TestServiceService } from 'src/app/service/rest/test-service.service';
 import { UploadResult, MdEditorOption } from "ngx-markdown-editor";
 import jwt_decode from 'jwt-decode';
 import { ActivatedRoute } from '@angular/router';
+import { ChecklistDatabase } from '../navigation/sidenav.component';
 
 @Component({
   selector: 'app-editor',
@@ -24,9 +25,8 @@ export class EditorComponent {
   private id: string;
   public title: string ;
   public content: string;
-  private typeCounter: Number;
 
-  constructor(private testService : TestServiceService, private route: ActivatedRoute) {
+  constructor(private database: ChecklistDatabase, private testService : TestServiceService, private route: ActivatedRoute) {
     this.preRender = this.preRender.bind(this);
     this.postRender = this.postRender.bind(this);
   }
@@ -37,13 +37,21 @@ export class EditorComponent {
       localStorage.setItem("currentUserId", user.username);
     });
 
+    this.database.initContentChange.subscribe(value => {
+      this.id = value.id;
+      this.title = value.title;
+      this.content = value.content;
+    });
+
     this.route.paramMap.subscribe(params => { 
       this.id = params.get('id'); 
-      this.testService.get("document/" + this.id).subscribe(message => {
-        var document = JSON.parse(JSON.stringify(message))
-        this.content = document.content
-        this.title = document.title
-       });
+      if (this.id) {
+        this.testService.get("document/" + this.id).subscribe(message => {
+          var document = JSON.parse(JSON.stringify(message))
+          this.content = document.content
+          this.title = document.title
+        });
+      }
     });
   }
 
@@ -113,9 +121,10 @@ export class EditorComponent {
         "parentId": "",
         "userId": localStorage.getItem("currentUserId"),
         "title": this.title,
-        "content": this.content 
+        "content": this.content,
+        "lastModified": Date.now
       }
-    ).subscribe()
+    ).subscribe();
   }
 
   getDecodedAccessToken(token: string): any {

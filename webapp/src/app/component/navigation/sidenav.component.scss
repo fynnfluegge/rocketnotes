@@ -14,6 +14,7 @@
 .mat-tree-node {
   height: 32px;
   border-bottom: 1px solid grey;
+  font-weight: 280;
 }
 
 .mat-icon {
@@ -66,7 +67,7 @@ span:hover {
 
 .sidebar {
 	position: absolute;
-  left: -160px;
+  left: -200px;
   transition: 0.3s;
   margin: 0;
   margin-top: 52px;
@@ -108,6 +109,7 @@ li a {
   padding: 14px 16px;
   text-decoration: none;
   transition: 0.3s;
+  font-weight: 300;
 }
 
 li a:hover {

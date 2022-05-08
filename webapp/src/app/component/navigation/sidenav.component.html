@@ -11,7 +11,7 @@
   </li>
 </ul>
 
-<div class="sidebar" [style.left.px]="showSidebar ? '0' : '-160'">
+<div class="sidebar" [style.left.px]="showSidebar ? '0' : '-200'">
     <div>
       
       <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
@@ -94,7 +94,7 @@
           <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="addNewItem(node)"><mat-icon>note_add</mat-icon></button>
           <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="editItem(node)"><mat-icon>edit</mat-icon></button>
           <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="moveToTrash(node)"><mat-icon>delete</mat-icon></button>
-          <button *ngIf="node.deleted" mat-icon-button class="icon-button-fade"><mat-icon>delete_forever</mat-icon></button>
+          <button *ngIf="node.deleted" mat-icon-button class="icon-button-fade" style="margin-left:auto;"><mat-icon>delete_forever</mat-icon></button>
           <button *ngIf="node.deleted" mat-icon-button class="icon-button-fade" (click)="restoreItem(node)"><mat-icon>restore_from_trash</mat-icon></button>
         </mat-tree-node>
   
@@ -103,6 +103,6 @@
     </div>
   </div>
 
-  <div class="container-t" [style.margin-left.px]="showSidebar ? '260' : '120'" [style.width]="showSidebar ? 'calc(100% - 280px)' : 'calc(100% - 140px)'">
+  <div class="container-t" [style.margin-left.px]="showSidebar ? '260' : '60'" [style.width]="showSidebar ? 'calc(100% - 280px)' : 'calc(100% - 80px)'">
       <app-editor></app-editor>
   </div>

@@ -130,7 +130,7 @@ func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNi
 		}),
 	)
 
-	// POST Document Api
+	// Save Document Api
 
 	rule := awsevents.NewRule(stack, jsii.String("myEventBusRule"), &awsevents.RuleProps{
 		EventBus: eventBus,
@@ -210,7 +210,7 @@ func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNi
 		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("postDocumentTreeLambdaIntegration"), postDocumentTreeHandler, &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
 	})
 
-	// POST Document Title Api
+	// Set Document Title Api
 
 	postDocumentTitleHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("POST-DocumentTitle"), &awscdklambdagoalpha.GoFunctionProps{
 		FunctionName: jsii.String("POST-DocumentTitle"),
@@ -243,8 +243,8 @@ func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNi
 
 	bucket := awss3.NewBucket(stack, jsii.String("MyS3Bucket"), &awss3.BucketProps{
 		BucketName:           jsii.String("takeniftynotes.net"),
-		WebsiteIndexDocument: jsii.String("index.html"),
-		WebsiteErrorDocument: jsii.String("index.html"),
+		WebsiteIndexDocument: jsii.String("index.html.gz"),
+		WebsiteErrorDocument: jsii.String("index.html.gz"),
 		PublicReadAccess:     jsii.Bool(true),
 	})
 

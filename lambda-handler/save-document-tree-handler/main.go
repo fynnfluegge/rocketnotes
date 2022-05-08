@@ -48,7 +48,7 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		log.Fatalf("Got error marshalling new movie item: %s", err)
 	}
 
-	tableName := "MyDynamoDB"
+	tableName := "tnn-tree"
 
 	input := &dynamodb.PutItemInput{
 		Item:      av,
