@@ -23,7 +23,7 @@ type Document struct {
 }
 
 type Item struct {
-	ID        string      `json:"ID"`
+	ID        string      `json:"id"`
 	Documents []*Document `json:"documents"`
 	Trash     []*Document `json:"trash"`
 	Pinned    []*Document `json:"pinned"`
@@ -42,7 +42,7 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 
 	svc := dynamodb.New(sess)
 
-	tableName := "tnn-tree"
+	tableName := "tnn-Tree"
 
 	result, err := svc.GetItem(&dynamodb.GetItemInput{
 		TableName: aws.String(tableName),

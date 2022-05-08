@@ -22,7 +22,7 @@ type Document struct {
 }
 
 type Item struct {
-	ID        string      `json:"ID"`
+	ID        string      `json:"id"`
 	Documents []*Document `json:"documents"`
 	Trash     []*Document `json:"trash"`
 	Pinned    []*Document `json:"pinned"`
@@ -48,7 +48,7 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		log.Fatalf("Got error marshalling new movie item: %s", err)
 	}
 
-	tableName := "tnn-tree"
+	tableName := "tnn-Tree"
 
 	input := &dynamodb.PutItemInput{
 		Item:      av,

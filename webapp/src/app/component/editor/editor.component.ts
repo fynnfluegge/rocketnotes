@@ -5,6 +5,7 @@ import { UploadResult, MdEditorOption } from "ngx-markdown-editor";
 import jwt_decode from 'jwt-decode';
 import { ActivatedRoute } from '@angular/router';
 import { ChecklistDatabase } from '../navigation/sidenav.component';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-editor',
@@ -26,7 +27,7 @@ export class EditorComponent {
   public title: string ;
   public content: string;
 
-  constructor(private database: ChecklistDatabase, private testService : TestServiceService, private route: ActivatedRoute) {
+  constructor(private database: ChecklistDatabase, private testService : TestServiceService, private route: ActivatedRoute, private titleService: Title) {
     this.preRender = this.preRender.bind(this);
     this.postRender = this.postRender.bind(this);
   }
@@ -41,6 +42,7 @@ export class EditorComponent {
       this.id = value.id;
       this.title = value.title;
       this.content = value.content;
+      this.titleService.setTitle(value.title);
     });
 
     this.route.paramMap.subscribe(params => { 
@@ -50,6 +52,7 @@ export class EditorComponent {
           var document = JSON.parse(JSON.stringify(message))
           this.content = document.content
           this.title = document.title
+          this.titleService.setTitle(document.title);
         });
       }
     });
@@ -117,7 +120,7 @@ export class EditorComponent {
   submit(): void{
     this.testService.post("saveDocument", 
       { 
-        "ID": this.id,
+        "id": this.id,
         "parentId": "",
         "userId": localStorage.getItem("currentUserId"),
         "title": this.title,

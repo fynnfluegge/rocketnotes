@@ -36,7 +36,7 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 
 	svc := dynamodb.New(sess)
 
-	tableName := "tnn-documents"
+	tableName := "tnn-Documents"
 
 	result, err := svc.GetItem(&dynamodb.GetItemInput{
 		TableName: aws.String(tableName),

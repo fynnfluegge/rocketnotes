@@ -7,6 +7,7 @@ import * as uuid from 'uuid';
 import { TestServiceService } from 'src/app/service/rest/test-service.service';
 import { Auth } from 'aws-amplify';
 import { environment } from 'src/environments/environment';
+import { Title } from '@angular/platform-browser';
 
 /**
  * Node for to-do item
@@ -61,8 +62,6 @@ export class ChecklistDatabase {
   }
 
   initialize() {
-
-    console.log("dsjdhfgjkh")
 
     this.http.get(this.backend_url + '/documentTree/' + localStorage.getItem("currentUserId")).subscribe({
       next: (res) => {
@@ -130,7 +129,7 @@ export class ChecklistDatabase {
           this.dataChange.next([this.pinnedNode, this.rootNode, this.trashNode]);
           this.testService.post("saveDocument", 
             { 
-              "ID": cheatSheet.id,
+              "id": cheatSheet.id,
               "parentId": "",
               "userId": localStorage.getItem("currentUserId"),
               "title": cheatSheet.name,
@@ -138,7 +137,7 @@ export class ChecklistDatabase {
             }).subscribe(() => {
               this.testService.post("saveDocumentTree", 
               { 
-                "ID": localStorage.getItem("currentUserId"),
+                "id": localStorage.getItem("currentUserId"),
                 "documents": JSON.parse(JSON.stringify(this.rootNode.children)),
                 "trash": JSON.parse(JSON.stringify(this.trashNode.children)),
                 "pinned": JSON.parse(JSON.stringify(this.pinnedNode.children))
@@ -201,7 +200,7 @@ export class ChecklistDatabase {
     this.dataChange.next(this.data);
     this.testService.post("saveDocumentTree", 
     { 
-      "ID": localStorage.getItem("currentUserId"),
+      "id": localStorage.getItem("currentUserId"),
       "documents": JSON.parse(JSON.stringify(this.rootNode.children)),
       "trash": JSON.parse(JSON.stringify(this.trashNode.children)),
       "pinned": JSON.parse(JSON.stringify(this.pinnedNode.children))
@@ -225,7 +224,7 @@ export class ChecklistDatabase {
     this.dataChange.next(this.data);
     this.testService.post("saveDocumentTree", 
     { 
-      "ID": localStorage.getItem("currentUserId"),
+      "id": localStorage.getItem("currentUserId"),
       "documents": JSON.parse(JSON.stringify(this.rootNode.children)),
       "trash": JSON.parse(JSON.stringify(this.trashNode.children)),
       "pinned": JSON.parse(JSON.stringify(this.pinnedNode.children))
@@ -247,7 +246,7 @@ export class ChecklistDatabase {
 
     this.testService.post("saveDocumentTree", 
       { 
-        "ID": localStorage.getItem("currentUserId"),
+        "id": localStorage.getItem("currentUserId"),
         "documents": JSON.parse(JSON.stringify(this.rootNode.children)),
         "trash": JSON.parse(JSON.stringify(this.trashNode.children)),
         "pinned": JSON.parse(JSON.stringify(this.pinnedNode.children))
@@ -256,7 +255,7 @@ export class ChecklistDatabase {
       if (newItem) {
         this.testService.post("saveDocument", 
         { 
-          "ID": node.id,
+          "id": node.id,
           "parentId": node.parent,
           "userId": localStorage.getItem("currentUserId"),
           "title": newName,
@@ -301,7 +300,7 @@ export class ChecklistDatabase {
 
       this.testService.post("saveDocumentTree", 
       { 
-        "ID": localStorage.getItem("currentUserId"),
+        "id": localStorage.getItem("currentUserId"),
         "documents": JSON.parse(JSON.stringify(this.rootNode.children)),
         "trash": JSON.parse(JSON.stringify(this.trashNode.children)),
         "pinned": JSON.parse(JSON.stringify(this.pinnedNode.children))
@@ -338,7 +337,7 @@ export class ChecklistDatabase {
     this.dataChange.next(this.data);
     this.testService.post("saveDocumentTree", 
     { 
-      "ID": localStorage.getItem("currentUserId"),
+      "id": localStorage.getItem("currentUserId"),
       "documents": JSON.parse(JSON.stringify(this.rootNode.children)),
       "trash": JSON.parse(JSON.stringify(this.trashNode.children)),
       "pinned": JSON.parse(JSON.stringify(this.pinnedNode.children))

@@ -15,7 +15,7 @@ import (
 )
 
 type Document struct {
-	ID           string `json:"ID"`
+	ID           string `json:"id"`
 	ParentId     string `json:"parentId"`
 	UserId       string `json:"userId"`
 	Title        string `json:"title"`
@@ -43,7 +43,7 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 
 	svc := dynamodb.New(sess)
 
-	tableName := "tnn-documents"
+	tableName := "tnn-Documents"
 
 	result, err := svc.GetItem(&dynamodb.GetItemInput{
 		TableName: aws.String(tableName),

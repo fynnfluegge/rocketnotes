@@ -243,8 +243,8 @@ func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNi
 
 	bucket := awss3.NewBucket(stack, jsii.String("MyS3Bucket"), &awss3.BucketProps{
 		BucketName:           jsii.String("takeniftynotes.net"),
-		WebsiteIndexDocument: jsii.String("index.html.gz"),
-		WebsiteErrorDocument: jsii.String("index.html.gz"),
+		WebsiteIndexDocument: jsii.String("index.html"),
+		WebsiteErrorDocument: jsii.String("index.html"),
 		PublicReadAccess:     jsii.Bool(true),
 	})
 
@@ -302,7 +302,7 @@ func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNi
 
 	awss3deployment.NewBucketDeployment(stack, jsii.String("MyS3BucketDeployment"), &awss3deployment.BucketDeploymentProps{
 		Sources: &[]awss3deployment.ISource{
-			awss3deployment.Source_Asset(jsii.String("./webapp/dist"), &awss3assets.AssetOptions{}),
+			awss3deployment.Source_Asset(jsii.String("./webapp/build"), &awss3assets.AssetOptions{}),
 		},
 		DestinationBucket: bucket,
 		Distribution:      distribution,

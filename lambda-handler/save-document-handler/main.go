@@ -18,7 +18,7 @@ type Item struct {
 }
 
 type Document struct {
-	ID           string `json:"ID"`
+	ID           string `json:"id"`
 	ParentId     string `json:"parentId"`
 	UserId       string `json:"userId"`
 	Title        string `json:"title"`
@@ -46,7 +46,7 @@ func handleRequest(ctx context.Context, event events.SQSEvent) {
 		log.Fatalf("Got error marshalling new movie item: %s", err)
 	}
 
-	tableName := "tnn-documents"
+	tableName := "tnn-Documents"
 
 	input := &dynamodb.PutItemInput{
 		Item:      av,
