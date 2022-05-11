@@ -12,7 +12,7 @@
 </ul>
 
 <div class="sidebar" [style.left.px]="showSidebar ? '0' : '-200'">
-    <div>
+    <div [ngClass]="{'hide': !showSidebar}">
       
       <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
   

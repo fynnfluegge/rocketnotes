@@ -15,6 +15,7 @@
   height: 32px;
   border-bottom: 1px solid grey;
   font-weight: 280;
+  font-size: 13px;
 }
 
 .mat-icon {
@@ -68,7 +69,7 @@ span:hover {
 .sidebar {
 	position: absolute;
   left: -200px;
-  transition: 0.3s;
+  transition: 0.5s;
   margin: 0;
   margin-top: 52px;
   padding: 0;
@@ -85,6 +86,17 @@ span:hover {
 
 .sidebar:hover {
   left: 0 !important;
+}
+
+.sidebar:hover > .hide {
+  visibility: visible;
+  opacity:1;
+}
+
+.hide {
+  visibility: hidden;
+  opacity:0;
+  transition:visibility 0.5s linear,opacity 0.5s linear;
 }
 
 //--- navigation bar ---//

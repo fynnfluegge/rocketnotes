@@ -8,6 +8,7 @@ import { TestServiceService } from 'src/app/service/rest/test-service.service';
 import { Auth } from 'aws-amplify';
 import { environment } from 'src/environments/environment';
 import { Title } from '@angular/platform-browser';
+import { ActivatedRoute } from '@angular/router';
 
 /**
  * Node for to-do item
@@ -57,7 +58,7 @@ export class ChecklistDatabase {
     return this.dataChange.value;
   }
 
-  constructor(public http: HttpClient, private testService : TestServiceService) {
+  constructor(public http: HttpClient, private testService : TestServiceService, private route: ActivatedRoute) {
     this.initialize();
   }
 
@@ -102,48 +103,52 @@ export class ChecklistDatabase {
         // get latest document and push to event emitter subject
         // this.testService.get("document/" + environment.welcomeDocumentId).subscribe(message => {
         // });
-        if (this.pinnedNode.children) {
-          this.testService.get("document/" + this.pinnedNode.children[0].id).subscribe(result => {
-            var document = JSON.parse(JSON.stringify(result));
-            this.initContentChange.next({ id: document.id, title: document.title, content: document.content });
-          });
-        } else if (this.rootNode.children) {
-          this.testService.get("document/" + this.rootNode.children[0].id).subscribe(result => {
-            var document = JSON.parse(JSON.stringify(result));
-            this.initContentChange.next({ id: document.id, title: document.title, content: document.content });
-          });
-        }
+        this.route.paramMap.subscribe(params => { 
+          if (!params.get('id')) {
+            if (this.pinnedNode.children) {
+              this.testService.get("document/" + this.pinnedNode.children[0].id).subscribe(result => {
+                var document = JSON.parse(JSON.stringify(result));
+                this.initContentChange.next({ id: document.id, title: document.title, content: document.content });
+              });
+            } else if (this.rootNode.children) {
+              this.testService.get("document/" + this.rootNode.children[0].id).subscribe(result => {
+                var document = JSON.parse(JSON.stringify(result));
+                this.initContentChange.next({ id: document.id, title: document.title, content: document.content });
+              });
+            }
+          }
+        });
       },
       error: (e) => {
-        this.rootNode = <TodoItemNode>{ id: "root", name: "root", children: [] };
-        this.trashNode = <TodoItemNode>{ id: "trash", name: "trash", children: null };
-        this.pinnedNode = <TodoItemNode>{ id: "pinned", name: "pinned", children: null };
-        this.rootNodeMap.set(this.rootNode.id, this.rootNode);
-        this.rootNodeMap.set(this.trashNode.id, this.trashNode);
+        // this.rootNode = <TodoItemNode>{ id: "root", name: "root", children: [] };
+        // this.trashNode = <TodoItemNode>{ id: "trash", name: "trash", children: null };
+        // this.pinnedNode = <TodoItemNode>{ id: "pinned", name: "pinned", children: null };
+        // this.rootNodeMap.set(this.rootNode.id, this.rootNode);
+        // this.rootNodeMap.set(this.trashNode.id, this.trashNode);
 
-        this.testService.get("document/" + environment.welcomeDocumentId).subscribe(message => {
-          var document = JSON.parse(JSON.stringify(message));
-          const cheatSheet = <TodoItemNode>{ id: uuid.v4(), name: document.title, parent: this.rootNode.id, pinned: false, deleted: false };
-          this.initContentChange.next({ id: cheatSheet.id, title: cheatSheet.name, content: document.content });
-          this.rootNode.children.push(cheatSheet);
-          this.dataChange.next([this.pinnedNode, this.rootNode, this.trashNode]);
-          this.testService.post("saveDocument", 
-            { 
-              "id": cheatSheet.id,
-              "parentId": "",
-              "userId": localStorage.getItem("currentUserId"),
-              "title": cheatSheet.name,
-              "content": document.content
-            }).subscribe(() => {
-              this.testService.post("saveDocumentTree", 
-              { 
-                "id": localStorage.getItem("currentUserId"),
-                "documents": JSON.parse(JSON.stringify(this.rootNode.children)),
-                "trash": JSON.parse(JSON.stringify(this.trashNode.children)),
-                "pinned": JSON.parse(JSON.stringify(this.pinnedNode.children))
-              }).subscribe();
-            });
-        });
+        // this.testService.get("document/" + environment.welcomeDocumentId).subscribe(message => {
+        //   var document = JSON.parse(JSON.stringify(message));
+        //   const cheatSheet = <TodoItemNode>{ id: uuid.v4(), name: document.title, parent: this.rootNode.id, pinned: false, deleted: false };
+        //   this.initContentChange.next({ id: cheatSheet.id, title: cheatSheet.name, content: document.content });
+        //   this.rootNode.children.push(cheatSheet);
+        //   this.dataChange.next([this.pinnedNode, this.rootNode, this.trashNode]);
+        //   this.testService.post("saveDocument", 
+        //     { 
+        //       "id": cheatSheet.id,
+        //       "parentId": "",
+        //       "userId": localStorage.getItem("currentUserId"),
+        //       "title": cheatSheet.name,
+        //       "content": document.content
+        //     }).subscribe(() => {
+        //       this.testService.post("saveDocumentTree", 
+        //       { 
+        //         "id": localStorage.getItem("currentUserId"),
+        //         "documents": JSON.parse(JSON.stringify(this.rootNode.children)),
+        //         "trash": JSON.parse(JSON.stringify(this.trashNode.children)),
+        //         "pinned": JSON.parse(JSON.stringify(this.pinnedNode.children))
+        //       }).subscribe();
+        //     });
+        // });
       }
     })
   }
