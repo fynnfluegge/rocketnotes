@@ -33,6 +33,11 @@ mat-tree-node:hover {
   background-color: #111;
 }
 
+mat-tree-node:hover > .hide {
+  visibility: visible;
+  opacity:1;
+}
+
 mat-tree-node:focus {
   background-color: #214b57;
 }
@@ -96,7 +101,7 @@ span:hover {
 .hide {
   visibility: hidden;
   opacity:0;
-  transition:visibility 0.5s linear,opacity 0.5s linear;
+  transition:visibility 0.3s linear,opacity 0.3s linear;
 }
 
 //--- navigation bar ---//
@@ -130,3 +135,35 @@ li a:hover {
   cursor: pointer;
 }
 //------------------------//
+
+.dropbtn {
+  color: white;
+  border: none;
+  display: block;
+  width:32px;
+  background-color:transparent;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+  margin-left:auto;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: black;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-content button {
+  width: 100%;
+}
+
+.dropdown-content a:hover {background-color: #ddd;}
+
+.dropdown:hover .dropdown-content {display: block;}
+
+// .dropdown:hover .dropbtn {background-color: #282828;}

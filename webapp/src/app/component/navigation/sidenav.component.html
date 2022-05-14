@@ -51,36 +51,57 @@
   
         <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle matTreeNodePadding matTreeNodePaddingIndent="8" [routerLink]="'/app/' + node.id">
           <span style="padding-left:24px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{node.name}}</span>
-          <button *ngIf="!node.deleted" mat-icon-button [ngClass]="node.pinned ? 'icon-button-star' : 'icon-button-fade'" (click)="pinItem(node)" style="margin-left:auto;"><mat-icon [style.color] = "node.pinned ? 'gold' : 'lightgray'">star</mat-icon></button>
-          <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="addNewItem(node)"><mat-icon>note_add</mat-icon></button>
-          <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="editItem(node)"><mat-icon>edit</mat-icon></button>
-          <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="moveToTrash(node)"><mat-icon>delete</mat-icon></button>
-          <button *ngIf="node.deleted" mat-icon-button class="icon-button-fade" style="margin-left:auto;"><mat-icon>delete_forever</mat-icon></button>
-          <button *ngIf="node.deleted" mat-icon-button class="icon-button-fade" (click)="restoreItem(node)"><mat-icon>restore_from_trash</mat-icon></button>
+          <div class="dropdown hide">
+            <button class="dropbtn">
+              <i class="fas fa-ellipsis-v"></i>
+            </button>
+            <div class="dropdown-content">
+              <button *ngIf="!node.deleted" mat-icon-button [ngClass]="node.pinned ? 'icon-button-star' : 'icon-button-fade'" (click)="pinItem(node)"><mat-icon [style.color] = "node.pinned ? 'gold' : 'lightgray'">star</mat-icon></button>
+              <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="addNewItem(node)"><mat-icon>note_add</mat-icon></button>
+              <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="editItem(node)"><mat-icon>edit</mat-icon></button>
+              <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="moveToTrash(node)"><mat-icon>delete</mat-icon></button>
+              <button *ngIf="node.deleted" mat-icon-button class="icon-button-fade" style="margin-left:auto;"><mat-icon>delete_forever</mat-icon></button>
+              <button *ngIf="node.deleted" mat-icon-button class="icon-button-fade" (click)="restoreItem(node)"><mat-icon>restore_from_trash</mat-icon></button>
+            </div>
+          </div>
         </mat-tree-node>
   
         <mat-tree-node *matTreeNodeDef="let node; when: hasNoContent" matTreeNodePadding matTreeNodePaddingIndent="8">
           <mat-form-field style="padding-left:24px;">
             <input matInput #itemValue placeholder="New document..." style="width:140px;height:24px;">
           </mat-form-field>
-          <button mat-icon-button (click)="saveNode(node, itemValue.value, true)" style="width: 24px;">
-            <mat-icon>save</mat-icon>
-          </button>
-          <button mat-icon-button (click)="deleteEmptyItem(node)" style="width: 24px;">
-            <mat-icon>delete</mat-icon>
-          </button>
+          <div class="dropdown hide">
+            <button class="dropbtn">
+              <i class="fas fa-ellipsis-v"></i>
+            </button>
+            <div class="dropdown-content">
+              <button mat-icon-button (click)="saveNode(node, itemValue.value, true)">
+                <mat-icon>save</mat-icon>
+              </button>
+              <button mat-icon-button (click)="deleteEmptyItem(node)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
         </mat-tree-node>
   
         <mat-tree-node *matTreeNodeDef="let node; when: editNode" matTreeNodePadding matTreeNodePaddingIndent="8">
           <mat-form-field style="padding-left:24px;">
             <input matInput #itemValue value="{{node.name}}" style="width:140px;height:24px;">
           </mat-form-field>
-          <button mat-icon-button (click)="saveNode(node, itemValue.value, false)" style="width:24px;">
-            <mat-icon>save</mat-icon>
-          </button>
-          <button mat-icon-button (click)="cancelEditItem(node, itemValue.value)" style="width:24px;">
-            <mat-icon>cancel</mat-icon>
-          </button>
+          <div class="dropdown hide">
+            <button class="dropbtn">
+              <i class="fas fa-ellipsis-v"></i>
+            </button>
+            <div class="dropdown-content">
+              <button mat-icon-button (click)="saveNode(node, itemValue.value, false)" style="width:24px;">
+                <mat-icon>save</mat-icon>
+              </button>
+              <button mat-icon-button (click)="cancelEditItem(node, itemValue.value)" style="width:24px;">
+                <mat-icon>cancel</mat-icon>
+              </button>
+            </div>
+          </div>
         </mat-tree-node>
       
         <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding matTreeNodePaddingIndent="8" [routerLink]="'/app/' + node.id">
@@ -90,12 +111,19 @@
             </mat-icon>
           </button>
           <span style="overflow:hidden;text-overflow: ellipsis;">{{node.name}}</span>
-          <button *ngIf="!node.deleted" mat-icon-button [ngClass]="node.pinned ? 'icon-button-star' : 'icon-button-fade'" (click)="pinItem(node)" style="margin-left:auto;"><mat-icon [style.color] = "node.pinned ? 'gold' : 'lightgray'">star</mat-icon></button>
-          <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="addNewItem(node)"><mat-icon>note_add</mat-icon></button>
-          <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="editItem(node)"><mat-icon>edit</mat-icon></button>
-          <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="moveToTrash(node)"><mat-icon>delete</mat-icon></button>
-          <button *ngIf="node.deleted" mat-icon-button class="icon-button-fade" style="margin-left:auto;"><mat-icon>delete_forever</mat-icon></button>
-          <button *ngIf="node.deleted" mat-icon-button class="icon-button-fade" (click)="restoreItem(node)"><mat-icon>restore_from_trash</mat-icon></button>
+          <div class="dropdown hide">
+            <button class="dropbtn">
+              <i class="fas fa-ellipsis-v"></i>
+            </button>
+            <div class="dropdown-content">
+              <button *ngIf="!node.deleted" mat-icon-button [ngClass]="node.pinned ? 'icon-button-star' : 'icon-button-fade'" (click)="pinItem(node)"><mat-icon [style.color] = "node.pinned ? 'gold' : 'lightgray'">star</mat-icon></button>
+              <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="addNewItem(node)"><mat-icon>note_add</mat-icon></button>
+              <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="editItem(node)"><mat-icon>edit</mat-icon></button>
+              <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="moveToTrash(node)"><mat-icon>delete</mat-icon></button>
+              <button *ngIf="node.deleted" mat-icon-button class="icon-button-fade" style="margin-left:auto;"><mat-icon>delete_forever</mat-icon></button>
+              <button *ngIf="node.deleted" mat-icon-button class="icon-button-fade" (click)="restoreItem(node)"><mat-icon>restore_from_trash</mat-icon></button>
+            </div>
+          </div>
         </mat-tree-node>
   
       </mat-tree>

@@ -17,7 +17,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTreeModule } from '@angular/material/tree';
 import { MarkdownModule } from 'ngx-markdown';
-import { MatMenuModule } from '@angular/material/menu';
 
 import 'prismjs';
 import 'prismjs/components/prism-typescript.min.js';
@@ -47,7 +46,6 @@ import { LandingComponent } from './component/landing/landing.component';
     MatTooltipModule,
     MatButtonModule,
     MatTreeModule,
-    MatMenuModule,
     MarkdownModule.forRoot()
   ],
   providers: [
