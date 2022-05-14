@@ -21,10 +21,10 @@ jobs:
       - name: Node $
         uses: actions/setup-node@v1
         with:
-          node-version: $
+          node-version: 12
 
       - name: npm install and npm run build
         run: |
           cd webapp
           npm ci
-          npm run build:ci
+          npm run build:ci --configuration production
