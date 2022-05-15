@@ -40,7 +40,7 @@ mat-tree-node:hover > .hide {
 }
 
 mat-tree-node:focus {
-  background-color: #214b57;
+  background-color: black;
 }
 
 span {
@@ -142,6 +142,7 @@ li a:hover {
   border: none;
   display: block;
   width:32px;
+  height:30px;
   background-color:transparent;
 }
 
