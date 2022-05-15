@@ -16,28 +16,3 @@ body {
   overflow-y: visible;
   transition: 500ms;
 }
-
-.mat-button {
-  background: #282828;
-  font-size: 16px;
-}
-
-.mat-icon {
-  color: white;
-}
-
-.mat-button:focus {
-  outline:0;
-}
-
-a:hover {
-  background-color: #353535;
-  color: white;
-  text-decoration: none;
-}
-
-a.whitelink:hover {
-  background-color: transparent;
-  color: white;
-  text-decoration: none;
-}
