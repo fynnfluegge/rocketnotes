@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Injectable } from '@angular/core';
+import { Component, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FlatTreeControl } from '@angular/cdk/tree';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
@@ -7,7 +7,6 @@ import * as uuid from 'uuid';
 import { TestServiceService } from 'src/app/service/rest/test-service.service';
 import { Auth } from 'aws-amplify';
 import { environment } from 'src/environments/environment';
-import { Title } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 
 /**
@@ -18,7 +17,6 @@ import { ActivatedRoute } from '@angular/router';
   name: string;
   parent: string;
   children?: TodoItemNode[];
-
   deleted: boolean;
   pinned: boolean;
 }
@@ -120,35 +118,6 @@ export class ChecklistDatabase {
         });
       },
       error: (e) => {
-        // this.rootNode = <TodoItemNode>{ id: "root", name: "root", children: [] };
-        // this.trashNode = <TodoItemNode>{ id: "trash", name: "trash", children: null };
-        // this.pinnedNode = <TodoItemNode>{ id: "pinned", name: "pinned", children: null };
-        // this.rootNodeMap.set(this.rootNode.id, this.rootNode);
-        // this.rootNodeMap.set(this.trashNode.id, this.trashNode);
-
-        // this.testService.get("document/" + environment.welcomeDocumentId).subscribe(message => {
-        //   var document = JSON.parse(JSON.stringify(message));
-        //   const cheatSheet = <TodoItemNode>{ id: uuid.v4(), name: document.title, parent: this.rootNode.id, pinned: false, deleted: false };
-        //   this.initContentChange.next({ id: cheatSheet.id, title: cheatSheet.name, content: document.content });
-        //   this.rootNode.children.push(cheatSheet);
-        //   this.dataChange.next([this.pinnedNode, this.rootNode, this.trashNode]);
-        //   this.testService.post("saveDocument", 
-        //     { 
-        //       "id": cheatSheet.id,
-        //       "parentId": "",
-        //       "userId": localStorage.getItem("currentUserId"),
-        //       "title": cheatSheet.name,
-        //       "content": document.content
-        //     }).subscribe(() => {
-        //       this.testService.post("saveDocumentTree", 
-        //       { 
-        //         "id": localStorage.getItem("currentUserId"),
-        //         "documents": JSON.parse(JSON.stringify(this.rootNode.children)),
-        //         "trash": JSON.parse(JSON.stringify(this.trashNode.children)),
-        //         "pinned": JSON.parse(JSON.stringify(this.pinnedNode.children))
-        //       }).subscribe();
-        //     });
-        // });
       }
     })
   }
@@ -261,7 +230,6 @@ export class ChecklistDatabase {
         this.testService.post("saveDocument", 
         { 
           "id": node.id,
-          "parentId": node.parent,
           "userId": localStorage.getItem("currentUserId"),
           "title": newName,
           "content": "new document"
@@ -460,26 +428,18 @@ export class SidenavComponent {
 
   addNewItem(node: TodoItemFlatNode) {
     this.database.insertItem(this.flatNodeMap.get(node), '');
-
     this.treeControl.expand(node);
-    this.treeControl.collapse(this.nestedNodeMap.get(this.database.rootNode));
-    this.treeControl.expand(this.nestedNodeMap.get(this.database.rootNode));
+    this.refreshTree();
   }
 
   editItem(node: TodoItemFlatNode) {
     node.editNode = true;
-    this.treeControl.collapse(this.nestedNodeMap.get(this.database.rootNode));
-    this.treeControl.expand(this.nestedNodeMap.get(this.database.rootNode));
-    this.treeControl.collapse(this.nestedNodeMap.get(this.database.pinnedNode));
-    this.treeControl.expand(this.nestedNodeMap.get(this.database.pinnedNode));
+    this.refreshTree();
   }
 
   cancelEditItem(node: TodoItemFlatNode) {
     node.editNode = false;
-    this.treeControl.collapse(this.nestedNodeMap.get(this.database.rootNode));
-    this.treeControl.expand(this.nestedNodeMap.get(this.database.rootNode));
-    this.treeControl.collapse(this.nestedNodeMap.get(this.database.pinnedNode));
-    this.treeControl.expand(this.nestedNodeMap.get(this.database.pinnedNode));
+    this.refreshTree()
   }
 
   deleteEmptyItem(node: TodoItemFlatNode) {
@@ -502,11 +462,7 @@ export class SidenavComponent {
     // move node to trash
     this.database.moveToTrash(nestedNode);
 
-    this.treeControl.collapse(this.nestedNodeMap.get(this.database.pinnedNode));
-    this.treeControl.expand(this.nestedNodeMap.get(this.database.pinnedNode));
-
-    this.treeControl.collapse(this.nestedNodeMap.get(this.database.rootNode));
-    this.treeControl.expand(this.nestedNodeMap.get(this.database.rootNode));
+    this.refreshTree();
 
     this.treeControl.collapse(this.nestedNodeMap.get(this.database.trashNode));
     this.treeControl.expand(this.nestedNodeMap.get(this.database.trashNode));
@@ -537,11 +493,7 @@ export class SidenavComponent {
       this.database.restoreItem(nodeToRestore, parentToInsert.id, parentToInsert.id === parentToRemoveId ? null : parentToRemoveId)
     }
 
-    this.treeControl.collapse(this.nestedNodeMap.get(this.database.rootNode));
-    this.treeControl.expand(this.nestedNodeMap.get(this.database.rootNode));
-
-    this.treeControl.collapse(this.nestedNodeMap.get(this.database.pinnedNode));
-    this.treeControl.expand(this.nestedNodeMap.get(this.database.pinnedNode));
+    this.refreshTree()
 
     this.treeControl.collapse(this.nestedNodeMap.get(this.database.trashNode));
     this.treeControl.expand(this.nestedNodeMap.get(this.database.trashNode));
@@ -569,6 +521,17 @@ export class SidenavComponent {
       }
     }
     return parentNode;
+  }
+
+  refreshTree() {
+    if (this.treeControl.isExpanded(this.nestedNodeMap.get(this.database.rootNode))) {
+      this.treeControl.collapse(this.nestedNodeMap.get(this.database.rootNode));
+      this.treeControl.expand(this.nestedNodeMap.get(this.database.rootNode));
+    }
+    if (this.treeControl.isExpanded(this.nestedNodeMap.get(this.database.pinnedNode))) {
+      this.treeControl.collapse(this.nestedNodeMap.get(this.database.pinnedNode));
+      this.treeControl.expand(this.nestedNodeMap.get(this.database.pinnedNode));
+    }
   }
 
   onMenuToggle(): void {

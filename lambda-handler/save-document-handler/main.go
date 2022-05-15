@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"log"
+	"time"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -18,12 +19,11 @@ type Item struct {
 }
 
 type Document struct {
-	ID           string `json:"id"`
-	ParentId     string `json:"parentId"`
-	UserId       string `json:"userId"`
-	Title        string `json:"title"`
-	Content      string `json:"content"`
-	LastModified string `json:"lastModified"`
+	ID           string    `json:"id"`
+	UserId       string    `json:"userId"`
+	Title        string    `json:"title"`
+	Content      string    `json:"content"`
+	LastModified time.Time `json:"lastModified"`
 }
 
 func init() {
@@ -34,6 +34,8 @@ func handleRequest(ctx context.Context, event events.SQSEvent) {
 	item := Item{}
 
 	json.Unmarshal([]byte(event.Records[0].Body), &item)
+
+	item.Document.LastModified = time.Now()
 
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,

@@ -121,11 +121,9 @@ export class EditorComponent {
     this.testService.post("saveDocument", 
       { 
         "id": this.id,
-        "parentId": "",
         "userId": localStorage.getItem("currentUserId"),
         "title": this.title,
-        "content": this.content,
-        "lastModified": Date.now
+        "content": this.content
       }
     ).subscribe();
   }

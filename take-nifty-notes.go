@@ -229,6 +229,18 @@ func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNi
 		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("postDocumentTitleLambdaIntegration"), postDocumentTitleHandler, &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
 	})
 
+	// sign-up confirmation lambda handler
+
+	awscdklambdagoalpha.NewGoFunction(stack, jsii.String("Sign-up-confirmation-handler"), &awscdklambdagoalpha.GoFunctionProps{
+		FunctionName: jsii.String("Sign-up-confirmation-handler"),
+		Runtime:      awslambda.Runtime_GO_1_X(),
+		Entry:        jsii.String("./lambda-handler/sign-up-confirmation-handler"),
+		Bundling: &awscdklambdagoalpha.BundlingOptions{
+			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
+		},
+		Role: dynamoDBRole,
+	})
+
 	// web app
 
 	domain := "www.takeniftynotes.net"
