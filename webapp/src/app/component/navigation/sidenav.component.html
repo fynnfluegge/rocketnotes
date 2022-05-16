@@ -68,7 +68,7 @@
   
         <mat-tree-node *matTreeNodeDef="let node; when: hasNoContent" matTreeNodePadding matTreeNodePaddingIndent="8">
           <mat-form-field style="padding-left:24px;">
-            <input matInput #itemValue placeholder="New document..." style="width:140px;height:24px;">
+            <input autofocus matInput #itemValue placeholder="New document..." style="width:140px;height:24px;">
           </mat-form-field>
             <button mat-icon-button (click)="saveNode(node, itemValue.value, true)">
               <mat-icon>save</mat-icon>
@@ -80,7 +80,7 @@
   
         <mat-tree-node *matTreeNodeDef="let node; when: editNode" matTreeNodePadding matTreeNodePaddingIndent="8">
           <mat-form-field style="padding-left:24px;">
-            <input matInput #itemValue value="{{node.name}}" style="width:140px;height:24px;">
+            <input autofocus matInput #itemValue value="{{node.name}}" style="width:140px;height:24px;">
           </mat-form-field>
             <button mat-icon-button (click)="saveNode(node, itemValue.value, false)">
               <mat-icon>save</mat-icon>
