@@ -61,7 +61,7 @@
               <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="editItem(node)"><mat-icon>edit</mat-icon></button>
               <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="moveToTrash(node)"><mat-icon>delete</mat-icon></button>
               <button *ngIf="node.deleted" mat-icon-button class="icon-button-fade" (click)="restoreItem(node)"><mat-icon>restore_from_trash</mat-icon></button>
-              <button *ngIf="node.deleted" mat-icon-button class="icon-button-fade" style="margin-left:auto;"><mat-icon>delete_forever</mat-icon></button>
+              <button *ngIf="node.deleted" mat-icon-button class="icon-button-fade"><mat-icon>delete_forever</mat-icon></button>
             </div>
           </div>
         </mat-tree-node>
@@ -107,7 +107,7 @@
               <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="editItem(node)"><mat-icon>edit</mat-icon></button>
               <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="moveToTrash(node)"><mat-icon>delete</mat-icon></button>
               <button *ngIf="node.deleted" mat-icon-button class="icon-button-fade" (click)="restoreItem(node)"><mat-icon>restore_from_trash</mat-icon></button>
-              <button *ngIf="node.deleted" mat-icon-button class="icon-button-fade" style="margin-left:auto;"><mat-icon>delete_forever</mat-icon></button>
+              <button *ngIf="node.deleted" mat-icon-button class="icon-button-fade"><mat-icon>delete_forever</mat-icon></button>
             </div>
           </div>
         </mat-tree-node>

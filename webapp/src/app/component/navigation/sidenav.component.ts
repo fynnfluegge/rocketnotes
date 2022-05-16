@@ -154,17 +154,20 @@ export class ChecklistDatabase {
     }
   }
 
-  insertItem(parent: TodoItemNode, vName: string) {
+  insertItem(parent: TodoItemFlatNode, vName: string): TodoItemNode{
     const child = <TodoItemNode>{ id: uuid.v4(), name: vName, parent: parent.id, pinned: false, deleted: false };
     this.rootNodeMap.set(child.id, child);
-    if (parent.children) {
-      parent.children.push(child);
+    // only add in root tree
+    const parentInRoot = this.rootNodeMap.get(parent.id)
+    if (parentInRoot.children) {
+      parentInRoot.children.push(child);
       this.dataChange.next(this.data);
     } else {
-      parent.children = [];
-      parent.children.push(child);
+      parentInRoot.children = [];
+      parentInRoot.children.push(child);
       this.dataChange.next(this.data);
     }
+    return parentInRoot;
   }
 
    deleteEmptyItem(node: TodoItemFlatNode) {
@@ -427,8 +430,8 @@ export class SidenavComponent {
   };
 
   addNewItem(node: TodoItemFlatNode) {
-    this.database.insertItem(this.flatNodeMap.get(node), '');
-    this.treeControl.expand(node);
+    var parentInRoot = this.database.insertItem(node, '');
+    this.treeControl.expand(this.nestedNodeMap.get(parentInRoot));
     this.refreshTree();
   }
 
