@@ -40,7 +40,7 @@ mat-tree-node:hover > .hide {
 }
 
 mat-tree-node:focus {
-  background-color: black;
+  background-color: rgb(44, 81, 91);
 }
 
 span {
@@ -168,4 +168,4 @@ li a:hover {
 
 .dropdown:hover .dropdown-content {display: block;}
 
-// .dropdown:hover .dropbtn {background-color: black;}
+.dropdown:hover .dropbtn {background-color: black;}

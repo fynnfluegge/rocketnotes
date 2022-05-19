@@ -20,8 +20,6 @@ export class EditorComponent {
 
   angularVersion = VERSION.full;
   ngxMarkdownVersion = '12.0.1';
-  
-  public mode: string = "preview";
 
   private id: string;
   public title: string ;
@@ -63,13 +61,7 @@ export class EditorComponent {
   }
 
   changeMode() {
-    if (this.mode === "preview") {
-      this.mode = "editor";
-      this.editorMode = true;
-    } else {
-      this.mode = "preview";
-      this.editorMode = false;
-    }
+      this.editorMode = !this.editorMode;
   }
 
   doUpload(files: Array<File>): Promise<Array<UploadResult>> {
