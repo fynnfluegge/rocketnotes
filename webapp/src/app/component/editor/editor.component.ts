@@ -1,7 +1,7 @@
 import { Component, Input, VERSION } from '@angular/core';
 import { Auth } from 'aws-amplify';
 import { TestServiceService } from 'src/app/service/rest/test-service.service';
-import { UploadResult, MdEditorOption } from "ngx-markdown-editor";
+import { UploadResult } from "ngx-markdown-editor";
 import jwt_decode from 'jwt-decode';
 import { ActivatedRoute } from '@angular/router';
 import { ChecklistDatabase } from '../navigation/sidenav.component';
@@ -13,6 +13,8 @@ import { Title } from '@angular/platform-browser';
   styleUrls: ['./editor.component.scss']
 })
 export class EditorComponent {
+
+  @Input() showSidebar: Boolean;
 
   public showPreview: Boolean = false;
   public editorMode: Boolean = false;
