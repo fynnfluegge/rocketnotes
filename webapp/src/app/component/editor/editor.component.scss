@@ -50,3 +50,9 @@ textarea.md-input {
 .btn:focus {
   box-shadow: none;
 }
+
+.center {
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
