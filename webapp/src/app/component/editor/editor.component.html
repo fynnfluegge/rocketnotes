@@ -9,8 +9,8 @@
 
 </div>
 
-<div class="center" style="position:absolute;bottom:12px;width:100%;transition:0.5s;"
-  [style.transform]="showSidebar ? 'translateX(-130px)' : 'translateX(-40px)'">
+<div class="center" style="position:absolute;bottom:12px;width:calc(100% - 240px);transition:0.5s;"
+  [style.transform]="showSidebar ? 'translateX(-12px)' : 'translateX(80px)'">
   <button *ngIf="editorMode" class="btn btn-default btn-primary" (click)="togglePreviewPanel()">
     <i [ngClass]="showPreview ? 'fa-solid fa-eye-slash' : 'fa-solid fa-magnifying-glass'"></i>
       {{ showPreview ? 'Hide Preview' : 'Show Preview' }}
