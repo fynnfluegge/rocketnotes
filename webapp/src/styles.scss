@@ -16,3 +16,27 @@ body {
   overflow-y: visible;
   transition: 500ms;
 }
+
+// ------- copy to clipboard ------------ //
+pre[class*=language-] {
+  position: relative;
+  overflow: visible;
+  border-radius: 5px;
+}
+
+pre[class*=language-] .copy {
+  padding: 2px 10px 0;
+  position: absolute;
+  top: 12px;
+  right: 10px;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  color: white;
+  background: #272822;
+  cursor: pointer;
+}
+
+pre[class*=language-]:hover .copy:hover {
+  color: gray;
+}
+// -------------------------------------- //

@@ -18,10 +18,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTreeModule } from '@angular/material/tree';
 import { MarkdownModule } from 'ngx-markdown';
 
-import 'prismjs';
-import 'prismjs/components/prism-typescript.min.js';
-import 'prismjs/plugins/line-numbers/prism-line-numbers.js';
-import 'prismjs/plugins/line-highlight/prism-line-highlight.js';
 import { SidenavComponent } from './component/navigation/sidenav.component';
 import { LandingComponent } from './component/landing/landing.component';
 

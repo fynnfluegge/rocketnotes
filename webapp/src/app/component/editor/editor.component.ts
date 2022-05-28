@@ -7,6 +7,8 @@ import { ActivatedRoute } from '@angular/router';
 import { ChecklistDatabase } from '../navigation/sidenav.component';
 import { Title } from '@angular/platform-browser';
 
+import '../../../assets/prism-custom.js';
+
 @Component({
   selector: 'app-editor',
   templateUrl: './editor.component.html',
