@@ -25,6 +25,7 @@
     "aws-amplify": "^3.4.3",
     "aws-amplify-angular": "^6.0.26",
     "bootstrap": "^5.1.3",
+    "clipboard": "^2.0.11",
     "font-awesome": "^4.7.0",
     "jwt-decode": "^3.1.2",
     "ngx-markdown": "^13.1.0",
