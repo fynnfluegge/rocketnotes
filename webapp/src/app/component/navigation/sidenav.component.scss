@@ -39,7 +39,7 @@ mat-tree-node:hover > .hide {
   opacity:1;
 }
 
-mat-tree-node:focus {
+.active-node {
   background-color: rgb(44, 81, 91);
 }
 
