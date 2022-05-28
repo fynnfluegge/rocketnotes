@@ -4,7 +4,7 @@ import { FlatTreeControl } from '@angular/cdk/tree';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
 import { of as ofObservable, Observable, BehaviorSubject, Subject } from 'rxjs';
 import * as uuid from 'uuid';
-import { TestServiceService } from 'src/app/service/rest/test-service.service';
+import { BasicRestService } from 'src/app/service/rest/basic-rest.service';
 import { Auth } from 'aws-amplify';
 import { environment } from 'src/environments/environment';
 import { ActivatedRoute } from '@angular/router';
@@ -56,7 +56,7 @@ export class ChecklistDatabase {
     return this.dataChange.value;
   }
 
-  constructor(public http: HttpClient, private testService : TestServiceService, private route: ActivatedRoute) {
+  constructor(public http: HttpClient, private testService : BasicRestService, private route: ActivatedRoute) {
     this.initialize();
   }
 

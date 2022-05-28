@@ -6,7 +6,7 @@ import { retry } from 'rxjs/operators';
 @Injectable({
   providedIn: 'root'
 })
-export class TestServiceService {
+export class BasicRestService {
 
   backend_url = environment.apiUrl;
 

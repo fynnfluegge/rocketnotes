@@ -1,6 +1,6 @@
 import { Component, Input, VERSION } from '@angular/core';
 import { Auth } from 'aws-amplify';
-import { TestServiceService } from 'src/app/service/rest/test-service.service';
+import { BasicRestService } from 'src/app/service/rest/basic-rest.service';
 import { UploadResult } from "ngx-markdown-editor";
 import jwt_decode from 'jwt-decode';
 import { ActivatedRoute } from '@angular/router';
@@ -29,7 +29,7 @@ export class EditorComponent {
   public title: string ;
   public content: string;
 
-  constructor(private database: ChecklistDatabase, private testService : TestServiceService, private route: ActivatedRoute, private titleService: Title) {
+  constructor(private database: ChecklistDatabase, private testService : BasicRestService, private route: ActivatedRoute, private titleService: Title) {
     this.preRender = this.preRender.bind(this);
     this.postRender = this.postRender.bind(this);
   }
