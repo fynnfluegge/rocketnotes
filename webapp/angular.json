@@ -75,18 +75,23 @@
                   "maximumError": "10kb"
                 }
               ]
+            },
+            "dev": {
+              "optimization": false,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "namedChunks": false,
+              "aot": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": false
             }
           }
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "webapp:build"
-          },
-          "configurations": {
-            "production": {
-              "browserTarget": "webapp:build:production"
-            }
+            "browserTarget": "webapp:build:dev"
           }
         },
         "extract-i18n": {
