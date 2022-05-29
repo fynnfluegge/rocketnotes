@@ -27,4 +27,4 @@ jobs:
       run: |
           cd webapp
           npm i
-          npm run build:prodproduction
+          npm run build:production
