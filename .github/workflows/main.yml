@@ -24,7 +24,7 @@ jobs:
           node-version: 12
 
       - name: npm install and npm run build
-        run: |
+      run: |
           cd webapp
-          npm ci
-          npm run build:ci --configuration production
+          npm i
+          npm run build:prodproduction
