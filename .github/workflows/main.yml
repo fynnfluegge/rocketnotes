@@ -39,5 +39,6 @@ jobs:
       - name: npm install and npm run build
         run: |
           cd webapp
-          npm ci
-          npm run ci:build
+          npm i
+          npm i @angular/cdk
+          npm run build
