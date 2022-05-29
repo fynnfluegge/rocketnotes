@@ -39,5 +39,5 @@ jobs:
       - name: npm install and npm run build
         run: |
           cd webapp
-          npm i
-          npm run build
+          npm ci
+          npm run ci:build
