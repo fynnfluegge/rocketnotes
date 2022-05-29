@@ -18,6 +18,19 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Cache node modules
+        id: cache-npm
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
       - name: Node $
         uses: actions/setup-node@v1
         with:
@@ -27,4 +40,4 @@ jobs:
         run: |
           cd webapp
           npm i
-          npm run build:production
+          npm run build
