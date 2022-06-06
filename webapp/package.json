@@ -4,7 +4,7 @@
   "main": "electron.js",
   "scripts": {
     "ng": "ng",
-    "start": "ng build --configuration production --base-href ./ && electron .",
+    "start": "electron .",
     "build": "ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
@@ -41,6 +41,7 @@
     "@types/jasmine": "~3.10.0",
     "@types/node": "^12.11.1",
     "electron": "^18.2.4",
+    "electron-icon-maker": "^0.0.5",
     "electron-installer-dmg": "^4.0.0",
     "electron-packager": "^15.5.1",
     "jasmine-core": "~4.0.0",

@@ -321,6 +321,20 @@ func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNi
 		DistributionPaths: jsii.Strings("/*"),
 	})
 
+	// Electron installer bucket
+
+	electronBucket := awss3.NewBucket(stack, jsii.String("ElectronBucket"), &awss3.BucketProps{
+		BucketName:       jsii.String("electron"),
+		PublicReadAccess: jsii.Bool(true),
+	})
+
+	awss3deployment.NewBucketDeployment(stack, jsii.String("ElectronBucketDeployment"), &awss3deployment.BucketDeploymentProps{
+		Sources: &[]awss3deployment.ISource{
+			awss3deployment.Source_Asset(jsii.String("./webapp/markdown-notes.dmg"), &awss3assets.AssetOptions{}),
+		},
+		DestinationBucket: electronBucket,
+	})
+
 	return stack
 }
 
