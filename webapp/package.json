@@ -5,7 +5,7 @@
   "scripts": {
     "ng": "ng",
     "start": "electron .",
-    "build": "ng build --configuration production",
+    "build": "ng build --configuration production --base-href ./",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
