@@ -1,6 +1,6 @@
 {
   "name": "webapp",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "main": "electron.js",
   "scripts": {
     "ng": "ng",
@@ -26,6 +26,8 @@
     "aws-amplify-angular": "^6.0.26",
     "bootstrap": "^5.1.3",
     "clipboard": "^2.0.11",
+    "electron-log": "^4.4.7",
+    "electron-updater": "^5.0.1",
     "font-awesome": "^4.7.0",
     "jwt-decode": "^3.1.2",
     "ngx-markdown": "^13.1.0",
@@ -41,8 +43,10 @@
     "@types/jasmine": "~3.10.0",
     "@types/node": "^12.11.1",
     "electron": "^18.2.4",
+    "electron-builder": "^23.0.3",
     "electron-icon-maker": "^0.0.5",
     "electron-installer-dmg": "^4.0.0",
+    "electron-notarize": "^1.2.1",
     "electron-packager": "^15.5.1",
     "jasmine-core": "~4.0.0",
     "karma": "~6.3.0",

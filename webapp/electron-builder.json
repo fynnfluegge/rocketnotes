@@ -1,0 +1,26 @@
+{
+    "appId": "rocketnotes",
+    "productName": "rocketnotes",
+    "copyright": "Copyright © Fynn Flügge",
+    "files": [
+        "build/**/*",
+        "package.json",
+        "electron.js"
+    ],
+    "directories": {
+      "output": "release/"
+    },
+    "mac": {
+      "icon": "dist",
+      "target": [
+        "zip",
+        "dmg"
+      ],
+      "category": "app.category.type"
+    },
+    "publish": {
+        "provider": "s3",
+        "bucket": "rocketnotes-electron-releases",
+        "region": "eu-central-1"
+    }
+  }
