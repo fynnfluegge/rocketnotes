@@ -4,11 +4,12 @@
       <mat-icon>menu</mat-icon>
     </a>
   </li>
-  <li style="margin-left:auto;">
-    <a (click)="onLogout()">
-      Logout
-    </a>
-  </li>
+  <div class="dropdown">
+    <button style="height:100%;"><i class="fa-solid fa-user"></i> {{ username }}</button>
+    <div class="dropdown-content" style="left:auto;right:0;">
+      <button (click)="onLogout()" style="padding:8px;">Logout</button>
+    </div>
+  </div>
 </ul>
 
 <div class="sidebar" [style.left.px]="showSidebar ? '0' : '-200'">

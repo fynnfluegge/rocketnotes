@@ -1,4 +1,4 @@
-import { Component, Injectable } from '@angular/core';
+import { Component, Injectable, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FlatTreeControl } from '@angular/cdk/tree';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
@@ -327,7 +327,9 @@ export class ChecklistDatabase {
   styleUrls: ['./sidenav.component.scss'],
   providers: [ChecklistDatabase],
 })
-export class SidenavComponent {
+export class SidenavComponent implements OnInit{
+
+  username: string;
 
   initContent: string;
 
@@ -349,6 +351,7 @@ export class SidenavComponent {
   dataSource: MatTreeFlatDataSource<TodoItemNode, TodoItemFlatNode>;
 
   constructor(private database: ChecklistDatabase) {
+
     this.treeFlattener = new MatTreeFlattener(
       this.transformer,
       this.getLevel,
@@ -370,6 +373,9 @@ export class SidenavComponent {
       this.treeControl.collapse(this.nestedNodeMap.get(this.database.rootNode));
       this.treeControl.expand(this.nestedNodeMap.get(this.database.rootNode));
     });
+  }
+  ngOnInit(): void {
+    this.username = localStorage.getItem("username");
   }
 
   getLevel = (node: TodoItemFlatNode) => {
@@ -542,10 +548,6 @@ export class SidenavComponent {
   }
 
   onLogout(): void {
-    console.log(Auth.currentUserInfo().then((user: any ) => {
-      console.log(user.username)
-    }))
     Auth.signOut();
   }
-
 }

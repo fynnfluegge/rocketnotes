@@ -38,6 +38,7 @@ export class EditorComponent {
 
     Auth.currentAuthenticatedUser().then((user) => {
       localStorage.setItem("currentUserId", user.username);
+      localStorage.setItem("username", user.attributes.email);
     });
 
     this.database.initContentChange.subscribe(value => {
