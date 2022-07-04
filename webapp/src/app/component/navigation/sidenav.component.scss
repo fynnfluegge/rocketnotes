@@ -1,3 +1,6 @@
+// @import '~@angular/material/prebuilt-themes/deeppurple-amber.css';
+// @import '~@angular/material/theming';
+
 button {
   color: white;
   background-color:#282828;
@@ -23,6 +26,23 @@ button {
   border-bottom: 1px solid grey;
   font-weight: 280;
   font-size: 13px;
+
+  &.cdk-drag-preview { // while dragging
+    background-color:#282828;
+    color: white;
+  }
+  &.cdk-drag-placeholder { // potential drop area
+    opacity: 0;
+  }
+}
+
+/* items moving away to make room for drop */
+.cdk-drop-list-dragging .mat-tree-node:not(.cdk-drag-placeholder) {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+/* item being dropped */
+.cdk-drag-animating {
+  transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
 }
 
 .mat-icon {
