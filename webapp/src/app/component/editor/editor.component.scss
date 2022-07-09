@@ -56,3 +56,44 @@ textarea.md-input {
   align-items: center;
   display: flex;
 }
+
+//---- snackbar ---- //
+#snackbar {
+  visibility: hidden;
+  background-color: #1fd370;
+  color: #fff;
+  text-align: center;
+  border-radius: 8px;
+  padding: 12px;
+  position: fixed;
+  z-index: 1;
+  right: 12px;
+  bottom: 12px;
+  font-size: 17px;
+}
+
+#snackbar.show {
+  visibility: visible;
+  -webkit-animation: fadein 0.5s, fadeout 0.5s 2.0s;
+  animation: fadein 0.5s, fadeout 0.5s 2.0s;
+}
+
+@-webkit-keyframes fadein {
+  from {bottom: 0; opacity: 0;} 
+  to {bottom: 12px; opacity: 1;}
+}
+
+@keyframes fadein {
+  from {bottom: 0; opacity: 0;}
+  to {bottom: 12px; opacity: 1;}
+}
+
+@-webkit-keyframes fadeout {
+  from {bottom: 12px; opacity: 1;} 
+  to {bottom: 0; opacity: 0;}
+}
+
+@keyframes fadeout {
+  from {bottom: 12px; opacity: 1;}
+  to {bottom: 0; opacity: 0;}
+}

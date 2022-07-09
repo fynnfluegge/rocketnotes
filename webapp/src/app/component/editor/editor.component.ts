@@ -19,6 +19,7 @@ export class EditorComponent {
   @Input() showSidebar: Boolean;
 
   public showPreview: Boolean = false;
+  public showSnackbar: Boolean = false;
   public editorMode: Boolean = false;
   public fullscreen: Boolean = false;
 
@@ -114,7 +115,7 @@ export class EditorComponent {
 
   }
 
-  submit(): void{
+  submit(): void {
     this.testService.post("saveDocument", 
       { 
         "id": this.id,
@@ -122,7 +123,12 @@ export class EditorComponent {
         "title": this.title,
         "content": this.content
       }
-    ).subscribe();
+    ).subscribe(() => {
+      this.showSnackbar = true;
+      setTimeout(() => {
+        this.showSnackbar = false;
+      }, 2500);
+    });
   }
 
   getDecodedAccessToken(token: string): any {
