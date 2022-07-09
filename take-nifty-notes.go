@@ -290,7 +290,7 @@ func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNi
 				ErrorCode:          jsii.Number(403),
 				ResponseCode:       jsii.Number(200),
 				ErrorCachingMinTtl: jsii.Number(300),
-				ResponsePagePath:   jsii.String("index.html"),
+				ResponsePagePath:   jsii.String("/index.html"),
 			},
 		},
 		OriginConfigs: &[]*awscloudfront.SourceConfiguration{
