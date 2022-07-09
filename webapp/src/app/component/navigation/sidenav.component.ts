@@ -641,6 +641,8 @@ export class SidenavComponent implements OnInit{
       return;
     }
 
+    nodeToInsert.parent = nodeAtDest.parent;
+
     // insert node 
     newSiblings.splice(insertIndex, 0, nodeToInsert);
     
