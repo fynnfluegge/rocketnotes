@@ -158,7 +158,7 @@ export class ChecklistDatabase {
     // only add in root tree
     const parentInRoot = this.rootNodeMap.get(parent.id)
     if (parentInRoot.children) {
-      parentInRoot.children.push(child);
+      parentInRoot.children = [child].concat(parentInRoot.children);
       this.dataChange.next(this.data);
     } else {
       parentInRoot.children = [];
