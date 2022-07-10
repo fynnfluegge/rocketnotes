@@ -81,6 +81,19 @@ span:hover {
   cursor: default;
 }
 
+.nav-bar-button {
+  font-size:smaller;
+  height:100%;
+  font-weight:200;
+  border:1px;
+  border-color:darkgrey;
+  border-radius:8px;
+  margin:8px;
+  border-style:groove;
+  height:70%;
+  width:120px !important;
+}
+
 .icon-button-fade {
   opacity: 0.5;
   width: 24px;

@@ -4,6 +4,7 @@
       <mat-icon>menu</mat-icon>
     </a>
   </li>
+  <button (click)="addNewItem()" class="icon-button-fade nav-bar-button">Add Document</button>
   <div class="dropdown">
     <button style="height:100%;"><i class="fa-solid fa-user"></i> {{ username }}</button>
     <div class="dropdown-content" style="left:auto;right:0;">
@@ -35,10 +36,7 @@
               {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
             </mat-icon>
           </button>
-          <span>My Documents</span>
-          <button mat-icon-button class="icon-button-fade" (click)="addNewItem(node)">
-            <mat-icon>note_add</mat-icon>
-          </button>
+          <span>Documents</span>
         </mat-tree-node>
   
         <mat-tree-node *matTreeNodeDef="let node; when: isTrash" matTreeNodePadding matTreeNodePaddingIndent="matTreeNodePaddingIndent">

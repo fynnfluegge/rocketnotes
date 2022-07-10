@@ -439,6 +439,10 @@ export class SidenavComponent implements OnInit{
   };
 
   addNewItem(node: TodoItemFlatNode) {
+    this.showSidebar = true;
+    if (!node) {
+      node = this.nestedNodeMap.get(this.database.rootNode);
+    }
     var parentInRoot = this.database.insertItem(node, '');
     this.treeControl.expand(this.nestedNodeMap.get(parentInRoot));
     this.refreshTree();
