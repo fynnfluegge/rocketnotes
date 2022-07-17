@@ -14,21 +14,6 @@ header,
   }
 }
 
-@media (min-width: 800px) and (max-width: 850px) {
-  html,
-  body,
-  header,
-  .carousel {
-    height: 100vh;
-  }
-}
-
-@media (min-width: 800px) and (max-width: 850px) {
-  .navbar:not(.top-nav-collapse) {
-      background: red !important;
-  }
-}
-
 .view,body,html{
   height:100%
 }
@@ -44,7 +29,8 @@ header,
 }
 
 .carousel .carousel-inner,
-.carousel .carousel-inner .active,.carousel .carousel-inner .carousel-item{
+.carousel .carousel-inner .active,
+.carousel .carousel-inner .carousel-item{
   height:100%
 }
 
@@ -55,16 +41,22 @@ header,
 }
 
 .navbar{
-  background-color:#282828
+  background-color:#282828;
+  min-height:60px;
 }
 
 .page-footer,
 .top-nav-collapse{
-  background-color:#1C2331
+  background-color:#282828;
 }
 
 @media only screen and (max-width:768px){
   .navbar{
-    background-color:#1C2331
+    background-color:#282828;
   }
+}
+
+a {
+  color: white;
+  padding: 8px !important;
 }

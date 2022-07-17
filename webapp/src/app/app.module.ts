@@ -18,17 +18,14 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTreeModule } from '@angular/material/tree';
 import { MarkdownModule } from 'ngx-markdown';
 import { DragDropModule } from '@angular/cdk/drag-drop';
-
 import { SidenavComponent } from './component/navigation/sidenav.component';
-import { LandingComponent } from './component/landing/landing.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
     EditorComponent,
-    SidenavComponent,
-    LandingComponent
+    SidenavComponent
   ],
   imports: [
     BrowserModule,
