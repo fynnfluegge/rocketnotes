@@ -582,10 +582,17 @@ export class SidenavComponent implements OnInit{
   drop(event: CdkDragDrop<string[]>) {
     if (!event.isPointerOverContainer) return;
 
-    let visibleNodes = this.visibleNodes(event.item.data.parent == "pinned", event.item.data.deleted);
+    let visibleNodes = this.visibleNodes(event.item.data.parent === "pinned", event.item.data.deleted);
+
+    // console.log("VISIBLE NODES");
+    // console.log(visibleNodes);
+    // console.log("------------");
 
     let dropIndex = event.currentIndex;
     let pinnedNodes = this.database.pinnedNode.children.length;
+
+    // console.log("DROP INDEX");
+    // console.log(dropIndex);
 
     if (!event.item.data.deleted && event.item.data.parent === "root" && this.treeControl.isExpanded(this.nestedNodeMap.get(this.database.pinnedNode))) {
       dropIndex = dropIndex - pinnedNodes;
@@ -600,6 +607,9 @@ export class SidenavComponent implements OnInit{
         dropIndex -= visibleRootNodes;
       }
     }
+
+    // console.log(dropIndex);
+    // console.log("------------");
 
     const changedData = this.dataSource.data;
 
@@ -628,15 +638,37 @@ export class SidenavComponent implements OnInit{
     }
     const newSiblings = findNodeSiblings(searchTree.children, nodeAtDest.id);
 
+    // console.log("SIBLINGS")
+    // console.log(newSiblings)
+    // console.log("---------")
+
     if (!newSiblings) return;
     const insertIndex = newSiblings.findIndex(s => s.id === nodeAtDest.id);
+
+    // console.log("INSERT INDEX")
+    // console.log(insertIndex)
+    // console.log("---------")
 
     // remove the node from its old place
     const node = event.item.data;
     const siblings = findNodeSiblings(searchTree.children, node.id);
+
+    // console.log("NEW SIBLINGS")
+    // console.log(siblings)
+    // console.log("---------")
+
     const siblingIndex = siblings.findIndex(n => n.id === node.id);
+
+    // console.log("SIBLINGS INDEX")
+    // console.log(siblingIndex)
+    // console.log("---------")
+
     const nodeToInsert: TodoItemNode = siblings.splice(siblingIndex, 1)[0];
     if (nodeAtDest.id === nodeToInsert.id) return;
+
+    // console.log("NODE TO INSERT")
+    // console.log(nodeToInsert)
+    // console.log("---------")
 
     // ensure validity of drop - must be same level
     const nodeAtDestFlatNode = this.treeControl.dataNodes.find((n) => nodeAtDest.id === n.id);
@@ -645,7 +677,7 @@ export class SidenavComponent implements OnInit{
       return;
     }
 
-    nodeToInsert.parent = nodeAtDest.parent;
+    nodeToInsert.parent = nodeAtDest.parent.slice();
 
     // insert node 
     newSiblings.splice(insertIndex, 0, nodeToInsert);
