@@ -10,6 +10,10 @@ import { environment } from 'src/environments/environment';
 import { ActivatedRoute } from '@angular/router';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 
+const ROOT_ID: string = "root";
+const PINNED_ID: string = "pinned";
+const TRASH_ID: string = "trash";
+
 /**
  * Node for to-do item
  */
@@ -66,9 +70,9 @@ export class ChecklistDatabase {
     this.http.get(this.backend_url + '/documentTree/' + localStorage.getItem("currentUserId")).subscribe({
       next: (res) => {
         const jsonObject = JSON.parse(JSON.stringify(res))
-        this.rootNode = <TodoItemNode>{ id: "root", name: "root", children: jsonObject.documents };
-        this.pinnedNode = <TodoItemNode>{ id: "pinned", name: "pinned", children: jsonObject.pinned };
-        this.trashNode = <TodoItemNode>{ id: "trash", name: "trash", children: jsonObject.trash };
+        this.rootNode = <TodoItemNode>{ id: ROOT_ID, name: ROOT_ID, children: jsonObject.documents };
+        this.pinnedNode = <TodoItemNode>{ id: PINNED_ID, name: PINNED_ID, children: jsonObject.pinned };
+        this.trashNode = <TodoItemNode>{ id: TRASH_ID, name: TRASH_ID, children: jsonObject.trash };
 
         if (jsonObject.trash) {
           jsonObject.trash.forEach(v => { this.setDeletedandUnpin(v) })
@@ -183,7 +187,7 @@ export class ChecklistDatabase {
    }
 
   removeFromDocuments(node: TodoItemNode) {
-    if (node.parent === "root") {
+    if (node.parent === ROOT_ID) {
       this.removeFromParent(this.rootNode, node.id)
     } else {
       const parent = this.rootNodeMap.get(node.parent)
@@ -288,7 +292,7 @@ export class ChecklistDatabase {
       if (!this.pinnedNode.children) this.pinnedNode.children = [];
 
       // add copy of pinned node to pinnedNodeTree
-      var nodeCopy = <TodoItemNode>{ id: node.id, name: node.name, parent: "pinned", children: null, pinned: true }
+      var nodeCopy = <TodoItemNode>{ id: node.id, name: node.name, parent: PINNED_ID, children: null, pinned: true }
       this.pinnedNode.children.push(nodeCopy);
 
       // add copy of pinned node to pinnedNodeMap
@@ -336,7 +340,6 @@ export class SidenavComponent implements OnInit{
   dragging = false;
   expandTimeout: any;
   expandDelay = 1000;
-  validateDrop = false;
 
   /** Map from flat node to nested node. This helps us finding the nested node to be modified */
   flatNodeMap: Map<TodoItemFlatNode, TodoItemNode> = new Map<TodoItemFlatNode,TodoItemNode>();
@@ -394,15 +397,15 @@ export class SidenavComponent implements OnInit{
   };
 
   isRoot = (_: number, _nodeData: TodoItemFlatNode) => {
-    return _nodeData.id === "root";
+    return _nodeData.id === ROOT_ID;
   };
 
   isTrash = (_: number, _nodeData: TodoItemFlatNode) => {
-    return _nodeData.id === "trash";
+    return _nodeData.id === TRASH_ID;
   };
 
   isPinned = (_: number, _nodeData: TodoItemFlatNode) => {
-    return _nodeData.id === "pinned";
+    return _nodeData.id === PINNED_ID;
   };
 
   editNode = (_: number, _nodeData: TodoItemFlatNode) => {
@@ -495,7 +498,7 @@ export class SidenavComponent implements OnInit{
     const nodeToRestore = this.flatNodeMap.get(node);
     const parentToRemoveId = `${nodeToRestore.parent}`;
 
-    if (node.parent === "root") {
+    if (node.parent === ROOT_ID) {
       this.database.restoreItem(nodeToRestore, node.parent)
     } else {
       var parentToInsert: TodoItemNode = this.database.rootNodeMap.get(node.parent);
@@ -504,7 +507,7 @@ export class SidenavComponent implements OnInit{
         if (parentToInsert)
           nodeToRestore.parent = parentToInsert.id
         else
-          nodeToRestore.parent = "root"
+          nodeToRestore.parent = ROOT_ID
       }
       this.database.restoreItem(nodeToRestore, parentToInsert.id, parentToInsert.id === parentToRemoveId ? null : parentToRemoveId)
     }
@@ -582,22 +585,26 @@ export class SidenavComponent implements OnInit{
   drop(event: CdkDragDrop<string[]>) {
     if (!event.isPointerOverContainer) return;
 
-    let visibleNodes = this.visibleNodes(event.item.data.parent === "pinned", event.item.data.deleted);
+    const draggedNode = event.item.data;
 
-    // console.log("VISIBLE NODES");
-    // console.log(visibleNodes);
-    // console.log("------------");
+    let visibleNodes = this.visibleNodes(event.item.data.parent === PINNED_ID, event.item.data.deleted);
+
+    const currentIndexOfDraggedNode = visibleNodes.findIndex(v => v.id === draggedNode.id);
+
+    console.log("CURRENT INDEX OF DRAGGED NODE");console.log(currentIndexOfDraggedNode);console.log("------------");
+    console.log("VISIBLE NODES");console.log(visibleNodes);console.log("------------");
 
     let dropIndex = event.currentIndex;
-    let pinnedNodes = this.database.pinnedNode.children.length;
 
-    // console.log("DROP INDEX");
-    // console.log(dropIndex);
+    let pinnedNodes = this.database.pinnedNode.children ? this.database.pinnedNode.children.length : 0;
+    let pinnedExpanded = this.treeControl.isExpanded(this.nestedNodeMap.get(this.database.pinnedNode))
 
-    if (!event.item.data.deleted && event.item.data.parent === "root" && this.treeControl.isExpanded(this.nestedNodeMap.get(this.database.pinnedNode))) {
+    console.log("DROP INDEX");console.log(dropIndex);
+
+    if (!draggedNode.deleted && pinnedExpanded && event.item.data.parent !== PINNED_ID) {
       dropIndex = dropIndex - pinnedNodes;
     } 
-    else if (event.item.data.deleted) {
+    else if (draggedNode.deleted) {
       let visibleRootNodes = visibleNodes.filter(x => !x.deleted).length;
       visibleNodes = visibleNodes.filter(x => x.deleted);
       if (this.treeControl.isExpanded(this.nestedNodeMap.get(this.database.pinnedNode))) {
@@ -608,10 +615,20 @@ export class SidenavComponent implements OnInit{
       }
     }
 
-    // console.log(dropIndex);
-    // console.log("------------");
+    if (currentIndexOfDraggedNode == dropIndex) return;
 
-    const changedData = this.dataSource.data;
+    let dropIndexIncremented = false;
+
+    // drop node at lower position, special handling
+    if (currentIndexOfDraggedNode < dropIndex) {
+      let nodeAtDropIndex = visibleNodes[dropIndex];
+      if (nodeAtDropIndex.children && this.treeControl.isExpanded(this.nestedNodeMap.get(nodeAtDropIndex))){
+        dropIndex++;
+        dropIndexIncremented = true
+      }
+    }
+
+    console.log(dropIndex);console.log("------------");
 
     function findNodeSiblings(arr: Array<any>, id: string): Array<any> {
       let result, subResult;
@@ -628,54 +645,58 @@ export class SidenavComponent implements OnInit{
 
     // determine where to insert the node
     const nodeAtDest = visibleNodes[dropIndex];
-    let searchTree;
-    if (event.item.data.deleted) {
-      searchTree = changedData.find(n => n.id === "trash")
-    } else if (event.item.data.parent === "pinned") {
-      searchTree = changedData.find(n => n.id === "pinned")
-    } else {
-      searchTree = changedData.find(n => n.id === "root")
-    }
-    const newSiblings = findNodeSiblings(searchTree.children, nodeAtDest.id);
 
-    // console.log("SIBLINGS")
-    // console.log(newSiblings)
-    // console.log("---------")
+    if (nodeAtDest.id == draggedNode.id) return;
+
+    console.log("NODE AT DEST");console.log(nodeAtDest);console.log("------------");
+
+    let searchTree;
+    const changedData = this.dataSource.data;
+    if (draggedNode.deleted) {
+      searchTree = changedData.find(n => n.id === TRASH_ID)
+    } else if (event.item.data.parent === PINNED_ID) {
+      searchTree = changedData.find(n => n.id === PINNED_ID)
+    } else {
+      searchTree = changedData.find(n => n.id === ROOT_ID)
+    }
+    
+    console.log("SEARCH TREE");console.log(searchTree);console.log("------------");
+
+    const newSiblings = findNodeSiblings(searchTree.children, nodeAtDest.id);
+    
+    console.log("NEW SIBLINGS");console.log(newSiblings);console.log("---------");
 
     if (!newSiblings) return;
-    const insertIndex = newSiblings.findIndex(s => s.id === nodeAtDest.id);
+    let insertIndex = newSiblings.findIndex(s => s.id === nodeAtDest.id);
 
-    // console.log("INSERT INDEX")
-    // console.log(insertIndex)
-    // console.log("---------")
+    if (!dropIndexIncremented && currentIndexOfDraggedNode < dropIndex) {
+      if (this.nestedNodeMap.get(nodeAtDest).level != draggedNode.level) {
+        insertIndex++;
+      }
+    }
+
+    console.log("INSERT INDEX");console.log(insertIndex);console.log("---------");
 
     // remove the node from its old place
-    const node = event.item.data;
-    const siblings = findNodeSiblings(searchTree.children, node.id);
+    const oldSiblings = findNodeSiblings(searchTree.children, draggedNode.id);
 
-    // console.log("NEW SIBLINGS")
-    // console.log(siblings)
-    // console.log("---------")
+    console.log("SIBLINGS");console.log(oldSiblings);console.log("---------");
 
-    const siblingIndex = siblings.findIndex(n => n.id === node.id);
+    const siblingIndex = oldSiblings.findIndex(n => n.id === draggedNode.id);
 
-    // console.log("SIBLINGS INDEX")
-    // console.log(siblingIndex)
-    // console.log("---------")
+    console.log("SIBLINGS INDEX");console.log(siblingIndex);console.log("---------");
 
-    const nodeToInsert: TodoItemNode = siblings.splice(siblingIndex, 1)[0];
-    if (nodeAtDest.id === nodeToInsert.id) return;
+    const nodeToInsert: TodoItemNode = oldSiblings.splice(siblingIndex, 1)[0];
+    // if (nodeAtDest.id === nodeToInsert.id) return; ERROR: if true dragged node will disappear after save
 
-    // console.log("NODE TO INSERT")
-    // console.log(nodeToInsert)
-    // console.log("---------")
+    console.log("NODE TO INSERT");console.log(nodeToInsert);console.log("---------");
 
     // ensure validity of drop - must be same level
-    const nodeAtDestFlatNode = this.treeControl.dataNodes.find((n) => nodeAtDest.id === n.id);
-    if (this.validateDrop && nodeAtDestFlatNode.level !== node.level) {
-      alert('Items can only be moved within the same level.');
-      return;
-    }
+    // const nodeAtDestFlatNode = this.treeControl.dataNodes.find((n) => nodeAtDest.id === n.id);
+    // if (this.validateDrop && nodeAtDestFlatNode.level !== draggedNode.level) {
+    //   alert('Items can only be moved within the same level.');
+    //   return;
+    // }
 
     nodeToInsert.parent = nodeAtDest.parent.slice();
 
@@ -685,6 +706,9 @@ export class SidenavComponent implements OnInit{
     this.rebuildTreeForData(changedData);
   }
 
+  /*
+    find all visible nodes regardless of the level, except the dragged node, and return it as a flat list
+  */
   visibleNodes(inPinned: boolean, deleted: boolean): TodoItemNode[] {
     const result = [];
     this.dataSource.data.forEach((node) => {
@@ -694,11 +718,11 @@ export class SidenavComponent implements OnInit{
   }
 
   addExpandedChildren(node: TodoItemNode, expanded: boolean, inPinned: boolean, deleted: boolean, result: any) {
-    if (node.id !== "root" && node.id !== "pinned" && node.id !== "trash") {
-      if (inPinned && node.parent === "pinned") {
+    if (node.id !== ROOT_ID && node.id !== PINNED_ID && node.id !== TRASH_ID) {
+      if (inPinned && node.parent === PINNED_ID) {
         result.push(node);
       } 
-      else if (!inPinned && node.parent !== "pinned"){
+      else if (!inPinned && node.parent !== PINNED_ID){
         result.push(node);
       }
     }
@@ -714,8 +738,8 @@ export class SidenavComponent implements OnInit{
     { 
       "id": localStorage.getItem("currentUserId"),
       "documents": JSON.parse(JSON.stringify(this.database.rootNode.children)),
-      "trash": JSON.parse(JSON.stringify(this.database.trashNode.children)),
-      "pinned": JSON.parse(JSON.stringify(this.database.pinnedNode.children))
+      TRASH_ID: JSON.parse(JSON.stringify(this.database.trashNode.children)),
+      PINNED_ID: JSON.parse(JSON.stringify(this.database.pinnedNode.children))
     }).subscribe()
   }
 }
