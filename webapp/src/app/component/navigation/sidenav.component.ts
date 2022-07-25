@@ -585,7 +585,9 @@ export class SidenavComponent implements OnInit{
   drop(event: CdkDragDrop<string[]>) {
     if (!event.isPointerOverContainer) return;
 
-    const draggedNode = event.item.data;
+    const draggedNode: TodoItemFlatNode = event.item.data;
+
+    this.treeControl.collapse(draggedNode);
 
     let visibleNodes = this.visibleNodes(event.item.data.parent === PINNED_ID, event.item.data.deleted);
 
@@ -622,6 +624,7 @@ export class SidenavComponent implements OnInit{
     // drop node at lower position, special handling
     if (currentIndexOfDraggedNode < dropIndex) {
       let nodeAtDropIndex = visibleNodes[dropIndex];
+      if (!nodeAtDropIndex) return;
       if (nodeAtDropIndex.children && this.treeControl.isExpanded(this.nestedNodeMap.get(nodeAtDropIndex))){
         dropIndex++;
         dropIndexIncremented = true
