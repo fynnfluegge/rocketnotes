@@ -67,61 +67,65 @@ export class ChecklistDatabase {
 
   initialize() {
 
-    this.http.get(this.backend_url + '/documentTree/' + localStorage.getItem("currentUserId")).subscribe({
-      next: (res) => {
-        const jsonObject = JSON.parse(JSON.stringify(res))
-        this.rootNode = <TodoItemNode>{ id: ROOT_ID, name: ROOT_ID, children: jsonObject.documents };
-        this.pinnedNode = <TodoItemNode>{ id: PINNED_ID, name: PINNED_ID, children: jsonObject.pinned };
-        this.trashNode = <TodoItemNode>{ id: TRASH_ID, name: TRASH_ID, children: jsonObject.trash };
-
-        if (jsonObject.trash) {
-          jsonObject.trash.forEach(v => { this.setDeletedandUnpin(v) })
-        }
-        this.dataChange.next([this.pinnedNode, this.rootNode, this.trashNode]);
-
-        this.rootNodeMap.set(this.rootNode.id, this.rootNode);
-        this.rootNodeMap.set(this.trashNode.id, this.trashNode);
-
-        if (jsonObject.documents) {
-          jsonObject.documents.forEach(v => {
-            this.rootNodeMap.set(v.id, v);
-            this.addFlatToMap(this.rootNodeMap, v)
-          })
-        }
-
-        if (jsonObject.pinned) {
-          jsonObject.pinned.forEach(v => {
-            this.pinnedNodeMap.set(v.id, v);
-            this.addFlatToMap(this.pinnedNodeMap, v)
-          })
-        }
-
-        if (jsonObject.trash) {
-          jsonObject.trash.forEach(v => {
-            this.rootNodeMap.set(v.id, v);
-            this.addFlatToMap(this.rootNodeMap, v)
-          })
-        }
-
-        this.route.paramMap.subscribe(params => { 
-          if (!params.get('id')) {
-            if (this.pinnedNode.children) {
-              this.testService.get("document/" + this.pinnedNode.children[0].id).subscribe(result => {
-                var document = JSON.parse(JSON.stringify(result));
-                this.initContentChange.next({ id: document.id, title: document.title, content: document.content });
-              });
-            } else if (this.rootNode.children) {
-              this.testService.get("document/" + this.rootNode.children[0].id).subscribe(result => {
-                var document = JSON.parse(JSON.stringify(result));
-                this.initContentChange.next({ id: document.id, title: document.title, content: document.content });
-              });
-            }
+    // since localStorage.getItem("currentUserId") may not yet be initialized Auth.currentAuthenticatedUser() is used
+    Auth.currentAuthenticatedUser().then((user) => {
+      this.http.get(this.backend_url + '/documentTree/' + user.username).subscribe({
+        next: (res) => {
+          const jsonObject = JSON.parse(JSON.stringify(res))
+          this.rootNode = <TodoItemNode>{ id: ROOT_ID, name: ROOT_ID, children: jsonObject.documents };
+          this.pinnedNode = <TodoItemNode>{ id: PINNED_ID, name: PINNED_ID, children: jsonObject.pinned };
+          this.trashNode = <TodoItemNode>{ id: TRASH_ID, name: TRASH_ID, children: jsonObject.trash };
+  
+          if (jsonObject.trash) {
+            jsonObject.trash.forEach(v => { this.setDeletedandUnpin(v) })
           }
-        });
-      },
-      error: (e) => {
-      }
-    })
+          this.dataChange.next([this.pinnedNode, this.rootNode, this.trashNode]);
+  
+          this.rootNodeMap.set(this.rootNode.id, this.rootNode);
+          this.rootNodeMap.set(this.trashNode.id, this.trashNode);
+  
+          if (jsonObject.documents) {
+            jsonObject.documents.forEach(v => {
+              this.rootNodeMap.set(v.id, v);
+              this.addFlatToMap(this.rootNodeMap, v)
+            })
+          }
+  
+          if (jsonObject.pinned) {
+            jsonObject.pinned.forEach(v => {
+              this.pinnedNodeMap.set(v.id, v);
+              this.addFlatToMap(this.pinnedNodeMap, v)
+            })
+          }
+  
+          if (jsonObject.trash) {
+            jsonObject.trash.forEach(v => {
+              this.rootNodeMap.set(v.id, v);
+              this.addFlatToMap(this.rootNodeMap, v)
+            })
+          }
+  
+          this.route.paramMap.subscribe(params => { 
+            if (!params.get('id')) {
+              if (this.pinnedNode.children) {
+                this.testService.get("document/" + this.pinnedNode.children[0].id).subscribe(result => {
+                  var document = JSON.parse(JSON.stringify(result));
+                  this.initContentChange.next({ id: document.id, title: document.title, content: document.content });
+                });
+              } else if (this.rootNode.children) {
+                this.testService.get("document/" + this.rootNode.children[0].id).subscribe(result => {
+                  var document = JSON.parse(JSON.stringify(result));
+                  this.initContentChange.next({ id: document.id, title: document.title, content: document.content });
+                });
+              }
+            } else {
+            }
+          });
+        },
+        error: (e) => {
+        }
+      })
+    });
   }
 
   addFlatToMap(map: Map<string, TodoItemNode>, node: TodoItemNode) {

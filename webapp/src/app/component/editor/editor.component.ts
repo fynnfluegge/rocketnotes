@@ -50,7 +50,7 @@ export class EditorComponent {
     });
 
     this.route.paramMap.subscribe(params => { 
-      this.id = params.get('id'); 
+      this.id = params.get('id');
       if (this.id) {
         this.testService.get("document/" + this.id).subscribe(message => {
           var document = JSON.parse(JSON.stringify(message))
