@@ -241,50 +241,52 @@ func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNi
 		Role: dynamoDBRole,
 	})
 
-	// web app
-
-	domain := "www.takeniftynotes.net"
-
-	cloudfrontOAI := awscloudfront.NewOriginAccessIdentity(stack, jsii.String("MyOriginAccessIdentity"), &awscloudfront.OriginAccessIdentityProps{
-		Comment: jsii.String("OAI for " + id),
-	})
+	// hosted zone & certificate
 
 	zone := awsroute53.HostedZone_FromLookup(stack, jsii.String("MyHostedZone"), &awsroute53.HostedZoneProviderProps{
 		DomainName: jsii.String("takeniftynotes.net"),
 	})
 
-	bucket := awss3.NewBucket(stack, jsii.String("MyS3Bucket"), &awss3.BucketProps{
-		BucketName:           jsii.String("takeniftynotes.net"),
+	certificateArn := awscertificatemanager.NewDnsValidatedCertificate(stack, jsii.String("MySiteCertificate"), &awscertificatemanager.DnsValidatedCertificateProps{
+		DomainName: jsii.String("*.takeniftynotes.net"),
+		HostedZone: zone,
+		Region:     jsii.String("us-east-1"), // Cloudfront only checks this region for certificates.
+	})
+
+	cloudfrontOAI := awscloudfront.NewOriginAccessIdentity(stack, jsii.String("MyOriginAccessIdentity"), &awscloudfront.OriginAccessIdentityProps{
+		Comment: jsii.String("OAI for takeniftynotes.net"),
+	})
+
+	// distribution & deployment
+
+	// App
+
+	appViewerCertificate := awscloudfront.ViewerCertificate_FromAcmCertificate(
+		certificateArn,
+		&awscloudfront.ViewerCertificateOptions{
+			SslMethod:      awscloudfront.SSLMethod_SNI,
+			SecurityPolicy: awscloudfront.SecurityPolicyProtocol_TLS_V1_1_2016,
+			Aliases:        jsii.Strings("app.takeniftynotes.net"),
+		},
+	)
+
+	appBucket := awss3.NewBucket(stack, jsii.String("MyS3Bucket"), &awss3.BucketProps{
+		BucketName:           jsii.String("app.takeniftynotes.net"),
 		WebsiteIndexDocument: jsii.String("index.html"),
 		WebsiteErrorDocument: jsii.String("index.html"),
 		PublicReadAccess:     jsii.Bool(true),
 	})
 
-	bucket.AddToResourcePolicy(awsiam.NewPolicyStatement(&awsiam.PolicyStatementProps{
+	appBucket.AddToResourcePolicy(awsiam.NewPolicyStatement(&awsiam.PolicyStatementProps{
 		Actions:   jsii.Strings("s3:GetObject"),
-		Resources: jsii.Strings(*bucket.ArnForObjects(jsii.String("*"))),
+		Resources: jsii.Strings(*appBucket.ArnForObjects(jsii.String("*"))),
 		Principals: &[]awsiam.IPrincipal{
 			awsiam.NewCanonicalUserPrincipal(cloudfrontOAI.CloudFrontOriginAccessIdentityS3CanonicalUserId()),
 		},
 	}))
 
-	certificateArn := awscertificatemanager.NewDnsValidatedCertificate(stack, jsii.String("MySiteCertificate"), &awscertificatemanager.DnsValidatedCertificateProps{
-		DomainName: &domain,
-		HostedZone: zone,
-		Region:     jsii.String("us-east-1"), // Cloudfront only checks this region for certificates.
-	})
-
-	viewerCertificate := awscloudfront.ViewerCertificate_FromAcmCertificate(
-		certificateArn,
-		&awscloudfront.ViewerCertificateOptions{
-			SslMethod:      awscloudfront.SSLMethod_SNI,
-			SecurityPolicy: awscloudfront.SecurityPolicyProtocol_TLS_V1_1_2016,
-			Aliases:        jsii.Strings(domain),
-		},
-	)
-
-	distribution := awscloudfront.NewCloudFrontWebDistribution(stack, jsii.String("MyCloudFrontDistribution"), &awscloudfront.CloudFrontWebDistributionProps{
-		ViewerCertificate: viewerCertificate,
+	appCloudFrontDistribution := awscloudfront.NewCloudFrontWebDistribution(stack, jsii.String("MainAppCloudFrontDistribution"), &awscloudfront.CloudFrontWebDistributionProps{
+		ViewerCertificate: appViewerCertificate,
 		ErrorConfigurations: &[]*awscloudfront.CfnDistribution_CustomErrorResponseProperty{
 			{
 				ErrorCode:          jsii.Number(403),
@@ -296,7 +298,7 @@ func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNi
 		OriginConfigs: &[]*awscloudfront.SourceConfiguration{
 			{
 				S3OriginSource: &awscloudfront.S3OriginConfig{
-					S3BucketSource:       bucket,
+					S3BucketSource:       appBucket,
 					OriginAccessIdentity: cloudfrontOAI,
 				},
 				Behaviors: &[]*awscloudfront.Behavior{
@@ -310,13 +312,9 @@ func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNi
 		},
 	})
 
-	awscdk.NewCfnOutput(stack, jsii.String("MyCloudFrontWebDistributionDomainName"), &awscdk.CfnOutputProps{
-		Value: distribution.DistributionDomainName(),
-	})
-
 	awsroute53.NewARecord(stack, jsii.String("MySiteAliasRecord"), &awsroute53.ARecordProps{
-		RecordName: &domain,
-		Target:     awsroute53.RecordTarget_FromAlias(awsroute53targets.NewCloudFrontTarget(distribution)),
+		RecordName: jsii.String("app.takeniftynotes.net"),
+		Target:     awsroute53.RecordTarget_FromAlias(awsroute53targets.NewCloudFrontTarget(appCloudFrontDistribution)),
 		Zone:       zone,
 	})
 
@@ -324,8 +322,76 @@ func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNi
 		Sources: &[]awss3deployment.ISource{
 			awss3deployment.Source_Asset(jsii.String("./webapp/build"), &awss3assets.AssetOptions{}),
 		},
-		DestinationBucket: bucket,
-		Distribution:      distribution,
+		DestinationBucket: appBucket,
+		Distribution:      appCloudFrontDistribution,
+		DistributionPaths: jsii.Strings("/*"),
+	})
+
+	// landing page
+
+	landingPageViewerCertificate := awscloudfront.ViewerCertificate_FromAcmCertificate(
+		certificateArn,
+		&awscloudfront.ViewerCertificateOptions{
+			SslMethod:      awscloudfront.SSLMethod_SNI,
+			SecurityPolicy: awscloudfront.SecurityPolicyProtocol_TLS_V1_1_2016,
+			Aliases:        jsii.Strings("www.takeniftynotes.net"),
+		},
+	)
+
+	laningPageBucket := awss3.NewBucket(stack, jsii.String("LaningPageS3Bucket"), &awss3.BucketProps{
+		BucketName:           jsii.String("takeniftynotes.net"),
+		WebsiteIndexDocument: jsii.String("index.html"),
+		WebsiteErrorDocument: jsii.String("index.html"),
+		PublicReadAccess:     jsii.Bool(true),
+	})
+
+	laningPageBucket.AddToResourcePolicy(awsiam.NewPolicyStatement(&awsiam.PolicyStatementProps{
+		Actions:   jsii.Strings("s3:GetObject"),
+		Resources: jsii.Strings(*laningPageBucket.ArnForObjects(jsii.String("*"))),
+		Principals: &[]awsiam.IPrincipal{
+			awsiam.NewCanonicalUserPrincipal(cloudfrontOAI.CloudFrontOriginAccessIdentityS3CanonicalUserId()),
+		},
+	}))
+
+	landingPageCloudFrontDistribution := awscloudfront.NewCloudFrontWebDistribution(stack, jsii.String("MyCloudFrontDistribution"), &awscloudfront.CloudFrontWebDistributionProps{
+		ViewerCertificate: landingPageViewerCertificate,
+		ErrorConfigurations: &[]*awscloudfront.CfnDistribution_CustomErrorResponseProperty{
+			{
+				ErrorCode:          jsii.Number(403),
+				ResponseCode:       jsii.Number(200),
+				ErrorCachingMinTtl: jsii.Number(300),
+				ResponsePagePath:   jsii.String("/index.html"),
+			},
+		},
+		OriginConfigs: &[]*awscloudfront.SourceConfiguration{
+			{
+				S3OriginSource: &awscloudfront.S3OriginConfig{
+					S3BucketSource:       laningPageBucket,
+					OriginAccessIdentity: cloudfrontOAI,
+				},
+				Behaviors: &[]*awscloudfront.Behavior{
+					{
+						IsDefaultBehavior: jsii.Bool(true),
+						Compress:          jsii.Bool(true),
+						AllowedMethods:    awscloudfront.CloudFrontAllowedMethods_GET_HEAD_OPTIONS,
+					},
+				},
+			},
+		},
+	})
+
+	awsroute53.NewARecord(stack, jsii.String("LaningPageSiteAliasRecord"), &awsroute53.ARecordProps{
+		RecordName: jsii.String("www.takeniftynotes.net"),
+		Target:     awsroute53.RecordTarget_FromAlias(awsroute53targets.NewCloudFrontTarget(landingPageCloudFrontDistribution)),
+		Zone:       zone,
+	})
+
+	awss3deployment.NewBucketDeployment(stack, jsii.String("LaningPageS3BucketDeployment"), &awss3deployment.BucketDeploymentProps{
+		Sources: &[]awss3deployment.ISource{
+			awss3deployment.Source_Asset(jsii.String("./landing-page/build"), &awss3assets.AssetOptions{}),
+		},
+		DestinationBucket: laningPageBucket,
+		Distribution:      landingPageCloudFrontDistribution,
 		DistributionPaths: jsii.Strings("/*"),
 	})
 
