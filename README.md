@@ -1,14 +1,10 @@
-# Welcome to your CDK Go project!
+# Rocket Notes
 
-This is a blank project for Go development with CDK.
+## lambda-handler
+serverless api as lambda-functions
 
-**NOTICE**: Go support is still in Developer Preview. This implies that APIs may
-change while we address early feedback from the community. We would love to hear
-about your experience through GitHub issues.
+## landing-page
+[](https://www.takeniftynotes.net)
 
-## Useful commands
-
- * `cdk deploy`      deploy this stack to your default AWS account/region
- * `cdk diff`        compare deployed stack with current state
- * `cdk synth`       emits the synthesized CloudFormation template
- * `go test`         run unit tests
+## webapp
+Angular main app
