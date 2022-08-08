@@ -8,7 +8,7 @@ import { AppComponent } from './app.component';
 import { EditorComponent } from './component/editor/editor.component';
 import { AuthGuard } from './component/auth/auth-guard.guard';
 import { JwtInterceptor } from './component/auth/jwt-intercepter';
-import { BasicRestService } from './service/rest/basic-rest.service';
+import { BasicRestService } from './service/basic-rest.service';
 import { PlatformModule } from '@angular/cdk/platform';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';

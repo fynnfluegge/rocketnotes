@@ -21,6 +21,7 @@ type Document struct {
 	Title        string `json:"title"`
 	Content      string `json:"content"`
 	LastModified string `json:"lastModified"`
+	Deleted      bool   `json:"deleted"`
 }
 
 func init() {
@@ -61,6 +62,12 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 	err = dynamodbattribute.UnmarshalMap(result.Item, &item)
 	if err != nil {
 		panic(fmt.Sprintf("Failed to unmarshal Record, %v", err))
+	}
+
+	if item.Deleted {
+		return events.APIGatewayProxyResponse{
+			StatusCode: 404,
+		}, nil
 	}
 
 	b, err := json.Marshal(item)

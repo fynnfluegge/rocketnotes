@@ -1,10 +1,11 @@
 import { Component, Injectable, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { FlatTreeControl } from '@angular/cdk/tree';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
 import { of as ofObservable, Observable, BehaviorSubject, Subject } from 'rxjs';
 import * as uuid from 'uuid';
-import { BasicRestService } from 'src/app/service/rest/basic-rest.service';
+import { BasicRestService } from 'src/app/service/basic-rest.service';
 import { Auth } from 'aws-amplify';
 import { environment } from 'src/environments/environment';
 import { ActivatedRoute } from '@angular/router';
@@ -213,47 +214,60 @@ export class ChecklistDatabase {
       "pinned": JSON.parse(JSON.stringify(this.pinnedNode.children))
     }).subscribe()
   }
- 
-   saveItem(node: TodoItemNode, newName: string, newItem: boolean) {
-    var node_ = this.rootNodeMap.get(node.id)
-    node_.name = newName
 
-    if (node.pinned) {
-      var pinnedNode = this.pinnedNodeMap.get(node.id)
-      pinnedNode.name = newName
-    }
-
-    if (newItem) this.rootNodeMap.set(node.id, node);
+  removeFromTrash(node: TodoItemNode) {
+    this.removeFromParent(this.trashNode, node.id)
 
     this.dataChange.next(this.data);
-
     this.testService.post("saveDocumentTree", 
+    { 
+      "id": localStorage.getItem("currentUserId"),
+      "documents": JSON.parse(JSON.stringify(this.rootNode.children)),
+      "trash": JSON.parse(JSON.stringify(this.trashNode.children)),
+      "pinned": JSON.parse(JSON.stringify(this.pinnedNode.children))
+    }).subscribe()
+  }
+ 
+  saveItem(node: TodoItemNode, newName: string, newItem: boolean) {
+  var node_ = this.rootNodeMap.get(node.id)
+  node_.name = newName
+
+  if (node.pinned) {
+    var pinnedNode = this.pinnedNodeMap.get(node.id)
+    pinnedNode.name = newName
+  }
+
+  if (newItem) this.rootNodeMap.set(node.id, node);
+
+  this.dataChange.next(this.data);
+
+  this.testService.post("saveDocumentTree", 
+    { 
+      "id": localStorage.getItem("currentUserId"),
+      "documents": JSON.parse(JSON.stringify(this.rootNode.children)),
+      "trash": JSON.parse(JSON.stringify(this.trashNode.children)),
+      "pinned": JSON.parse(JSON.stringify(this.pinnedNode.children))
+    }
+  ).subscribe(() => {
+    if (newItem) {
+      this.testService.post("saveDocument", 
       { 
-        "id": localStorage.getItem("currentUserId"),
-        "documents": JSON.parse(JSON.stringify(this.rootNode.children)),
-        "trash": JSON.parse(JSON.stringify(this.trashNode.children)),
-        "pinned": JSON.parse(JSON.stringify(this.pinnedNode.children))
-      }
-    ).subscribe(() => {
-      if (newItem) {
-        this.testService.post("saveDocument", 
-        { 
-          "id": node.id,
-          "userId": localStorage.getItem("currentUserId"),
-          "title": newName,
-          "content": "new document"
-        }).subscribe(() => {
-          this.initContentChange.next({ id: node.id, title: newName, content: "new document" });
-        })
-      } else {
-        this.testService.post("saveDocumentTitle", 
-        { 
-          "id": node.id,
-          "title": newName
-        }).subscribe()
-      }
-    })
-   }
+        "id": node.id,
+        "userId": localStorage.getItem("currentUserId"),
+        "title": newName,
+        "content": "new document"
+      }).subscribe(() => {
+        this.initContentChange.next({ id: node.id, title: newName, content: "new document" });
+      })
+    } else {
+      this.testService.post("saveDocumentTitle", 
+      { 
+        "id": node.id,
+        "title": newName
+      }).subscribe()
+    }
+  })
+  }
 
    restoreItem(node: TodoItemNode, parentToInsertId: string, parentToRemoveId: string = null) {
 
@@ -360,7 +374,7 @@ export class SidenavComponent implements OnInit{
 
   dataSource: MatTreeFlatDataSource<TodoItemNode, TodoItemFlatNode>;
 
-  constructor(private database: ChecklistDatabase, private testService : BasicRestService) {
+  constructor(private database: ChecklistDatabase, private testService : BasicRestService, private router: Router) {
 
     this.treeFlattener = new MatTreeFlattener(
       this.transformer,
@@ -489,6 +503,20 @@ export class SidenavComponent implements OnInit{
 
     this.treeControl.collapse(this.nestedNodeMap.get(this.database.trashNode));
     this.treeControl.expand(this.nestedNodeMap.get(this.database.trashNode));
+  }
+
+  removeFromTrash(node: TodoItemFlatNode) {
+    if (confirm('Are you sure you want to permanently delete ' + node.name + '?')) {
+      var nestedNode = this.flatNodeMap.get(node);
+
+      this.database.removeFromTrash(nestedNode);
+
+      this.treeControl.collapse(this.nestedNodeMap.get(this.database.trashNode));
+      this.treeControl.expand(this.nestedNodeMap.get(this.database.trashNode));
+
+      // todo load first document
+      this.router.navigate(['/' + this.database.rootNode.children[0].id]);
+    }
   }
 
   saveNode(node: TodoItemFlatNode, itemValue: string, newItem: boolean) {

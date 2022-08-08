@@ -5,6 +5,15 @@
     </a>
   </li>
   <button (click)="addNewItem(null)" class="icon-button-fade nav-bar-button">Add Document</button>
+  <!-- <div class="dropdown">
+    <button style="height:100%;"><i class="fa fa-lg fa-question-circle"></i></button>
+    <div class="dropdown-content" style="left:auto;right:0;background-color:rgba(255,255,255,0.8);padding:12px;width:240px;">
+      <div>Shortcuts</div>
+      <div>Save:          ⌘ + ⇧ + S</div>
+      <div>New Document:  ⌘ + ⇧ + N</div>
+    </div>
+  </div> -->
+  <!-- <div class="dropdown" style="margin-left:unset;"> -->
   <div class="dropdown">
     <button style="height:100%;"><i class="fa-solid fa-user"></i> {{ username }}</button>
     <div class="dropdown-content" style="left:auto;right:0;">
@@ -62,7 +71,7 @@
               <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="editItem(node)"><mat-icon>edit</mat-icon></button>
               <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="moveToTrash(node)"><mat-icon>delete</mat-icon></button>
               <button *ngIf="node.deleted" mat-icon-button class="icon-button-fade" (click)="restoreItem(node)"><mat-icon>restore_from_trash</mat-icon></button>
-              <button *ngIf="node.deleted" mat-icon-button class="icon-button-fade"><mat-icon>delete_forever</mat-icon></button>
+              <button *ngIf="node.deleted" mat-icon-button class="icon-button-fade" (click)="removeFromTrash(node)"><mat-icon>delete_forever</mat-icon></button>
             </div>
           </div>
         </mat-tree-node>
@@ -109,7 +118,7 @@
               <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="editItem(node)"><mat-icon>edit</mat-icon></button>
               <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="moveToTrash(node)"><mat-icon>delete</mat-icon></button>
               <button *ngIf="node.deleted" mat-icon-button class="icon-button-fade" (click)="restoreItem(node)"><mat-icon>restore_from_trash</mat-icon></button>
-              <button *ngIf="node.deleted" mat-icon-button class="icon-button-fade"><mat-icon>delete_forever</mat-icon></button>
+              <button *ngIf="node.deleted" mat-icon-button class="icon-button-fade" (click)="removeFromTrash(node)"><mat-icon>delete_forever</mat-icon></button>
             </div>
           </div>
         </mat-tree-node>

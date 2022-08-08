@@ -15,6 +15,11 @@ npm start
 ng build --configuration production
 ```
 
+## ng build for electron
+```
+ng build --configuration production --base-href ./
+```
+
 ## electron-packager
 ### Package Electron App
 ```
