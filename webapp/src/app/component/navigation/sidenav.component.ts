@@ -597,15 +597,15 @@ export class SidenavComponent implements OnInit{
 
     const currentIndexOfDraggedNode = visibleNodes.findIndex(v => v.id === draggedNode.id);
 
-    console.log("CURRENT INDEX OF DRAGGED NODE");console.log(currentIndexOfDraggedNode);console.log("------------");
-    console.log("VISIBLE NODES");console.log(visibleNodes);console.log("------------");
+    // console.log("CURRENT INDEX OF DRAGGED NODE");console.log(currentIndexOfDraggedNode);console.log("------------");
+    // console.log("VISIBLE NODES");console.log(visibleNodes);console.log("------------");
 
     let dropIndex = event.currentIndex;
 
     let pinnedNodes = this.database.pinnedNode.children ? this.database.pinnedNode.children.length : 0;
     let pinnedExpanded = this.treeControl.isExpanded(this.nestedNodeMap.get(this.database.pinnedNode))
 
-    console.log("DROP INDEX");console.log(dropIndex);
+    // console.log("DROP INDEX");console.log(dropIndex);
 
     if (!draggedNode.deleted && pinnedExpanded && event.item.data.parent !== PINNED_ID) {
       dropIndex = dropIndex - pinnedNodes;
@@ -635,7 +635,7 @@ export class SidenavComponent implements OnInit{
       }
     }
 
-    console.log(dropIndex);console.log("------------");
+    // console.log(dropIndex);console.log("------------");
 
     function findNodeSiblings(arr: Array<any>, id: string): Array<any> {
       let result, subResult;
@@ -655,7 +655,7 @@ export class SidenavComponent implements OnInit{
 
     if (nodeAtDest.id == draggedNode.id) return;
 
-    console.log("NODE AT DEST");console.log(nodeAtDest);console.log("------------");
+    // console.log("NODE AT DEST");console.log(nodeAtDest);console.log("------------");
 
     let searchTree;
     const changedData = this.dataSource.data;
@@ -667,11 +667,11 @@ export class SidenavComponent implements OnInit{
       searchTree = changedData.find(n => n.id === ROOT_ID)
     }
     
-    console.log("SEARCH TREE");console.log(searchTree);console.log("------------");
+    // console.log("SEARCH TREE");console.log(searchTree);console.log("------------");
 
     const newSiblings = findNodeSiblings(searchTree.children, nodeAtDest.id);
     
-    console.log("NEW SIBLINGS");console.log(newSiblings);console.log("---------");
+    // console.log("NEW SIBLINGS");console.log(newSiblings);console.log("---------");
 
     if (!newSiblings) return;
     let insertIndex = newSiblings.findIndex(s => s.id === nodeAtDest.id);
@@ -682,21 +682,21 @@ export class SidenavComponent implements OnInit{
       }
     }
 
-    console.log("INSERT INDEX");console.log(insertIndex);console.log("---------");
+    // console.log("INSERT INDEX");console.log(insertIndex);console.log("---------");
 
     // remove the node from its old place
     const oldSiblings = findNodeSiblings(searchTree.children, draggedNode.id);
 
-    console.log("SIBLINGS");console.log(oldSiblings);console.log("---------");
+    // console.log("SIBLINGS");console.log(oldSiblings);console.log("---------");
 
     const siblingIndex = oldSiblings.findIndex(n => n.id === draggedNode.id);
 
-    console.log("SIBLINGS INDEX");console.log(siblingIndex);console.log("---------");
+    // console.log("SIBLINGS INDEX");console.log(siblingIndex);console.log("---------");
 
     const nodeToInsert: TodoItemNode = oldSiblings.splice(siblingIndex, 1)[0];
     // if (nodeAtDest.id === nodeToInsert.id) return; ERROR: if true dragged node will disappear after save
 
-    console.log("NODE TO INSERT");console.log(nodeToInsert);console.log("---------");
+    // console.log("NODE TO INSERT");console.log(nodeToInsert);console.log("---------");
 
     // ensure validity of drop - must be same level
     // const nodeAtDestFlatNode = this.treeControl.dataNodes.find((n) => nodeAtDest.id === n.id);

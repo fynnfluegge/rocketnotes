@@ -1,4 +1,7 @@
-<div style="margin-top: 50px; height:calc(100% - 160px);">
+<div style="margin-top: 50px; height:calc(100% - 160px);"
+  (document:keydown.meta.shift.s)="submit()"
+  (document:keydown.shift.meta.c)="copyToClipboard()"
+  (document:keydown.shift.meta.v)="paste()">
 
   <span class="center" style="font-size:28px;margin: 6px 0px 6px 0px;">{{ title }}</span>
 

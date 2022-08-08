@@ -13,7 +13,7 @@
   </div>
 </ul>
 
-<div class="sidebar" [style.left.px]="showSidebar ? '0' : '-200'">
+<div class="sidebar" [style.left.px]="showSidebar ? '0' : '-200'" (document:keydown.meta.control.n)="addNewItem(null)">
     <div [ngClass]="{'hide': !showSidebar}">
       
       <mat-tree [dataSource]="dataSource" [treeControl]="treeControl"

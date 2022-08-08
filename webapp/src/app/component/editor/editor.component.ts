@@ -131,6 +131,14 @@ export class EditorComponent {
     });
   }
 
+  copyToClipboard(): void {
+
+  }
+
+  paste(): void {
+
+  }
+
   getDecodedAccessToken(token: string): any {
     try {
       return jwt_decode(token);
