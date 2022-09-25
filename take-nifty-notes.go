@@ -47,7 +47,7 @@ func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNi
 		},
 	})
 
-	// GET Document Api
+	// Http Api with Authorization
 
 	httpApi := awscdkapigatewayv2alpha.NewHttpApi(stack, jsii.String("MyHttpApi"), &awscdkapigatewayv2alpha.HttpApiProps{
 		ApiName: jsii.String("MyHttpApi"),
@@ -75,6 +75,8 @@ func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNi
 		AuthorizerId:   authorizer.AuthorizerId(),
 		AuthorizerType: jsii.String("JWT"),
 	})
+
+	// GET Document Api
 
 	getDocumentHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("GET-Document"), &awscdklambdagoalpha.GoFunctionProps{
 		FunctionName: jsii.String("GET-Document"),
@@ -111,6 +113,27 @@ func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNi
 		Methods:     &[]awscdkapigatewayv2alpha.HttpMethod{awscdkapigatewayv2alpha.HttpMethod_GET},
 		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("MyHttpLambdaIntegration"), getDocumentTreeHandler, &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
 	})
+
+	// GET search Documents API
+
+	searchDocumentHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("GET-search-Documents"), &awscdklambdagoalpha.GoFunctionProps{
+		FunctionName: jsii.String("GET-search-Documents"),
+		Runtime:      awslambda.Runtime_GO_1_X(),
+		Entry:        jsii.String("./lambda-handler/search-document-handler"),
+		Bundling: &awscdklambdagoalpha.BundlingOptions{
+			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
+		},
+		Role: dynamoDBRole,
+	})
+
+	httpApi.AddRoutes(&awscdkapigatewayv2alpha.AddRoutesOptions{
+		Path:        jsii.String("/search-documents/{userId}"),
+		Authorizer:  httpApiAuthorizer,
+		Methods:     &[]awscdkapigatewayv2alpha.HttpMethod{awscdkapigatewayv2alpha.HttpMethod_GET},
+		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("MyHttpLambdaIntegration"), searchDocumentHandler, &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
+	})
+
+	// POST delete Document API
 
 	// Eventbridge
 

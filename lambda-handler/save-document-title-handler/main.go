@@ -72,8 +72,6 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 
 	item.Title = requestBody.Title
 
-	log.Println(item)
-
 	av, err := dynamodbattribute.MarshalMap(item)
 	if err != nil {
 		log.Fatalf("Got error marshalling new movie item: %s", err)

@@ -1,4 +1,4 @@
-import { Component, Injectable, OnInit } from '@angular/core';
+import { AfterViewInit, Component, Injectable, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { FlatTreeControl } from '@angular/cdk/tree';
@@ -225,7 +225,9 @@ export class ChecklistDatabase {
       "documents": JSON.parse(JSON.stringify(this.rootNode.children)),
       "trash": JSON.parse(JSON.stringify(this.trashNode.children)),
       "pinned": JSON.parse(JSON.stringify(this.pinnedNode.children))
-    }).subscribe()
+    }).subscribe(() => {
+      // here delete post
+    })
   }
  
   saveItem(node: TodoItemNode, newName: string, newItem: boolean) {
@@ -347,7 +349,7 @@ export class ChecklistDatabase {
   styleUrls: ['./sidenav.component.scss'],
   providers: [ChecklistDatabase],
 })
-export class SidenavComponent implements OnInit{
+export class SidenavComponent implements OnInit, AfterViewInit{
 
   username: string;
 
@@ -397,6 +399,12 @@ export class SidenavComponent implements OnInit{
       this.treeControl.collapse(this.nestedNodeMap.get(this.database.rootNode));
       this.treeControl.expand(this.nestedNodeMap.get(this.database.rootNode));
     });
+  }
+  ngAfterViewInit(): void {
+    this.autocomplete(document.getElementById("search_documents"), this.testService, this.database.initContentChange);
+  }
+  ngAfterContentInit(): void {
+    
   }
   ngOnInit(): void {
     this.username = localStorage.getItem("username");
@@ -776,5 +784,111 @@ export class SidenavComponent implements OnInit{
       TRASH_ID: JSON.parse(JSON.stringify(this.database.trashNode.children)),
       PINNED_ID: JSON.parse(JSON.stringify(this.database.pinnedNode.children))
     }).subscribe()
+  }
+
+  autocomplete(inp: any, testService: BasicRestService, initContentChange: Subject<any>) {
+    /*the autocomplete function takes two arguments,
+    the text field element and an array of possible autocompleted values:*/
+    var currentFocus;
+    /*execute a function when someone writes in the text field:*/
+    inp.addEventListener("input", async function() {
+      var a, b, i, val = this.value;
+      /*close any already open lists of autocompleted values*/
+      closeAllLists(null);
+      if (!val) { 
+        return false;
+      } else if (val.length > 2) {
+        currentFocus = -1;
+        /*create a DIV element that will contain the items (values):*/
+
+        const result = await testService.get("search-documents/" + localStorage.getItem("currentUserId") + "?searchString=" + this.value).toPromise();
+
+        if (result) {
+          a = document.createElement("DIV");
+          a.setAttribute("id", this.id + "autocomplete-list");
+          a.setAttribute("class", "autocomplete-items");
+          /*append the DIV element as a child of the autocomplete container:*/
+          // console.log(result)
+          const foundElements = JSON.parse(JSON.stringify(result))
+
+          foundElements.forEach((item) => {
+            console.log(item)
+              /*create a DIV element for each matching element:*/
+              b = document.createElement("DIV");
+              /*make the matching letters bold:*/
+              b.innerHTML = "<strong>" + item.title.substr(0, val.length) + "</strong>";
+              b.innerHTML += item.title.substr(val.length);
+              /*insert a input field that will hold the current array item's value:*/
+              b.innerHTML += "<input type='hidden' value='" + item.id + "'>";
+              /*execute a function when someone clicks on the item value (DIV element):*/
+              b.addEventListener("click", function(e) {
+                  testService.get("document/" + this.getElementsByTagName("input")[0].value).subscribe(result => {
+                    var document = JSON.parse(JSON.stringify(result));
+                    initContentChange.next({ id: document.id, title: document.title, content: document.content });
+                  });
+                  closeAllLists(null);
+              });
+              a.appendChild(b);
+          });
+
+          this.parentNode.appendChild(a);
+        }
+      }
+    });
+    /*execute a function presses a key on the keyboard:*/
+    inp.addEventListener("keydown", function(e) {
+        var x = document.getElementById(this.id + "autocomplete-list");
+        if (x) var suggestionList = x.getElementsByTagName("div");
+        if (e.keyCode == 40) {
+          /*If the arrow DOWN key is pressed,
+          increase the currentFocus variable:*/
+          currentFocus++;
+          /*and and make the current item more visible:*/
+          addActive(suggestionList);
+        } else if (e.keyCode == 38) { //up
+          /*If the arrow UP key is pressed,
+          decrease the currentFocus variable:*/
+          currentFocus--;
+          /*and and make the current item more visible:*/
+          addActive(suggestionList);
+        } else if (e.keyCode == 13) {
+          /*If the ENTER key is pressed, prevent the form from being submitted,*/
+          e.preventDefault();
+          if (currentFocus > -1) {
+            /*and simulate a click on the "active" item:*/
+            if (suggestionList) suggestionList[currentFocus].click();
+          }
+        }
+    });
+    function addActive(x: any) {
+      /*a function to classify an item as "active":*/
+      if (!x) return false;
+      /*start by removing the "active" class on all items:*/
+      removeActive(x);
+      if (currentFocus >= x.length) currentFocus = 0;
+      if (currentFocus < 0) currentFocus = (x.length - 1);
+      /*add class "autocomplete-active":*/
+      x[currentFocus].classList.add("autocomplete-active");
+    }
+    function removeActive(x: any) {
+      /*a function to remove the "active" class from all autocomplete items:*/
+      for (var i = 0; i < x.length; i++) {
+        x[i].classList.remove("autocomplete-active");
+      }
+    }
+    function closeAllLists(elmnt: any) {
+      /*close all autocomplete lists in the document,
+      except the one passed as an argument:*/
+      var x = document.getElementsByClassName("autocomplete-items");
+      for (var i = 0; i < x.length; i++) {
+        if (elmnt != x[i] && elmnt != inp) {
+          x[i].parentNode.removeChild(x[i]);
+        }
+      }
+    }
+    /*execute a function when someone clicks in the document:*/
+    document.addEventListener("click", function (e) {
+        closeAllLists(e.target);
+    });
   }
 }

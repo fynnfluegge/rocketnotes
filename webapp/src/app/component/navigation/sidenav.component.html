@@ -5,6 +5,12 @@
     </a>
   </li>
   <button (click)="addNewItem(null)" class="icon-button-fade nav-bar-button">Add Document</button>
+  <!--Make sure the form has the autocomplete function switched off:-->
+  <form autocomplete="off">
+    <div class="autocomplete" style="width:300px;">
+      <input type="text" id="search_documents" name="search_documents" placeholder="Search">
+    </div>
+  </form>
   <!-- <div class="dropdown">
     <button style="height:100%;"><i class="fa fa-lg fa-question-circle"></i></button>
     <div class="dropdown-content" style="left:auto;right:0;background-color:rgba(255,255,255,0.8);padding:12px;width:240px;">

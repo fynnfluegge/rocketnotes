@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 
@@ -11,6 +12,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
+	"github.com/aws/jsii-runtime-go"
 )
 
 type Document struct {
@@ -28,7 +30,8 @@ func init() {
 
 func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 
-	id := request.PathParameters["documentId"]
+	userId := request.PathParameters["userId"]
+	searchString := request.QueryStringParameters["searchString"]
 
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
@@ -38,50 +41,42 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 
 	tableName := "tnn-Documents"
 
-	result, err := svc.GetItem(&dynamodb.GetItemInput{
+	result, err := svc.Scan(&dynamodb.ScanInput{
 		TableName: aws.String(tableName),
-		Key: map[string]*dynamodb.AttributeValue{
-			"id": {
-				S: aws.String(id),
+		ExpressionAttributeNames: map[string]*string{
+			"#userId":  jsii.String("userId"),
+			"#content": jsii.String("content"),
+		},
+		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
+			":userId": {
+				S: aws.String(userId),
+			},
+			":content": {
+				S: aws.String(searchString),
 			},
 		},
+		FilterExpression: jsii.String("(#userId = :userId) and contains(#content, :content)"),
 	})
+
 	if err != nil {
 		log.Fatalf("Got error calling GetItem: %s", err)
 	}
 
-	if result.Item == nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 404,
-		}, nil
-	}
+	item := []Document{}
 
-	item := Document{}
-
-	err = dynamodbattribute.UnmarshalMap(result.Item, &item)
+	err = dynamodbattribute.UnmarshalListOfMaps(result.Items, &item)
 	if err != nil {
 		panic(fmt.Sprintf("Failed to unmarshal Record, %v", err))
 	}
 
-	item.Deleted = true
-
-	av, err := dynamodbattribute.MarshalMap(item)
+	b, err := json.Marshal(item)
 	if err != nil {
-		log.Fatalf("Got error marshalling new movie item: %s", err)
-	}
-
-	input := &dynamodb.PutItemInput{
-		Item:      av,
-		TableName: aws.String(tableName),
-	}
-
-	_, err = svc.PutItem(input)
-	if err != nil {
-		log.Fatalf("Got error calling PutItem: %s", err)
+		fmt.Println(err)
 	}
 
 	return events.APIGatewayProxyResponse{
 		StatusCode: 200,
+		Body:       string(b),
 	}, nil
 }
 
