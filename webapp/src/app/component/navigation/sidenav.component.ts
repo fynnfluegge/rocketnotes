@@ -10,6 +10,7 @@ import { Auth } from 'aws-amplify';
 import { environment } from 'src/environments/environment';
 import { ActivatedRoute } from '@angular/router';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
+import { start } from 'repl';
 
 const ROOT_ID: string = "root";
 const PINNED_ID: string = "pinned";
@@ -798,11 +799,10 @@ export class SidenavComponent implements OnInit, AfterViewInit{
       if (!val) { 
         return false;
       } else if (val.length > 2) {
+        await new Promise(f => setTimeout(f, 1000));
         currentFocus = -1;
         /*create a DIV element that will contain the items (values):*/
-
         const result = await testService.get("search-documents/" + localStorage.getItem("currentUserId") + "?searchString=" + this.value).toPromise();
-
         if (result) {
           a = document.createElement("DIV");
           a.setAttribute("id", this.id + "autocomplete-list");
@@ -812,12 +812,12 @@ export class SidenavComponent implements OnInit, AfterViewInit{
           const foundElements = JSON.parse(JSON.stringify(result))
 
           foundElements.forEach((item) => {
-            console.log(item)
               /*create a DIV element for each matching element:*/
               b = document.createElement("DIV");
               /*make the matching letters bold:*/
-              b.innerHTML = "<strong>" + item.title.substr(0, val.length) + "</strong>";
-              b.innerHTML += item.title.substr(val.length);
+              // b.innerHTML = "<strong>" + item.title.substr(0, val.length) + "</strong>";
+              // b.innerHTML += item.title.substr(val.length);
+              b.innerHTML += suggestionToDisplay(item.content, val);
               /*insert a input field that will hold the current array item's value:*/
               b.innerHTML += "<input type='hidden' value='" + item.id + "'>";
               /*execute a function when someone clicks on the item value (DIV element):*/
@@ -845,6 +845,7 @@ export class SidenavComponent implements OnInit, AfterViewInit{
           currentFocus++;
           /*and and make the current item more visible:*/
           addActive(suggestionList);
+          console.log(suggestionList)
         } else if (e.keyCode == 38) { //up
           /*If the arrow UP key is pressed,
           decrease the currentFocus variable:*/
@@ -884,6 +885,25 @@ export class SidenavComponent implements OnInit, AfterViewInit{
         if (elmnt != x[i] && elmnt != inp) {
           x[i].parentNode.removeChild(x[i]);
         }
+      }
+    }
+    function suggestionToDisplay(content: string, searchPattern: string): string {
+      const offset = content.length - searchPattern.length;
+      const startOffset = content.indexOf(searchPattern);
+      const endOffset = offset - startOffset;
+      if (offset >= 20) {
+        if (startOffset >= 10 && endOffset >= 10) {
+          return content.substring(startOffset - 10, startOffset + searchPattern.length + 10);
+        }
+        if (startOffset < 10){
+          return content.substring(0, searchPattern.length + 20);
+        }
+        if (endOffset < 10) {
+          return content.substring(startOffset-20+endOffset, content.length);
+        }
+      }
+      else {
+        return content;
       }
     }
     /*execute a function when someone clicks in the document:*/

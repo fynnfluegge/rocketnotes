@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -19,11 +20,12 @@ type Item struct {
 }
 
 type Document struct {
-	ID           string    `json:"id"`
-	UserId       string    `json:"userId"`
-	Title        string    `json:"title"`
-	Content      string    `json:"content"`
-	LastModified time.Time `json:"lastModified"`
+	ID            string    `json:"id"`
+	UserId        string    `json:"userId"`
+	Title         string    `json:"title"`
+	Content       string    `json:"content"`
+	Searchcontent string    `json:"searchContent"`
+	LastModified  time.Time `json:"lastModified"`
 }
 
 func init() {
@@ -34,6 +36,8 @@ func handleRequest(ctx context.Context, event events.SQSEvent) {
 	item := Item{}
 
 	json.Unmarshal([]byte(event.Records[0].Body), &item)
+
+	item.Document.Searchcontent = strings.ToLower(item.Document.Content)
 
 	item.Document.LastModified = time.Now()
 

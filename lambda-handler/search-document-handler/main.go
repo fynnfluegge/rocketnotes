@@ -45,7 +45,7 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		TableName: aws.String(tableName),
 		ExpressionAttributeNames: map[string]*string{
 			"#userId":  jsii.String("userId"),
-			"#content": jsii.String("content"),
+			"#content": jsii.String("searchContent"),
 		},
 		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
 			":userId": {
