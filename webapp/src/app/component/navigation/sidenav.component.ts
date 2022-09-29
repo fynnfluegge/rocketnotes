@@ -814,7 +814,11 @@ export class SidenavComponent implements OnInit, AfterViewInit{
             /*create a DIV element for each matching element:*/
             b = document.createElement("DIV");
             /*make the matching letters bold:*/
-            b.innerHTML += suggestionToDisplay(foundElements[i].content, val);
+            var suggestion = suggestionToDisplay(foundElements[i].content, val);
+            var startIndex = suggestion.indexOf(val);
+            b.innerHTML += suggestion.substring(0, startIndex);
+            b.innerHTML += "<strong>" + val + "</strong>";
+            b.innerHTML += suggestion.substring(startIndex + val.length);
               /*insert a input field that will hold the current array item's value:*/
             b.innerHTML += "<input type='hidden' value='" + foundElements[i].id + "'>";
             /*execute a function when someone clicks on the item value (DIV element):*/
