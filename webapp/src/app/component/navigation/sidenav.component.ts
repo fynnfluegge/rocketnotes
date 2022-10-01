@@ -10,6 +10,7 @@ import { Auth } from 'aws-amplify';
 import { environment } from 'src/environments/environment';
 import { ActivatedRoute } from '@angular/router';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
+import { HostListener } from "@angular/core";
 
 const ROOT_ID: string = "root";
 const PINNED_ID: string = "pinned";
@@ -399,13 +400,21 @@ export class SidenavComponent implements OnInit, AfterViewInit{
       this.treeControl.collapse(this.nestedNodeMap.get(this.database.rootNode));
       this.treeControl.expand(this.nestedNodeMap.get(this.database.rootNode));
     });
+
+    this.getScreenSize();
   }
+
+  @HostListener('window:resize', ['$event'])
+    getScreenSize(event?) {
+        if (window.innerWidth < 768) {
+          this.showSidebar = false;
+        }
+    }
+
   ngAfterViewInit(): void {
     this.autocomplete(document.getElementById("search_documents"), this.testService, this.router, this.countries);
   }
-  ngAfterContentInit(): void {
-    
-  }
+
   ngOnInit(): void {
     this.username = localStorage.getItem("username");
   }
