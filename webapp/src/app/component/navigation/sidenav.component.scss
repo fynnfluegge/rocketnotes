@@ -128,6 +128,7 @@ span:hover {
   position: fixed;
   height: calc(100% - 52px);
   overflow: auto;
+  z-index: 1;
   box-shadow: 0 0 10px rgba(0,0,0,0.75);
   clip-path: inset(0px -20px 0px 0px);
 }
@@ -190,7 +191,6 @@ li a:hover {
 .dropdown {
   position: relative;
   display: inline-block;
-  margin-left:auto;
 }
 
 .dropdown-content {
@@ -213,6 +213,7 @@ li a:hover {
 
 #search_documents {
   height: 36px;
+  width: 220px;
   border-radius: 32px;
   margin: 8px;
   border:1px solid black;

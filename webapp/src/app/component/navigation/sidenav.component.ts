@@ -806,15 +806,13 @@ export class SidenavComponent implements OnInit, AfterViewInit{
         this.parentNode.appendChild(a);
         const result = await testService.get("search-documents/" + localStorage.getItem("currentUserId") + "?searchString=" + this.value).toPromise();
         const foundElements = JSON.parse(JSON.stringify(result))
-          // foundElements.forEach((item) => {
         /*for each item in the array...*/
         for (i = 0; i < foundElements.length; i++) {
-          /*check if the item starts with the same letters as the text field value:*/
-          // if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
             /*create a DIV element for each matching element:*/
             b = document.createElement("DIV");
-            /*make the matching letters bold:*/
+            b.innerHTML += "<strong style='font-size:18px;'>" + foundElements[i].title + "</strong></br>";
             var suggestion = suggestionToDisplay(foundElements[i].content, val);
+            /*make the matching letters bold:*/
             var startIndex = suggestion.indexOf(val);
             b.innerHTML += suggestion.substring(0, startIndex);
             b.innerHTML += "<strong>" + val + "</strong>";
@@ -841,7 +839,6 @@ export class SidenavComponent implements OnInit, AfterViewInit{
           currentFocus++;
           /*and and make the current item more visible:*/
           addActive(suggestionList);
-          console.log(suggestionList)
         } else if (e.keyCode == 38) { //up
           /*If the arrow UP key is pressed,
           decrease the currentFocus variable:*/
@@ -889,13 +886,13 @@ export class SidenavComponent implements OnInit, AfterViewInit{
       const endOffset = offset - startOffset;
       if (offset >= 30) {
         if (startOffset >= 15 && endOffset >= 15) {
-          return content.substring(startOffset - 15, startOffset + searchPattern.length + 15);
+          return "..." + content.substring(startOffset - 15, startOffset + searchPattern.length + 15) + "...";
         }
         if (startOffset < 15){
-          return content.substring(0, searchPattern.length + 30);
+          return content.substring(0, searchPattern.length + 30) + "...";
         }
         if (endOffset < 15) {
-          return content.substring(startOffset-30+endOffset, content.length);
+          return "..." + content.substring(startOffset-30+endOffset, content.length);
         }
       }
       else {
