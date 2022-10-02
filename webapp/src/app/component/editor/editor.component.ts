@@ -30,6 +30,10 @@ export class EditorComponent {
   public title: string ;
   public content: string;
 
+  initialContent: string;
+
+  keyPressCounter: number = 0;
+
   constructor(private database: ChecklistDatabase, private testService : BasicRestService, private route: ActivatedRoute, private titleService: Title) {
     this.preRender = this.preRender.bind(this);
     this.postRender = this.postRender.bind(this);
@@ -60,6 +64,8 @@ export class EditorComponent {
         });
       }
     });
+
+    this.startTimer();
   }
 
   togglePreviewPanel() {
@@ -68,6 +74,44 @@ export class EditorComponent {
 
   changeMode() {
       this.editorMode = !this.editorMode;
+      if (this.editorMode) {
+        this.keyPressCounter = 0;
+        this.initialContent = (' ' + this.content).slice(1);
+      }
+  }
+
+  cancelEdit() {
+    this.editorMode = false;
+    if (this,this.keyPressCounter > 0) {
+      this.submit();
+    }
+  }
+
+  undoChanges() {
+    if (confirm('Are you sure to undo all Changes to ' + this.title + '?')) {
+      this.content = this.initialContent;
+      this.submit();
+    }
+  }
+
+  onKeydown(event) {
+    if (event.code !== "Escape") {
+      console.log(event);
+      this.keyPressCounter++
+      if (this.keyPressCounter === 10) {
+        this.keyPressCounter = 0;
+        this.submit();
+      }
+    }
+  }
+
+  startTimer() {
+    setInterval(() => {
+      if (this.keyPressCounter > 0) {
+        this.keyPressCounter = 0;
+        this.submit();
+      }
+    },5000)
   }
 
   doUpload(files: Array<File>): Promise<Array<UploadResult>> {
@@ -127,7 +171,7 @@ export class EditorComponent {
       this.showSnackbar = true;
       setTimeout(() => {
         this.showSnackbar = false;
-      }, 2500);
+      }, 2000);
     });
   }
 
