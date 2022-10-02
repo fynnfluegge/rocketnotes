@@ -99,9 +99,8 @@ export class EditorComponent {
 
   onKeydown(event) {
     if (event.code !== "Escape") {
-      console.log(event);
       this.keyPressCounter++
-      if (this.keyPressCounter === 10) {
+      if (this.keyPressCounter === 20) {
         this.keyPressCounter = 0;
         this.submit();
       }
@@ -114,7 +113,7 @@ export class EditorComponent {
         this.keyPressCounter = 0;
         this.submit();
       }
-    },5000)
+    },10000)
   }
 
   doUpload(files: Array<File>): Promise<Array<UploadResult>> {
