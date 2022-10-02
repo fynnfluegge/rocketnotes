@@ -822,7 +822,7 @@ export class SidenavComponent implements OnInit, AfterViewInit{
             b.innerHTML += "<strong style='font-size:18px;'>" + foundElements[i].title + "</strong></br>";
             var suggestion = suggestionToDisplay(foundElements[i].content, val);
             /*make the matching letters bold:*/
-            var startIndex = suggestion.indexOf(val);
+            var startIndex = suggestion.toLocaleLowerCase().indexOf(val.toLocaleLowerCase());
             b.innerHTML += suggestion.substring(0, startIndex);
             b.innerHTML += "<strong>" + val + "</strong>";
             b.innerHTML += suggestion.substring(startIndex + val.length);
@@ -891,7 +891,7 @@ export class SidenavComponent implements OnInit, AfterViewInit{
     }
     function suggestionToDisplay(content: string, searchPattern: string): string {
       const offset = content.length - searchPattern.length;
-      const startOffset = content.indexOf(searchPattern);
+      const startOffset = content.toLocaleLowerCase().indexOf(searchPattern.toLocaleLowerCase());
       const endOffset = offset - startOffset;
       if (offset >= 28) {
         if (startOffset >= 14 && endOffset >= 14) {
