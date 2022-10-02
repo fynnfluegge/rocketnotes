@@ -893,15 +893,15 @@ export class SidenavComponent implements OnInit, AfterViewInit{
       const offset = content.length - searchPattern.length;
       const startOffset = content.indexOf(searchPattern);
       const endOffset = offset - startOffset;
-      if (offset >= 30) {
-        if (startOffset >= 15 && endOffset >= 15) {
-          return "..." + content.substring(startOffset - 15, startOffset + searchPattern.length + 15) + "...";
+      if (offset >= 28) {
+        if (startOffset >= 14 && endOffset >= 14) {
+          return "..." + content.substring(startOffset - 14, startOffset + searchPattern.length + 14) + "...";
         }
-        if (startOffset < 15){
-          return content.substring(0, searchPattern.length + 30) + "...";
+        if (startOffset < 14){
+          return content.substring(0, searchPattern.length + 28) + "...";
         }
-        if (endOffset < 15) {
-          return "..." + content.substring(startOffset-30+endOffset, content.length);
+        if (endOffset < 14) {
+          return "..." + content.substring(startOffset-28+endOffset, content.length);
         }
       }
       else {

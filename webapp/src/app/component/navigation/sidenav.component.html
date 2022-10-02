@@ -5,24 +5,25 @@
     </a>
   </li>
   <button (click)="addNewItem(null)" class="icon-button-fade nav-bar-button">Add Document</button>
+  <form autocomplete="off" style="margin-left:auto;">
+    <div class="autocomplete" style="width:280px;">
+      <input type="text" id="search_documents" name="search_documents" placeholder="Search">
+    </div>
+  </form>
   <!-- <div class="dropdown">
     <button style="height:100%;"><i class="fa fa-lg fa-question-circle"></i></button>
-    <div class="dropdown-content" style="left:auto;right:0;background-color:rgba(255,255,255,0.8);padding:12px;width:240px;">
-      <div>Shortcuts</div>
+    <div class="dropdown-content dropdown-light">
+      <div><strong>Shortcuts</strong></div>
       <div>Save:          ⌘ + ⇧ + S</div>
       <div>New Document:  ⌘ + ⇧ + N</div>
     </div>
   </div> -->
-  <!-- <div class="dropdown" style="margin-left:unset;"> -->
-  <form autocomplete="off" style="margin-left:auto;">
-    <div class="autocomplete" style="width:240px;">
-      <input type="text" id="search_documents" name="search_documents" placeholder="Search">
-    </div>
-  </form>
-  <div class="dropdown">
-    <button style="height:100%;"><i class="fa-solid fa-user"></i> {{ username }}</button>
-    <div class="dropdown-content" style="left:auto;right:0;">
-      <button (click)="onLogout()" style="padding:8px;">Logout</button>
+  <div class="dropdown" style="margin-right:8px;">
+    <button style="height:100%;"><i class="fa-solid fa-user"></i></button>
+    <div class="dropdown-content dropdown-light">
+      <div>Signed in as</div>
+      <div><strong>{{ username }}</strong></div>
+      <button (click)="onLogout()" style="padding:8px;margin-top:4px;">Logout</button>
     </div>
   </div>
 </ul>
@@ -66,7 +67,7 @@
         <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle matTreeNodePadding matTreeNodePaddingIndent="8" [routerLink]="'/' + node.id" routerLinkActive="active-node"
           cdkDrag [cdkDragData]="node" (mouseenter)="dragHover(node)" (mouseleave)="dragHoverEnd()" (cdkDragStarted)="dragStart()" (cdkDragReleased)="dragEnd()">
           <span style="padding-left:24px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{node.name}}</span>
-          <div class="dropdown hide">
+          <div class="dropdown hide" style="margin-left:auto;">
             <button class="dropbtn">
               <i class="fas fa-ellipsis-v"></i>
             </button>
@@ -113,7 +114,7 @@
             </mat-icon>
           </button>
           <span style="overflow:hidden;text-overflow: ellipsis;">{{node.name}}</span>
-          <div class="dropdown hide">
+          <div class="dropdown hide" style="margin-left:auto;">
             <button class="dropbtn">
               <i class="fas fa-ellipsis-v"></i>
             </button>

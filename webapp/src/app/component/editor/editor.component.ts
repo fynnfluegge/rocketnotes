@@ -89,8 +89,11 @@ export class EditorComponent {
 
   undoChanges() {
     if (confirm('Are you sure to undo all Changes to ' + this.title + '?')) {
-      this.content = this.initialContent;
-      this.submit();
+      if (this.initialContent !== this.content) {
+        this.keyPressCounter = 0;
+        this.content = this.initialContent;
+        this.submit();
+      }
     }
   }
 

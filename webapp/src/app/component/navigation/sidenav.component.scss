@@ -201,6 +201,14 @@ li a:hover {
   z-index: 1;
 }
 
+.dropdown-light {
+  left:auto;
+  right:0;
+  background-color:rgba(255,255,255,1);
+  padding:12px;
+  width:240px;
+}
+
 .dropdown-content button {
   width: 100%;
 }
@@ -213,7 +221,7 @@ li a:hover {
 
 #search_documents {
   height: 36px;
-  width: 220px;
+  width: 260px;
   border-radius: 32px;
   margin: 8px;
   border:1px solid black;
