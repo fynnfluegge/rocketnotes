@@ -15,7 +15,7 @@
   [style.transform]="showSidebar ? 'translateX(-8px)' : 'translateX(90px)'">
   <button *ngIf="editorMode" class="btn btn-default btn-primary" (click)="togglePreviewPanel()">
     <i [ngClass]="showPreview ? 'fa-solid fa-eye-slash' : 'fa-solid fa-magnifying-glass'"></i>
-      {{ showPreview ? 'Hide Preview' : 'Show Preview' }}
+      {{ showPreview ? 'Preview' : 'Preview' }}
   </button>
   &nbsp;&nbsp;
   <button class="btn btn-default btn-primary" (click)="changeMode()">
@@ -23,7 +23,7 @@
       {{ editorMode ? 'Cancel Edit' : 'Edit' }}
   </button>
   &nbsp;&nbsp;
-  <button *ngIf="editorMode" class="btn btn-default btn-primary" (click)="undoChanges()"><i class="fa-solid fa-undo"></i> Undo Changes</button>
+  <button *ngIf="editorMode" class="btn btn-default btn-primary" (click)="undoChanges()"><i class="fa-solid fa-undo"></i> Undo</button>
   &nbsp;&nbsp;
 </div>
 

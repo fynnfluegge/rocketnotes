@@ -17,6 +17,10 @@ body {
   transition: 500ms;
 }
 
+button {
+  white-space:nowrap;
+}
+
 // ------- copy to clipboard ------------ //
 pre[class*=language-] {
   position: relative;
