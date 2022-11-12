@@ -26,8 +26,8 @@ type Document struct {
 }
 
 type RequestBody struct {
-	ID    string `json:"id"`
-	Title string `json:"title"`
+	ID       string `json:"id"`
+	IsPublic bool   `json:"isPublic"`
 }
 
 func init() {
@@ -72,7 +72,7 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		panic(fmt.Sprintf("Failed to unmarshal Record, %v", err))
 	}
 
-	item.Title = requestBody.Title
+	item.IsPublic = requestBody.IsPublic
 
 	av, err := dynamodbattribute.MarshalMap(item)
 	if err != nil {

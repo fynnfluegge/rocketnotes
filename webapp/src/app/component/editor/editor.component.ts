@@ -6,6 +6,7 @@ import jwt_decode from 'jwt-decode';
 import { ActivatedRoute } from '@angular/router';
 import { ChecklistDatabase } from '../navigation/sidenav.component';
 import { Title } from '@angular/platform-browser';
+import { environment } from 'src/environments/environment';
 
 import '../../../assets/prism-custom.js';
 
@@ -27,8 +28,9 @@ export class EditorComponent {
   ngxMarkdownVersion = '12.0.1';
 
   private id: string;
-  public title: string ;
+  public title: string;
   public content: string;
+  public shared: boolean = true;
 
   initialContent: string;
 
@@ -162,7 +164,7 @@ export class EditorComponent {
   }
 
   submit(): void {
-    this.testService.post("saveDocument", 
+    this.testService.post("shareDocument", 
       { 
         "id": this.id,
         "userId": localStorage.getItem("currentUserId"),
@@ -175,6 +177,46 @@ export class EditorComponent {
         this.showSnackbar = false;
       }, 2000);
     });
+  }
+
+  shareDocument(): void {
+    this.testService.post("shareDocument", 
+      { 
+        "id": this.id,
+        "isPublic": true
+      }
+    ).subscribe(() => {
+      this.shared = true
+    });
+  }
+
+  unshareDocument(): void {
+    this.testService.post("saveDocument", 
+      { 
+        "id": this.id,
+        "isPublic": false,
+      }
+    ).subscribe(() => {
+      this.shared = false;
+    });
+  }
+
+  copyLinkToClipBoard(): void {
+    const selBox = document.createElement('textarea');
+    selBox.style.position = 'fixed';
+    selBox.style.left = '0';
+    selBox.style.top = '0';
+    selBox.style.opacity = '0';
+    selBox.value = environment.redirectSignIn + "/shared/" + this.id;
+    document.body.appendChild(selBox);
+    selBox.focus();
+    selBox.select();
+    document.getElementById("custom-tooltip").style.display = "inline";
+    document.execCommand('copy');
+    document.body.removeChild(selBox);
+    setTimeout( function() {
+      document.getElementById("custom-tooltip").style.display = "none";
+    }, 1000);
   }
 
   copyToClipboard(): void {

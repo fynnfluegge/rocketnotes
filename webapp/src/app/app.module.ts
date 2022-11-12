@@ -19,13 +19,15 @@ import { MatTreeModule } from '@angular/material/tree';
 import { MarkdownModule } from 'ngx-markdown';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { SidenavComponent } from './component/navigation/sidenav.component';
+import { PublicDocumentViewerComponent } from './component/public-document-viewer/public-document-viewer.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
     EditorComponent,
-    SidenavComponent
+    SidenavComponent,
+    PublicDocumentViewerComponent
   ],
   imports: [
     BrowserModule,

@@ -15,19 +15,11 @@ import (
 )
 
 type Document struct {
-	ID           string `json:"id"`
-	ParentId     string `json:"parentId"`
-	UserId       string `json:"userId"`
-	Title        string `json:"title"`
-	Content      string `json:"content"`
-	LastModified string `json:"lastModified"`
-	Deleted      bool   `json:"deleted"`
-	IsPublic     bool   `json:"isPublic"`
-}
-
-type RequestBody struct {
-	ID    string `json:"id"`
-	Title string `json:"title"`
+	ID       string `json:"id"`
+	Title    string `json:"title"`
+	Content  string `json:"content"`
+	Deleted  bool   `json:"deleted"`
+	IsPublic bool   `json:"isPublic"`
 }
 
 func init() {
@@ -35,9 +27,7 @@ func init() {
 
 func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 
-	requestBody := RequestBody{}
-
-	json.Unmarshal([]byte(request.Body), &requestBody)
+	id := request.PathParameters["documentId"]
 
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
@@ -51,7 +41,7 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		TableName: aws.String(tableName),
 		Key: map[string]*dynamodb.AttributeValue{
 			"id": {
-				S: aws.String(requestBody.ID),
+				S: aws.String(id),
 			},
 		},
 	})
@@ -72,25 +62,26 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		panic(fmt.Sprintf("Failed to unmarshal Record, %v", err))
 	}
 
-	item.Title = requestBody.Title
-
-	av, err := dynamodbattribute.MarshalMap(item)
-	if err != nil {
-		log.Fatalf("Got error marshalling new movie item: %s", err)
+	if !item.IsPublic {
+		return events.APIGatewayProxyResponse{
+			StatusCode: 404,
+		}, nil
 	}
 
-	input := &dynamodb.PutItemInput{
-		Item:      av,
-		TableName: aws.String(tableName),
+	if item.Deleted {
+		return events.APIGatewayProxyResponse{
+			StatusCode: 404,
+		}, nil
 	}
 
-	_, err = svc.PutItem(input)
+	b, err := json.Marshal(item)
 	if err != nil {
-		log.Fatalf("Got error calling PutItem: %s", err)
+		fmt.Println(err)
 	}
 
 	return events.APIGatewayProxyResponse{
 		StatusCode: 200,
+		Body:       string(b),
 	}, nil
 }
 

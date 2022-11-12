@@ -227,7 +227,7 @@ export class ChecklistDatabase {
       "trash": JSON.parse(JSON.stringify(this.trashNode.children)),
       "pinned": JSON.parse(JSON.stringify(this.pinnedNode.children))
     }).subscribe(() => {
-      // here delete post
+      // TODO here delete post
     })
   }
  

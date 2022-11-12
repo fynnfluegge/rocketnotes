@@ -22,6 +22,7 @@ type Document struct {
 	Content      string `json:"content"`
 	LastModified string `json:"lastModified"`
 	Deleted      bool   `json:"deleted"`
+	IsPublic     bool   `json:"isPublic"`
 }
 
 func init() {

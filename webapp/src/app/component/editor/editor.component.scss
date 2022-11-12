@@ -97,3 +97,13 @@ textarea.md-input {
   from {bottom: 12px; opacity: 1;}
   to {bottom: 0; opacity: 0;}
 }
+
+#custom-tooltip {
+  display: none;
+  margin-left: -112px;
+  margin-top: -6px;
+  padding: 5px 12px;
+  background-color: #000000df;
+  border-radius: 4px;
+  color: #fff;
+}
