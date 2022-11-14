@@ -13,7 +13,6 @@ import { PlatformModule } from '@angular/cdk/platform';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
-import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTreeModule } from '@angular/material/tree';
 import { MarkdownModule } from 'ngx-markdown';
@@ -39,7 +38,6 @@ import { PublicDocumentViewerComponent } from './component/public-document-viewe
     MatExpansionModule,
     MatIconModule,
     MatListModule,
-    MatTooltipModule,
     MatButtonModule,
     MatTreeModule,
     DragDropModule,

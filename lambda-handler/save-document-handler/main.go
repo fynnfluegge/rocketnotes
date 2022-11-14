@@ -26,6 +26,7 @@ type Document struct {
 	Content       string    `json:"content"`
 	Searchcontent string    `json:"searchContent"`
 	LastModified  time.Time `json:"lastModified"`
+	IsPublic      bool      `json:"isPublic"`
 }
 
 func init() {

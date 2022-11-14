@@ -30,7 +30,7 @@ export class EditorComponent {
   private id: string;
   public title: string;
   public content: string;
-  public shared: boolean = true;
+  public isShared: boolean;
 
   initialContent: string;
 
@@ -63,6 +63,7 @@ export class EditorComponent {
           this.content = document.content
           this.title = document.title
           this.titleService.setTitle(document.title);
+          this.isShared = document.isPublic;
         });
       }
     });
@@ -164,12 +165,13 @@ export class EditorComponent {
   }
 
   submit(): void {
-    this.testService.post("shareDocument", 
+    this.testService.post("saveDocument", 
       { 
         "id": this.id,
         "userId": localStorage.getItem("currentUserId"),
         "title": this.title,
-        "content": this.content
+        "content": this.content,
+        "isPublic": this.isShared
       }
     ).subscribe(() => {
       this.showSnackbar = true;
@@ -186,45 +188,35 @@ export class EditorComponent {
         "isPublic": true
       }
     ).subscribe(() => {
-      this.shared = true
+      this.isShared = true
     });
   }
 
   unshareDocument(): void {
-    this.testService.post("saveDocument", 
+    this.testService.post("shareDocument", 
       { 
         "id": this.id,
         "isPublic": false,
       }
     ).subscribe(() => {
-      this.shared = false;
+      this.isShared = false;
     });
   }
 
   copyLinkToClipBoard(): void {
     const selBox = document.createElement('textarea');
-    selBox.style.position = 'fixed';
-    selBox.style.left = '0';
-    selBox.style.top = '0';
-    selBox.style.opacity = '0';
     selBox.value = environment.redirectSignIn + "/shared/" + this.id;
     document.body.appendChild(selBox);
     selBox.focus();
     selBox.select();
-    document.getElementById("custom-tooltip").style.display = "inline";
+    document.getElementById("testttt").children[0].classList.toggle("fa-link");
+    document.getElementById("testttt").children[0].classList.toggle("fa-check");
     document.execCommand('copy');
     document.body.removeChild(selBox);
     setTimeout( function() {
-      document.getElementById("custom-tooltip").style.display = "none";
+      document.getElementById("testttt").children[0].classList.toggle("fa-link");
+      document.getElementById("testttt").children[0].classList.toggle("fa-check");
     }, 1000);
-  }
-
-  copyToClipboard(): void {
-
-  }
-
-  paste(): void {
-
   }
 
   getDecodedAccessToken(token: string): any {

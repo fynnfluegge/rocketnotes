@@ -3,12 +3,12 @@
   (document:keydown.esc)="cancelEdit()">
 
   <div style="display:flex;">
-    <span class="center" style="font-size:28px;margin: 6px 0px 6px 0px;" style="font-size:32px;flex-grow:1;">{{ title }}</span>
-    <button *ngIf="!shared" class="btn btn-default btn-primary" (click)="shareDocument()"><i class="fas fa-share"></i> Share</button>
-    <button *ngIf="shared" class="btn btn-default btn-primary" (click)="copyLinkToClipBoard()" style="margin-right:4px;"><i class="fas fa-link"></i>
-      <span id="custom-tooltip" style="z-index:3;position:fixed;">copied!</span>
+    <span class="center" style="font-size:32px;margin: 6px 0px 6px 0px;flex-grow:1;">{{ title }}</span>
+    <button *ngIf="!isShared" class="btn btn-default btn-primary" (click)="shareDocument()" style="height:38px;text-align:center;line-height:19px;"><i class="fas fa-share"></i> Share</button>
+    <button *ngIf="isShared" id="testttt" class="btn btn-default btn-primary tooltip-bottom expand" data-title="Copy link to clipboard" (click)="copyLinkToClipBoard(this)" style="margin-right:4px;height:38px;width:48px;text-align:center;line-height:19px;">
+      <i class="fas fa-link"></i>
     </button>
-    <button *ngIf="shared" class="btn btn-default btn-primary" (click)="unshareDocument()"><i class="fa-solid fa-circle-stop"></i> Stop Share</button>
+    <button *ngIf="isShared" class="btn btn-default btn-primary" (click)="unshareDocument()" style="height:38px;text-align:center;line-height:19px;"><i class="fas fa-ban"></i> Stop Share</button>
   </div>
 
   <textarea *ngIf="editorMode && showPreview" class="variable-textarea" [(ngModel)]="content" style="resize:none;margin-top:4px;" (keydown)="onKeydown($event)"></textarea>

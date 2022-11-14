@@ -98,12 +98,95 @@ textarea.md-input {
   to {bottom: 0; opacity: 0;}
 }
 
-#custom-tooltip {
-  display: none;
-  margin-left: -112px;
-  margin-top: -6px;
-  padding: 5px 12px;
-  background-color: #000000df;
-  border-radius: 4px;
+// ---- Tooltips ---- //
+
+.tooltip-bottom {
+  @extend .tooltip-base;
+}
+
+.tooltip-bottom::before,
+.tooltip-bottom::after {
+  margin-top: 17px;
+}
+
+.tooltip-bottom:after {
+  border-right: 6px solid transparent;
+	border-bottom: 6px solid rgba(0,0,0,.75); 
+  border-left: 6px solid transparent;
+  top: 20px;
+}
+
+.tooltip-bottom.expand:after {
+  transform: translate3d(0,6px,0);
+}
+
+.tooltip-top {
+  @extend .tooltip-base;
+}
+
+.tooltip-top::before,
+.tooltip-top::after {
+  margin-top: -68px;
+}
+
+.tooltip-top:after {
+  border-right: 6px solid transparent;
+	border-top: 6px solid rgba(0,0,0,.75); 
+  border-left: 6px solid transparent;
+  top: 58px;
+}
+
+.tooltip-top.expand:after {
+  transform: translate3d(0,-6px,0);
+}
+
+/* setup tooltips base */
+.tooltip-base {
+  position: relative;
+}
+
+.tooltip-base:focus{
+  background-color:red;    
+}
+
+.tooltip-base:before,
+.tooltip-base:after {
+  transition: 0s;
+  display: block;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+}
+.tooltip-base:after {
+  content: '';
+  height: 0;
+  left: 20px;
+  width: 0;
+}
+.tooltip-base:before {
+  background: rgba(0,0,0,.75);
+  border-radius: 2px;
   color: #fff;
+  content: attr(data-title);
+  font-size: 14px;
+  padding: 6px 10px;
+  top: 26px;
+  white-space: nowrap;
+}
+
+/* expand animation */
+.tooltip-base.expand:before {
+  transform: scale3d(.2,.2,1);
+  transition: all .2s ease-in-out;
+}
+.tooltip-base.expand:after {
+  transition: all .1s ease-in-out;
+}
+.tooltip-base.expand:hover:before,
+.tooltip-base.expand:hover:after {
+  opacity: 1;
+  transform: scale3d(1,1,1);
+}
+.tooltip-base.expand:hover:after {
+  transition: all .2s .1s ease-in-out;
 }
