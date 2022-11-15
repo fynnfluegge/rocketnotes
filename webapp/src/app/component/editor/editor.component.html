@@ -4,11 +4,11 @@
 
   <div style="display:flex;">
     <span class="center" style="font-size:32px;margin: 6px 0px 6px 0px;flex-grow:1;">{{ title }}</span>
-    <button *ngIf="!isShared" class="btn btn-default btn-primary" (click)="shareDocument()" style="height:38px;text-align:center;line-height:19px;"><i class="fas fa-share"></i> Share</button>
-    <button *ngIf="isShared" id="testttt" class="btn btn-default btn-primary tooltip-bottom expand" data-title="Copy link to clipboard" (click)="copyLinkToClipBoard(this)" style="margin-right:4px;height:38px;width:48px;text-align:center;line-height:19px;">
+    <button *ngIf="!isPublic" id="share-button" class="btn btn-default btn-primary" (click)="shareDocument()" style="height:38px;text-align:center;line-height:19px;"><i class="fas fa-share"></i> Share</button>
+    <button *ngIf="isPublic" class="btn btn-default btn-primary tooltip-bottom expand" data-title="Copy link to clipboard" (click)="copyLinkToClipBoard($event, this.publicLink)" style="margin-right:4px;height:38px;width:48px;text-align:center;line-height:19px;">
       <i class="fas fa-link"></i>
     </button>
-    <button *ngIf="isShared" class="btn btn-default btn-primary" (click)="unshareDocument()" style="height:38px;text-align:center;line-height:19px;"><i class="fas fa-ban"></i> Stop Share</button>
+    <button *ngIf="isPublic" id="unshare-button" class="btn btn-default btn-primary" (click)="unshareDocument()" style="height:38px;text-align:center;line-height:19px;"><i class="fas fa-ban"></i> Stop Share</button>
   </div>
 
   <textarea *ngIf="editorMode && showPreview" class="variable-textarea" [(ngModel)]="content" style="resize:none;margin-top:4px;" (keydown)="onKeydown($event)"></textarea>

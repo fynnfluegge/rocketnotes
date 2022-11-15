@@ -30,7 +30,8 @@ export class EditorComponent {
   private id: string;
   public title: string;
   public content: string;
-  public isShared: boolean;
+  public isPublic: boolean;
+  public publicLink: string;
 
   initialContent: string;
 
@@ -63,7 +64,8 @@ export class EditorComponent {
           this.content = document.content
           this.title = document.title
           this.titleService.setTitle(document.title);
-          this.isShared = document.isPublic;
+          this.isPublic = document.isPublic;
+          this.publicLink = environment.redirectSignIn + "/shared/" + this.id;
         });
       }
     });
@@ -171,7 +173,7 @@ export class EditorComponent {
         "userId": localStorage.getItem("currentUserId"),
         "title": this.title,
         "content": this.content,
-        "isPublic": this.isShared
+        "isPublic": this.isPublic
       }
     ).subscribe(() => {
       this.showSnackbar = true;
@@ -182,40 +184,58 @@ export class EditorComponent {
   }
 
   shareDocument(): void {
+    document.getElementById("share-button").children[0].classList.toggle("fa-share");
+    document.getElementById("share-button").children[0].classList.toggle("fa-hourglass");
     this.testService.post("shareDocument", 
       { 
         "id": this.id,
         "isPublic": true
       }
     ).subscribe(() => {
-      this.isShared = true
+      this.isPublic = true
+      document.getElementById("share-button").children[0].classList.toggle("fa-share");
+      document.getElementById("share-button").children[0].classList.toggle("fa-hourglass");
     });
   }
 
   unshareDocument(): void {
+    document.getElementById("unshare-button").children[0].classList.toggle("fa-ban");
+    document.getElementById("unshare-button").children[0].classList.toggle("fa-hourglass");
     this.testService.post("shareDocument", 
       { 
         "id": this.id,
         "isPublic": false,
       }
     ).subscribe(() => {
-      this.isShared = false;
+      this.isPublic = false;
+      document.getElementById("unshare-button").children[0].classList.toggle("fa-ban");
+      document.getElementById("unshare-button").children[0].classList.toggle("fa-hourglass");
     });
   }
 
-  copyLinkToClipBoard(): void {
+  copyLinkToClipBoard(event, textToCopy): void {
     const selBox = document.createElement('textarea');
-    selBox.value = environment.redirectSignIn + "/shared/" + this.id;
+    selBox.value = textToCopy;
     document.body.appendChild(selBox);
     selBox.focus();
     selBox.select();
-    document.getElementById("testttt").children[0].classList.toggle("fa-link");
-    document.getElementById("testttt").children[0].classList.toggle("fa-check");
+    if (event.target.children.length === 0) {
+      event.target.classList.toggle("fa-link");
+      event.target.classList.toggle("fa-check");
+    } else {
+      event.target.children[0].classList.toggle("fa-link");
+      event.target.children[0].classList.toggle("fa-check");  
+    }
     document.execCommand('copy');
     document.body.removeChild(selBox);
     setTimeout( function() {
-      document.getElementById("testttt").children[0].classList.toggle("fa-link");
-      document.getElementById("testttt").children[0].classList.toggle("fa-check");
+      if (event.target.children.length === 0) {
+        event.target.classList.toggle("fa-link");
+        event.target.classList.toggle("fa-check");
+      } else {
+        event.target.children[0].classList.toggle("fa-link");
+        event.target.children[0].classList.toggle("fa-check");
+      }
     }, 1000);
   }
 
