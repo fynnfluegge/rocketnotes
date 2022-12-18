@@ -112,12 +112,12 @@ export class ChecklistDatabase {
               if (this.pinnedNode.children) {
                 this.testService.get("document/" + this.pinnedNode.children[0].id).subscribe(result => {
                   var document = JSON.parse(JSON.stringify(result));
-                  this.initContentChange.next({ id: document.id, title: document.title, content: document.content });
+                  this.initContentChange.next({ id: document.id, title: document.title, content: document.content, isPublic: document.isPublic });
                 });
               } else if (this.rootNode.children) {
                 this.testService.get("document/" + this.rootNode.children[0].id).subscribe(result => {
                   var document = JSON.parse(JSON.stringify(result));
-                  this.initContentChange.next({ id: document.id, title: document.title, content: document.content });
+                  this.initContentChange.next({ id: document.id, title: document.title, content: document.content, isPublic: document.isPublic });
                 });
               }
             } else {

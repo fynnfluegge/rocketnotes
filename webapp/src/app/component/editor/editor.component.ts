@@ -54,6 +54,8 @@ export class EditorComponent {
       this.title = value.title;
       this.content = value.content;
       this.titleService.setTitle(value.title);
+      this.isPublic = value.isPublic;
+      this.publicLink = environment.redirectSignIn + "/shared/" + this.id;
     });
 
     this.route.paramMap.subscribe(params => { 
