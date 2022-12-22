@@ -89,9 +89,7 @@ export class EditorComponent {
 
   cancelEdit() {
     this.editorMode = false;
-    if (this,this.keyPressCounter > 0) {
-      this.submit();
-    }
+    this.submit();
   }
 
   undoChanges() {
