@@ -77,3 +77,15 @@ pre[class*=language-]:hover .copy:hover {
   color: #ffffff; 
 }
 // -------------------------------------- //
+
+// ------- code block ------------ //
+code[class*=language-] {
+  color: #f8f8f2 !important;
+}
+
+code {
+  color: rgb(6, 27, 35) !important;
+  padding: 2px 4px;
+  background-color: lightgray;
+}
+// ------------------------------- //
