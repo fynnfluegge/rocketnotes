@@ -27,20 +27,15 @@ pre[class*=language-] {
   border-radius: 5px;
 }
 
-pre[class*=language-] .copy {
-  padding: 2px 10px 0;
+div.copy {
+  padding: 8px;
   position: absolute;
-  top: 12px;
-  right: 10px;
-  border-top-left-radius: 5px;
-  border-top-right-radius: 5px;
+  right: 0;
+  top: 0;
   color: white;
+  font-size: larger;
   background: #272822;
   cursor: pointer;
-}
-
-pre[class*=language-]:hover .copy:hover {
-  color: gray;
 }
 // -------------------------------------- //
 

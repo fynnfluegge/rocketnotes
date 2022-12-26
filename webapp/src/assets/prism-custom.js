@@ -7,23 +7,24 @@ import 'prismjs';
 (function (){
 
     var hook = function (env) {
-        const pres = document.getElementsByTagName("pre")
-        
-        if (pres !== null ) {
-            for (let i = 0; i < pres.length; i++) {
-                // check if its a pre tag with a prism class
-                if (isPrismClass(pres[i], env.language)) {
-                    // insert code and copy element
-                    pres[i].innerHTML = `<div class="copy"><i class="fa-regular fa-clone"></i></div>${pres[i].innerHTML}`
-                }
-            }
-        }
 
+        console.log(env.element.parentElement.parentNode)
+
+        var wrapper = document.createElement('div');
+        wrapper.style.position = "relative";
+        env.element.parentElement.parentNode.insertBefore(wrapper, env.element.parentElement)
+
+        var copyElement = document.createElement('div');
+        copyElement.classList.add("copy");
+        copyElement.innerHTML = '<i class="fa-regular fa-clone"></i>';
+
+        wrapper.appendChild(env.element.parentElement);
+        wrapper.appendChild(copyElement);
+        
         // create clipboard for every copy element
         const clipboard = new ClipboardJS('.copy', {
             target: (trigger) => {
-                trigger.setse
-                return trigger.nextElementSibling;
+                return trigger.parentElement;
             }
         });
 
