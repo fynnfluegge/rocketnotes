@@ -67,7 +67,7 @@ func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNi
 		HttpApi:        httpApi,
 		Type:           awscdkapigatewayv2alpha.HttpAuthorizerType_JWT,
 		JwtIssuer:      jsii.String("https://cognito-idp.eu-central-1.amazonaws.com/" + userPoolId),
-		JwtAudience:    jsii.Strings("4it9fm6jifrvov4djvep3vn9sp", "tt3v27pnqqh7elqdvq9tgmr9v"),
+		JwtAudience:    jsii.Strings("4it9fm6jifrvov4djvep3vn9sp", "tt3v27pnqqh7elqdvq9tgmr9v"), // Look this up in Cognito Userpool App Client settings. It’s the App client ID.
 		IdentitySource: jsii.Strings("$request.header.Authorization"),
 	})
 
