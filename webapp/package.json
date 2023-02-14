@@ -4,9 +4,11 @@
   "main": "electron.js",
   "scripts": {
     "ng": "ng",
-    "start": "electron .",
-    "build": "ng build --configuration production --base-href ./",
-    "watch": "ng build --watch --configuration development",
+    "config-dev": "ts-node set-env.mjs",
+    "config-prod": "ts-node set-env.mjs -- prod",
+    "start": "npm run config-dev && ng serve",
+    "electron": "electron .",
+    "build": "npm run config-prod && ng build --configuration production --base-href ./",
     "test": "ng test"
   },
   "private": true,
@@ -34,7 +36,8 @@
     "ngx-markdown-editor": "^4.0.0",
     "rxjs": "~7.5.0",
     "tslib": "^2.3.0",
-    "zone.js": "~0.11.4"
+    "zone.js": "~0.11.4",
+    "dotenv": "^5.0.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~13.2.5",
@@ -54,6 +57,7 @@
     "karma-coverage": "~2.1.0",
     "karma-jasmine": "~4.0.0",
     "karma-jasmine-html-reporter": "~1.7.0",
-    "typescript": "~4.5.2"
+    "typescript": "~4.5.2",
+    "ts-node": "~5.0.1"
   }
 }
