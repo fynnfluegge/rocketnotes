@@ -8,7 +8,8 @@
     "config-prod": "ts-node set-env.mjs -- prod",
     "start": "npm run config-dev && ng serve",
     "electron": "electron .",
-    "build": "npm run config-prod && ng build --configuration production --base-href ./",
+    "build": "npm run config-prod && ng build --configuration production",
+    "build-electron": "npm run config-prod && ng build --configuration production --base-href ./",
     "test": "ng test"
   },
   "private": true,

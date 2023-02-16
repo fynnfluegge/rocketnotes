@@ -10,6 +10,15 @@
 ## What is Rocketnotes?
 ---
 ## Getting Started
+#### 1. Start DynamoDB with docker and create docker network
+```
+docker-compose up -d
+```
+#### 2. Init tables and create data for default user in DynamoDB Docker container
+```
+sh ./dynamodb-init.sh
+```
+#### 3. Start Lambda functions with AWS SAM
 ---
 ## Contributing Guidelines
 ---

@@ -1,0 +1,29 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  rocketnotes-local
+
+Transform:
+- AWS::Serverless-2016-10-31
+Resources:
+
+  getDocumentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: lambda-handler/get-document-handler/main
+      Runtime: go1.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: tnn-documents
+      Environment:
+        Variables:
+          USE_LOCAL_DYNAMODB: 1
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /document/{documentId}
+            Method: GET

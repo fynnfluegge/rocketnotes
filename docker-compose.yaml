@@ -1,0 +1,13 @@
+services:
+  dynamodb:
+    image: amazon/dynamodb-local
+    hostname: dynamodb-local
+    container_name: dynamodb-local
+    ports:
+      - "8041:8000"
+    networks:
+      - local-serverless-network
+
+networks:
+   local-serverless-network:
+     driver: "bridge"
