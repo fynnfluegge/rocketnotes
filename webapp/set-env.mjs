@@ -4,7 +4,7 @@ const targetPath = `./src/environments/environment.${process.argv[2] === 'prod' 
 // Load node modules
 // `environment.ts` file structure
 const envConfigFile = `export const environment = {
-    production: '${process.argv[2] === 'prod' ? 'true' : 'false'}',
+    production: ${process.argv[2] === 'prod' ? true : false},
     cognitoUserPoolId: '${process.env.COGNITO_USER_POOL_ID}',
     cognitoAppClientId: '${process.env.COGNITO_APP_CLIENT_ID}',
     redirectSignIn: '${process.env.REDIRECT_SIGN_IN}',

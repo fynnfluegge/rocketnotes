@@ -3,5 +3,11 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-    production: false
+    production: false,
+    cognitoUserPoolId: 'undefined',
+    cognitoAppClientId: 'undefined',
+    redirectSignIn: 'undefined',
+    redirectSignOut: 'undefined',
+    authGuardRedirect: 'undefined',
+    apiUrl: 'undefined'
 };
