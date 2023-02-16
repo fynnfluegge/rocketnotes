@@ -1,15 +1,12 @@
-AWSTemplateFormatVersion: 2010-09-09
-Description: >-
-  rocketnotes-local
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
 
-Transform:
-- AWS::Serverless-2016-10-31
 Resources:
-
   getDocumentFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: lambda-handler/get-document-handler/main
+      CodeUri: lambda-handler/get-document-handler
+      Handler: get-document-handler
       Runtime: go1.x
       Architectures:
         - x86_64
