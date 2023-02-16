@@ -1,6 +1,16 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 
+Globals:
+  Function:
+    Timeout: 20
+  Api:
+    Cors:
+      AllowMethods: "'GET,POST,OPTIONS'"
+      AllowHeaders: "'content-type'"
+      AllowOrigin: "'*'"
+      AllowCredentials: "'*'"
+
 Resources:
   getDocumentFunction:
     Type: AWS::Serverless::Function
@@ -24,3 +34,35 @@ Resources:
           Properties:
             Path: /document/{documentId}
             Method: GET
+        Options:
+          Type: Api
+          Properties:
+            Path: /
+            Method: OPTIONS
+  getDocumentTreeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda-handler/get-document-tree-handler
+      Handler: get-document-tree-handler
+      Runtime: go1.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: tnn-tree
+      Environment:
+        Variables:
+          USE_LOCAL_DYNAMODB: 1
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /documentTree/{userId}
+            Method: GET
+        Options:
+          Type: Api
+          Properties:
+            Path: /
+            Method: OPTIONS

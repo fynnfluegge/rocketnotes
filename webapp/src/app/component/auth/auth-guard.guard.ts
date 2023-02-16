@@ -12,11 +12,13 @@ export class AuthGuard implements CanActivate {
   constructor(){
   }
 
-  canActivate(route: ActivatedRouteSnapshot,state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-    return Auth.currentAuthenticatedUser().then(() => { return true; })
-      .catch(() => {
-        window.location.assign(environment.authGuardRedirect)
-        return false;
-      });
+  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
+    return environment.production ?
+      Auth.currentAuthenticatedUser().then(() => { return true; })
+        .catch(() => {
+          window.location.assign(environment.authGuardRedirect)
+          return false;
+        })
+      : true;
   }
 }

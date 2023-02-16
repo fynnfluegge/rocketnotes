@@ -44,10 +44,15 @@ export class EditorComponent {
 
   ngOnInit() {
 
-    Auth.currentAuthenticatedUser().then((user) => {
-      localStorage.setItem("currentUserId", user.username);
-      localStorage.setItem("username", user.attributes.email);
-    });
+    if (environment.production) {
+      Auth.currentAuthenticatedUser().then((user) => {
+        localStorage.setItem("currentUserId", user.username);
+        localStorage.setItem("username", user.attributes.email);
+      });
+    } else {
+      localStorage.setItem("currentUserId", "4afe1f16-add0-11ed-afa1-0242ac120002");
+      localStorage.setItem("username", "localuser@test.com");
+    }
 
     this.database.initContentChange.subscribe(value => {
       this.id = value.id;
