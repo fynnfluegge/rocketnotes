@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"os"
+	"log"
 	"strings"
 	"time"
 
@@ -14,6 +14,10 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 )
+
+type Item struct {
+	Document *Document `json:"detail"`
+}
 
 type Document struct {
 	ID            string    `json:"id"`
@@ -28,33 +32,25 @@ type Document struct {
 func init() {
 }
 
-func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+func handleRequest(ctx context.Context, event events.SQSEvent) {
 
-	item := Document{}
+	item := Item{}
 
-	json.Unmarshal([]byte(request.Body), &item)
+	json.Unmarshal([]byte(event.Records[0].Body), &item)
 
-	item.Searchcontent = strings.ToLower(item.Content)
+	item.Document.Searchcontent = strings.ToLower(item.Document.Content)
 
-	item.LastModified = time.Now()
+	item.Document.LastModified = time.Now()
 
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
 	}))
 
-	var svc *dynamodb.DynamoDB
+	svc := dynamodb.New(sess)
 
-	if os.Getenv("USE_LOCAL_DYNAMODB") == "1" {
-		svc = dynamodb.New(sess, aws.NewConfig().WithEndpoint("http://dynamodb:8000"))
-	} else {
-		svc = dynamodb.New(sess)
-	}
-
-	av, err := dynamodbattribute.MarshalMap(item)
+	av, err := dynamodbattribute.MarshalMap(item.Document)
 	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 404,
-		}, nil
+		log.Fatalf("Got error marshalling new movie item: %s", err)
 	}
 
 	tableName := "tnn-Documents"
@@ -66,17 +62,8 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 
 	_, err = svc.PutItem(input)
 	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 404,
-		}, nil
+		log.Fatalf("Got error calling PutItem: %s", err)
 	}
-
-	return events.APIGatewayProxyResponse{
-		StatusCode: 200,
-		Headers: map[string]string{
-			"Access-Control-Allow-Origin": "*", // Required for CORS support to work locally
-		},
-	}, nil
 }
 
 func main() {

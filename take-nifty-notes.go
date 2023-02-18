@@ -213,7 +213,7 @@ func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNi
 	postDocumentHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("POST-Document"), &awscdklambdagoalpha.GoFunctionProps{
 		FunctionName: jsii.String("POST-Document"),
 		Runtime:      awslambda.Runtime_GO_1_X(),
-		Entry:        jsii.String("./lambda-handler/save-document-handler"),
+		Entry:        jsii.String("./lambda-handler/save-document-event-handler"),
 		Events: &[]awslambda.IEventSource{
 			awslambdaeventsources.NewSqsEventSource(queue, &awslambdaeventsources.SqsEventSourceProps{
 				BatchSize: jsii.Number(10),
@@ -270,7 +270,7 @@ func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNi
 		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("postDocumentTitleLambdaIntegration"), postDocumentTitleHandler, &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
 	})
 
-	// POST Share Document Title Api
+	// POST Share Document Api
 
 	postShareDocumentHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("POST-share-Document"), &awscdklambdagoalpha.GoFunctionProps{
 		FunctionName: jsii.String("POST-share-Document"),

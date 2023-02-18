@@ -57,3 +57,118 @@ Resources:
           Properties:
             Path: /documentTree/{userId}
             Method: GET
+
+  saveDocumentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda-handler/save-document-handler
+      Handler: save-document-handler
+      Runtime: go1.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: tnn-documents
+      Environment:
+        Variables:
+          USE_LOCAL_DYNAMODB: 1
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /saveDocument
+            Method: POST
+
+  saveDocumentTreeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda-handler/save-document-tree-handler
+      Handler: save-document-tree-handler
+      Runtime: go1.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: tnn-tree
+      Environment:
+        Variables:
+          USE_LOCAL_DYNAMODB: 1
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /saveDocumentTree
+            Method: POST
+
+  saveDocumentPublicFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda-handler/save-document-public-handler
+      Handler: save-document-public-handler
+      Runtime: go1.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: tnn-documents
+      Environment:
+        Variables:
+          USE_LOCAL_DYNAMODB: 1
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /shareDocument
+            Method: POST
+
+  saveDocumentTitleFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda-handler/save-document-title-handler
+      Handler: save-document-title-handler
+      Runtime: go1.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: tnn-documents
+      Environment:
+        Variables:
+          USE_LOCAL_DYNAMODB: 1
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /saveDocumentTitle
+            Method: POST
+
+  searchDocumentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda-handler/search-document-handler
+      Handler: search-document-handler
+      Runtime: go1.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: tnn-documents
+      Environment:
+        Variables:
+          USE_LOCAL_DYNAMODB: 1
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /search-documents/{userId}
+            Method: GET

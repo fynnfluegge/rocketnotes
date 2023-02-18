@@ -5,8 +5,6 @@ import { environment } from './environments/environment';
 import Amplify, { Auth } from 'aws-amplify';
 import awsconfig from './aws-exports';
 
-Amplify.configure(awsconfig);
-
 const oauth = {
   // Domain name
   domain : 'takeniftynotes.auth.eu-central-1.amazoncognito.com', 
@@ -31,12 +29,14 @@ const oauth = {
   }
 }
 
-Auth.configure({
-  oauth:oauth
-});
-
 if (environment.production) {
   enableProdMode();
+
+  Amplify.configure(awsconfig);
+
+  Auth.configure({
+    oauth:oauth
+  });
 }
 
 platformBrowserDynamic().bootstrapModule(AppModule)

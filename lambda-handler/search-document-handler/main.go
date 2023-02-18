@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 	"strings"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -38,7 +39,13 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		SharedConfigState: session.SharedConfigEnable,
 	}))
 
-	svc := dynamodb.New(sess)
+	var svc *dynamodb.DynamoDB
+
+	if os.Getenv("USE_LOCAL_DYNAMODB") == "1" {
+		svc = dynamodb.New(sess, aws.NewConfig().WithEndpoint("http://dynamodb:8000"))
+	} else {
+		svc = dynamodb.New(sess)
+	}
 
 	tableName := "tnn-Documents"
 
@@ -77,7 +84,10 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 
 	return events.APIGatewayProxyResponse{
 		StatusCode: 200,
-		Body:       string(b),
+		Headers: map[string]string{
+			"Access-Control-Allow-Origin": "*", // Required for CORS support to work locally
+		},
+		Body: string(b),
 	}, nil
 }
 
