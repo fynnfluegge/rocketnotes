@@ -34,11 +34,7 @@ Resources:
           Properties:
             Path: /document/{documentId}
             Method: GET
-        Options:
-          Type: Api
-          Properties:
-            Path: /
-            Method: OPTIONS
+            
   getDocumentTreeFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -61,8 +57,3 @@ Resources:
           Properties:
             Path: /documentTree/{userId}
             Method: GET
-        Options:
-          Type: Api
-          Properties:
-            Path: /
-            Method: OPTIONS
