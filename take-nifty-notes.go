@@ -28,6 +28,8 @@ import (
 
 type TakeNiftyNotesStackProps struct {
 	awscdk.StackProps
+	CognitoAppClientId string
+	CognitoUserPoolId  string
 }
 
 func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNiftyNotesStackProps) awscdk.Stack {
@@ -36,8 +38,6 @@ func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNi
 		sprops = props.StackProps
 	}
 	stack := awscdk.NewStack(scope, &id, &sprops)
-
-	userPoolId := "eu-central-1_FjpoPfr51"
 
 	dynamoDBRole := awsiam.NewRole(stack, aws.String("myDynamoDBFullAccessRole"), &awsiam.RoleProps{
 		AssumedBy: awsiam.NewServicePrincipal(aws.String("lambda.amazonaws.com"), &awsiam.ServicePrincipalOpts{}),
@@ -66,8 +66,8 @@ func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNi
 		AuthorizerName: jsii.String("MyHttpAuthorizer"),
 		HttpApi:        httpApi,
 		Type:           awscdkapigatewayv2alpha.HttpAuthorizerType_JWT,
-		JwtIssuer:      jsii.String("https://cognito-idp.eu-central-1.amazonaws.com/" + userPoolId),
-		JwtAudience:    jsii.Strings("4it9fm6jifrvov4djvep3vn9sp", "tt3v27pnqqh7elqdvq9tgmr9v"), // Look this up in Cognito Userpool App Client settings. It’s the App client ID.
+		JwtIssuer:      jsii.String("https://cognito-idp." + *props.Env.Region + ".amazonaws.com/" + props.CognitoUserPoolId),
+		JwtAudience:    jsii.Strings(props.CognitoAppClientId), // Look this up in Cognito Userpool App Client settings. It’s the App client ID.
 		IdentitySource: jsii.Strings("$request.header.Authorization"),
 	})
 
@@ -178,7 +178,7 @@ func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNi
 		EventPattern: &awsevents.EventPattern{
 			Source:     &[]*string{jsii.String("MyCdkApp")},
 			DetailType: &[]*string{jsii.String("message-for-queue")},
-			Region:     &[]*string{jsii.String("eu-central-1")},
+			Region:     &[]*string{props.Env.Region},
 		},
 	})
 
@@ -472,6 +472,8 @@ func main() {
 		awscdk.StackProps{
 			Env: env(),
 		},
+		os.Getenv("COGNITO_APP_CLIENT_ID"),
+		os.Getenv("COGNITO_USER_POOL_ID"),
 	})
 
 	app.Synth(nil)
