@@ -9,8 +9,15 @@
 
 ## What is Rocketnotes?
 ---
-## Getting Started
-#### 1. Start DynamoDB with docker and create docker network
+## Setup local dev environment
+#### The following needs to be installed on your system prior to start:
+- [Docker](https://docs.docker.com/get-docker/)
+- [Node.js >= 14.x](https://nodejs.org/download/release/latest-v14.x/)
+- go 1.x
+- AWS CLI
+- AWS SAM CLI
+
+#### 1. Start DynamoDB and docker network
 ```
 docker-compose up -d
 ```
@@ -18,15 +25,13 @@ docker-compose up -d
 ```
 sh ./dynamodb-init.sh
 ```
-#### 3. Start Lambda functions with AWS SAM
+#### 3. Build and start Lambda functions with AWS SAM
+```
+sam build && sam start rocketnotes-serverless-api rocketnotes_serverless-docker-network
+```
+#### 4. Start Angular App
+```
+export BASE_API_URL="http://localhost:3000" \
+cd webapp && npm install && npm run start
+```
 ---
-## Contributing Guidelines
----
-## lambda-handler
-serverless api as lambda-functions
-
-## landing-page
-[takeniftynotes.net](https://www.takeniftynotes.net)
-
-## webapp
-Angular main app
