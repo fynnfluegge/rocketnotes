@@ -1,21 +1,19 @@
-<p align="center">
+<div align="center">
   <a href="https://www.takeniftynotes.net/">
-    <picture>
-      <img src="landing-page/src/assets/128x128.png" height="128">
-    </picture>
-    <h1 align="center">Rocketnotes</h1>
+    <img src="landing-page/src/assets/128x128.png" height="128">
   </a>
-</p>
+  <h1>Rocketnotes</h1>
+</div>
 
 ## What is Rocketnotes?
----
+Rocketnotes is a Markdown Editor for the Web.
+
 ## Setup local dev environment
 #### The following needs to be installed on your system prior to start:
 - [Docker](https://docs.docker.com/get-docker/)
 - [Node.js >= 14.x](https://nodejs.org/download/release/latest-v14.x/)
-- go 1.x
-- AWS CLI
-- AWS SAM CLI
+- [Go 1.x](https://go.dev/doc/install)
+- [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html)
 
 #### 1. Start DynamoDB and docker network
 ```

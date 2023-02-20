@@ -21,3 +21,4 @@ cdk.out
 .idea
 
 .aws-sam
+cdk.context.json
