@@ -26,13 +26,13 @@ import (
 	"github.com/aws/jsii-runtime-go"
 )
 
-type TakeNiftyNotesStackProps struct {
+type RocketnotesStackProps struct {
 	awscdk.StackProps
 	CognitoAppClientId string
 	CognitoUserPoolId  string
 }
 
-func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNiftyNotesStackProps) awscdk.Stack {
+func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesStackProps) awscdk.Stack {
 	var sprops awscdk.StackProps
 	if props != nil {
 		sprops = props.StackProps
@@ -81,7 +81,7 @@ func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNi
 	getDocumentHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("GET-Document"), &awscdklambdagoalpha.GoFunctionProps{
 		FunctionName: jsii.String("GET-Document"),
 		Runtime:      awslambda.Runtime_GO_1_X(),
-		Entry:        jsii.String("./lambda-handler/get-document-handler"),
+		Entry:        jsii.String("../lambda-handler/get-document-handler"),
 		Bundling: &awscdklambdagoalpha.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
@@ -100,7 +100,7 @@ func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNi
 	getSharedDocumentHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("GET-Shared-Document"), &awscdklambdagoalpha.GoFunctionProps{
 		FunctionName: jsii.String("GET-Shared-Document"),
 		Runtime:      awslambda.Runtime_GO_1_X(),
-		Entry:        jsii.String("./lambda-handler/get-shared-document-handler"),
+		Entry:        jsii.String("../lambda-handler/get-shared-document-handler"),
 		Bundling: &awscdklambdagoalpha.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
@@ -118,7 +118,7 @@ func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNi
 	getDocumentTreeHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("GET-DocumentTree"), &awscdklambdagoalpha.GoFunctionProps{
 		FunctionName: jsii.String("GET-DocumentTree"),
 		Runtime:      awslambda.Runtime_GO_1_X(),
-		Entry:        jsii.String("./lambda-handler/get-document-tree-handler"),
+		Entry:        jsii.String("../lambda-handler/get-document-tree-handler"),
 		Bundling: &awscdklambdagoalpha.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
@@ -137,7 +137,7 @@ func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNi
 	searchDocumentHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("GET-search-Documents"), &awscdklambdagoalpha.GoFunctionProps{
 		FunctionName: jsii.String("GET-search-Documents"),
 		Runtime:      awslambda.Runtime_GO_1_X(),
-		Entry:        jsii.String("./lambda-handler/search-document-handler"),
+		Entry:        jsii.String("../lambda-handler/search-document-handler"),
 		Bundling: &awscdklambdagoalpha.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
@@ -213,7 +213,7 @@ func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNi
 	postDocumentHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("POST-Document"), &awscdklambdagoalpha.GoFunctionProps{
 		FunctionName: jsii.String("POST-Document"),
 		Runtime:      awslambda.Runtime_GO_1_X(),
-		Entry:        jsii.String("./lambda-handler/save-document-event-handler"),
+		Entry:        jsii.String("../lambda-handler/save-document-event-handler"),
 		Events: &[]awslambda.IEventSource{
 			awslambdaeventsources.NewSqsEventSource(queue, &awslambdaeventsources.SqsEventSourceProps{
 				BatchSize: jsii.Number(10),
@@ -237,7 +237,7 @@ func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNi
 	postDocumentTreeHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("POST-DocumentTree"), &awscdklambdagoalpha.GoFunctionProps{
 		FunctionName: jsii.String("POST-DocumentTree"),
 		Runtime:      awslambda.Runtime_GO_1_X(),
-		Entry:        jsii.String("./lambda-handler/save-document-tree-handler"),
+		Entry:        jsii.String("../lambda-handler/save-document-tree-handler"),
 		Bundling: &awscdklambdagoalpha.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
@@ -256,7 +256,7 @@ func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNi
 	postDocumentTitleHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("POST-DocumentTitle"), &awscdklambdagoalpha.GoFunctionProps{
 		FunctionName: jsii.String("POST-DocumentTitle"),
 		Runtime:      awslambda.Runtime_GO_1_X(),
-		Entry:        jsii.String("./lambda-handler/save-document-title-handler"),
+		Entry:        jsii.String("../lambda-handler/save-document-title-handler"),
 		Bundling: &awscdklambdagoalpha.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
@@ -275,7 +275,7 @@ func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNi
 	postShareDocumentHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("POST-share-Document"), &awscdklambdagoalpha.GoFunctionProps{
 		FunctionName: jsii.String("POST-share-Document"),
 		Runtime:      awslambda.Runtime_GO_1_X(),
-		Entry:        jsii.String("./lambda-handler/save-document-public-handler"),
+		Entry:        jsii.String("../lambda-handler/save-document-public-handler"),
 		Bundling: &awscdklambdagoalpha.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
@@ -294,7 +294,7 @@ func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNi
 	awscdklambdagoalpha.NewGoFunction(stack, jsii.String("Sign-up-confirmation-handler"), &awscdklambdagoalpha.GoFunctionProps{
 		FunctionName: jsii.String("Sign-up-confirmation-handler"),
 		Runtime:      awslambda.Runtime_GO_1_X(),
-		Entry:        jsii.String("./lambda-handler/sign-up-confirmation-handler"),
+		Entry:        jsii.String("../lambda-handler/sign-up-confirmation-handler"),
 		Bundling: &awscdklambdagoalpha.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
@@ -380,7 +380,7 @@ func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNi
 
 	awss3deployment.NewBucketDeployment(stack, jsii.String("MyS3BucketDeployment"), &awss3deployment.BucketDeploymentProps{
 		Sources: &[]awss3deployment.ISource{
-			awss3deployment.Source_Asset(jsii.String("./webapp/build"), &awss3assets.AssetOptions{}),
+			awss3deployment.Source_Asset(jsii.String("../webapp/build"), &awss3assets.AssetOptions{}),
 		},
 		DestinationBucket: appBucket,
 		Distribution:      appCloudFrontDistribution,
@@ -448,7 +448,7 @@ func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNi
 
 	awss3deployment.NewBucketDeployment(stack, jsii.String("LaningPageS3BucketDeployment"), &awss3deployment.BucketDeploymentProps{
 		Sources: &[]awss3deployment.ISource{
-			awss3deployment.Source_Asset(jsii.String("./landing-page/build"), &awss3assets.AssetOptions{}),
+			awss3deployment.Source_Asset(jsii.String("../landing-page/build"), &awss3assets.AssetOptions{}),
 		},
 		DestinationBucket: laningPageBucket,
 		Distribution:      landingPageCloudFrontDistribution,
@@ -468,7 +468,7 @@ func NewTakeNiftyNotesStack(scope constructs.Construct, id string, props *TakeNi
 func main() {
 	app := awscdk.NewApp(nil)
 
-	NewTakeNiftyNotesStack(app, "TakeNiftyNotesStack", &TakeNiftyNotesStackProps{
+	RocketnotesStack(app, "TakeNiftyNotesStack", &RocketnotesStackProps{
 		awscdk.StackProps{
 			Env: env(),
 		},
