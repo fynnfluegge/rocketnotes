@@ -7,12 +7,21 @@
 
 ## What is Rocketnotes?
 Rocketnotes is a Markdown Editor for the Web.
+Save and structure your daily notes and learnings in the web browser from any device. 
+You can sign up for free, run it locally on your machine with Docker, host it on-premise within your own infrastructure or even deploy it with low effort in your personal AWS account and region.
+Check out the guides for deploying Rocketnotes [on-premise](https://abc) or in the [cloud](https://abc).
 
-## Setup local dev environment
-#### The following needs to be installed on your system prior to start:
+## On-premise hosting
+
+## Cloud hosting
+
+## Setup dev environment
+### Prerequisites
+The following tools and frameworks need to be installed on your system prior to start:
 - [Docker](https://docs.docker.com/get-docker/)
 - [Node.js >= 14.x](https://nodejs.org/download/release/latest-v14.x/)
 - [Go 1.x](https://go.dev/doc/install)
+- [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 - [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html)
 
 #### 1. Start DynamoDB and docker network
