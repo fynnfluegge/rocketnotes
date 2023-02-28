@@ -1,4 +1,4 @@
-# Contributing
+# Contributing to Rocketnotes 🚀
 We love your input! We want to make contributing to this project as easy and transparent as possible, whether it's:
 
 - Reporting a bug
@@ -7,8 +7,45 @@ We love your input! We want to make contributing to this project as easy and tra
 - Proposing new features
 - Becoming a maintainer
 
-## We Develop with Github
-We use github to host code, to track issues and feature requests, as well as accept pull requests.
+## Getting Started
+### Setup dev environment
+
+First, the following tools and frameworks need to be installed on your system prior to start:
+- [Docker](https://docs.docker.com/get-docker/)
+- [Node.js >= 14.x](https://nodejs.org/download/release/latest-v14.x/)
+- [Go 1.x](https://go.dev/doc/install)
+- [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
+- [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html)
+
+Second, fork the repository, and then run the following commands to clone the repository locally.
+
+```
+$ git clone https://github.com/{your-account}/rocketnotes.git
+$ cd rocketnotes
+$ npm install
+```
+
+#### 1. Start DynamoDB and docker network
+```
+$ docker-compose up -d
+```
+#### 2. Init tables and create data for default user in DynamoDB Docker container
+```
+$ sh ./dynamodb-init.sh
+```
+#### 3. Build and start Lambda functions with AWS SAM
+```
+$ sam build
+$ sam start rocketnotes-serverless-api rocketnotes_serverless-docker-network
+```
+#### 4. Start Angular App
+```
+$ export BASE_API_URL="http://localhost:3000"
+$ cd webapp
+$ npm install
+$ npm run start
+```
+Open http://localhost:3000 in your browser and you should see the Rocketnotes webapp with the cheat sheet of the default user displayed.
 
 ## All Code Changes Happen Through Pull Requests
 Pull requests are the best way to propose changes to the codebase. We actively welcome your pull requests:
@@ -21,7 +58,7 @@ Pull requests are the best way to propose changes to the codebase. We actively w
 6. Issue that pull request!
 
 ## Any contributions you make will be under the MIT Software License
-In short, when you submit code changes, your submissions are understood to be under the same GNU General Public License v3.0 that covers the project. Feel free to contact the maintainers if that's a concern.
+In short, when you submit code changes, your submissions are understood to be under the MIT License that covers the project. Feel free to contact the maintainers if that's a concern.
 
 ## Report bugs using Github's issues
 We use GitHub issues to track public bugs. Report a bug by opening a new issue.
@@ -39,4 +76,4 @@ We use GitHub issues to track public bugs. Report a bug by opening a new issue.
 - Notes (possibly including why you think this might be happening, or stuff you tried that didn't work)
 
 ## License
-By contributing, you agree that your contributions will be licensed under its GNU General Public License v3.0.
+By contributing, you agree that your contributions will be licensed under the MIT License.
