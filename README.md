@@ -19,24 +19,29 @@ Any contribution is welcome!
 
 ## Features
 
-### Create code snipptes with syntax highlighting
-Use the power and simplicity of Markdown for your personal notes. Markdown is a straightforward WYSIWYG description language. Create useful code snippets in your favourite programming language with syntax highlighting.
+### Create code snipptes with syntax highlighting 
+- 📝 Use the power and simplicity of Markdown for your personal notes.
+- 👀 Markdown is a straightforward WYSIWYG description language. 
+- 💻 Create useful code snippets in your favourite programming language with syntax highlighting.
 <div align="center">
-  <img src="landing-page/src/assets/code_editor.gif" height="480">
+  <img src="landing-page/src/assets/code_editor.gif">
 </div>
 
 &nbsp;
 
 ### Hierarchical Document Tree
-Structure your note documents hierarchical with unlimited depth of subdocuments. Restructure your notes by simply drag and drop the desired document. Pin your favorite documents for fast top-level access.
+- 📚 Save your note documents hierarchical with unlimited depth of subdocuments.
+- 🗂️ Structure your notes by simply drag and drop the desired document.
+- 🌟 Pin favourite documents for fast top-level access.
 <div align="center">
-  <img src="landing-page/src/assets/tree.gif" height="380">
+  <img src="landing-page/src/assets/tree.gif">
 </div>
 
 &nbsp;
 
 ### Superfast Document Search
-Enter any search phrases in the searchbar and get an autosuggestion of the searched content from all your documents.
+- 🔎 Search all your documents by content
+- 🚀 Get an autosuggestion panel with all documents matching you search pattern - superfast!
 <div align="center">
-  <img src="landing-page/src/assets/searchbar.gif" height="480">
+  <img src="landing-page/src/assets/searchbar.gif">
 </div>
