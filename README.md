@@ -23,7 +23,7 @@ Any contribution is welcome!
 - 📝 Use the power and simplicity of Markdown for your personal notes.
 - 👀 Markdown is a straightforward WYSIWYG description language. 
 - 💻 Create useful code snippets in your favourite programming language with syntax highlighting.
-- 📖 Share documents to with external users.
+- 📖 Share documents with external users.
 <div align="center">
   <img src="landing-page/src/assets/code_editor.gif">
 </div>
