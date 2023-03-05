@@ -38,17 +38,22 @@ How to create a Hosted Zone and configure Route 53 as a DNS service with your do
 The Angular webapp need to be bundled in production mode.
 The following environment variables are required for the production build:
 ```
-$ export
+$ export COGNITO_USER_POOL_ID="<YOUR_COGNITO_USER_POOL_ID>"
+$ export COGNITO_APP_CLIENT_ID="<YOUR_COGNITO_APP_CLIENT_ID>"
+$ export REDIRECT_SIGN_IN="<YOUR_DOMAIN_URL>"
+$ export REDIRECT_SIGN_OUT="<YOUR_DOMAIN_URL/logout>"
+$ export AUTH_GUARD_REDIRECT="<AUTH_GUARD_REDIRECT_URL>"
+$ export API_URL="<YOUR_API_URL>"
 ```
 Once your environment variables are specified run
 ```
-cd webapp
-npm install
-npm run build
+$ cd webapp
+$ npm install
+$ npm run build
 ```
 
 ### Deploy
-```console
+```
 $ cd cdk
 $ cdk deploy
 ```
