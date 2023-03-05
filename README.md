@@ -10,6 +10,7 @@ Rocketnotes is a Markdown Editor for the Web.
 Save, structure and share if you like daily notes and learnings in the browser from any device. 
 You can [sign up](https://takeniftynotes.auth.eu-central-1.amazoncognito.com/login?response_type=code&client_id=tt3v27pnqqh7elqdvq9tgmr9v&redirect_uri=https://app.takeniftynotes.net) for free (Yes, it's free and it will be free forever as far as possible), run it locally on your machine with Docker, host it on-premise within your own infrastructure or even deploy it with low effort in your personal AWS account and your desired region.
 Check out the [installation](INSTALLATION.md#installation) guides for deploying Rocketnotes in the [cloud](INSTALLATION.md#cloud-hosting) or [on-premise](INSTALLATION.md#on-premise-hosting).
+> **_NOTE:_**  On-premise hosting still under development.
 
 ## Want to contribute?
 👉 [Get started](CONTRIBUTING.md#getting-started) with all required steps to run the project locally in development mode.
