@@ -4,7 +4,7 @@ import { BasicRestService } from 'src/app/service/basic-rest.service';
 import { UploadResult } from "ngx-markdown-editor";
 import jwt_decode from 'jwt-decode';
 import { ActivatedRoute } from '@angular/router';
-import { ChecklistDatabase } from '../navigation/sidenav.component';
+import { DocumentTree } from '../navigation/sidenav.component';
 import { Title } from '@angular/platform-browser';
 import { environment } from 'src/environments/environment';
 
@@ -37,7 +37,7 @@ export class EditorComponent {
 
   keyPressCounter: number = 0;
 
-  constructor(private database: ChecklistDatabase, private testService : BasicRestService, private route: ActivatedRoute, private titleService: Title) {
+  constructor(private database: DocumentTree, private testService : BasicRestService, private route: ActivatedRoute, private titleService: Title) {
     this.preRender = this.preRender.bind(this);
     this.postRender = this.postRender.bind(this);
   }

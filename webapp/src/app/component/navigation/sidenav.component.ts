@@ -17,19 +17,21 @@ const PINNED_ID: string = "pinned";
 const TRASH_ID: string = "trash";
 
 /**
- * Node for to-do item
+ * Document node for hierarchical representation
  */
- export class TodoItemNode {
+ export class DocumentNode {
   id: string;
   name: string;
   parent: string;
-  children?: TodoItemNode[];
+  children?: DocumentNode[];
   deleted: boolean;
   pinned: boolean;
 }
 
-/** Flat to-do item node with expandable and level information */
-export class TodoItemFlatNode {
+/**
+ * Document node for flat representation
+ */
+export class DocumentFlatNode {
   id: string;
   name: string;
   parent: string;
@@ -40,26 +42,21 @@ export class TodoItemFlatNode {
   expandable: boolean;
 }
 
-/**
- * Checklist database, it can build a tree structured Json object.
- * Each node in Json object represents a to-do item or a category.
- * If a node is a category, it has children items and new items can be added under the category.
- */
 @Injectable()
-export class ChecklistDatabase {
+export class DocumentTree {
   backend_url = environment.apiUrl;
-  rootNode: TodoItemNode;
-  trashNode: TodoItemNode;
-  pinnedNode: TodoItemNode;
+  rootNode: DocumentNode;
+  trashNode: DocumentNode;
+  pinnedNode: DocumentNode;
 
-  rootNodeMap: Map<string, TodoItemNode> = new Map(); 
-  pinnedNodeMap: Map<string, TodoItemNode> = new Map();
+  rootNodeMap: Map<string, DocumentNode> = new Map(); 
+  pinnedNodeMap: Map<string, DocumentNode> = new Map();
 
-  dataChange: BehaviorSubject<TodoItemNode[]> = new BehaviorSubject<TodoItemNode[]>([]);
+  dataChange: BehaviorSubject<DocumentNode[]> = new BehaviorSubject<DocumentNode[]>([]);
 
   initContentChange: Subject<any> = new Subject<any>();
 
-  get data(): TodoItemNode[] {
+  get data(): DocumentNode[] {
     return this.dataChange.value;
   }
 
@@ -75,9 +72,9 @@ export class ChecklistDatabase {
         this.http.get(this.backend_url + '/documentTree/' + user.username).subscribe({
           next: (res) => {
             const jsonObject = JSON.parse(JSON.stringify(res))
-            this.rootNode = <TodoItemNode>{ id: ROOT_ID, name: ROOT_ID, children: jsonObject.documents };
-            this.pinnedNode = <TodoItemNode>{ id: PINNED_ID, name: PINNED_ID, children: jsonObject.pinned };
-            this.trashNode = <TodoItemNode>{ id: TRASH_ID, name: TRASH_ID, children: jsonObject.trash };
+            this.rootNode = <DocumentNode>{ id: ROOT_ID, name: ROOT_ID, children: jsonObject.documents };
+            this.pinnedNode = <DocumentNode>{ id: PINNED_ID, name: PINNED_ID, children: jsonObject.pinned };
+            this.trashNode = <DocumentNode>{ id: TRASH_ID, name: TRASH_ID, children: jsonObject.trash };
     
             if (jsonObject.trash) {
               jsonObject.trash.forEach(v => { this.setDeletedandUnpin(v) })
@@ -133,9 +130,9 @@ export class ChecklistDatabase {
       this.http.get(this.backend_url + '/documentTree/4afe1f16-add0-11ed-afa1-0242ac120002').subscribe({
         next: (res) => {
           const jsonObject = JSON.parse(JSON.stringify(res))
-          this.rootNode = <TodoItemNode>{ id: ROOT_ID, name: ROOT_ID, children: jsonObject.documents };
-          this.pinnedNode = <TodoItemNode>{ id: PINNED_ID, name: PINNED_ID, children: jsonObject.pinned };
-          this.trashNode = <TodoItemNode>{ id: TRASH_ID, name: TRASH_ID, children: jsonObject.trash };
+          this.rootNode = <DocumentNode>{ id: ROOT_ID, name: ROOT_ID, children: jsonObject.documents };
+          this.pinnedNode = <DocumentNode>{ id: PINNED_ID, name: PINNED_ID, children: jsonObject.pinned };
+          this.trashNode = <DocumentNode>{ id: TRASH_ID, name: TRASH_ID, children: jsonObject.trash };
   
           if (jsonObject.trash) {
             jsonObject.trash.forEach(v => { this.setDeletedandUnpin(v) })
@@ -190,7 +187,7 @@ export class ChecklistDatabase {
     
   }
 
-  addFlatToMap(map: Map<string, TodoItemNode>, node: TodoItemNode) {
+  addFlatToMap(map: Map<string, DocumentNode>, node: DocumentNode) {
     if (node.children) {
       node.children.forEach(v => {
         map.set(v.id, v);
@@ -199,12 +196,12 @@ export class ChecklistDatabase {
     }
   }
 
-  setNotDeleted(node: TodoItemNode) {
+  setNotDeleted(node: DocumentNode) {
     node.deleted = false
     if (node.children) node.children.forEach(v => { this.setNotDeleted(v) })
   }
   
-  setDeletedandUnpin(node: TodoItemNode) {
+  setDeletedandUnpin(node: DocumentNode) {
     node.deleted = true
     this.rootNodeMap.set(node.id, node)
     if (node.pinned) {
@@ -215,15 +212,15 @@ export class ChecklistDatabase {
     if (node.children) node.children.forEach(v => { this.setDeletedandUnpin(v) })
   }
 
-  removeFromParent(parent: TodoItemNode, id: string) {
+  removeFromParent(parent: DocumentNode, id: string) {
     if (parent.children) {
       parent.children = parent.children.filter(c => c.id !== id);
       if (parent.children.length === 0) parent.children = null;
     }
   }
 
-  insertItem(parent: TodoItemFlatNode, vName: string): TodoItemNode{
-    const child = <TodoItemNode>{ id: uuid.v4(), name: vName, parent: parent.id, pinned: false, deleted: false };
+  insertItem(parent: DocumentFlatNode, vName: string): DocumentNode{
+    const child = <DocumentNode>{ id: uuid.v4(), name: vName, parent: parent.id, pinned: false, deleted: false };
     this.rootNodeMap.set(child.id, child);
     // only add in root tree
     const parentInRoot = this.rootNodeMap.get(parent.id)
@@ -238,7 +235,7 @@ export class ChecklistDatabase {
     return parentInRoot;
   }
 
-   deleteEmptyItem(node: TodoItemFlatNode) {
+   deleteEmptyItem(node: DocumentFlatNode) {
     const parent = this.rootNodeMap.get(node.parent)
     this.removeFromParent(parent, node.id)
     
@@ -252,7 +249,7 @@ export class ChecklistDatabase {
     }).subscribe()
    }
 
-  removeFromDocuments(node: TodoItemNode) {
+  removeFromDocuments(node: DocumentNode) {
     if (node.parent === ROOT_ID) {
       this.removeFromParent(this.rootNode, node.id)
     } else {
@@ -262,7 +259,7 @@ export class ChecklistDatabase {
     this.dataChange.next(this.data);
   }
 
-  moveToTrash(node: TodoItemNode) {
+  moveToTrash(node: DocumentNode) {
     if (!this.trashNode.children) this.trashNode.children = [];
     this.trashNode.children.push(node);
 
@@ -276,7 +273,7 @@ export class ChecklistDatabase {
     }).subscribe()
   }
 
-  removeFromTrash(node: TodoItemNode) {
+  removeFromTrash(node: DocumentNode) {
     this.removeFromParent(this.trashNode, node.id)
 
     this.dataChange.next(this.data);
@@ -291,7 +288,7 @@ export class ChecklistDatabase {
     })
   }
  
-  saveItem(node: TodoItemNode, newName: string, newItem: boolean) {
+  saveItem(node: DocumentNode, newName: string, newItem: boolean) {
   var node_ = this.rootNodeMap.get(node.id)
   node_.name = newName
 
@@ -332,7 +329,7 @@ export class ChecklistDatabase {
   })
   }
 
-   restoreItem(node: TodoItemNode, parentToInsertId: string, parentToRemoveId: string = null) {
+   restoreItem(node: DocumentNode, parentToInsertId: string, parentToRemoveId: string = null) {
 
       this.setNotDeleted(node)
 
@@ -366,14 +363,14 @@ export class ChecklistDatabase {
       }).subscribe()
    }
 
-  pinItem(node: TodoItemNode) {
+  pinItem(node: DocumentNode) {
     node.pinned = !node.pinned
-    // PIN Node
+    // pin node
     if (node.pinned) {
       if (!this.pinnedNode.children) this.pinnedNode.children = [];
 
       // add copy of pinned node to pinnedNodeTree
-      var nodeCopy = <TodoItemNode>{ id: node.id, name: node.name, parent: PINNED_ID, children: null, pinned: true }
+      var nodeCopy = <DocumentNode>{ id: node.id, name: node.name, parent: PINNED_ID, children: null, pinned: true }
       this.pinnedNode.children.push(nodeCopy);
 
       // add copy of pinned node to pinnedNodeMap
@@ -382,7 +379,7 @@ export class ChecklistDatabase {
       // pin node in rootNodeMap if node was pinned on pinnedNodeTree
       this.rootNodeMap.get(node.id).pinned = true;
     } 
-    // UNPIN Node
+    // unpin Node
     else {
       this.pinnedNode.children = this.pinnedNode.children.filter(c => c.id !== node.id);
 
@@ -408,7 +405,7 @@ export class ChecklistDatabase {
   selector: 'app-sidenav',
   templateUrl: './sidenav.component.html',
   styleUrls: ['./sidenav.component.scss'],
-  providers: [ChecklistDatabase],
+  providers: [DocumentTree],
 })
 export class SidenavComponent implements OnInit, AfterViewInit{
 
@@ -423,21 +420,21 @@ export class SidenavComponent implements OnInit, AfterViewInit{
   expandDelay = 1000;
 
   /** Map from flat node to nested node. This helps us finding the nested node to be modified */
-  flatNodeMap: Map<TodoItemFlatNode, TodoItemNode> = new Map<TodoItemFlatNode,TodoItemNode>();
+  flatNodeMap: Map<DocumentFlatNode, DocumentNode> = new Map<DocumentFlatNode,DocumentNode>();
 
   /** Map from nested node to flattened node. This helps us to keep the same object for selection */
-  nestedNodeMap: Map<TodoItemNode, TodoItemFlatNode> = new Map<TodoItemNode,TodoItemFlatNode>();
+  nestedNodeMap: Map<DocumentNode, DocumentFlatNode> = new Map<DocumentNode,DocumentFlatNode>();
 
   /** A selected parent node to be inserted */
-  selectedParent: TodoItemFlatNode | null = null;
+  selectedParent: DocumentFlatNode | null = null;
 
-  treeControl: FlatTreeControl<TodoItemFlatNode>;
+  treeControl: FlatTreeControl<DocumentFlatNode>;
 
-  treeFlattener: MatTreeFlattener<TodoItemNode, TodoItemFlatNode>;
+  treeFlattener: MatTreeFlattener<DocumentNode, DocumentFlatNode>;
 
-  dataSource: MatTreeFlatDataSource<TodoItemNode, TodoItemFlatNode>;
+  dataSource: MatTreeFlatDataSource<DocumentNode, DocumentFlatNode>;
 
-  constructor(private database: ChecklistDatabase, private testService : BasicRestService, private router: Router) {
+  constructor(private database: DocumentTree, private testService : BasicRestService, private router: Router) {
 
     this.treeFlattener = new MatTreeFlattener(
       this.transformer,
@@ -445,7 +442,7 @@ export class SidenavComponent implements OnInit, AfterViewInit{
       this.isExpandable,
       this.getChildren
     );
-    this.treeControl = new FlatTreeControl<TodoItemFlatNode>(
+    this.treeControl = new FlatTreeControl<DocumentFlatNode>(
       this.getLevel,
       this.isExpandable
     );
@@ -465,7 +462,7 @@ export class SidenavComponent implements OnInit, AfterViewInit{
   }
 
   @HostListener('window:resize', ['$event'])
-    getScreenSize(event?) {
+    getScreenSize() {
         if (window.innerWidth < 768) {
           this.showSidebar = false;
         }
@@ -479,51 +476,51 @@ export class SidenavComponent implements OnInit, AfterViewInit{
     this.username = localStorage.getItem("username");
   }
 
-  getLevel = (node: TodoItemFlatNode) => {
+  getLevel = (node: DocumentFlatNode) => {
     return node.level;
   };
 
-  isExpandable = (node: TodoItemFlatNode) => {
+  isExpandable = (node: DocumentFlatNode) => {
     return node.expandable;
   };
 
-  getChildren = (node: TodoItemNode): Observable<TodoItemNode[]> => {
+  getChildren = (node: DocumentNode): Observable<DocumentNode[]> => {
     return ofObservable(node.children);
   };
 
-  isRoot = (_: number, _nodeData: TodoItemFlatNode) => {
+  isRoot = (_: number, _nodeData: DocumentFlatNode) => {
     return _nodeData.id === ROOT_ID;
   };
 
-  isTrash = (_: number, _nodeData: TodoItemFlatNode) => {
+  isTrash = (_: number, _nodeData: DocumentFlatNode) => {
     return _nodeData.id === TRASH_ID;
   };
 
-  isPinned = (_: number, _nodeData: TodoItemFlatNode) => {
+  isPinned = (_: number, _nodeData: DocumentFlatNode) => {
     return _nodeData.id === PINNED_ID;
   };
 
-  editNode = (_: number, _nodeData: TodoItemFlatNode) => {
+  editNode = (_: number, _nodeData: DocumentFlatNode) => {
     return _nodeData.editNode;
   };
 
-  hasChild = (_: number, _nodeData: TodoItemFlatNode) => {
+  hasChild = (_: number, _nodeData: DocumentFlatNode) => {
     return _nodeData.expandable;
   };
 
-  hasNoContent = (_: number, _nodeData: TodoItemFlatNode) => {
+  hasNoContent = (_: number, _nodeData: DocumentFlatNode) => {
     return _nodeData.name === '';
   };
 
   /**
    * Transformer to convert nested node to flat node. Record the nodes in maps for later use.
    */
-  transformer = (node: TodoItemNode, level: number) => {
+  transformer = (node: DocumentNode, level: number) => {
     let flatNode =
       this.nestedNodeMap.has(node) &&
       this.nestedNodeMap.get(node)!.name === node.name
         ? this.nestedNodeMap.get(node)!
-        : new TodoItemFlatNode();
+        : new DocumentFlatNode();
     flatNode.name = node.name;
     flatNode.id = node.id;
     flatNode.parent = node.parent;
@@ -536,7 +533,7 @@ export class SidenavComponent implements OnInit, AfterViewInit{
     return flatNode;
   };
 
-  addNewItem(node: TodoItemFlatNode) {
+  addNewItem(node: DocumentFlatNode) {
     this.showSidebar = true;
     if (!node) {
       node = this.nestedNodeMap.get(this.database.rootNode);
@@ -546,24 +543,24 @@ export class SidenavComponent implements OnInit, AfterViewInit{
     this.refreshTree();
   }
 
-  editItem(node: TodoItemFlatNode) {
+  editItem(node: DocumentFlatNode) {
     node.editNode = true;
     this.refreshTree();
   }
 
-  cancelEditItem(node: TodoItemFlatNode) {
+  cancelEditItem(node: DocumentFlatNode) {
     node.editNode = false;
     this.refreshTree()
   }
 
-  deleteEmptyItem(node: TodoItemFlatNode) {
+  deleteEmptyItem(node: DocumentFlatNode) {
     this.database.deleteEmptyItem(node);
 
     this.treeControl.collapse(this.nestedNodeMap.get(this.database.rootNode));
     this.treeControl.expand(this.nestedNodeMap.get(this.database.rootNode));
   }
 
-  moveToTrash(node: TodoItemFlatNode) {
+  moveToTrash(node: DocumentFlatNode) {
     var nestedNode = this.flatNodeMap.get(node);
 
     // remove from parent in documents
@@ -582,7 +579,7 @@ export class SidenavComponent implements OnInit, AfterViewInit{
     this.treeControl.expand(this.nestedNodeMap.get(this.database.trashNode));
   }
 
-  removeFromTrash(node: TodoItemFlatNode) {
+  removeFromTrash(node: DocumentFlatNode) {
     if (confirm('Are you sure you want to permanently delete ' + node.name + '?')) {
       var nestedNode = this.flatNodeMap.get(node);
 
@@ -596,21 +593,21 @@ export class SidenavComponent implements OnInit, AfterViewInit{
     }
   }
 
-  saveNode(node: TodoItemFlatNode, itemValue: string, newItem: boolean) {
+  saveNode(node: DocumentFlatNode, itemValue: string, newItem: boolean) {
     const nestedNode = this.flatNodeMap.get(node);
     this.database.saveItem(nestedNode!, itemValue, newItem);
     this.treeControl.collapse(this.nestedNodeMap.get(this.database.rootNode));
     this.treeControl.expand(this.nestedNodeMap.get(this.database.rootNode));
   }
 
-  restoreItem(node: TodoItemFlatNode) {
+  restoreItem(node: DocumentFlatNode) {
     const nodeToRestore = this.flatNodeMap.get(node);
     const parentToRemoveId = `${nodeToRestore.parent}`;
 
     if (node.parent === ROOT_ID) {
       this.database.restoreItem(nodeToRestore, node.parent)
     } else {
-      var parentToInsert: TodoItemNode = this.database.rootNodeMap.get(node.parent);
+      var parentToInsert: DocumentNode = this.database.rootNodeMap.get(node.parent);
       if (parentToInsert.deleted) {
         parentToInsert = this.getNearestParentThatIsNotDeleted(nodeToRestore)
         if (parentToInsert)
@@ -627,14 +624,14 @@ export class SidenavComponent implements OnInit, AfterViewInit{
     this.treeControl.expand(this.nestedNodeMap.get(this.database.trashNode));
   }
 
-  pinItem(node: TodoItemFlatNode) {
+  pinItem(node: DocumentFlatNode) {
     const nestedNode = this.flatNodeMap.get(node);
     this.database.pinItem(nestedNode);
     this.treeControl.collapse(this.nestedNodeMap.get(this.database.pinnedNode));
     this.treeControl.expand(this.nestedNodeMap.get(this.database.pinnedNode));
   }
 
-  getNearestParentThatIsNotDeleted(node: TodoItemNode): TodoItemNode {
+  getNearestParentThatIsNotDeleted(node: DocumentNode): DocumentNode {
     var parentNode;
     for (let element of this.flatNodeMap.values()) {
       if (element.id === node.parent) {
@@ -677,7 +674,7 @@ export class SidenavComponent implements OnInit, AfterViewInit{
   dragEnd() {
     this.dragging = false;
   }
-  dragHover(node: TodoItemFlatNode) {
+  dragHover(node: DocumentFlatNode) {
     if (this.dragging) {
       clearTimeout(this.expandTimeout);
       this.expandTimeout = setTimeout(() => {
@@ -694,7 +691,7 @@ export class SidenavComponent implements OnInit, AfterViewInit{
   drop(event: CdkDragDrop<string[]>) {
     if (!event.isPointerOverContainer) return;
 
-    const draggedNode: TodoItemFlatNode = event.item.data;
+    const draggedNode: DocumentFlatNode = event.item.data;
 
     this.treeControl.collapse(draggedNode);
 
@@ -702,15 +699,10 @@ export class SidenavComponent implements OnInit, AfterViewInit{
 
     const currentIndexOfDraggedNode = visibleNodes.findIndex(v => v.id === draggedNode.id);
 
-    // console.log("CURRENT INDEX OF DRAGGED NODE");console.log(currentIndexOfDraggedNode);console.log("------------");
-    // console.log("VISIBLE NODES");console.log(visibleNodes);console.log("------------");
-
     let dropIndex = event.currentIndex;
 
     let pinnedNodes = this.database.pinnedNode.children ? this.database.pinnedNode.children.length : 0;
     let pinnedExpanded = this.treeControl.isExpanded(this.nestedNodeMap.get(this.database.pinnedNode))
-
-    // console.log("DROP INDEX");console.log(dropIndex);
 
     if (!draggedNode.deleted && pinnedExpanded && event.item.data.parent !== PINNED_ID) {
       dropIndex = dropIndex - pinnedNodes;
@@ -740,8 +732,6 @@ export class SidenavComponent implements OnInit, AfterViewInit{
       }
     }
 
-    // console.log(dropIndex);console.log("------------");
-
     function findNodeSiblings(arr: Array<any>, id: string): Array<any> {
       let result, subResult;
       arr.forEach((item, i) => {
@@ -760,8 +750,6 @@ export class SidenavComponent implements OnInit, AfterViewInit{
 
     if (nodeAtDest.id == draggedNode.id) return;
 
-    // console.log("NODE AT DEST");console.log(nodeAtDest);console.log("------------");
-
     let searchTree;
     const changedData = this.dataSource.data;
     if (draggedNode.deleted) {
@@ -771,12 +759,8 @@ export class SidenavComponent implements OnInit, AfterViewInit{
     } else {
       searchTree = changedData.find(n => n.id === ROOT_ID)
     }
-    
-    // console.log("SEARCH TREE");console.log(searchTree);console.log("------------");
 
     const newSiblings = findNodeSiblings(searchTree.children, nodeAtDest.id);
-    
-    // console.log("NEW SIBLINGS");console.log(newSiblings);console.log("---------");
 
     if (!newSiblings) return;
     let insertIndex = newSiblings.findIndex(s => s.id === nodeAtDest.id);
@@ -787,28 +771,12 @@ export class SidenavComponent implements OnInit, AfterViewInit{
       }
     }
 
-    // console.log("INSERT INDEX");console.log(insertIndex);console.log("---------");
-
     // remove the node from its old place
     const oldSiblings = findNodeSiblings(searchTree.children, draggedNode.id);
 
-    // console.log("SIBLINGS");console.log(oldSiblings);console.log("---------");
-
     const siblingIndex = oldSiblings.findIndex(n => n.id === draggedNode.id);
 
-    // console.log("SIBLINGS INDEX");console.log(siblingIndex);console.log("---------");
-
-    const nodeToInsert: TodoItemNode = oldSiblings.splice(siblingIndex, 1)[0];
-    // if (nodeAtDest.id === nodeToInsert.id) return; ERROR: if true dragged node will disappear after save
-
-    // console.log("NODE TO INSERT");console.log(nodeToInsert);console.log("---------");
-
-    // ensure validity of drop - must be same level
-    // const nodeAtDestFlatNode = this.treeControl.dataNodes.find((n) => nodeAtDest.id === n.id);
-    // if (this.validateDrop && nodeAtDestFlatNode.level !== draggedNode.level) {
-    //   alert('Items can only be moved within the same level.');
-    //   return;
-    // }
+    const nodeToInsert: DocumentNode = oldSiblings.splice(siblingIndex, 1)[0];
 
     nodeToInsert.parent = nodeAtDest.parent.slice();
 
@@ -821,7 +789,7 @@ export class SidenavComponent implements OnInit, AfterViewInit{
   /*
     find all visible nodes regardless of the level, except the dragged node, and return it as a flat list
   */
-  visibleNodes(inPinned: boolean, deleted: boolean): TodoItemNode[] {
+  visibleNodes(inPinned: boolean, deleted: boolean): DocumentNode[] {
     const result = [];
     this.dataSource.data.forEach((node) => {
       this.addExpandedChildren(node, this.treeControl.isExpanded(this.nestedNodeMap.get(node)), inPinned, deleted, result);
@@ -829,7 +797,7 @@ export class SidenavComponent implements OnInit, AfterViewInit{
     return result;
   }
 
-  addExpandedChildren(node: TodoItemNode, expanded: boolean, inPinned: boolean, deleted: boolean, result: any) {
+  addExpandedChildren(node: DocumentNode, expanded: boolean, inPinned: boolean, deleted: boolean, result: any) {
     if (node.id !== ROOT_ID && node.id !== PINNED_ID && node.id !== TRASH_ID) {
       if (inPinned && node.parent === PINNED_ID) {
         result.push(node);

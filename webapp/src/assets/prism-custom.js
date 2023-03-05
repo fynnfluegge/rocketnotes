@@ -8,8 +8,6 @@ import 'prismjs';
 
     var hook = function (env) {
 
-        console.log(env.element.parentElement.parentNode)
-
         var wrapper = document.createElement('div');
         wrapper.style.position = "relative";
         env.element.parentElement.parentNode.insertBefore(wrapper, env.element.parentElement)
@@ -36,10 +34,6 @@ import 'prismjs';
                 event.trigger.innerHTML = '<i class="fa-regular fa-clone"></i>';
             }, 500);
         });
-
-        function isPrismClass(preTag, language) { 
-            return preTag.className === 'language-' + language
-        }
     }
 
     Prism.hooks.add('complete', hook);
