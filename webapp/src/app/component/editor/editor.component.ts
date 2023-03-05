@@ -38,8 +38,6 @@ export class EditorComponent {
   keyPressCounter: number = 0;
 
   constructor(private database: DocumentTree, private testService : BasicRestService, private route: ActivatedRoute, private titleService: Title) {
-    this.preRender = this.preRender.bind(this);
-    this.postRender = this.postRender.bind(this);
   }
 
   ngOnInit() {
@@ -124,51 +122,6 @@ export class EditorComponent {
         this.submit();
       }
     },10000)
-  }
-
-  doUpload(files: Array<File>): Promise<Array<UploadResult>> {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        let result: Array<UploadResult> = [];
-        for (let file of files) {
-          result.push({
-            name: file.name,
-            url: `https://avatars3.githubusercontent.com/${file.name}`,
-            isImg: file.type.indexOf("image") !== -1
-          });
-        }
-        resolve(result);
-      }, 3000);
-    });
-  }
-
-  onEditorLoaded(editor) {
-    // console.log(`ACE Editor Ins: `, editor);
-  }
-
-  preRender(mdContent) {
-    // console.log(`preRender fired`);
-    // return new Promise((resolve) => {
-    //   setTimeout(() => {
-    //     resolve(mdContent);
-    //   }, 4000);
-    // })
-    return mdContent;
-  }
-
-  postRender(html) {
-    // console.log(`postRender fired`);
-    return html;
-  }
-
-  onPreviewDomChanged(dom: HTMLElement) {
-    // console.log(dom);
-    // console.log(dom.innerHTML);
-    // console.log(this.content)
-  }
-
-  onFullscreen(): void {
-
   }
 
   submit(): void {
