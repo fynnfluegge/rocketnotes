@@ -29,7 +29,7 @@ $ npm install
 ```
 $ docker-compose up -d
 ```
-#### 2. Init tables and create data for default user in DynamoDB Docker container
+#### 2. Init tables and create data for default user
 ```
 $ sh ./dynamodb-init.sh
 ```
@@ -38,7 +38,7 @@ $ sh ./dynamodb-init.sh
 $ sam build
 $ sam start rocketnotes-serverless-api rocketnotes_serverless-docker-network
 ```
-#### 4. Start Angular App
+#### 4. Start Angular app
 ```
 $ export BASE_API_URL="http://localhost:3000"
 $ cd webapp
@@ -47,10 +47,12 @@ $ npm run start
 ```
 Open http://localhost:3000 in your browser and you should see the Rocketnotes webapp with the cheat sheet of the default user displayed.
 
+> **_NOTE:_**  Authentication is disabled in dev environment.
+
 ## All Code Changes Happen Through Pull Requests
 Pull requests are the best way to propose changes to the codebase. We actively welcome your pull requests:
 
-1. Fork the repo and create your branch from `master`.
+1. Fork the repo and create your branch from `main`.
 2. If you've added code that should be tested, add tests.
 3. If you've changed APIs, update the documentation.
 4. Ensure the test suite passes.
