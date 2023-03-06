@@ -45,7 +45,7 @@ $ cd webapp
 $ npm install
 $ npm run start
 ```
-Open http://localhost:3000 in your browser and you should see the Rocketnotes webapp with the cheat sheet of the default user displayed.
+Open http://localhost:4200 in your browser and you should see the Rocketnotes webapp with the cheat sheet of the default user displayed.
 
 > **_NOTE:_**  Authentication is disabled in dev environment.
 
