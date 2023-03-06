@@ -16,7 +16,7 @@ Check out the [installation](INSTALLATION.md#installation) guides for deploying 
 👉 [Get started](CONTRIBUTING.md#getting-started) with all required steps to run the project locally in development mode.
 You find also the contribution guidelines there.
 Don't hesitate to open an issue for getting some feedback about a potential bug or if you desire a missing feature.
-We also appreciate to check over current [issues](https://github.com/fynnfluegge/rocketnotes/issues) and provide feedback to exising ones or even raise a PR which solves an issue.
+We also appreciate to check over current [issues](https://github.com/fynnfluegge/rocketnotes/issues) and provide feedback to existing ones or even raise a PR which solves an issue.
 Any contribution is welcome!
 
 ## Features
