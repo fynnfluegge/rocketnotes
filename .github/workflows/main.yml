@@ -39,9 +39,7 @@ jobs:
       - name: npm install and npm run build
         run: |
           cd webapp
-          npm i
-          npm i @angular/cdk
-          npm i @angular/material
+          npm install
           npm run build
 
       # - name: cdk deploy
