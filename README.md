@@ -48,3 +48,10 @@ Any contribution is welcome!
 <div align="center">
   <img src="landing-page/src/assets/searchbar.gif">
 </div>
+
+&nbsp;
+
+## 📝 License
+
+Copyright © 2023-present, [Rocketnotes Contributors](https://github.com/fynnfluegge/rocketnotes/graphs/contributors).<br>
+This project is [MIT](https://github.com/fynnfluegge/rocketnotes/blob/main/LICENSE) licensed.
