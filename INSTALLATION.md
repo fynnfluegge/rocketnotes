@@ -34,32 +34,48 @@ If you want to create the cognito resources via the aws console, there are plent
 Second, you need an existing hosted zone in the target region of your AWS account. This requires a domain you are in charge of.
 How to create a hosted zone and configure Route 53 as a DNS service with your domain you will find [here](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/CreatingHostedZone.html).
 
-### Build
-The Angular webapp need to be bundled in production mode.
-The following environment variables are required for the production build and also for the deployment one step further:
+### Deploy all AWS resources
+The following environment variables are required for the deployment:
 ```console
 $ export COGNITO_USER_POOL_ID="<YOUR_COGNITO_USER_POOL_ID>"
 $ export COGNITO_APP_CLIENT_ID="<YOUR_COGNITO_APP_CLIENT_ID>"
+$ export DOMAIN="<YOUR_DOMAIN>"
+$ export SUBDOMAIN="<YOUR_SUBDOMAIN>" # <- use "www" here if you don't have a subdomain configured in your hosted zone (e.g app)
+```
+
+Once your environment variables are specified run:
+```
+$ cd cdk
+$ cdk deploy
+```
+
+The first deployment will take some minutes, since all the resources and lambda functions need to be initially created. If the deployment was successfull the api url should be logged in the console as `HTTP API endpoint URL`.
+
+### Build webapp
+The Angular webapp need to be bundled in production mode.
+The following environment variables are required for the production build:
+```console
 $ export REDIRECT_SIGN_IN="<YOUR_DOMAIN_URL>"
 $ export REDIRECT_SIGN_OUT="<YOUR_DOMAIN_URL/logout>"
-$ export AUTH_GUARD_REDIRECT="<AUTH_GUARD_REDIRECT_URL>"
-$ export API_URL="<YOUR_API_URL>"
-$ export DOMAIN="<YOUR_DOMAIN>"
-$ export SUBDOMAIN="<YOUR_SUBDOMAIN>" # <- use www here if you don't have a subdomain configured in your hosted zone (e.g app)
+$ export AUTH_GUARD_REDIRECT="<AUTH_GUARD_REDIRECT_URL>" # <- "https://<YOUR_DOMAIN_NAME>.auth.<AWS_REGION>.amazoncognito.com/login?response_type=code&client_id=<YOUR_COGNITO_APP_CLIENT_ID>&redirect_uri=https://<YOUR_SUBDOMAIN>.<YOUR_DOMAIN>"
+$ export API_URL="<YOUR_API_URL>" # <- HTTP API endpoint URL from deployment console log
 ```
-Once your environment variables are specified run
+> **_NOTE:_** <YOUR_DOMAIN_NAME> is your domain **without** extension like ".com" while <YOUR_DOMAIN> is your domain **with** extension in this context.
+
+Once your environment variables are specified run:
 ```
 $ cd webapp
 $ npm install
 $ npm run build
 ```
 
-### Deploy
+### Deploy webapp
+Finally, the Angular app can be deployed to S3 with again:
 ```
 $ cd cdk
 $ cdk deploy
 ```
-The first deployment will take some minutes, since all the resources and lambda functions need to be initially created.
+This deployment will only deploy the webapp build to the S3 bucket and will be much faster than the previous one.
 
 ## On-premise hosting
 To be defined.

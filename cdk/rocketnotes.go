@@ -30,6 +30,9 @@ type RocketnotesStackProps struct {
 	awscdk.StackProps
 	CognitoAppClientId string
 	CognitoUserPoolId  string
+	Domain             string
+	Subdomain          string
+	DeployLandingPage  string
 }
 
 func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesStackProps) awscdk.Stack {
@@ -304,17 +307,17 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 	// hosted zone & certificate
 
 	zone := awsroute53.HostedZone_FromLookup(stack, jsii.String("MyHostedZone"), &awsroute53.HostedZoneProviderProps{
-		DomainName: jsii.String("takeniftynotes.net"),
+		DomainName: jsii.String(props.Domain),
 	})
 
 	certificateArn := awscertificatemanager.NewDnsValidatedCertificate(stack, jsii.String("MySiteCertificate"), &awscertificatemanager.DnsValidatedCertificateProps{
-		DomainName: jsii.String("*.takeniftynotes.net"),
+		DomainName: jsii.String("*." + props.Domain),
 		HostedZone: zone,
 		Region:     jsii.String("us-east-1"), // Cloudfront only checks this region for certificates.
 	})
 
 	cloudfrontOAI := awscloudfront.NewOriginAccessIdentity(stack, jsii.String("MyOriginAccessIdentity"), &awscloudfront.OriginAccessIdentityProps{
-		Comment: jsii.String("OAI for takeniftynotes.net"),
+		Comment: jsii.String("OAI for " + props.Domain),
 	})
 
 	// distribution & deployment
@@ -326,12 +329,12 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		&awscloudfront.ViewerCertificateOptions{
 			SslMethod:      awscloudfront.SSLMethod_SNI,
 			SecurityPolicy: awscloudfront.SecurityPolicyProtocol_TLS_V1_1_2016,
-			Aliases:        jsii.Strings("app.takeniftynotes.net"),
+			Aliases:        jsii.Strings(props.Subdomain + "." + props.Domain),
 		},
 	)
 
 	appBucket := awss3.NewBucket(stack, jsii.String("MyS3Bucket"), &awss3.BucketProps{
-		BucketName:           jsii.String("app.takeniftynotes.net"),
+		BucketName:           jsii.String(props.Subdomain + "." + props.Domain),
 		WebsiteIndexDocument: jsii.String("index.html"),
 		WebsiteErrorDocument: jsii.String("index.html"),
 		PublicReadAccess:     jsii.Bool(true),
@@ -373,7 +376,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 	})
 
 	awsroute53.NewARecord(stack, jsii.String("MySiteAliasRecord"), &awsroute53.ARecordProps{
-		RecordName: jsii.String("app.takeniftynotes.net"),
+		RecordName: jsii.String(props.Subdomain + "." + props.Domain),
 		Target:     awsroute53.RecordTarget_FromAlias(awsroute53targets.NewCloudFrontTarget(appCloudFrontDistribution)),
 		Zone:       zone,
 	})
@@ -394,12 +397,12 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		&awscloudfront.ViewerCertificateOptions{
 			SslMethod:      awscloudfront.SSLMethod_SNI,
 			SecurityPolicy: awscloudfront.SecurityPolicyProtocol_TLS_V1_1_2016,
-			Aliases:        jsii.Strings("www.takeniftynotes.net"),
+			Aliases:        jsii.Strings("www." + props.Domain),
 		},
 	)
 
 	laningPageBucket := awss3.NewBucket(stack, jsii.String("LaningPageS3Bucket"), &awss3.BucketProps{
-		BucketName:           jsii.String("takeniftynotes.net"),
+		BucketName:           jsii.String(props.Domain),
 		WebsiteIndexDocument: jsii.String("index.html"),
 		WebsiteErrorDocument: jsii.String("index.html"),
 		PublicReadAccess:     jsii.Bool(true),
@@ -441,7 +444,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 	})
 
 	awsroute53.NewARecord(stack, jsii.String("LaningPageSiteAliasRecord"), &awsroute53.ARecordProps{
-		RecordName: jsii.String("www.takeniftynotes.net"),
+		RecordName: jsii.String("www." + props.Domain),
 		Target:     awsroute53.RecordTarget_FromAlias(awsroute53targets.NewCloudFrontTarget(landingPageCloudFrontDistribution)),
 		Zone:       zone,
 	})
@@ -462,6 +465,11 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		PublicReadAccess: jsii.Bool(true),
 	})
 
+	awscdk.NewCfnOutput(stack, jsii.String("apiUrl"), &awscdk.CfnOutputProps{
+		Value:       httpApi.Url(),
+		Description: jsii.String("HTTP API endpoint URL"),
+	})
+
 	return stack
 }
 
@@ -474,6 +482,9 @@ func main() {
 		},
 		os.Getenv("COGNITO_APP_CLIENT_ID"),
 		os.Getenv("COGNITO_USER_POOL_ID"),
+		os.Getenv("DOMAIN"),
+		os.Getenv("SUBDOMAIN"),
+		os.Getenv("DEPLOY_LANDING_PAGE"),
 	})
 
 	app.Synth(nil)
