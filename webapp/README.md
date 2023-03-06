@@ -1,37 +1,38 @@
 # Webapp
 
-### Run Devmode
+### Run dev mode on localhost
 ```
-ng serve
+npm run start
 ```
 
 ### Run Electron App
 ```
-npm start
+npm run electron
 ```
+> **_NOTE:_**  Electron has the be build with `npm run build-electron` in order to run.
 
 ### Production Build
 ```
-ng build --configuration production
+npm run build
 ```
 
-## ng build for electron
+### Electron build
 ```
-ng build --configuration production --base-href ./
+npm run build-electron
 ```
 
-## electron-packager
-### Package Electron App
+### electron-packager
+#### Package Electron App
 ```
 ./node_modules/.bin/electron-packager . --overwrite --platform=darwin --arch=x64 --icon=./src/assets/icons/mac/icon.icns --prune=true --out=release-builds --ignore="node_modules*|src*" rocketnotes
 ```
 
-### Create Installer
+#### Create Installer
 ```
 ./node_modules/.bin/electron-installer-dmg ./release-builds/rocketnotes-darwin-x64/rocketnotes.app rocketnotes
 ```
-## electron-builder
-### electron builder build and publish
+### electron-builder
+#### electron builder build and publish
 ```
 ./node_modules/.bin/electron-builder --publish always
 ```
