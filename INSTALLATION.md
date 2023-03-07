@@ -37,11 +37,15 @@ How to create a hosted zone and configure Route 53 as a DNS service with your do
 ### Deploy all AWS resources
 The following environment variables are required for the deployment:
 ```console
+$ export AWS_ACCOUNT="<YOUR_AWS_ACCOUNT_ID>"
+$ export AWS_REGION="<YOUR_AWS_REGION>"
 $ export COGNITO_USER_POOL_ID="<YOUR_COGNITO_USER_POOL_ID>"
 $ export COGNITO_APP_CLIENT_ID="<YOUR_COGNITO_APP_CLIENT_ID>"
+$ export DOMAIN_NAME="<YOUR_DOMAIN_NAME>"
 $ export DOMAIN="<YOUR_DOMAIN>"
 $ export SUBDOMAIN="<YOUR_SUBDOMAIN>" # <- use "www" here if you don't have a subdomain configured in your hosted zone (e.g app)
 ```
+> **_NOTE:_** <YOUR_DOMAIN_NAME> is your domain **without** extension like ".com" while <YOUR_DOMAIN> is your domain **with** extension in this context.
 
 Once your environment variables are specified run:
 ```
@@ -60,8 +64,6 @@ $ export REDIRECT_SIGN_OUT="<YOUR_DOMAIN_URL/logout>"
 $ export AUTH_GUARD_REDIRECT="<AUTH_GUARD_REDIRECT_URL>" # <- "https://<YOUR_DOMAIN_NAME>.auth.<AWS_REGION>.amazoncognito.com/login?response_type=code&client_id=<YOUR_COGNITO_APP_CLIENT_ID>&redirect_uri=https://<YOUR_SUBDOMAIN>.<YOUR_DOMAIN>"
 $ export API_URL="<YOUR_API_URL>" # <- HTTP API endpoint URL from deployment console log
 ```
-> **_NOTE:_** <YOUR_DOMAIN_NAME> is your domain **without** extension like ".com" while <YOUR_DOMAIN> is your domain **with** extension in this context.
-
 Once your environment variables are specified run:
 ```
 $ cd webapp

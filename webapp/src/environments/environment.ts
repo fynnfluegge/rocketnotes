@@ -4,6 +4,8 @@
 
 export const environment = {
     production: false,
+    awsRegion: 'undefined',
+    domainName: 'undefined',
     cognitoUserPoolId: 'undefined',
     cognitoAppClientId: 'undefined',
     redirectSignIn: 'undefined',
