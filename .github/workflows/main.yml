@@ -31,15 +31,15 @@ jobs:
             ${{ runner.os }}-build-
             ${{ runner.os }}-
 
-      - name: Node $
-        uses: actions/setup-node@v1
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: ${{ matrix.node-version }}
 
-      - name: npm install and npm run build
+      - name: build
         run: |
           cd webapp
-          npm install
+          npm ci
           npm run build
 
       # - name: cdk deploy
