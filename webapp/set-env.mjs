@@ -13,8 +13,6 @@ const envConfigFile = `export const environment = {
     apiUrl: '${process.env.API_URL}'
 };
 `;
-console.log('The file `environment.ts` will be written with the following content: \n');
-console.log(envConfigFile);
 writeFile(targetPath, envConfigFile, function (err) {
    if (err) {
        throw console.error(err);

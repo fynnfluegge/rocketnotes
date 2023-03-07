@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"strconv"
 
 	"github.com/aws/aws-cdk-go/awscdk/v2"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsapigatewayv2"
@@ -381,89 +382,96 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		Zone:       zone,
 	})
 
-	awss3deployment.NewBucketDeployment(stack, jsii.String("MyS3BucketDeployment"), &awss3deployment.BucketDeploymentProps{
-		Sources: &[]awss3deployment.ISource{
-			awss3deployment.Source_Asset(jsii.String("../webapp/build"), &awss3assets.AssetOptions{}),
-		},
-		DestinationBucket: appBucket,
-		Distribution:      appCloudFrontDistribution,
-		DistributionPaths: jsii.Strings("/*"),
-	})
-
-	// landing page
-
-	landingPageViewerCertificate := awscloudfront.ViewerCertificate_FromAcmCertificate(
-		certificateArn,
-		&awscloudfront.ViewerCertificateOptions{
-			SslMethod:      awscloudfront.SSLMethod_SNI,
-			SecurityPolicy: awscloudfront.SecurityPolicyProtocol_TLS_V1_1_2016,
-			Aliases:        jsii.Strings("www." + props.Domain),
-		},
-	)
-
-	laningPageBucket := awss3.NewBucket(stack, jsii.String("LaningPageS3Bucket"), &awss3.BucketProps{
-		BucketName:           jsii.String(props.Domain),
-		WebsiteIndexDocument: jsii.String("index.html"),
-		WebsiteErrorDocument: jsii.String("index.html"),
-		PublicReadAccess:     jsii.Bool(true),
-	})
-
-	laningPageBucket.AddToResourcePolicy(awsiam.NewPolicyStatement(&awsiam.PolicyStatementProps{
-		Actions:   jsii.Strings("s3:GetObject"),
-		Resources: jsii.Strings(*laningPageBucket.ArnForObjects(jsii.String("*"))),
-		Principals: &[]awsiam.IPrincipal{
-			awsiam.NewCanonicalUserPrincipal(cloudfrontOAI.CloudFrontOriginAccessIdentityS3CanonicalUserId()),
-		},
-	}))
-
-	landingPageCloudFrontDistribution := awscloudfront.NewCloudFrontWebDistribution(stack, jsii.String("MyCloudFrontDistribution"), &awscloudfront.CloudFrontWebDistributionProps{
-		ViewerCertificate: landingPageViewerCertificate,
-		ErrorConfigurations: &[]*awscloudfront.CfnDistribution_CustomErrorResponseProperty{
-			{
-				ErrorCode:          jsii.Number(403),
-				ResponseCode:       jsii.Number(200),
-				ErrorCachingMinTtl: jsii.Number(300),
-				ResponsePagePath:   jsii.String("/index.html"),
+	// Deploy web app if build exists
+	if _, err := os.Stat("../webapp/build/index.html"); err == nil {
+		awss3deployment.NewBucketDeployment(stack, jsii.String("MyS3BucketDeployment"), &awss3deployment.BucketDeploymentProps{
+			Sources: &[]awss3deployment.ISource{
+				awss3deployment.Source_Asset(jsii.String("../webapp/build"), &awss3assets.AssetOptions{}),
 			},
-		},
-		OriginConfigs: &[]*awscloudfront.SourceConfiguration{
-			{
-				S3OriginSource: &awscloudfront.S3OriginConfig{
-					S3BucketSource:       laningPageBucket,
-					OriginAccessIdentity: cloudfrontOAI,
+			DestinationBucket: appBucket,
+			Distribution:      appCloudFrontDistribution,
+			DistributionPaths: jsii.Strings("/*"),
+		})
+	}
+
+	// Deploy landing page and electron installer if explicitly specified in environment variables
+	if _, err := strconv.ParseBool(props.DeployLandingPage); err == nil {
+
+		// landing page
+
+		landingPageViewerCertificate := awscloudfront.ViewerCertificate_FromAcmCertificate(
+			certificateArn,
+			&awscloudfront.ViewerCertificateOptions{
+				SslMethod:      awscloudfront.SSLMethod_SNI,
+				SecurityPolicy: awscloudfront.SecurityPolicyProtocol_TLS_V1_1_2016,
+				Aliases:        jsii.Strings("www." + props.Domain),
+			},
+		)
+
+		laningPageBucket := awss3.NewBucket(stack, jsii.String("LaningPageS3Bucket"), &awss3.BucketProps{
+			BucketName:           jsii.String(props.Domain),
+			WebsiteIndexDocument: jsii.String("index.html"),
+			WebsiteErrorDocument: jsii.String("index.html"),
+			PublicReadAccess:     jsii.Bool(true),
+		})
+
+		laningPageBucket.AddToResourcePolicy(awsiam.NewPolicyStatement(&awsiam.PolicyStatementProps{
+			Actions:   jsii.Strings("s3:GetObject"),
+			Resources: jsii.Strings(*laningPageBucket.ArnForObjects(jsii.String("*"))),
+			Principals: &[]awsiam.IPrincipal{
+				awsiam.NewCanonicalUserPrincipal(cloudfrontOAI.CloudFrontOriginAccessIdentityS3CanonicalUserId()),
+			},
+		}))
+
+		landingPageCloudFrontDistribution := awscloudfront.NewCloudFrontWebDistribution(stack, jsii.String("MyCloudFrontDistribution"), &awscloudfront.CloudFrontWebDistributionProps{
+			ViewerCertificate: landingPageViewerCertificate,
+			ErrorConfigurations: &[]*awscloudfront.CfnDistribution_CustomErrorResponseProperty{
+				{
+					ErrorCode:          jsii.Number(403),
+					ResponseCode:       jsii.Number(200),
+					ErrorCachingMinTtl: jsii.Number(300),
+					ResponsePagePath:   jsii.String("/index.html"),
 				},
-				Behaviors: &[]*awscloudfront.Behavior{
-					{
-						IsDefaultBehavior: jsii.Bool(true),
-						Compress:          jsii.Bool(true),
-						AllowedMethods:    awscloudfront.CloudFrontAllowedMethods_GET_HEAD_OPTIONS,
+			},
+			OriginConfigs: &[]*awscloudfront.SourceConfiguration{
+				{
+					S3OriginSource: &awscloudfront.S3OriginConfig{
+						S3BucketSource:       laningPageBucket,
+						OriginAccessIdentity: cloudfrontOAI,
+					},
+					Behaviors: &[]*awscloudfront.Behavior{
+						{
+							IsDefaultBehavior: jsii.Bool(true),
+							Compress:          jsii.Bool(true),
+							AllowedMethods:    awscloudfront.CloudFrontAllowedMethods_GET_HEAD_OPTIONS,
+						},
 					},
 				},
 			},
-		},
-	})
+		})
 
-	awsroute53.NewARecord(stack, jsii.String("LaningPageSiteAliasRecord"), &awsroute53.ARecordProps{
-		RecordName: jsii.String("www." + props.Domain),
-		Target:     awsroute53.RecordTarget_FromAlias(awsroute53targets.NewCloudFrontTarget(landingPageCloudFrontDistribution)),
-		Zone:       zone,
-	})
+		awsroute53.NewARecord(stack, jsii.String("LaningPageSiteAliasRecord"), &awsroute53.ARecordProps{
+			RecordName: jsii.String("www." + props.Domain),
+			Target:     awsroute53.RecordTarget_FromAlias(awsroute53targets.NewCloudFrontTarget(landingPageCloudFrontDistribution)),
+			Zone:       zone,
+		})
 
-	awss3deployment.NewBucketDeployment(stack, jsii.String("LaningPageS3BucketDeployment"), &awss3deployment.BucketDeploymentProps{
-		Sources: &[]awss3deployment.ISource{
-			awss3deployment.Source_Asset(jsii.String("../landing-page/build"), &awss3assets.AssetOptions{}),
-		},
-		DestinationBucket: laningPageBucket,
-		Distribution:      landingPageCloudFrontDistribution,
-		DistributionPaths: jsii.Strings("/*"),
-	})
+		awss3deployment.NewBucketDeployment(stack, jsii.String("LaningPageS3BucketDeployment"), &awss3deployment.BucketDeploymentProps{
+			Sources: &[]awss3deployment.ISource{
+				awss3deployment.Source_Asset(jsii.String("../landing-page/build"), &awss3assets.AssetOptions{}),
+			},
+			DestinationBucket: laningPageBucket,
+			Distribution:      landingPageCloudFrontDistribution,
+			DistributionPaths: jsii.Strings("/*"),
+		})
 
-	// Electron installer bucket
+		// Electron installer bucket
 
-	awss3.NewBucket(stack, jsii.String("ElectronBucket"), &awss3.BucketProps{
-		BucketName:       jsii.String("rocketnotes-electron-releases"),
-		PublicReadAccess: jsii.Bool(true),
-	})
+		awss3.NewBucket(stack, jsii.String("ElectronBucket"), &awss3.BucketProps{
+			BucketName:       jsii.String("rocketnotes-electron-releases"),
+			PublicReadAccess: jsii.Bool(true),
+		})
+	}
 
 	awscdk.NewCfnOutput(stack, jsii.String("apiUrl"), &awscdk.CfnOutputProps{
 		Value:       httpApi.Url(),
