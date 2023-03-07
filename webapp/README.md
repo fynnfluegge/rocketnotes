@@ -9,7 +9,7 @@ npm run start
 ```
 npm run electron
 ```
-> **_NOTE:_**  Electron has the be build with `npm run build-electron` in order to run.
+> **_NOTE:_**  Electron has to be build with `npm run build-electron` in order to run.
 
 ### Production Build
 ```
