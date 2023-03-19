@@ -9,6 +9,8 @@ import 'prismjs';
     var hook = function (env) {
 
         var wrapper = document.createElement('div');
+        wrapper.classList.add("code-wrapper");
+        
         wrapper.style.position = "relative";
         env.element.parentElement.parentNode.insertBefore(wrapper, env.element.parentElement)
 

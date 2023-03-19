@@ -27,15 +27,19 @@ pre[class*=language-] {
   border-radius: 5px;
 }
 
-div.copy {
-  padding: 8px;
+.copy {
+  padding: 8px 12px;
   position: absolute;
   right: 0;
   top: 0;
-  color: white;
-  font-size: larger;
+  color: rgb(189, 188, 188);
+  font-size: 24px;
   background: #272822;
-  cursor: pointer;
+  opacity: 0.0;
+}
+
+.copy:hover {
+  color: white;
 }
 // -------------------------------------- //
 
@@ -83,5 +87,11 @@ code {
   color: rgb(6, 27, 35) !important;
   padding: 2px 4px;
   background-color: rgb(227, 226, 226);
+}
+
+.code-wrapper:hover div.copy{
+  opacity: 1.0;
+  transition: opacity .3s ease-in-out;
+  cursor: pointer;
 }
 // ------------------------------- //
