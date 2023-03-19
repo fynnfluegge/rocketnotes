@@ -172,3 +172,26 @@ Resources:
           Properties:
             Path: /search-documents/{userId}
             Method: GET
+
+  getSharedDocumentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda-handler/get-shared-document-handler
+      Handler: get-shared-document-handler
+      Runtime: go1.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: tnn-documents
+      Environment:
+        Variables:
+          USE_LOCAL_DYNAMODB: 1
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /shared/{documentId}
+            Method: GET
