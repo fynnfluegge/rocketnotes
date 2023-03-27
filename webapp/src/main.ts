@@ -7,7 +7,7 @@ import awsconfig from './aws-exports';
 
 const oauth = {
   // Domain name
-  domain : 'takeniftynotes.auth.eu-central-1.amazoncognito.com', 
+  domain : environment.domainName + '.auth.' + environment.awsRegion + '.amazoncognito.com', 
 
   // Authorized scopes
   scope : ['email', 'openid'], 
