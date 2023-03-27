@@ -21,6 +21,10 @@ button {
   white-space:nowrap;
 }
 
+a {
+  text-decoration: none !important;
+}
+
 // ------- copy to clipboard ------------ //
 pre[class*=language-] {
   position: relative;
