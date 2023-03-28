@@ -1,7 +1,6 @@
 import { Component, Input, VERSION } from '@angular/core';
 import { Auth } from 'aws-amplify';
 import { BasicRestService } from 'src/app/service/basic-rest.service';
-import { UploadResult } from "ngx-markdown-editor";
 import jwt_decode from 'jwt-decode';
 import { ActivatedRoute } from '@angular/router';
 import { DocumentTree } from '../navigation/sidenav.component';
