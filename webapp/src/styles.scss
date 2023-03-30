@@ -94,3 +94,37 @@ code {
   cursor: pointer;
 }
 // ------------------------------- //
+
+// ----- code block tabs---------- //
+.tab {
+  background-color: #d4d1d1;
+  border-radius: 0.3em 0.3em 0 0;
+}
+
+.tabcontent {
+  display: none;
+  border-top: none;
+}
+
+.tab button {
+  background-color: inherit;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 8px 12px;
+  transition: 0.3s;
+  font-size: 18px;
+  font-weight: 340;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  border-radius: 0.3em 0.3em 0 0;
+}
+
+.tab button.inactive:hover {
+  background-color: #b3b3b3 !important;
+}
+
+.tab button.inactive {
+  background-color: #d4d1d1 !important;
+  color: black !important;
+}
+// ------------------------------- //
