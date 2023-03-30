@@ -93,7 +93,8 @@ function openTab(evt, id) {
 
     // set all tablinks inactive
     for (let i = 0; i < evt.currentTarget.parentNode.children.length; i++) {
-        if (evt.currentTarget.parentNode.children[i] !== evt.currentTarget)
+        if (evt.currentTarget.parentNode.children[i] !== evt.currentTarget && 
+            evt.currentTarget.parentNode.children[i].className.includes("inactive") == false)
             evt.currentTarget.parentNode.children[i].className = evt.currentTarget.parentNode.children[i].className += " inactive";
     }
 
