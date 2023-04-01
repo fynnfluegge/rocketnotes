@@ -1,12 +1,19 @@
 services:
   dynamodb:
-    image: amazon/dynamodb-local
+    build: .
     hostname: dynamodb-local
     container_name: dynamodb-local
+    command: -jar DynamoDBLocal.jar -sharedDb -dbPath /home/dynamodblocal/data/
     ports:
       - "8041:8000"
+    volumes:
+      - dynamodb-volume:/home/dynamodblocal/data
     networks:
       - local-serverless-network
+
+volumes:
+  dynamodb-volume:
+   driver: local
 
 networks:
    local-serverless-network:
