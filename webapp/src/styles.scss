@@ -20,6 +20,26 @@ a {
   text-decoration: none !important;
 }
 
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* 4px scroll thumb. 10px margin from right margin */
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 14px 14px transparent;
+  border: solid 2px transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  box-shadow: inset 0 0 14px 14px #bbbbbe;
+  border: solid 2px transparent;
+  border-radius: 14px;
+}
+
+::-webkit-scrollbar-button {
+  display: none;
+}
+
 // ------- copy to clipboard ------------ //
 pre[class*=language-] {
   position: relative;

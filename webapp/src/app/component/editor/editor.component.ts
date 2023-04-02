@@ -18,7 +18,7 @@ export class EditorComponent {
 
   @Input() showSidebar: Boolean;
 
-  public showPreview: Boolean = false;
+  public showPreview: Boolean = true;
   public showSnackbar: Boolean = false;
   public editorMode: Boolean = false;
   public fullscreen: Boolean = false;
