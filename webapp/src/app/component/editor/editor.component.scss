@@ -57,6 +57,11 @@ textarea.md-input {
   display: flex;
 }
 
+div.center {
+  transition:0.25s;
+  position:absolute;bottom:12px;width:calc(100% - 264px);
+}
+
 //---- snackbar ---- //
 #snackbar {
   visibility: hidden;
