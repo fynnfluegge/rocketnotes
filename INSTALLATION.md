@@ -79,5 +79,5 @@ $ cdk deploy
 ```
 This deployment will only deploy the webapp build to the S3 bucket and will be much faster than the previous one.
 
-## On-premise hosting
+## Run locally
 To be defined.
