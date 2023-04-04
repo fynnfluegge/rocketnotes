@@ -20,26 +20,6 @@ a {
   text-decoration: none !important;
 }
 
-::-webkit-scrollbar {
-  width: 10px;
-}
-
-/* 4px scroll thumb. 10px margin from right margin */
-::-webkit-scrollbar-track {
-  box-shadow: inset 0 0 14px 14px transparent;
-  border: solid 2px transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  box-shadow: inset 0 0 14px 14px #bbbbbe;
-  border: solid 2px transparent;
-  border-radius: 14px;
-}
-
-::-webkit-scrollbar-button {
-  display: none;
-}
-
 // ------- copy to clipboard ------------ //
 pre[class*=language-] {
   position: relative;
@@ -52,9 +32,9 @@ pre[class*=language-] {
   right: 0;
   top: 0;
   color: rgb(189, 188, 188);
-  font-size: 24px;
-  background: transparent;
+  font-size: 20px;
   opacity: 0.0;
+  border-radius: 0.3em;
 }
 
 .copy:hover {

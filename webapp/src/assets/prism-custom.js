@@ -7,6 +7,7 @@ import 'clipboard';
         // create wrapper for code element
         var wrapper = document.createElement('div');
         wrapper.classList.add("code-wrapper");
+        var theme = getComputedStyle(env.element.parentElement)
 
         // check if element is inside a tabbed element
         if (env.element.parentElement.parentNode.classList.contains("tabbed")) {
@@ -27,7 +28,6 @@ import 'clipboard';
             tabButton.classList.add("tablinks", env.language);
 
             // set button background color from prism theme
-            var theme = getComputedStyle(env.element.parentElement)
             tabButton.style.backgroundColor = theme.backgroundColor;
             tabButton.style.color = theme.color;
 
@@ -57,6 +57,7 @@ import 'clipboard';
 
         var copyElement = document.createElement('div');
         copyElement.classList.add("copy");
+        copyElement.style.backgroundColor = theme.backgroundColor;
         copyElement.innerHTML = '<i class="fa-regular fa-clone"></i>';
 
         wrapper.appendChild(env.element.parentElement);
