@@ -36,7 +36,7 @@ $ sh ./dynamodb-init.sh
 #### 3. Build and start Lambda functions with AWS SAM
 ```
 $ sam build
-$ sam local rocketnotes-serverless-api --docker-network rocketnotes_serverless-docker-network --warm-containers EAGER 
+$ sam local rocketnotes-serverless-api --docker-network rocketnotes_local-serverless-network --warm-containers EAGER 
 ```
 #### 4. Start Angular app
 ```
