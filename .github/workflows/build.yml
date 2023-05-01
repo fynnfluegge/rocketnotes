@@ -36,7 +36,7 @@ jobs:
 
       - name: Build webapp
         run: |
-          echo ${{ env.COGNITO_USER_POOL_ID }}
+          echo "${{ env.COGNITO_USER_POOL_ID }}"
           cd webapp
           npm ci
           npm run build
