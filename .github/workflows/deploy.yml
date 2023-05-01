@@ -17,16 +17,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: actions/download-artifact@master
-        with:
-          name: webapp-build
-          path: webapp/build
-
-    - uses: actions/download-artifact@master
-        with:
-          name: landing-page-build
-          path: landing-page/build
-
       - name: Cache node modules
         id: cache-npm
         uses: actions/cache@v3
@@ -55,6 +45,16 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
           aws-region: ${{ vars.AWS_REGION }}
+
+      - uses: actions/download-artifact@master
+        with:
+          name: webapp-build
+          path: webapp/build
+
+      - uses: actions/download-artifact@master
+        with:
+          name: landing-page-build
+          path: landing-page/build
 
       - name: Deploy to AWS
         run: |
