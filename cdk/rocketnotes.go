@@ -339,6 +339,8 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		WebsiteIndexDocument: jsii.String("index.html"),
 		WebsiteErrorDocument: jsii.String("index.html"),
 		PublicReadAccess:     jsii.Bool(true),
+		BlockPublicAccess:    awss3.BlockPublicAccess_BLOCK_ACLS(),
+		AccessControl:        awss3.BucketAccessControl_BUCKET_OWNER_FULL_CONTROL,
 	})
 
 	appBucket.AddToResourcePolicy(awsiam.NewPolicyStatement(&awsiam.PolicyStatementProps{
@@ -408,16 +410,18 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 			},
 		)
 
-		laningPageBucket := awss3.NewBucket(stack, jsii.String("LaningPageS3Bucket"), &awss3.BucketProps{
+		landingPageBucket := awss3.NewBucket(stack, jsii.String("LandingPageS3Bucket"), &awss3.BucketProps{
 			BucketName:           jsii.String(props.Domain),
 			WebsiteIndexDocument: jsii.String("index.html"),
 			WebsiteErrorDocument: jsii.String("index.html"),
 			PublicReadAccess:     jsii.Bool(true),
+			BlockPublicAccess:    awss3.BlockPublicAccess_BLOCK_ACLS(),
+			AccessControl:        awss3.BucketAccessControl_BUCKET_OWNER_FULL_CONTROL,
 		})
 
-		laningPageBucket.AddToResourcePolicy(awsiam.NewPolicyStatement(&awsiam.PolicyStatementProps{
+		landingPageBucket.AddToResourcePolicy(awsiam.NewPolicyStatement(&awsiam.PolicyStatementProps{
 			Actions:   jsii.Strings("s3:GetObject"),
-			Resources: jsii.Strings(*laningPageBucket.ArnForObjects(jsii.String("*"))),
+			Resources: jsii.Strings(*landingPageBucket.ArnForObjects(jsii.String("*"))),
 			Principals: &[]awsiam.IPrincipal{
 				awsiam.NewCanonicalUserPrincipal(cloudfrontOAI.CloudFrontOriginAccessIdentityS3CanonicalUserId()),
 			},
@@ -436,7 +440,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 			OriginConfigs: &[]*awscloudfront.SourceConfiguration{
 				{
 					S3OriginSource: &awscloudfront.S3OriginConfig{
-						S3BucketSource:       laningPageBucket,
+						S3BucketSource:       landingPageBucket,
 						OriginAccessIdentity: cloudfrontOAI,
 					},
 					Behaviors: &[]*awscloudfront.Behavior{
@@ -460,16 +464,18 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 			Sources: &[]awss3deployment.ISource{
 				awss3deployment.Source_Asset(jsii.String("../landing-page/build"), &awss3assets.AssetOptions{}),
 			},
-			DestinationBucket: laningPageBucket,
+			DestinationBucket: landingPageBucket,
 			Distribution:      landingPageCloudFrontDistribution,
 			DistributionPaths: jsii.Strings("/*"),
 		})
 
 		// Electron installer bucket
 
-		awss3.NewBucket(stack, jsii.String("ElectronBucket"), &awss3.BucketProps{
-			BucketName:       jsii.String("rocketnotes-electron-releases"),
-			PublicReadAccess: jsii.Bool(true),
+		awss3.NewBucket(stack, jsii.String("ElectronReleaseS3Bucket"), &awss3.BucketProps{
+			BucketName:        jsii.String("rocketnotes-electron-releases"),
+			PublicReadAccess:  jsii.Bool(true),
+			BlockPublicAccess: awss3.BlockPublicAccess_BLOCK_ACLS(),
+			AccessControl:     awss3.BucketAccessControl_BUCKET_OWNER_FULL_CONTROL,
 		})
 	}
 
