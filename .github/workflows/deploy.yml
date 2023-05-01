@@ -54,7 +54,7 @@ jobs:
       - name: Deploy to AWS
         run: |
           cd cdk
-          cdk synth
+          cdk diff
           cdk deploy --require-approval=never
         env:
           AWS_ACCOUNT: ${{ secrets.AWS_ACCOUNT }}
@@ -63,4 +63,4 @@ jobs:
           COGNITO_APP_CLIENT_ID: ${{ vars.COGNITO_APP_CLIENT_ID }}
           DOMAIN: ${{ vars.DOMAIN }}
           SUBDOMAIN: ${{ vars.SUBDOMAIN }}
-          DEPLOY_LADNING_PAGE: ${{ vars.DEPLOY_LADNING_PAGE }}
+          DEPLOY_LANDING_PAGE: ${{ vars.DEPLOY_LANDING_PAGE }}
