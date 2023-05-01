@@ -36,20 +36,47 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: build
+      - name: Build webapp
         run: |
           cd webapp
           npm ci
           npm run build
+        env:
+          AWS_REGION: ${{ env.AWS_REGION }}
+          DOMAIN_NAME: ${{ env.DOMAIN_NAME }}
+          API_URL: ${{ env.API_URL }}
+          COGNITO_USER_POOL_ID: ${{ env.COGNITO_USER_POOL_ID }}
+          COGNITO_APP_CLIENT_ID: ${{ env.COGNITO_APP_CLIENT_ID }}
+          REDIRECT_SIGN_IN: ${{ env.REDIRECT_SIGN_IN }}
+          REDIRECT_SIGN_OUT: ${{ env.REDIRECT_SIGN_OUT }}
+          AUTH_GUARD_REDIRECT: ${{ env.AUTH_GUARD_REDIRECT }}
 
-      # - name: cdk deploy
-      #   uses: youyo/aws-cdk-github-actions@v2
-      #   with:
-      #     cdk_subcommand: 'deploy'
-      #     cdk_stack: 'stack1'
-      #     cdk_args: '--require-approval never'
-      #     actions_comment: false
-      #   env:
-      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #     AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
+      - name: Build landing-page
+        run: |
+          cd landing-page
+          npm ci
+          npm run build
+
+      - name: Install AWS CDK 
+        run: |
+          npm install -g aws-cdk
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@master
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy to AWS
+        run: |
+          cd cdk
+          cdk deploy --require-approval=never
+        end:
+          AWS_ACCOUNT: ${{ secrets.AWS_ACCOUNT }}
+          AWS_REGION: ${{ env.AWS_REGION }}
+          COGNITO_USER_POOL_ID: ${{ env.COGNITO_USER_POOL_ID }}
+          COGNITO_APP_CLIENT_ID: ${{ env.COGNITO_APP_CLIENT_ID }}
+          DOMAIN: ${{ env.DOMAIN }}
+          SUBDOMAIN: ${{ env.SUBDOMAIN }}
+          DEPLOY_LADNING_PAGE: ${{ env.DEPLOY_LADNING_PAGE }}
