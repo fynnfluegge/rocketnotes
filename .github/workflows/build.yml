@@ -36,18 +36,19 @@ jobs:
 
       - name: Build webapp
         run: |
+          echo ${{ env.COGNITO_USER_POOL_ID }}
           cd webapp
           npm ci
           npm run build
-        env:
-          AWS_REGION: ${{ env.AWS_REGION }}
-          DOMAIN_NAME: ${{ env.DOMAIN_NAME }}
-          API_URL: ${{ env.API_URL }}
-          COGNITO_USER_POOL_ID: ${{ env.COGNITO_USER_POOL_ID }}
-          COGNITO_APP_CLIENT_ID: ${{ env.COGNITO_APP_CLIENT_ID }}
-          REDIRECT_SIGN_IN: ${{ env.REDIRECT_SIGN_IN }}
-          REDIRECT_SIGN_OUT: ${{ env.REDIRECT_SIGN_OUT }}
-          AUTH_GUARD_REDIRECT: ${{ env.AUTH_GUARD_REDIRECT }}
+        # env:
+        #   AWS_REGION: ${{ env.AWS_REGION }}
+        #   DOMAIN_NAME: ${{ env.DOMAIN_NAME }}
+        #   API_URL: ${{ env.API_URL }}
+        #   COGNITO_USER_POOL_ID: ${{ env.COGNITO_USER_POOL_ID }}
+        #   COGNITO_APP_CLIENT_ID: ${{ env.COGNITO_APP_CLIENT_ID }}
+        #   REDIRECT_SIGN_IN: ${{ env.REDIRECT_SIGN_IN }}
+        #   REDIRECT_SIGN_OUT: ${{ env.REDIRECT_SIGN_OUT }}
+        #   AUTH_GUARD_REDIRECT: ${{ env.AUTH_GUARD_REDIRECT }}
 
       - name: Build landing-page
         run: |
