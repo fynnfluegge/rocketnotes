@@ -17,6 +17,16 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - uses: actions/download-artifact@master
+        with:
+          name: webapp-build
+          path: webapp/build
+
+    - uses: actions/download-artifact@master
+        with:
+          name: landing-page-build
+          path: landing-page/build
+
       - name: Cache node modules
         id: cache-npm
         uses: actions/cache@v3
