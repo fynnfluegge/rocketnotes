@@ -1,12 +1,10 @@
-name: CI
+name: Build
 
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
-
-  workflow_dispatch:
 
 jobs:
   build:
@@ -36,20 +34,23 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: build
+      - name: Build webapp
         run: |
           cd webapp
           npm ci
           npm run build
+        env:
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          DOMAIN_NAME: ${{ vars.DOMAIN_NAME }}
+          API_URL: ${{ vars.API_URL }}
+          COGNITO_USER_POOL_ID: ${{ vars.COGNITO_USER_POOL_ID }}
+          COGNITO_APP_CLIENT_ID: ${{ vars.COGNITO_APP_CLIENT_ID }}
+          REDIRECT_SIGN_IN: ${{ vars.REDIRECT_SIGN_IN }}
+          REDIRECT_SIGN_OUT: ${{ vars.REDIRECT_SIGN_OUT }}
+          AUTH_GUARD_REDIRECT: ${{ vars.AUTH_GUARD_REDIRECT }}
 
-      # - name: cdk deploy
-      #   uses: youyo/aws-cdk-github-actions@v2
-      #   with:
-      #     cdk_subcommand: 'deploy'
-      #     cdk_stack: 'stack1'
-      #     cdk_args: '--require-approval never'
-      #     actions_comment: false
-      #   env:
-      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #     AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
+      - name: Build landing-page
+        run: |
+          cd landing-page
+          npm ci
+          npm run build
