@@ -1,10 +1,6 @@
 name: Deploy
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
   workflow_run:
     workflows: [Build]
     types:
@@ -13,7 +9,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    # if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     strategy:
       matrix:
         node-version: [18.x]
@@ -50,16 +46,16 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
           aws-region: ${{ vars.AWS_REGION }}
 
-      # - name: Deploy to AWS
-      #   run: |
-      #     cd cdk
-      #     cdk synth
-      #     cdk deploy --require-approval=never
-      #   env:
-      #     AWS_ACCOUNT: ${{ secrets.AWS_ACCOUNT }}
-      #     AWS_REGION: ${{ vars.AWS_REGION }}
-      #     COGNITO_USER_POOL_ID: ${{ vars.COGNITO_USER_POOL_ID }}
-      #     COGNITO_APP_CLIENT_ID: ${{ vars.COGNITO_APP_CLIENT_ID }}
-      #     DOMAIN: ${{ vars.DOMAIN }}
-      #     SUBDOMAIN: ${{ vars.SUBDOMAIN }}
-      #     DEPLOY_LADNING_PAGE: ${{ vars.DEPLOY_LADNING_PAGE }}
+      - name: Deploy to AWS
+        run: |
+          cd cdk
+          cdk synth
+          cdk deploy --require-approval=never
+        env:
+          AWS_ACCOUNT: ${{ secrets.AWS_ACCOUNT }}
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          COGNITO_USER_POOL_ID: ${{ vars.COGNITO_USER_POOL_ID }}
+          COGNITO_APP_CLIENT_ID: ${{ vars.COGNITO_APP_CLIENT_ID }}
+          DOMAIN: ${{ vars.DOMAIN }}
+          SUBDOMAIN: ${{ vars.SUBDOMAIN }}
+          DEPLOY_LADNING_PAGE: ${{ vars.DEPLOY_LADNING_PAGE }}
