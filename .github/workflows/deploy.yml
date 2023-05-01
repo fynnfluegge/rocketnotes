@@ -46,12 +46,12 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
           aws-region: ${{ vars.AWS_REGION }}
 
-      - uses: actions/download-artifact@master
+      - uses: dawidd6/action-download-artifact@v2
         with:
           name: webapp-build
           path: webapp/build
 
-      - uses: actions/download-artifact@master
+      - uses: dawidd6/action-download-artifact@v2
         with:
           name: landing-page-build
           path: landing-page/build
