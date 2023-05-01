@@ -72,7 +72,7 @@ jobs:
         run: |
           cd cdk
           cdk deploy --require-approval=never
-        end:
+        env:
           AWS_ACCOUNT: ${{ secrets.AWS_ACCOUNT }}
           AWS_REGION: ${{ env.AWS_REGION }}
           COGNITO_USER_POOL_ID: ${{ env.COGNITO_USER_POOL_ID }}
