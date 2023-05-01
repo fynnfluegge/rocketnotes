@@ -4,8 +4,11 @@
   </a>
   <h1>Rocketnotes</h1>
   <h3>The space for your daily learnings.<br/>Available from any device at any time.</h3>
-  <a href="https://github.com/fynnfluegge/rocketnotes/actions/workflows/main.yml">
-    <img src="https://github.com/fynnfluegge/rocketnotes/actions/workflows/main.yml/badge.svg?branch=main"/> 
+  <a href="https://github.com/fynnfluegge/rocketnotes/actions/workflows/build.yml">
+    <img src="https://github.com/fynnfluegge/rocketnotes/actions/workflows/build.yml/badge.svg?branch=main"/> 
+  </a>
+  <a href="https://github.com/fynnfluegge/rocketnotes/actions/workflows/deploy.yml">
+    <img src="https://github.com/fynnfluegge/rocketnotes/actions/workflows/deploy.yml/badge.svg?branch=main"/> 
   </a>
   <a href="https://github.com/fynnfluegge/rocketnotes/blob/main/LICENSE">
     <img src="https://img.shields.io/badge/License-MIT-green.svg"/>
