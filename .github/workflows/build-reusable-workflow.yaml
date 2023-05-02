@@ -47,8 +47,18 @@ jobs:
           REDIRECT_SIGN_OUT: ${{ vars.REDIRECT_SIGN_OUT }}
           AUTH_GUARD_REDIRECT: ${{ vars.AUTH_GUARD_REDIRECT }}
 
+      - uses: actions/upload-artifact@master
+        with:
+          name: webapp-build
+          path: webapp/build
+
       - name: Build landing-page
         run: |
           cd landing-page
           npm ci
           npm run build
+
+      - uses: actions/upload-artifact@master
+        with:
+          name: landing-page-build
+          path: landing-page/build

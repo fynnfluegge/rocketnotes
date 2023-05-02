@@ -11,15 +11,3 @@ concurrency:
 jobs:
   build:
     uses: ./.github/workflows/build-reusable-workflow.yaml
-  upload:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - uses: actions/upload-artifact@master
-        with:
-          name: webapp-build
-          path: webapp/build
-      - uses: actions/upload-artifact@master
-        with:
-          name: landing-page-build
-          path: landing-page/build
