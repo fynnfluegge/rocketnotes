@@ -2,18 +2,19 @@ name: Deploy
 
 on:
   workflow_run:
-    workflows: [Build]
+    workflows: [ Build ]
+    branches: [ main ]
     types:
       - completed
       
-#concurrency:
-#  group: ${{ github.ref }}
-#  cancel-in-progress: false
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event.workflow_run.conclusion == 'success'
+    if: github.event.workflow_run.conclusion == 'success'
     strategy:
       matrix:
         node-version: [18.x]
