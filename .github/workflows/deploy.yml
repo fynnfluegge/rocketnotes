@@ -6,9 +6,9 @@ on:
     types:
       - completed
       
-concurrency:
-  group: ${{ github.ref }}
-  cancel-in-progress: false
+#concurrency:
+#  group: ${{ github.ref }}
+#  cancel-in-progress: false
 
 jobs:
   deploy:
