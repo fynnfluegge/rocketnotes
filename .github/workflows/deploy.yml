@@ -5,11 +5,15 @@ on:
     workflows: [Build]
     types:
       - completed
+      
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' }} && ${{github.ref == 'refs/heads/main'}}
     strategy:
       matrix:
         node-version: [18.x]
