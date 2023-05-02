@@ -4,8 +4,7 @@ on:
   workflow_run:
     workflows: [ Build ]
     branches: [ main ]
-    types:
-      - completed
+    types: [ completed ]
       
 concurrency:
   group: ${{ github.ref }}
@@ -14,7 +13,7 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: github.event.workflow_run.conclusion == 'success'
+    if: github.event.workflow_run.conclusion == 'success' && github.event_name == 'push'
     strategy:
       matrix:
         node-version: [18.x]
