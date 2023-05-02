@@ -1,5 +1,5 @@
 
-name: PR Build
+name: Pull Request Build
 
 on:
   pull_request:
@@ -11,4 +11,4 @@ concurrency:
 
 jobs:
   build:
-    uses: ./.github/workflows/build-reusable-workflow.yaml
+    uses: ./.github/workflows/workflow-build.yaml

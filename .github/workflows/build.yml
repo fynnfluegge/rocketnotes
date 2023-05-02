@@ -10,4 +10,4 @@ concurrency:
 
 jobs:
   build:
-    uses: ./.github/workflows/build-reusable-workflow.yaml
+    uses: ./.github/workflows/workflow-build.yaml
