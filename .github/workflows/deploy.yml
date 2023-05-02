@@ -13,7 +13,7 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' && github.ref_name == 'main' }}
+    if: github.ref == 'refs/heads/main' && github.event.workflow_run.conclusion == 'success'
     strategy:
       matrix:
         node-version: [18.x]
