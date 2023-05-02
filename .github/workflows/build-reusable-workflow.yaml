@@ -34,7 +34,6 @@ jobs:
 
       - name: Build webapp
         run: |
-          echo "$AWS_REGION"
           cd webapp
           npm ci
           npm run build
