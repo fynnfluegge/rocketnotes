@@ -11,4 +11,4 @@ concurrency:
 
 jobs:
   build:
-    uses: ./.github/workflows/reusable-build-workflow.yml
+    uses: ./.github/workflows/build-reusable-workflow.yml
