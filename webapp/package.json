@@ -48,7 +48,7 @@
     "@types/marked": "^4.0.8",
     "@types/node": "^12.11.1",
     "electron": "^18.3.7",
-    "electron-builder": "^23.0.3",
+    "electron-builder": "^24.3.0",
     "electron-icon-maker": "^0.0.5",
     "electron-installer-dmg": "^4.0.0",
     "electron-notarize": "^1.2.1",
