@@ -11,6 +11,19 @@ services:
     networks:
       - local-serverless-network
 
+  api:
+    image: public.ecr.aws/sam/build-go1.x:latest
+    command: sam build && sam local start-api --warm-containers EAGER --docker-network rocketnotes_local-serverless-network
+    ports:
+      - "3000:3000"
+
+  webapp:
+    build: webapp/.
+    container_name: rocketnotes-webapp
+    platform: linux/amd64
+    ports:
+      - "3001:3001"
+
 volumes:
   dynamodb-volume:
    driver: local

@@ -16,7 +16,7 @@ $ cd rocketnotes
 $ npm install
 ```
 
-## Cloud hosting
+## AWS hosting
 ### Prerequisites
 The following tools need to be installed on your system prior to build and deploy to AWS:
 
@@ -79,5 +79,9 @@ $ cdk deploy
 ```
 This deployment will only deploy the webapp build to the S3 bucket and will be much faster than the previous one.
 
-## Run locally
-To be defined.
+## Run on your local machine with Docker
+All you need to do is hitting
+```
+docker-compuse up -d
+```
+Docker-compose will create and start three docker containers and a network for you. First, the DynamoDB with a volume. Second the Webapp with Node. And last, all the lambda functions in a single container. On initial startup it may take a moment. Once it's done you can open http://localhost:3001 in the browser and you should see the initially created Cheat Sheet document 🚀

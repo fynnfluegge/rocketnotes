@@ -27,7 +27,7 @@ $ npm install
 
 #### 1. Start DynamoDB and docker network
 ```
-$ docker-compose up -d
+$ docker-compose up dynamodb -d
 ```
 #### 2. Init tables and create data for default user
 ```
