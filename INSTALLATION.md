@@ -16,7 +16,9 @@ $ cd rocketnotes
 $ npm install
 ```
 
-## Cloud hosting
+</br>
+
+## AWS hosting
 ### Prerequisites
 The following tools need to be installed on your system prior to build and deploy to AWS:
 
@@ -78,6 +80,8 @@ $ cd cdk
 $ cdk deploy
 ```
 This deployment will only deploy the webapp build to the S3 bucket and will be much faster than the previous one.
+
+</br>
 
 ## Run on your local machine with Docker
 All you need to do is hitting
