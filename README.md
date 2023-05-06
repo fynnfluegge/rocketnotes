@@ -18,7 +18,7 @@
 Rocketnotes is a Markdown Editor for the Web.
 Save, structure and share if you like daily notes and learnings in the browser from any device. 
 You can [sign up](https://takeniftynotes.auth.eu-central-1.amazoncognito.com/login?response_type=code&client_id=tt3v27pnqqh7elqdvq9tgmr9v&redirect_uri=https://app.takeniftynotes.net) for free (Yes, it's free and it will be free forever as far as possible), run it on your local machine with Docker or deploy it with low effort in your personal AWS account and your desired region.
-Check out the [installation guides](INSTALLATION.md#installation) for deploying Rocketnotes at [AWS](INSTALLATION.md#aws-hosting) or running it with [Docker on your local machine](INSTALLATION.md#run-locally).
+Check out the [installation guides](INSTALLATION.md#installation) for deploying Rocketnotes at [AWS](INSTALLATION.md#aws-hosting) or running it on your [local machine with Docker](INSTALLATION.md#run-on-your-local-machine-with-docker).
 
 > **_NOTE:_**  Hosting on AWS with a Cloudfront distribution for S3, DynamoDB and Lambda will cost you less than $1 per month under normal usage.
 

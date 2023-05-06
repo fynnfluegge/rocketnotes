@@ -7,6 +7,8 @@ We love your input! We want to make contributing to this project as easy and tra
 - Proposing new features
 - Becoming a maintainer
 
+</br>
+
 ## Getting Started
 ### Setup dev environment
 
