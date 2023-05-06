@@ -49,6 +49,8 @@ Open http://localhost:4200 in your browser and you should see the Rocketnotes we
 
 > **_NOTE:_**  Authentication is disabled in dev environment.
 
+</br>
+
 ## All Code Changes Happen Through Pull Requests
 Pull requests are the best way to propose changes to the codebase. We actively welcome your pull requests:
 

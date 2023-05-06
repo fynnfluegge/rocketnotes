@@ -71,7 +71,7 @@ jobs:
           AWS_ACCOUNT: ${{ secrets.AWS_ACCOUNT }}
           AWS_REGION: ${{ vars.AWS_REGION }}
           COGNITO_USER_POOL_ID: ${{ vars.COGNITO_USER_POOL_ID }}
-          COGNITO_APP_CLIENT_ID: ${{ vars.COGNITO_APP_CLIENT_ID }}
+          COGNITO_APP_CLIENT_ID: ${{ secrets.COGNITO_APP_CLIENT_ID }}
           DOMAIN: ${{ vars.DOMAIN }}
           SUBDOMAIN: ${{ vars.SUBDOMAIN }}
           DEPLOY_LANDING_PAGE: ${{ vars.DEPLOY_LANDING_PAGE }}
