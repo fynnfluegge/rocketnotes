@@ -7,6 +7,8 @@ We love your input! We want to make contributing to this project as easy and tra
 - Proposing new features
 - Becoming a maintainer
 
+</br>
+
 ## Getting Started
 ### Setup dev environment
 
@@ -48,6 +50,8 @@ $ npm run start
 Open http://localhost:4200 in your browser and you should see the Rocketnotes webapp with the cheat sheet of the default user displayed.
 
 > **_NOTE:_**  Authentication is disabled in dev environment.
+
+</br>
 
 ## All Code Changes Happen Through Pull Requests
 Pull requests are the best way to propose changes to the codebase. We actively welcome your pull requests:
