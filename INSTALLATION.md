@@ -16,7 +16,7 @@ $ cd rocketnotes
 $ npm install
 ```
 
-## AWS hosting
+## Cloud hosting
 ### Prerequisites
 The following tools need to be installed on your system prior to build and deploy to AWS:
 

@@ -17,10 +17,15 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.sam
-    command: bash -c "sam build && sam local start-api --warm-containers EAGER --docker-network rocketnotes_local-serverless-network"
+    command: bash -c "sam build && sam local start-api --host 0.0.0.0 --container-host host.docker.internal --port 3002 --docker-volume-basedir /var/task/.aws-sam/build --debug"
+      # NEEDS TO BE ADDED TO command once segmentataion fault is fixed: --skip-pull-image --warm-containers EAGER --docker-network rocketnotes_local-serverless-network
+    container_name: rocketnotes-api
+    mem_limit: "1g"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     platform: linux/amd64
     ports:
-      - "3000:3000"
+      - "3002:3002"
 
   webapp:
     build: webapp/.
