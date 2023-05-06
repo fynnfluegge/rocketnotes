@@ -42,7 +42,7 @@ jobs:
           DOMAIN_NAME: ${{ vars.DOMAIN_NAME }}
           API_URL: ${{ vars.API_URL }}
           COGNITO_USER_POOL_ID: ${{ vars.COGNITO_USER_POOL_ID }}
-          COGNITO_APP_CLIENT_ID: ${{ secrets.COGNITO_APP_CLIENT_ID }}
+          COGNITO_APP_CLIENT_ID: ${{ vars.COGNITO_APP_CLIENT_ID }}
           REDIRECT_SIGN_IN: ${{ vars.REDIRECT_SIGN_IN }}
           REDIRECT_SIGN_OUT: ${{ vars.REDIRECT_SIGN_OUT }}
           AUTH_GUARD_REDIRECT: ${{ vars.AUTH_GUARD_REDIRECT }}
