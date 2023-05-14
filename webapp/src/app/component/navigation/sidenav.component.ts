@@ -419,6 +419,8 @@ export class SidenavComponent implements OnInit, AfterViewInit{
   expandTimeout: any;
   expandDelay = 1000;
 
+  isMobileDevice = false;
+
   /** Map from flat node to nested node. This helps us finding the nested node to be modified */
   flatNodeMap: Map<DocumentFlatNode, DocumentNode> = new Map<DocumentFlatNode,DocumentNode>();
 
@@ -474,6 +476,9 @@ export class SidenavComponent implements OnInit, AfterViewInit{
 
   ngOnInit(): void {
     this.username = localStorage.getItem("username");
+
+    // check if opened on mobile browser, to prevent drag and drop
+    this.isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(navigator.userAgent);
   }
 
   getLevel = (node: DocumentFlatNode) => {
