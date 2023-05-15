@@ -20,6 +20,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 17.3.0
+          cache: 'npm'
 
       - name: Cache node modules
         id: cache-npm
