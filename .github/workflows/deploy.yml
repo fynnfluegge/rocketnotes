@@ -14,12 +14,13 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     if: github.event.workflow_run.conclusion == 'success'
-    strategy:
-      matrix:
-        node-version: [18.x]
 
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 17.3.0
+          cache: 'npm'
 
       - name: Cache node modules
         id: cache-npm
