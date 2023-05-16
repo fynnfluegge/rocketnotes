@@ -17,10 +17,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 17.3.0
-          cache: 'npm'
 
       - name: Cache node modules
         id: cache-npm
@@ -35,10 +31,10 @@ jobs:
             ${{ runner.os }}-build-
             ${{ runner.os }}-
 
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js 17.3.0
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 17.3.0
 
       - name: Install AWS CDK 
         run: |
