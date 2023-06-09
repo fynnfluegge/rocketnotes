@@ -2,7 +2,7 @@ image: gitpod/workspace-full
 
 tasks:
   - name: Install AWS CLI
-    before: |
+    command: |
       (
         curl -fSsl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
         unzip -qq awscliv2.zip
@@ -10,8 +10,8 @@ tasks:
         rm awscliv2.zip
       )
 
-  - name: Install SAM CLI
-    before: brew install aws/tap/aws-sam-cli
+  # - name: Install SAM CLI
+  #   before: brew install aws/tap/aws-sam-cli
 
 #   - name: Start DynamoDB
 #     - before: |
