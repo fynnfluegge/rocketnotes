@@ -2,23 +2,22 @@ image: gitpod/workspace-full
 
 tasks:
   - name: Install AWS CLI
-    command: >
+    before: >
       curl -fSsl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" &&
       unzip -qq awscliv2.zip &&
       sudo ./aws/install --update &&
       rm awscliv2.zip &&
 
   - name: Install SAM CLI
-    command: brew install aws/tap/aws-sam-cli
+    before: brew install aws/tap/aws-sam-cli
 
   - name: Start DynamoDB
     init: docker-compose up -d
     command: sh ./dynamodb-init.sh
 
   - name: Start Lambda functions
-    command: >
-      sam build &&
-      sam local rocketnotes-serverless-api --docker-network rocketnotes_local-serverless-network --warm-containers EAGER 
+    init: sam build
+    command: sam local rocketnotes-serverless-api --docker-network rocketnotes_local-serverless-network --warm-containers EAGER 
 
   - name: Start webapp
     before: export BASE_API_URL="http://localhost:3000"
