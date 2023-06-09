@@ -18,7 +18,7 @@ tasks:
     init: docker-compose up
 
   - name: Init DynamoDb
-    command: sh ./dynamodb-init.sh
+    command: bash $GITPOD_REPO_ROOT/dynamodb-init.sh
 
   # - name: Start Lambda functions
   #   init: sam build
