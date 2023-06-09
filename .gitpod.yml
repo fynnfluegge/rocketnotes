@@ -33,7 +33,7 @@ tasks:
       )
 
 ports:
-  - port: 3000
+  - port: 4200
     onOpen: open-preview
     name: Website
     description: Website Preview
