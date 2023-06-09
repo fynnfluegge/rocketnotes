@@ -17,12 +17,12 @@ tasks:
     before: docker-compose pull
     init: docker-compose up
 
-#   - name: Init DynamoDb
-#     command: sh ./dynamodb-init.sh
+  - name: Init DynamoDb
+    command: sh ./dynamodb-init.sh
 
-#   - name: Start Lambda functions
-#     init: sam build
-#     command: sam local rocketnotes-serverless-api --docker-network rocketnotes_local-serverless-network --warm-containers EAGER 
+  # - name: Start Lambda functions
+  #   init: sam build
+  #   command: sam local rocketnotes-serverless-api --docker-network rocketnotes_local-serverless-network --warm-containers EAGER 
 
 #   - name: Start webapp
 #     before: export BASE_API_URL="http://localhost:3000"
