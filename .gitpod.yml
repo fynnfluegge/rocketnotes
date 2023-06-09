@@ -13,11 +13,11 @@ tasks:
   - name: Install SAM CLI
     before: brew install aws/tap/aws-sam-cli
 
-#   - name: Start DynamoDB
-#     - before: |
-#       docker-compose pull
-#     - init: |
-#       docker-compose up
+  - name: Start DynamoDB
+    - before: |
+      docker-compose pull
+    - init: |
+      docker-compose up
 
 #   - name: Init DynamoDb
 #     command: sh ./dynamodb-init.sh
