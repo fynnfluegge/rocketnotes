@@ -2,7 +2,7 @@ image: gitpod/workspace-full
 
 tasks:
   - name: Install AWS CLI
-    before: >
+    before: |
       curl -fSsl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" &&
       unzip -qq awscliv2.zip &&
       sudo ./aws/install --update &&
@@ -12,7 +12,12 @@ tasks:
     before: brew install aws/tap/aws-sam-cli
 
   - name: Start DynamoDB
-    init: docker-compose up -d
+    - before: |
+      docker-compose pull
+    - init: |
+      docker-compose up
+
+  - name: Init DynamoDb
     command: sh ./dynamodb-init.sh
 
   - name: Start Lambda functions
@@ -21,12 +26,14 @@ tasks:
 
   - name: Start webapp
     before: export BASE_API_URL="http://localhost:3000"
-    init: >
+    init: |
       cd webapp &&
       npm install
     command: npm run start
 
 ports:
+  - port: 8000
+    onOpen: ignore
   - port: 3000
     onOpen: open-preview
     name: Website
