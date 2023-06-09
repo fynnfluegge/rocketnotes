@@ -3,10 +3,12 @@ image: gitpod/workspace-full
 tasks:
   - name: Install AWS CLI
     before: |
-      curl -fSsl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" &&
-      unzip -qq awscliv2.zip &&
-      sudo ./aws/install --update &&
-      rm awscliv2.zip &&
+      (
+        curl -fSsl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+        unzip -qq awscliv2.zip
+        sudo ./aws/install --update
+        rm awscliv2.zip
+      )
 
   - name: Install SAM CLI
     before: brew install aws/tap/aws-sam-cli
@@ -27,8 +29,10 @@ tasks:
   - name: Start webapp
     before: export BASE_API_URL="http://localhost:3000"
     init: |
-      cd webapp &&
-      npm install
+      (
+        cd webapp
+        npm install
+      )
     command: npm run start
 
 ports:
