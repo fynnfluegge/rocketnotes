@@ -1,15 +1,6 @@
 image: gitpod/workspace-full
 
 tasks:
-  - name: Install AWS CLI
-    before: |
-      (
-        curl -fSsl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-        unzip -qq awscliv2.zip
-        sudo ./aws/install --update
-        rm awscliv2.zip
-      )
-
   - name: Install SAM CLI
     before: brew install aws/tap/aws-sam-cli
 
@@ -18,6 +9,13 @@ tasks:
     init: docker-compose up
 
   - name: Init DynamoDb
+    before: |
+      (
+        curl -fSsl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+        unzip -qq awscliv2.zip
+        sudo ./aws/install --update
+        rm awscliv2.zip
+      )
     command: bash $GITPOD_REPO_ROOT/dynamodb-init.sh
 
   # - name: Start Lambda functions
