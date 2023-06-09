@@ -1,9 +1,6 @@
 image: gitpod/workspace-full
 
 tasks:
-  - name: Install SAM CLI
-    before: brew install aws/tap/aws-sam-cli
-
   - name: Start DynamoDB
     before: docker-compose pull
     init: docker-compose up
@@ -18,23 +15,22 @@ tasks:
       )
     command: bash $GITPOD_REPO_ROOT/dynamodb-init.sh
 
-  # - name: Start Lambda functions
-  #   init: sam build
-  #   command: sam local rocketnotes-serverless-api --docker-network rocketnotes_local-serverless-network --warm-containers EAGER 
+  - name: Start Lambda functions
+    before: brew install aws/tap/aws-sam-cli
+    init: sam build
+    command: sam local rocketnotes-serverless-api --docker-network rocketnotes_local-serverless-network --warm-containers EAGER 
 
-#   - name: Start webapp
-#     before: export BASE_API_URL="http://localhost:3000"
-#     init: |
-#       (
-#         cd webapp
-#         npm install
-#       )
-#     command: npm run start
+  - name: Start webapp
+    before: export BASE_API_URL="http://localhost:3000"
+    init: |
+      (
+        cd webapp
+        npm install
+      )
+    command: npm run start
 
-# ports:
-#   - port: 8000
-#     onOpen: ignore
-#   - port: 3000
-#     onOpen: open-preview
-#     name: Website
-#     description: Website Preview
+ports:
+  - port: 3000
+    onOpen: open-preview
+    name: Website
+    description: Website Preview
