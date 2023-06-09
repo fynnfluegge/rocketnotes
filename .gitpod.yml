@@ -15,9 +15,9 @@ tasks:
 
   - name: Start DynamoDB
     - before: |
-      docker-compose pull
+        docker-compose pull
     - init: |
-      docker-compose up
+        docker-compose up
 
 #   - name: Init DynamoDb
 #     command: sh ./dynamodb-init.sh
