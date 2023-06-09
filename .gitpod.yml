@@ -21,13 +21,16 @@ tasks:
     command: sam local rocketnotes-serverless-api --docker-network rocketnotes_local-serverless-network --warm-containers EAGER 
 
   - name: Start webapp
-    before: export BASE_API_URL="http://localhost:3000"
     init: |
       (
         cd webapp
         npm install
       )
-    command: npm run start
+    command: |
+      (
+        cd webapp
+        npm run start
+      )
 
 ports:
   - port: 3000
