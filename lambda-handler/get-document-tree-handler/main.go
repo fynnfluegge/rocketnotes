@@ -85,7 +85,6 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		StatusCode: 200,
 		Headers: map[string]string{
 			"Access-Control-Allow-Origin": "*", // Required for CORS support to work locally
-			// "Access-Control-Allow-Credentials": "true",
 		},
 		Body: string(b),
 	}, nil
