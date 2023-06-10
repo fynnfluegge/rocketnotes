@@ -39,7 +39,7 @@ export class BasicRestService {
       }
     }
 
-    return this.http.get('/' + endpoint, reqOpts).pipe(retry(3));
+    return this.http.get(this.backend_url + '/' + endpoint, reqOpts).pipe(retry(3));
   }
 
   post(endpoint: string, body: any, reqOpts?: any) {
