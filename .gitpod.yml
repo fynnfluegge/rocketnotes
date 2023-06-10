@@ -2,11 +2,7 @@ image: gitpod/workspace-full
 
 tasks:
   - name: Start DynamoDB
-    before: |
-      (
-        docker-compose pull
-        docker-compose up
-      )
+    before: docker-compose up -d
     init: |
       (
         curl -fSsl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
