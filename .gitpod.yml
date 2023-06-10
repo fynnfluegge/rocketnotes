@@ -13,7 +13,7 @@ tasks:
         sudo ./aws/install --update
         rm awscliv2.zip
         aws configure set aws_access_key_id 123
-        aws configure set aws_access_key_id 123
+        aws configure set aws_secret_access_key_id 123
         aws configure set region us-east-1
       )
     command: bash $GITPOD_REPO_ROOT/dynamodb-init.sh
