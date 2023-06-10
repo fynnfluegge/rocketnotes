@@ -104,8 +104,7 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "webapp:build:dev",
-            "proxyConfig": "proxy.conf.json"
+            "browserTarget": "webapp:build:dev"
           }
         },
         "extract-i18n": {
