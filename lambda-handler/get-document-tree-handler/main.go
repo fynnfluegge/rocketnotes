@@ -86,6 +86,7 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		Headers: map[string]string{
 			"Access-Control-Allow-Methods":     "GET,POST,OPTIONS",
 			"Access-Control-Allow-Origin":      "*", // Required for CORS support to work locally
+			"Access-Control-Allow-Headers":     "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization",
 			"Access-Control-Allow-Credentials": "true",
 		},
 		Body: string(b),
