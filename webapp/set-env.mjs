@@ -26,7 +26,7 @@ writeFile(targetPath, envConfigFile, function (err) {
 const proxyConfigFile = `{
     "/documentTree": {
         "target": "${process.env.API_URL}",
-        "secure": false,
+        "secure": true,
         "changeOrigin": true
     }
 }
