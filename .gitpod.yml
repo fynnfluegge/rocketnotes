@@ -38,6 +38,7 @@ ports:
     name: Website
     description: Website Preview
   - port: 3000
+    visibility: public
     onOpen: ignore
     name: Api
   - port: 8041
