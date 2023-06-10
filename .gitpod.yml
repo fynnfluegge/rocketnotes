@@ -34,6 +34,12 @@ tasks:
 
 ports:
   - port: 4200
-    onOpen: open-preview
+    onOpen: open-browser
     name: Website
     description: Website Preview
+  - port: 3000
+    onOpen: ignore
+    name: Api
+  - port: 8041
+    onOpen: ignore
+    name: Db
