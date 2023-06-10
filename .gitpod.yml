@@ -18,7 +18,7 @@ tasks:
   - name: Start Lambda functions
     before: brew install aws/tap/aws-sam-cli
     init: sam build
-    command: sam local rocketnotes-serverless-api --docker-network rocketnotes_local-serverless-network --warm-containers EAGER 
+    command: sam local start-api --docker-network rocketnotes_local-serverless-network --warm-containers EAGER 
 
   - name: Start webapp
     init: |
@@ -34,7 +34,7 @@ tasks:
 
 ports:
   - port: 4200
-    onOpen: open-browser
+    onOpen: open-preview
     name: Website
     description: Website Preview
   - port: 3000
