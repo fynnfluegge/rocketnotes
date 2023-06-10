@@ -1,15 +1,15 @@
 # create tables
-aws dynamodb create-table --endpoint-url http://localhost:8041 --table-name tnn-Documents \
---attribute-definitions AttributeName=id,AttributeType=S \
---key-schema AttributeName=id,KeyType=HASH \
---provisioned-throughput ReadCapacityUnits=2,WriteCapacityUnits=2
-
-aws dynamodb create-table --endpoint-url http://localhost:8041 --table-name tnn-Tree \
---attribute-definitions AttributeName=id,AttributeType=S \
---key-schema AttributeName=id,KeyType=HASH \
---provisioned-throughput ReadCapacityUnits=2,WriteCapacityUnits=2
-
 url=$(gp url 8041)
+
+aws dynamodb create-table --endpoint-url $url --table-name tnn-Documents \
+--attribute-definitions AttributeName=id,AttributeType=S \
+--key-schema AttributeName=id,KeyType=HASH \
+--provisioned-throughput ReadCapacityUnits=2,WriteCapacityUnits=2
+
+aws dynamodb create-table --endpoint-url $url --table-name tnn-Tree \
+--attribute-definitions AttributeName=id,AttributeType=S \
+--key-schema AttributeName=id,KeyType=HASH \
+--provisioned-throughput ReadCapacityUnits=2,WriteCapacityUnits=2
 
 # create document tree
 aws dynamodb put-item --endpoint-url $url --table-name tnn-Tree --item '{"id": {"S": "4afe1f16-add0-11ed-afa1-0242ac120002"},"documents": {"L": [{"M": {"id": {"S": "5b6ae09e-c32a-45ee-bb3b-1c65fc943a9c"},"children": {"NULL": true},"name": {"S": "Cheat Sheet"},"parent": {"S": "root"},"pinned": {"BOOL": false}}}]},"pinned": {"NULL": true},"trash": {"NULL": true}}'
