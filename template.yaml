@@ -7,9 +7,9 @@ Globals:
   Api:
     Cors:
       AllowMethods: "'GET,POST,OPTIONS'"
-      AllowHeaders: "'*'"
+      AllowHeaders: "'Origin, X-Requested-With, Content-Type, Accept'"
       AllowOrigin: "'*'"
-      AllowCredentials: true
+      AllowCredentials: "'*'"
 
 Resources:
   getDocumentFunction:
