@@ -37,10 +37,10 @@ const proxyConfigFile = `{
 }
 `;
 
-writeFile("./proxy.conf.json", proxyConfigFile, function (err) {
-    if (err) {
-        throw console.error(err);
-    } else {
-        console.log(`Angular proxy.conf.json generated correctly \n`);
-    }
- });
+// writeFile("./proxy.conf.json", proxyConfigFile, function (err) {
+//     if (err) {
+//         throw console.error(err);
+//     } else {
+//         console.log(`Angular proxy.conf.json generated correctly \n`);
+//     }
+//  });
