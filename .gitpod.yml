@@ -29,7 +29,7 @@ tasks:
     command: |
       (
         cd webapp
-        npm run start
+        npm run start-gitpod
       )
 
 ports:
