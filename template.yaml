@@ -7,7 +7,7 @@ Globals:
   Api:
     Cors:
       AllowMethods: "'GET,POST,OPTIONS'"
-      AllowHeaders: "'content-type'"
+      AllowHeaders: "'Origin, X-Requested-With, Content-Type, Accept'"
       AllowOrigin: "'*'"
       AllowCredentials: "'*'"
 
