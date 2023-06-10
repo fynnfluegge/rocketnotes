@@ -22,3 +22,20 @@ writeFile(targetPath, envConfigFile, function (err) {
        console.log(`Angular environment.ts file generated correctly at ${targetPath} \n`);
    }
 });
+
+const proxyConfigFile = `{
+    "/documentTree": {
+        "target": ${process.env.API_URL},
+        "secure": false,
+        "changeOrigin": true
+    }
+}
+`;
+
+writeFile("./proxy.config.json", proxyConfigFile, function (err) {
+    if (err) {
+        throw console.error(err);
+    } else {
+        console.log(`Angular proxy.config.json generated correctly \n`);
+    }
+ });
