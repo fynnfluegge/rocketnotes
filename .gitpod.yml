@@ -38,7 +38,7 @@ ports:
     name: Website
     description: Website Preview
   - port: 3000
-    onOpen: open-preview
+    onOpen: ignore
     name: Api
   - port: 8041
     onOpen: ignore
