@@ -28,7 +28,6 @@ export class BasicRestService {
       reqOpts = {
         headers: this._addStandardHeaders(new HttpHeaders()),
         params: new HttpParams(),
-        // withCredentials: true,
       };
     }
 
