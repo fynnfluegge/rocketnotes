@@ -1,10 +1,10 @@
 # create tables
-aws dynamodb create-table --endpoint-url http://localhost:8041 --table-name tnn-Documents \
+aws dynamodb create-table --endpoint-url http://localhost:8041 --table-name tnn-Tree \
 --attribute-definitions AttributeName=id,AttributeType=S \
 --key-schema AttributeName=id,KeyType=HASH \
 --provisioned-throughput ReadCapacityUnits=2,WriteCapacityUnits=2
 
-aws dynamodb create-table --endpoint-url http://localhost:8041 --table-name tnn-Tree \
+aws dynamodb create-table --endpoint-url http://localhost:8041 --table-name tnn-Documents \
 --attribute-definitions AttributeName=id,AttributeType=S \
 --key-schema AttributeName=id,KeyType=HASH \
 --provisioned-throughput ReadCapacityUnits=2,WriteCapacityUnits=2

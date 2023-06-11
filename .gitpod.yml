@@ -13,7 +13,7 @@ tasks:
         aws configure set aws_secret_access_key 123
         aws configure set region us-east-1
       )
-    # command: sh $GITPOD_REPO_ROOT/dynamodb-init.sh
+    command: sh $GITPOD_REPO_ROOT/dynamodb-init.sh
 
   - name: Start Lambda functions
     before: brew install aws/tap/aws-sam-cli
