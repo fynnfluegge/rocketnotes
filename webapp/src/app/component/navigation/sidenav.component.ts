@@ -127,7 +127,7 @@ export class DocumentTree {
         })
       });
     } else {
-      this.http.get(this.backend_url + '/documentTree/4afe1f16-add0-11ed-afa1-0242ac120002').subscribe({
+      this.testService.get("documentTree/4afe1f16-add0-11ed-afa1-0242ac120002").subscribe({
         next: (res) => {
           const jsonObject = JSON.parse(JSON.stringify(res))
           this.rootNode = <DocumentNode>{ id: ROOT_ID, name: ROOT_ID, children: jsonObject.documents };
