@@ -421,6 +421,8 @@ export class SidenavComponent implements OnInit, AfterViewInit{
 
   isMobileDevice = false;
 
+  operatingSystem: string;
+
   /** Map from flat node to nested node. This helps us finding the nested node to be modified */
   flatNodeMap: Map<DocumentFlatNode, DocumentNode> = new Map<DocumentFlatNode,DocumentNode>();
 
@@ -461,13 +463,39 @@ export class SidenavComponent implements OnInit, AfterViewInit{
     });
 
     this.getScreenSize();
+    this.getOperatingSystem();
   }
+
+  getOperatingSystem() {
+    var userAgent = navigator.userAgent;
+  
+    var operatingSystem = "";
+    if (/Windows/i.test(userAgent)) {
+      operatingSystem = "Windows";
+    } else if (/Macintosh|Mac OS/i.test(userAgent)) {
+      operatingSystem = "Mac";
+    } else if (/Linux/i.test(userAgent)) {
+      operatingSystem = "Linux";
+    } else if (/Android/i.test(userAgent)) {
+      operatingSystem = "Android";
+    } else if (/iOS|iPhone|iPad|iPod/i.test(userAgent)) {
+      operatingSystem = "iOS";
+    }
+  
+    this.operatingSystem = operatingSystem;
+  }
+  
 
   @HostListener('window:resize', ['$event'])
     getScreenSize() {
         if (window.innerWidth < 768) {
           this.showSidebar = false;
         }
+    }
+
+  @HostListener('document:keydown.meta.k', ['$event']) 
+    focusSearchInput(){
+      document.getElementById("search_documents").focus();
     }
 
   ngAfterViewInit(): void {
