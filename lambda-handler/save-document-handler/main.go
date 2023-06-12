@@ -34,7 +34,7 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 
 	json.Unmarshal([]byte(request.Body), &item)
 
-	item.Searchcontent = strings.ToLower(item.Content)
+	item.Searchcontent = strings.ToLower(item.Title + "\n" + item.Content)
 
 	item.LastModified = time.Now()
 

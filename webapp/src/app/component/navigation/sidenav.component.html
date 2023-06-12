@@ -7,7 +7,7 @@
   <button (click)="addNewItem(null)" class="icon-button-fade nav-bar-button">Add Document</button>
   <form autocomplete="off" style="margin-left:auto;">
     <div class="autocomplete" style="width:280px;">
-      <input type="text" id="search_documents" name="search_documents" placeholder="Search">
+      <input type="text" id="search_documents" name="search_documents" placeholder="Search {{ this.isMobileDevice ? '' : (this.operatingSystem == 'Mac' ? '⌘K' : '⊞WinK') }}">
     </div>
   </form>
   <!-- <div class="dropdown">

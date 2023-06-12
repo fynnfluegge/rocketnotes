@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
+	"time"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -16,14 +18,15 @@ import (
 )
 
 type Document struct {
-	ID           string `json:"id"`
-	ParentId     string `json:"parentId"`
-	UserId       string `json:"userId"`
-	Title        string `json:"title"`
-	Content      string `json:"content"`
-	LastModified string `json:"lastModified"`
-	Deleted      bool   `json:"deleted"`
-	IsPublic     bool   `json:"isPublic"`
+	ID            string    `json:"id"`
+	ParentId      string    `json:"parentId"`
+	UserId        string    `json:"userId"`
+	Title         string    `json:"title"`
+	Content       string    `json:"content"`
+	Searchcontent string    `json:"searchContent"`
+	LastModified  time.Time `json:"lastModified"`
+	Deleted       bool      `json:"deleted"`
+	IsPublic      bool      `json:"isPublic"`
 }
 
 type RequestBody struct {
@@ -80,6 +83,8 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 	}
 
 	item.Title = requestBody.Title
+	item.Searchcontent = strings.ToLower(item.Title + "\n" + item.Content)
+	item.LastModified = time.Now()
 
 	av, err := dynamodbattribute.MarshalMap(item)
 	if err != nil {

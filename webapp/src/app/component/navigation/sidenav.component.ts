@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { FlatTreeControl } from '@angular/cdk/tree';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
-import { of as ofObservable, Observable, BehaviorSubject, Subject } from 'rxjs';
+import { of as ofObservable, Observable, BehaviorSubject, Subject, ConnectableObservable } from 'rxjs';
 import * as uuid from 'uuid';
 import { BasicRestService } from 'src/app/service/basic-rest.service';
 import { Auth } from 'aws-amplify';
@@ -421,6 +421,8 @@ export class SidenavComponent implements OnInit, AfterViewInit{
 
   isMobileDevice = false;
 
+  operatingSystem: string;
+
   /** Map from flat node to nested node. This helps us finding the nested node to be modified */
   flatNodeMap: Map<DocumentFlatNode, DocumentNode> = new Map<DocumentFlatNode,DocumentNode>();
 
@@ -461,13 +463,39 @@ export class SidenavComponent implements OnInit, AfterViewInit{
     });
 
     this.getScreenSize();
+    this.getOperatingSystem();
   }
+
+  getOperatingSystem() {
+    var userAgent = navigator.userAgent;
+  
+    var operatingSystem = "";
+    if (/Windows/i.test(userAgent)) {
+      operatingSystem = "Windows";
+    } else if (/Macintosh|Mac OS/i.test(userAgent)) {
+      operatingSystem = "Mac";
+    } else if (/Linux/i.test(userAgent)) {
+      operatingSystem = "Linux";
+    } else if (/Android/i.test(userAgent)) {
+      operatingSystem = "Android";
+    } else if (/iOS|iPhone|iPad|iPod/i.test(userAgent)) {
+      operatingSystem = "iOS";
+    }
+  
+    this.operatingSystem = operatingSystem;
+  }
+  
 
   @HostListener('window:resize', ['$event'])
     getScreenSize() {
         if (window.innerWidth < 768) {
           this.showSidebar = false;
         }
+    }
+
+  @HostListener('document:keydown.meta.k', ['$event']) 
+    focusSearchInput(){
+      document.getElementById("search_documents").focus();
     }
 
   ngAfterViewInit(): void {
@@ -856,10 +884,14 @@ export class SidenavComponent implements OnInit, AfterViewInit{
             var suggestion = suggestionToDisplay(foundElements[i].content, val);
             /*make the matching letters bold:*/
             var startIndex = suggestion.toLocaleLowerCase().indexOf(val.toLocaleLowerCase());
-            b.innerHTML += suggestion.substring(0, startIndex);
-            b.innerHTML += "<strong>" + val + "</strong>";
-            b.innerHTML += suggestion.substring(startIndex + val.length);
-              /*insert a input field that will hold the current array item's value:*/
+            if (startIndex > -1) {
+              b.innerHTML += suggestion.substring(0, startIndex);
+              b.innerHTML += "<strong>" + val + "</strong>";
+              b.innerHTML += suggestion.substring(startIndex + val.length);
+            } else {
+              b.innerHTML += suggestion;
+            }
+            /*insert a input field that will hold the current array item's value:*/
             b.innerHTML += "<input type='hidden' value='" + foundElements[i].id + "'>";
             /*execute a function when someone clicks on the item value (DIV element):*/
             b.addEventListener("click", function(e) {
@@ -926,7 +958,7 @@ export class SidenavComponent implements OnInit, AfterViewInit{
       const offset = content.length - searchPattern.length;
       const startOffset = content.toLocaleLowerCase().indexOf(searchPattern.toLocaleLowerCase());
       const endOffset = offset - startOffset;
-      if (offset >= 28) {
+      if (offset >= 28 && startOffset >= 0) {
         if (startOffset >= 14 && endOffset >= 14) {
           return "..." + content.substring(startOffset - 14, startOffset + searchPattern.length + 14) + "...";
         }
@@ -937,7 +969,9 @@ export class SidenavComponent implements OnInit, AfterViewInit{
           return "..." + content.substring(startOffset-28+endOffset, content.length);
         }
       }
-      else {
+      else if (startOffset === -1 && content.length > 28){
+        return content.substring(0, 28) + "...";
+      } else {
         return content;
       }
     }
