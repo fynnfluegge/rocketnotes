@@ -14,13 +14,13 @@ export class PublicDocumentViewerComponent implements OnInit {
   public title: string;
   public content: string;
 
-  constructor(private testService : BasicRestService, private route: ActivatedRoute, private titleService: Title) { }
+  constructor(private basicRestService : BasicRestService, private route: ActivatedRoute, private titleService: Title) { }
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => { 
       this.id = params.get('id');
       if (this.id) {
-        this.testService.get("shared/" + this.id).subscribe(message => {
+        this.basicRestService.get("shared/" + this.id).subscribe(message => {
           var document = JSON.parse(JSON.stringify(message))
           this.content = document.content
           this.title = document.title
