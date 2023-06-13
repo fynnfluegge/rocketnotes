@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { FlatTreeControl } from '@angular/cdk/tree';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
-import { of as ofObservable, Observable, BehaviorSubject, Subject, ConnectableObservable } from 'rxjs';
+import { of as ofObservable, Observable, BehaviorSubject, Subject } from 'rxjs';
 import * as uuid from 'uuid';
 import { BasicRestService } from 'src/app/service/basic-rest.service';
 import { Auth } from 'aws-amplify';
@@ -60,7 +60,7 @@ export class DocumentTree {
     return this.dataChange.value;
   }
 
-  constructor(public http: HttpClient, private testService : BasicRestService, private route: ActivatedRoute) {
+  constructor(public http: HttpClient, private basicRestService : BasicRestService, private route: ActivatedRoute) {
     this.initialize();
   }
 
@@ -108,12 +108,12 @@ export class DocumentTree {
             this.route.paramMap.subscribe(params => { 
               if (!params.get('id')) {
                 if (this.pinnedNode.children) {
-                  this.testService.get("document/" + this.pinnedNode.children[0].id).subscribe(result => {
+                  this.basicRestService.get("document/" + this.pinnedNode.children[0].id).subscribe(result => {
                     var document = JSON.parse(JSON.stringify(result));
                     this.initContentChange.next({ id: document.id, title: document.title, content: document.content, isPublic: document.isPublic });
                   });
                 } else if (this.rootNode.children) {
-                  this.testService.get("document/" + this.rootNode.children[0].id).subscribe(result => {
+                  this.basicRestService.get("document/" + this.rootNode.children[0].id).subscribe(result => {
                     var document = JSON.parse(JSON.stringify(result));
                     this.initContentChange.next({ id: document.id, title: document.title, content: document.content, isPublic: document.isPublic });
                   });
@@ -127,7 +127,7 @@ export class DocumentTree {
         })
       });
     } else {
-      this.testService.get("documentTree/4afe1f16-add0-11ed-afa1-0242ac120002").subscribe({
+      this.basicRestService.get("documentTree/4afe1f16-add0-11ed-afa1-0242ac120002").subscribe({
         next: (res) => {
           const jsonObject = JSON.parse(JSON.stringify(res))
           this.rootNode = <DocumentNode>{ id: ROOT_ID, name: ROOT_ID, children: jsonObject.documents };
@@ -166,12 +166,12 @@ export class DocumentTree {
           this.route.paramMap.subscribe(params => { 
             if (!params.get('id')) {
               if (this.pinnedNode.children) {
-                this.testService.get("document/" + this.pinnedNode.children[0].id).subscribe(result => {
+                this.basicRestService.get("document/" + this.pinnedNode.children[0].id).subscribe(result => {
                   var document = JSON.parse(JSON.stringify(result));
                   this.initContentChange.next({ id: document.id, title: document.title, content: document.content, isPublic: document.isPublic });
                 });
               } else if (this.rootNode.children) {
-                this.testService.get("document/" + this.rootNode.children[0].id).subscribe(result => {
+                this.basicRestService.get("document/" + this.rootNode.children[0].id).subscribe(result => {
                   var document = JSON.parse(JSON.stringify(result));
                   this.initContentChange.next({ id: document.id, title: document.title, content: document.content, isPublic: document.isPublic });
                 });
@@ -240,7 +240,7 @@ export class DocumentTree {
     this.removeFromParent(parent, node.id)
     
     this.dataChange.next(this.data);
-    this.testService.post("saveDocumentTree",
+    this.basicRestService.post("saveDocumentTree",
     { 
       "id": localStorage.getItem("currentUserId"),
       "documents": JSON.parse(JSON.stringify(this.rootNode.children)),
@@ -264,7 +264,7 @@ export class DocumentTree {
     this.trashNode.children.push(node);
 
     this.dataChange.next(this.data);
-    this.testService.post("saveDocumentTree", 
+    this.basicRestService.post("saveDocumentTree", 
     { 
       "id": localStorage.getItem("currentUserId"),
       "documents": JSON.parse(JSON.stringify(this.rootNode.children)),
@@ -277,7 +277,7 @@ export class DocumentTree {
     this.removeFromParent(this.trashNode, node.id)
 
     this.dataChange.next(this.data);
-    this.testService.post("saveDocumentTree", 
+    this.basicRestService.post("saveDocumentTree", 
     { 
       "id": localStorage.getItem("currentUserId"),
       "documents": JSON.parse(JSON.stringify(this.rootNode.children)),
@@ -301,7 +301,7 @@ export class DocumentTree {
 
   this.dataChange.next(this.data);
 
-  this.testService.post("saveDocumentTree", 
+  this.basicRestService.post("saveDocumentTree", 
     { 
       "id": localStorage.getItem("currentUserId"),
       "documents": JSON.parse(JSON.stringify(this.rootNode.children)),
@@ -310,7 +310,7 @@ export class DocumentTree {
     }
   ).subscribe(() => {
     if (newItem) {
-      this.testService.post("saveDocument", 
+      this.basicRestService.post("saveDocument", 
       { 
         "id": node.id,
         "userId": localStorage.getItem("currentUserId"),
@@ -320,7 +320,7 @@ export class DocumentTree {
         this.initContentChange.next({ id: node.id, title: newName, content: "new document" });
       })
     } else {
-      this.testService.post("saveDocumentTitle", 
+      this.basicRestService.post("saveDocumentTitle", 
       { 
         "id": node.id,
         "title": newName
@@ -354,7 +354,7 @@ export class DocumentTree {
 
       this.dataChange.next(this.data);
 
-      this.testService.post("saveDocumentTree", 
+      this.basicRestService.post("saveDocumentTree", 
       { 
         "id": localStorage.getItem("currentUserId"),
         "documents": JSON.parse(JSON.stringify(this.rootNode.children)),
@@ -391,7 +391,7 @@ export class DocumentTree {
     }
 
     this.dataChange.next(this.data);
-    this.testService.post("saveDocumentTree", 
+    this.basicRestService.post("saveDocumentTree", 
     { 
       "id": localStorage.getItem("currentUserId"),
       "documents": JSON.parse(JSON.stringify(this.rootNode.children)),
@@ -438,7 +438,7 @@ export class SidenavComponent implements OnInit, AfterViewInit{
 
   dataSource: MatTreeFlatDataSource<DocumentNode, DocumentFlatNode>;
 
-  constructor(private database: DocumentTree, private testService : BasicRestService, private router: Router) {
+  constructor(private database: DocumentTree, private basicRestService : BasicRestService, private router: Router) {
 
     this.treeFlattener = new MatTreeFlattener(
       this.transformer,
@@ -499,7 +499,7 @@ export class SidenavComponent implements OnInit, AfterViewInit{
     }
 
   ngAfterViewInit(): void {
-    this.autocomplete(document.getElementById("search_documents"), this.testService, this.router);
+    this.autocomplete(document.getElementById("search_documents"), this.basicRestService, this.router);
   }
 
   ngOnInit(): void {
@@ -566,6 +566,13 @@ export class SidenavComponent implements OnInit, AfterViewInit{
     return flatNode;
   };
 
+  openItem(id: string) {
+    this.basicRestService.get("document/" + id).subscribe(result => {
+      var document = JSON.parse(JSON.stringify(result));
+      this.database.initContentChange.next({ id: document.id, title: document.title, content: document.content, isPublic: document.isPublic });
+    });
+  }
+
   addNewItem(node: DocumentFlatNode) {
     this.showSidebar = true;
     if (!node) {
@@ -621,8 +628,10 @@ export class SidenavComponent implements OnInit, AfterViewInit{
       this.treeControl.collapse(this.nestedNodeMap.get(this.database.trashNode));
       this.treeControl.expand(this.nestedNodeMap.get(this.database.trashNode));
 
-      // todo load first document
-      this.router.navigate(['/' + this.database.rootNode.children[0].id]);
+      this.basicRestService.get("document/" + this.database.rootNode.children[0].id).subscribe(result => {
+        var document = JSON.parse(JSON.stringify(result));
+        this.database.initContentChange.next({ id: document.id, title: document.title, content: document.content, isPublic: document.isPublic });
+      });
     }
   }
 
@@ -847,7 +856,7 @@ export class SidenavComponent implements OnInit, AfterViewInit{
   rebuildTreeForData(data: any) {
     this.dataSource.data = data;
     this.refreshTree();
-    this.testService.post("saveDocumentTree",
+    this.basicRestService.post("saveDocumentTree",
     { 
       "id": localStorage.getItem("currentUserId"),
       "documents": JSON.parse(JSON.stringify(this.database.rootNode.children)),

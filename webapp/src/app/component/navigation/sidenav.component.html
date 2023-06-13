@@ -64,7 +64,7 @@
           Trash
         </mat-tree-node>
   
-        <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle matTreeNodePadding matTreeNodePaddingIndent="8" [routerLink]="'/' + node.id" routerLinkActive="active-node"
+        <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle matTreeNodePadding matTreeNodePaddingIndent="8" (click)="openItem(node.id)" routerLinkActive="active-node"
           cdkDrag [cdkDragDisabled]="this.isMobileDevice" [cdkDragData]="node" (mouseenter)="dragHover(node)" (mouseleave)="dragHoverEnd()" (cdkDragStarted)="dragStart()" (cdkDragReleased)="dragEnd()">
           <span style="padding-left:24px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{node.name}}</span>
           <div class="dropdown hide" style="margin-left:auto;">

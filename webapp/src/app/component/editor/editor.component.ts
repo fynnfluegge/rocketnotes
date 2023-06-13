@@ -6,6 +6,7 @@ import { ActivatedRoute } from '@angular/router';
 import { DocumentTree } from '../navigation/sidenav.component';
 import { Title } from '@angular/platform-browser';
 import { environment } from 'src/environments/environment';
+import { Location } from '@angular/common'; 
 
 import '../../../assets/prism-custom.js';
 
@@ -36,7 +37,7 @@ export class EditorComponent {
 
   keyPressCounter: number = 0;
 
-  constructor(private database: DocumentTree, private testService : BasicRestService, private route: ActivatedRoute, private titleService: Title) {
+  constructor(private database: DocumentTree, private basicRestService : BasicRestService, private route: ActivatedRoute, private titleService: Title, private location: Location) {
   }
 
   ngOnInit() {
@@ -58,12 +59,13 @@ export class EditorComponent {
       this.titleService.setTitle(value.title);
       this.isPublic = value.isPublic;
       this.publicLink = environment.redirectSignIn + "/shared/" + this.id;
+      this.location.replaceState("/" + this.id);
     });
 
     this.route.paramMap.subscribe(params => { 
       this.id = params.get('id');
       if (this.id) {
-        this.testService.get("document/" + this.id).subscribe(message => {
+        this.basicRestService.get("document/" + this.id).subscribe(message => {
           var document = JSON.parse(JSON.stringify(message))
           this.content = document.content
           this.title = document.title
@@ -124,7 +126,7 @@ export class EditorComponent {
   }
 
   submit(): void {
-    this.testService.post("saveDocument", 
+    this.basicRestService.post("saveDocument", 
       { 
         "id": this.id,
         "userId": localStorage.getItem("currentUserId"),
@@ -143,7 +145,7 @@ export class EditorComponent {
   shareDocument(): void {
     document.getElementById("share-button").children[0].classList.toggle("fa-share");
     document.getElementById("share-button").children[0].classList.toggle("fa-hourglass");
-    this.testService.post("shareDocument", 
+    this.basicRestService.post("shareDocument", 
       { 
         "id": this.id,
         "isPublic": true
@@ -158,7 +160,7 @@ export class EditorComponent {
   unshareDocument(): void {
     document.getElementById("unshare-button").children[0].classList.toggle("fa-ban");
     document.getElementById("unshare-button").children[0].classList.toggle("fa-hourglass");
-    this.testService.post("shareDocument", 
+    this.basicRestService.post("shareDocument", 
       { 
         "id": this.id,
         "isPublic": false,
