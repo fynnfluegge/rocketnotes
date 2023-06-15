@@ -106,7 +106,7 @@
             </button>
         </mat-tree-node>
       
-        <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding matTreeNodePaddingIndent="8" [routerLink]="'/' + node.id" routerLinkActive="active-node"
+        <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding matTreeNodePaddingIndent="8" (click)="openItem(node.id)" routerLinkActive="active-node"
           cdkDrag [cdkDragData]="node" (mouseenter)="dragHover(node)" (mouseleave)="dragHoverEnd()" (cdkDragStarted)="dragStart()" (cdkDragReleased)="dragEnd()">
           <button mat-icon-button matTreeNodeToggle class="icon-button-chevron">
             <mat-icon>
