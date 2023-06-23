@@ -6,17 +6,16 @@ import { ActivatedRoute } from '@angular/router';
 import { DocumentTree } from '../navigation/sidenav.component';
 import { Title } from '@angular/platform-browser';
 import { environment } from 'src/environments/environment';
-import { Location } from '@angular/common'; 
+import { Location } from '@angular/common';
 
 import '../../../assets/prism-custom.js';
 
 @Component({
   selector: 'app-editor',
   templateUrl: './editor.component.html',
-  styleUrls: ['./editor.component.scss']
+  styleUrls: ['./editor.component.scss'],
 })
 export class EditorComponent {
-
   @Input() showSidebar: Boolean;
 
   public showPreview: Boolean = true;
@@ -37,42 +36,51 @@ export class EditorComponent {
 
   keyPressCounter: number = 0;
 
-  constructor(private database: DocumentTree, private basicRestService : BasicRestService, private route: ActivatedRoute, private titleService: Title, private location: Location) {
-  }
+  constructor(
+    private database: DocumentTree,
+    private basicRestService: BasicRestService,
+    private route: ActivatedRoute,
+    private titleService: Title,
+    private location: Location
+  ) { }
 
   ngOnInit() {
-
     if (environment.production) {
       Auth.currentAuthenticatedUser().then((user) => {
-        localStorage.setItem("currentUserId", user.username);
-        localStorage.setItem("username", user.attributes.email);
+        localStorage.setItem('currentUserId', user.username);
+        localStorage.setItem('username', user.attributes.email);
       });
     } else {
-      localStorage.setItem("currentUserId", "4afe1f16-add0-11ed-afa1-0242ac120002");
-      localStorage.setItem("username", "localuser@test.com");
+      localStorage.setItem(
+        'currentUserId',
+        '4afe1f16-add0-11ed-afa1-0242ac120002'
+      );
+      localStorage.setItem('username', 'localuser@test.com');
     }
 
-    this.database.initContentChange.subscribe(value => {
+    this.database.initContentChange.subscribe((value) => {
       this.id = value.id;
       this.title = value.title;
       this.content = value.content;
       this.titleService.setTitle(value.title);
       this.isPublic = value.isPublic;
-      this.publicLink = environment.redirectSignIn + "/shared/" + this.id;
-      this.location.replaceState("/" + this.id);
+      this.publicLink = environment.redirectSignIn + '/shared/' + this.id;
+      this.location.replaceState('/' + this.id);
     });
 
-    this.route.paramMap.subscribe(params => { 
+    this.route.paramMap.subscribe((params) => {
       this.id = params.get('id');
       if (this.id) {
-        this.basicRestService.get("document/" + this.id).subscribe(message => {
-          var document = JSON.parse(JSON.stringify(message))
-          this.content = document.content
-          this.title = document.title
-          this.titleService.setTitle(document.title);
-          this.isPublic = document.isPublic;
-          this.publicLink = environment.redirectSignIn + "/shared/" + this.id;
-        });
+        this.basicRestService
+          .get('document/' + this.id)
+          .subscribe((message) => {
+            var document = JSON.parse(JSON.stringify(message));
+            this.content = document.content;
+            this.title = document.title;
+            this.titleService.setTitle(document.title);
+            this.isPublic = document.isPublic;
+            this.publicLink = environment.redirectSignIn + '/shared/' + this.id;
+          });
       }
     });
 
@@ -84,11 +92,11 @@ export class EditorComponent {
   }
 
   changeMode() {
-      this.editorMode = !this.editorMode;
-      if (this.editorMode) {
-        this.keyPressCounter = 0;
-        this.initialContent = (' ' + this.content).slice(1);
-      }
+    this.editorMode = !this.editorMode;
+    if (this.editorMode) {
+      this.keyPressCounter = 0;
+      this.initialContent = (' ' + this.content).slice(1);
+    }
   }
 
   cancelEdit() {
@@ -107,8 +115,8 @@ export class EditorComponent {
   }
 
   onKeydown(event) {
-    if (event.code !== "Escape") {
-      this.keyPressCounter++
+    if (event.code !== 'Escape') {
+      this.keyPressCounter++;
       if (this.keyPressCounter === 20) {
         this.keyPressCounter = 0;
         this.submit();
@@ -122,54 +130,70 @@ export class EditorComponent {
         this.keyPressCounter = 0;
         this.submit();
       }
-    },10000)
+    }, 10000);
   }
 
   submit(): void {
-    this.basicRestService.post("saveDocument", 
-      { 
-        "id": this.id,
-        "userId": localStorage.getItem("currentUserId"),
-        "title": this.title,
-        "content": this.content,
-        "isPublic": this.isPublic
-      }
-    ).subscribe(() => {
-      this.showSnackbar = true;
-      setTimeout(() => {
-        this.showSnackbar = false;
-      }, 2000);
-    });
+    this.basicRestService
+      .post('saveDocument', {
+        id: this.id,
+        userId: localStorage.getItem('currentUserId'),
+        title: this.title,
+        content: this.content,
+        isPublic: this.isPublic,
+      })
+      .subscribe(() => {
+        this.showSnackbar = true;
+        setTimeout(() => {
+          this.showSnackbar = false;
+        }, 2000);
+      });
   }
 
   shareDocument(): void {
-    document.getElementById("share-button").children[0].classList.toggle("fa-share");
-    document.getElementById("share-button").children[0].classList.toggle("fa-hourglass");
-    this.basicRestService.post("shareDocument", 
-      { 
-        "id": this.id,
-        "isPublic": true
-      }
-    ).subscribe(() => {
-      this.isPublic = true
-      document.getElementById("share-button").children[0].classList.toggle("fa-share");
-      document.getElementById("share-button").children[0].classList.toggle("fa-hourglass");
-    });
+    document
+      .getElementById('share-button')
+      .children[0].classList.toggle('fa-share');
+    document
+      .getElementById('share-button')
+      .children[0].classList.toggle('fa-hourglass');
+    this.basicRestService
+      .post('shareDocument', {
+        id: this.id,
+        isPublic: true,
+      })
+      .subscribe(() => {
+        this.isPublic = true;
+        document
+          .getElementById('share-button')
+          .children[0].classList.toggle('fa-share');
+        document
+          .getElementById('share-button')
+          .children[0].classList.toggle('fa-hourglass');
+      });
   }
 
   unshareDocument(): void {
-    document.getElementById("unshare-button").children[0].classList.toggle("fa-ban");
-    document.getElementById("unshare-button").children[0].classList.toggle("fa-hourglass");
-    this.basicRestService.post("shareDocument", 
-      { 
-        "id": this.id,
-        "isPublic": false,
-      }
-    ).subscribe(() => {
-      this.isPublic = false;
-      document.getElementById("unshare-button").children[0].classList.toggle("fa-ban");
-      document.getElementById("unshare-button").children[0].classList.toggle("fa-hourglass");
-    });
+    document
+      .getElementById('unshare-button')
+      .children[0].classList.toggle('fa-ban');
+    document
+      .getElementById('unshare-button')
+      .children[0].classList.toggle('fa-hourglass');
+    this.basicRestService
+      .post('shareDocument', {
+        id: this.id,
+        isPublic: false,
+      })
+      .subscribe(() => {
+        this.isPublic = false;
+        document
+          .getElementById('unshare-button')
+          .children[0].classList.toggle('fa-ban');
+        document
+          .getElementById('unshare-button')
+          .children[0].classList.toggle('fa-hourglass');
+      });
   }
 
   copyLinkToClipBoard(event, textToCopy): void {
@@ -179,21 +203,21 @@ export class EditorComponent {
     selBox.focus();
     selBox.select();
     if (event.target.children.length === 0) {
-      event.target.classList.toggle("fa-link");
-      event.target.classList.toggle("fa-check");
+      event.target.classList.toggle('fa-link');
+      event.target.classList.toggle('fa-check');
     } else {
-      event.target.children[0].classList.toggle("fa-link");
-      event.target.children[0].classList.toggle("fa-check");  
+      event.target.children[0].classList.toggle('fa-link');
+      event.target.children[0].classList.toggle('fa-check');
     }
     document.execCommand('copy');
     document.body.removeChild(selBox);
-    setTimeout( function() {
+    setTimeout(function() {
       if (event.target.children.length === 0) {
-        event.target.classList.toggle("fa-link");
-        event.target.classList.toggle("fa-check");
+        event.target.classList.toggle('fa-link');
+        event.target.classList.toggle('fa-check');
       } else {
-        event.target.children[0].classList.toggle("fa-link");
-        event.target.children[0].classList.toggle("fa-check");
+        event.target.children[0].classList.toggle('fa-link');
+        event.target.children[0].classList.toggle('fa-check');
       }
     }, 1000);
   }
@@ -201,7 +225,7 @@ export class EditorComponent {
   getDecodedAccessToken(token: string): any {
     try {
       return jwt_decode(token);
-    } catch(Error) {
+    } catch (Error) {
       return null;
     }
   }

@@ -1,7 +1,7 @@
 button {
   color: white;
-  background-color:#282828;
-  border:none;
+  background-color: #282828;
+  border: none;
 }
 
 .mat-button {
@@ -9,12 +9,12 @@ button {
   padding: 0;
   margin-right: 12px;
   color: lightgray;
-  background-color:transparent;
+  background-color: transparent;
 }
 
 .mat-icon-button {
   color: lightgray;
-  background-color:transparent;
+  background-color: transparent;
   width: 24px;
 }
 
@@ -24,11 +24,13 @@ button {
   font-weight: 280;
   font-size: 13px;
 
-  &.cdk-drag-preview { // while dragging
-    background-color:#282828;
+  &.cdk-drag-preview {
+    // while dragging
+    background-color: #282828;
     color: white;
   }
-  &.cdk-drag-placeholder { // potential drop area
+  &.cdk-drag-placeholder {
+    // potential drop area
     opacity: 0;
   }
 }
@@ -46,7 +48,7 @@ button {
   height: 28px;
   width: 24px;
   color: lightgray;
-  background-color:transparent;
+  background-color: transparent;
 }
 
 mat-tree-node {
@@ -59,7 +61,7 @@ mat-tree-node:hover {
 
 mat-tree-node:hover > .hide {
   visibility: visible;
-  opacity:1;
+  opacity: 1;
 }
 
 mat-tree-node:focus {
@@ -79,15 +81,15 @@ span:hover {
 }
 
 .nav-bar-button {
-  font-size:smaller;
-  height:100%;
-  font-weight:200;
-  border:1px;
-  border-color:darkgrey;
-  border-radius:8px;
-  margin:8px;
-  border-style:groove;
-  height:70%;
+  font-size: smaller;
+  height: 100%;
+  font-weight: 200;
+  border: 1px;
+  border-color: darkgrey;
+  border-radius: 8px;
+  margin: 8px;
+  border-style: groove;
+  height: 70%;
   min-width: 110px !important;
 }
 
@@ -113,7 +115,7 @@ span:hover {
 }
 
 .sidebar {
-	position: absolute;
+  position: absolute;
   left: -200px;
   transition: 0.25s;
   margin: 0;
@@ -126,7 +128,7 @@ span:hover {
   height: calc(100% - 52px);
   overflow: auto;
   z-index: 1;
-  box-shadow: 0 0 10px rgba(0,0,0,0.75);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.75);
   clip-path: inset(0px -20px 0px 0px);
 }
 
@@ -136,13 +138,13 @@ span:hover {
 
 .sidebar:hover > .hide {
   visibility: visible;
-  opacity:1;
+  opacity: 1;
 }
 
 .hide {
   visibility: hidden;
-  opacity:0;
-  transition:visibility 0.3s linear,opacity 0.3s linear;
+  opacity: 0;
+  transition: visibility 0.3s linear, opacity 0.3s linear;
 }
 
 //--- navigation bar ---//
@@ -159,7 +161,7 @@ ul {
 }
 
 li a {
-  height:100%;
+  height: 100%;
   display: block;
   color: white;
   text-align: center;
@@ -180,9 +182,9 @@ li a:hover {
   color: white;
   border: none;
   display: block;
-  width:32px;
-  height:28px;
-  background-color:transparent;
+  width: 32px;
+  height: 28px;
+  background-color: transparent;
 }
 
 .dropdown {
@@ -194,41 +196,47 @@ li a:hover {
   display: none;
   position: absolute;
   background-color: black;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.4);
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.4);
   z-index: 1;
 }
 
 .dropdown-light {
-  left:auto;
-  right:0;
-  background-color:rgba(255,255,255,1);
-  padding:12px;
-  width:240px;
+  left: auto;
+  right: 0;
+  background-color: rgba(255, 255, 255, 1);
+  padding: 12px;
+  width: 240px;
 }
 
 .dropdown-content button {
   width: 100%;
 }
 
-.dropdown-content a:hover {background-color: #ddd;}
+.dropdown-content a:hover {
+  background-color: #ddd;
+}
 
-.dropdown:hover .dropdown-content {display: block;}
+.dropdown:hover .dropdown-content {
+  display: block;
+}
 
-.dropdown:hover .dropbtn {background-color: black;}
+.dropdown:hover .dropbtn {
+  background-color: black;
+}
 
 #search_documents {
   height: 36px;
   width: 260px;
   border-radius: 32px;
   margin: 8px;
-  border:1px solid black;
+  border: 1px solid black;
   padding: 3px 10px 3px 10px;
   background-color: lightgray;
 }
 
 #search_documents:focus {
   outline: none !important;
-  border:2px solid #719ECE;
-  box-shadow: 0 0 2px #719ECE;
+  border: 2px solid #719ece;
+  box-shadow: 0 0 2px #719ece;
   background-color: white;
 }

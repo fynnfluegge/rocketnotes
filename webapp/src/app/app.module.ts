@@ -20,13 +20,12 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { SidenavComponent } from './component/navigation/sidenav.component';
 import { PublicDocumentViewerComponent } from './component/public-document-viewer/public-document-viewer.component';
 
-
 @NgModule({
   declarations: [
     AppComponent,
     EditorComponent,
     SidenavComponent,
-    PublicDocumentViewerComponent
+    PublicDocumentViewerComponent,
   ],
   imports: [
     BrowserModule,
@@ -41,13 +40,13 @@ import { PublicDocumentViewerComponent } from './component/public-document-viewe
     MatButtonModule,
     MatTreeModule,
     DragDropModule,
-    MarkdownModule.forRoot()
+    MarkdownModule.forRoot(),
   ],
   providers: [
     AuthGuard,
     BasicRestService,
-    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
 export class AppModule { }

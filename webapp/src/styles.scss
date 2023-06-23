@@ -1,5 +1,8 @@
-html, body { height: 100%; }
-body { 
+html,
+body {
+  height: 100%;
+}
+body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
 }
@@ -13,7 +16,7 @@ body {
 }
 
 button {
-  white-space:nowrap;
+  white-space: nowrap;
 }
 
 a {
@@ -21,7 +24,7 @@ a {
 }
 
 // ------- copy to clipboard ------------ //
-pre[class*=language-] {
+pre[class*="language-"] {
   position: relative;
   border-radius: 5px;
 }
@@ -33,7 +36,7 @@ pre[class*=language-] {
   top: 0;
   color: rgb(189, 188, 188);
   font-size: 20px;
-  opacity: 0.0;
+  opacity: 0;
   border-radius: 0.3em;
 }
 
@@ -60,24 +63,26 @@ pre[class*=language-] {
   width: 300px;
   padding: 10px;
   cursor: pointer;
-  background-color: #fff; 
-  box-shadow: rgba(0, 0, 0, 0.07) 0px 1px 2px, rgba(0, 0, 0, 0.07) 0px 2px 4px, rgba(0, 0, 0, 0.07) 0px 4px 8px, rgba(0, 0, 0, 0.07) 0px 8px 16px, rgba(0, 0, 0, 0.07) 0px 16px 32px, rgba(0, 0, 0, 0.07) 0px 32px 64px;
+  background-color: #fff;
+  box-shadow: rgba(0, 0, 0, 0.07) 0px 1px 2px, rgba(0, 0, 0, 0.07) 0px 2px 4px,
+    rgba(0, 0, 0, 0.07) 0px 4px 8px, rgba(0, 0, 0, 0.07) 0px 8px 16px,
+    rgba(0, 0, 0, 0.07) 0px 16px 32px, rgba(0, 0, 0, 0.07) 0px 32px 64px;
 }
 
 /*when hovering an item:*/
 .autocomplete-items div:hover {
-  background-color: #e9e9e9; 
+  background-color: #e9e9e9;
 }
 
 /*when navigating through the items using the arrow keys:*/
 .autocomplete-active {
-  background-color: DodgerBlue !important; 
-  color: #ffffff; 
+  background-color: DodgerBlue !important;
+  color: #ffffff;
 }
 // -------------------------------------- //
 
 // ------- code block ------------ //
-code[class*=language-] {
+code[class*="language-"] {
   color: #f8f8f2 !important;
   padding: 0px;
 }
@@ -88,9 +93,9 @@ code {
   background-color: rgb(227, 226, 226);
 }
 
-.code-wrapper:hover div.copy{
-  opacity: 1.0;
-  transition: opacity .3s ease-in-out;
+.code-wrapper:hover div.copy {
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
   cursor: pointer;
 }
 // ------------------------------- //
@@ -115,7 +120,7 @@ code {
   transition: 0.3s;
   font-size: 18px;
   font-weight: 340;
-  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
   border-radius: 0.3em 0.3em 0 0;
 }
 
