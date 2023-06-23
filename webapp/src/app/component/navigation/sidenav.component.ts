@@ -577,10 +577,10 @@ export class SidenavComponent implements OnInit, AfterViewInit {
     });
 
     this.getScreenSize();
-    this.getOperatingSystem();
+    this.setOperatingSystem();
   }
 
-  getOperatingSystem() {
+  setOperatingSystem() {
     var userAgent = navigator.userAgent;
 
     var operatingSystem = '';
