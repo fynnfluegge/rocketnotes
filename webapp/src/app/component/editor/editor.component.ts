@@ -7,6 +7,7 @@ import { DocumentTree } from '../navigation/sidenav.component';
 import { Title } from '@angular/platform-browser';
 import { environment } from 'src/environments/environment';
 import { Location } from '@angular/common';
+import { HostListener } from '@angular/core';
 
 import '../../../assets/prism-custom.js';
 
@@ -100,8 +101,10 @@ export class EditorComponent {
   }
 
   cancelEdit() {
-    this.editorMode = false;
-    this.submit();
+    if (this.editorMode) {
+      this.editorMode = false;
+      this.submit();
+    }
   }
 
   undoChanges() {
@@ -112,6 +115,11 @@ export class EditorComponent {
         this.submit();
       }
     }
+  }
+
+  @HostListener('document:keydown.meta.e', ['$event'])
+  toggleEditMode() {
+    this.changeMode();
   }
 
   onKeydown(event) {
