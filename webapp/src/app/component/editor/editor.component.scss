@@ -44,8 +44,8 @@ textarea.md-input {
 }
 
 .variable-textarea:hover {
-  box-shadow: 0 6px 12px 3px rgba(0,0,0,.09),
-    0 2px 3px 1px rgba(0,0,0,.06);
+  box-shadow: 0 6px 12px 3px rgba(0, 0, 0, 0.09),
+    0 2px 3px 1px rgba(0, 0, 0, 0.06);
 }
 
 .variable-binding {
@@ -64,8 +64,10 @@ textarea.md-input {
 }
 
 div.center {
-  transition:0.25s;
-  position:absolute;bottom:12px;width:calc(100% - 264px);
+  transition: 0.25s;
+  position: absolute;
+  bottom: 12px;
+  width: calc(100% - 264px);
 }
 
 //---- snackbar ---- //
@@ -85,28 +87,52 @@ div.center {
 
 #snackbar.show {
   visibility: visible;
-  -webkit-animation: fadein 0.5s, fadeout 0.5s 2.0s;
-  animation: fadein 0.5s, fadeout 0.5s 2.0s;
+  -webkit-animation: fadein 0.5s, fadeout 0.5s 2s;
+  animation: fadein 0.5s, fadeout 0.5s 2s;
 }
 
 @-webkit-keyframes fadein {
-  from {bottom: 0; opacity: 0;} 
-  to {bottom: 12px; opacity: 1;}
+  from {
+    bottom: 0;
+    opacity: 0;
+  }
+  to {
+    bottom: 12px;
+    opacity: 1;
+  }
 }
 
 @keyframes fadein {
-  from {bottom: 0; opacity: 0;}
-  to {bottom: 12px; opacity: 1;}
+  from {
+    bottom: 0;
+    opacity: 0;
+  }
+  to {
+    bottom: 12px;
+    opacity: 1;
+  }
 }
 
 @-webkit-keyframes fadeout {
-  from {bottom: 12px; opacity: 1;} 
-  to {bottom: 0; opacity: 0;}
+  from {
+    bottom: 12px;
+    opacity: 1;
+  }
+  to {
+    bottom: 0;
+    opacity: 0;
+  }
 }
 
 @keyframes fadeout {
-  from {bottom: 12px; opacity: 1;}
-  to {bottom: 0; opacity: 0;}
+  from {
+    bottom: 12px;
+    opacity: 1;
+  }
+  to {
+    bottom: 0;
+    opacity: 0;
+  }
 }
 
 // ---- Tooltips ---- //
@@ -122,13 +148,13 @@ div.center {
 
 .tooltip-bottom:after {
   border-right: 6px solid transparent;
-	border-bottom: 6px solid rgba(0,0,0,.75); 
+  border-bottom: 6px solid rgba(0, 0, 0, 0.75);
   border-left: 6px solid transparent;
   top: 20px;
 }
 
 .tooltip-bottom.expand:after {
-  transform: translate3d(0,6px,0);
+  transform: translate3d(0, 6px, 0);
 }
 
 .tooltip-top {
@@ -142,13 +168,13 @@ div.center {
 
 .tooltip-top:after {
   border-right: 6px solid transparent;
-	border-top: 6px solid rgba(0,0,0,.75); 
+  border-top: 6px solid rgba(0, 0, 0, 0.75);
   border-left: 6px solid transparent;
   top: 58px;
 }
 
 .tooltip-top.expand:after {
-  transform: translate3d(0,-6px,0);
+  transform: translate3d(0, -6px, 0);
 }
 
 /* setup tooltips base */
@@ -165,13 +191,13 @@ div.center {
   position: absolute;
 }
 .tooltip-base:after {
-  content: '';
+  content: "";
   height: 0;
   left: 20px;
   width: 0;
 }
 .tooltip-base:before {
-  background: rgba(0,0,0,.75);
+  background: rgba(0, 0, 0, 0.75);
   border-radius: 2px;
   color: #fff;
   content: attr(data-title);
@@ -183,17 +209,17 @@ div.center {
 
 /* expand animation */
 .tooltip-base.expand:before {
-  transform: scale3d(.2,.2,1);
-  transition: all .2s ease-in-out;
+  transform: scale3d(0.2, 0.2, 1);
+  transition: all 0.2s ease-in-out;
 }
 .tooltip-base.expand:after {
-  transition: all .1s ease-in-out;
+  transition: all 0.1s ease-in-out;
 }
 .tooltip-base.expand:hover:before,
 .tooltip-base.expand:hover:after {
   opacity: 1;
-  transform: scale3d(1,1,1);
+  transform: scale3d(1, 1, 1);
 }
 .tooltip-base.expand:hover:after {
-  transition: all .2s .1s ease-in-out;
+  transition: all 0.2s 0.1s ease-in-out;
 }
