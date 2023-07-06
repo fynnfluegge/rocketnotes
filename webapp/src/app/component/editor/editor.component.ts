@@ -100,27 +100,29 @@ export class EditorComponent {
 
   togglePreviewPanel() {
     this.showPreview = !this.showPreview;
-    let elem = this.markdownTextareaFullscreen.nativeElement;
-    if (!elem.hasAttribute('data-event-listener-added')) {
-      elem.setAttribute('data-event-listener-added', 'true');
+    setTimeout(() => {
+      // add event listener to visible textarea for handling enter key to prevent scroll issue
+      let elem = this.showPreview
+        ? this.markdownTextarea.nativeElement
+        : this.markdownTextareaFullscreen.nativeElement;
       elem.addEventListener('keydown', (event: KeyboardEvent) =>
         this.handleTextareaKeyDown(event, elem)
       );
-    }
+    }, 100);
   }
 
   changeMode() {
     this.editorMode = !this.editorMode;
     if (this.editorMode) {
       setTimeout(() => {
-        let elem = this.markdownTextarea.nativeElement;
-        if (!elem.hasAttribute('data-event-listener-added')) {
-          elem.setAttribute('data-event-listener-added', 'true');
-          elem.addEventListener('keydown', (event: KeyboardEvent) =>
-            this.handleTextareaKeyDown(event, elem)
-          );
-        }
-      }, 10);
+        // add event listener to visible textarea for handling enter key to prevent scroll issue
+        let elem = this.showPreview
+          ? this.markdownTextarea.nativeElement
+          : this.markdownTextareaFullscreen.nativeElement;
+        elem.addEventListener('keydown', (event: KeyboardEvent) =>
+          this.handleTextareaKeyDown(event, elem)
+        );
+      }, 100);
       this.keyPressCounter = 0;
       this.initialContent = (' ' + this.content).slice(1);
     }
