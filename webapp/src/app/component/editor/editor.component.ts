@@ -1,4 +1,10 @@
-import { Component, Input, VERSION } from '@angular/core';
+import {
+  Component,
+  Input,
+  ViewChild,
+  ElementRef,
+  VERSION,
+} from '@angular/core';
 import { Auth } from 'aws-amplify';
 import { BasicRestService } from 'src/app/service/basic-rest.service';
 import jwt_decode from 'jwt-decode';
@@ -37,13 +43,17 @@ export class EditorComponent {
 
   keyPressCounter: number = 0;
 
+  @ViewChild('markdownTextarea') markdownTextarea: ElementRef;
+  @ViewChild('markdownTextareaFullscreen')
+  markdownTextareaFullscreen: ElementRef;
+
   constructor(
     private database: DocumentTree,
     private basicRestService: BasicRestService,
     private route: ActivatedRoute,
     private titleService: Title,
     private location: Location
-  ) { }
+  ) {}
 
   ngOnInit() {
     if (environment.production) {
@@ -90,13 +100,43 @@ export class EditorComponent {
 
   togglePreviewPanel() {
     this.showPreview = !this.showPreview;
+    setTimeout(() => {
+      // add event listener to visible textarea for handling enter key to prevent scroll issue
+      let elem = this.showPreview
+        ? this.markdownTextarea.nativeElement
+        : this.markdownTextareaFullscreen.nativeElement;
+      elem.addEventListener('keydown', (event: KeyboardEvent) =>
+        this.handleTextareaKeyDown(event, elem)
+      );
+    }, 100);
   }
 
   changeMode() {
     this.editorMode = !this.editorMode;
     if (this.editorMode) {
+      setTimeout(() => {
+        // add event listener to visible textarea for handling enter key to prevent scroll issue
+        let elem = this.showPreview
+          ? this.markdownTextarea.nativeElement
+          : this.markdownTextareaFullscreen.nativeElement;
+        elem.addEventListener('keydown', (event: KeyboardEvent) =>
+          this.handleTextareaKeyDown(event, elem)
+        );
+      }, 100);
       this.keyPressCounter = 0;
       this.initialContent = (' ' + this.content).slice(1);
+    }
+  }
+
+  handleTextareaKeyDown(event: KeyboardEvent, elem: any) {
+    if (event.key === 'Enter') {
+      event.preventDefault(); // prevent usual browser behavour
+      var currentPos = elem.selectionStart;
+      var value = elem.value;
+      var newValue =
+        value.substr(0, currentPos) + '\n' + value.substr(currentPos);
+      elem.value = newValue;
+      elem.selectionEnd = currentPos + 1;
     }
   }
 
@@ -122,7 +162,7 @@ export class EditorComponent {
     this.changeMode();
   }
 
-  onKeydown(event) {
+  onKeydown(event: KeyboardEvent) {
     if (event.code !== 'Escape') {
       this.keyPressCounter++;
       if (this.keyPressCounter === 20) {
