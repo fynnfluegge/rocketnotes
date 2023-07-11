@@ -108,6 +108,10 @@ export class EditorComponent {
       elem.addEventListener('keydown', (event: KeyboardEvent) =>
         this.handleTextareaKeyDown(event, elem)
       );
+      // add synronize scroll event listener
+      if (this.showPreview) {
+        this.addSynchronizedScrollEventListeners(elem);
+      }
     }, 100);
   }
 
@@ -122,6 +126,10 @@ export class EditorComponent {
         elem.addEventListener('keydown', (event: KeyboardEvent) =>
           this.handleTextareaKeyDown(event, elem)
         );
+        // add synronize scroll event listener
+        if (this.showPreview) {
+          this.addSynchronizedScrollEventListeners(elem);
+        }
       }, 100);
       this.keyPressCounter = 0;
       this.initialContent = (' ' + this.content).slice(1);
@@ -137,6 +145,28 @@ export class EditorComponent {
         value.substr(0, currentPos) + '\n' + value.substr(currentPos);
       elem.value = newValue;
       elem.selectionEnd = currentPos + 1;
+    }
+  }
+
+  addSynchronizedScrollEventListeners(elem: any) {
+    elem.addEventListener('scroll', (event: any) =>
+      this.synchronizeScroll(event)
+    );
+    document
+      .getElementById('markdownPreview')
+      .addEventListener('scroll', (event: any) =>
+        this.synchronizeScroll(event)
+      );
+  }
+
+  synchronizeScroll(event: any) {
+    var scrollTop = event.target.scrollTop;
+    let previewPanel = document.getElementById('markdownPreview');
+    // Synchronize the scrollTop property of the other panel
+    if (event.target === this.markdownTextarea.nativeElement) {
+      previewPanel.scrollTop = scrollTop;
+    } else if (event.target === document.getElementById('markdownPreview')) {
+      this, (this.markdownTextarea.nativeElement.scrollTop = scrollTop);
     }
   }
 

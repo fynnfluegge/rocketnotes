@@ -61,6 +61,7 @@
     (keydown)="onKeydown($event)"
   ></textarea>
   <markdown
+    id="markdownPreview"
     *ngIf="showPreview && editorMode"
     class="variable-binding"
     [data]="content"
