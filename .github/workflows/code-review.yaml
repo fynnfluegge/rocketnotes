@@ -21,6 +21,4 @@ jobs:
           LANGUAGE: Englisch
           OPENAI_API_ENDPOINT: https://api.openai.com/v1
           MODEL: gpt-3.5-turbo
-          PROMPT: "You are a helpful code reviewer. Here are my code changes. Could you please review them and provide feedback?"
-          max_tokens: 10000
-          MAX_PATCH_LENGTH: 10000
+          max_tokens: 1000
