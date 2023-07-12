@@ -166,7 +166,7 @@ export class EditorComponent {
     if (event.target === this.markdownTextarea.nativeElement) {
       previewPanel.scrollTop = scrollTop;
     } else if (event.target === document.getElementById('markdownPreview')) {
-      this, (this.markdownTextarea.nativeElement.scrollTop = scrollTop);
+      this.markdownTextarea.nativeElement.scrollTop = scrollTop;
     }
   }
 
