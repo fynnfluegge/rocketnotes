@@ -108,7 +108,7 @@ export class EditorComponent {
       elem.addEventListener('keydown', (event: KeyboardEvent) =>
         this.handleTextareaKeyDown(event, elem)
       );
-      // add synronize scroll event listener
+      // add synchronize scroll event listener
       if (this.showPreview) {
         this.addSynchronizedScrollEventListeners(elem);
       }
