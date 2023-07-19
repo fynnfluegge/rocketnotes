@@ -44,8 +44,6 @@ export class EditorComponent {
   keyPressCounter: number = 0;
 
   @ViewChild('markdownTextarea') markdownTextarea: ElementRef;
-  @ViewChild('markdownTextareaFullscreen')
-  markdownTextareaFullscreen: ElementRef;
 
   constructor(
     private database: DocumentTree,
@@ -53,7 +51,7 @@ export class EditorComponent {
     private route: ActivatedRoute,
     private titleService: Title,
     private location: Location
-  ) {}
+  ) { }
 
   ngOnInit() {
     if (environment.production) {
@@ -101,13 +99,15 @@ export class EditorComponent {
   togglePreviewPanel() {
     this.showPreview = !this.showPreview;
     setTimeout(() => {
-      // add event listener to visible textarea for handling enter key to prevent scroll issue
-      let elem = this.showPreview
-        ? this.markdownTextarea.nativeElement
-        : this.markdownTextareaFullscreen.nativeElement;
-      elem.addEventListener('keydown', (event: KeyboardEvent) =>
-        this.handleTextareaKeyDown(event, elem)
-      );
+      // add synchronize scroll event listener
+      if (this.showPreview) {
+        let previewPanel = document.getElementById('markdownPreview');
+        this.addSynchronizedScrollEventListeners(
+          this.markdownTextarea.nativeElement,
+          previewPanel
+        );
+        previewPanel.scrollTop = this.markdownTextarea.nativeElement.scrollTop;
+      }
     }, 100);
   }
 
@@ -116,12 +116,24 @@ export class EditorComponent {
     if (this.editorMode) {
       setTimeout(() => {
         // add event listener to visible textarea for handling enter key to prevent scroll issue
-        let elem = this.showPreview
-          ? this.markdownTextarea.nativeElement
-          : this.markdownTextareaFullscreen.nativeElement;
-        elem.addEventListener('keydown', (event: KeyboardEvent) =>
-          this.handleTextareaKeyDown(event, elem)
+        this.markdownTextarea.nativeElement.addEventListener(
+          'keydown',
+          (event: KeyboardEvent) => {
+            this.handleTextareaKeyDown(
+              event,
+              this.markdownTextarea.nativeElement
+            );
+          }
         );
+
+        // add synchronize scroll event listener
+        if (this.showPreview) {
+          let previewPanel = document.getElementById('markdownPreview');
+          this.addSynchronizedScrollEventListeners(
+            this.markdownTextarea.nativeElement,
+            previewPanel
+          );
+        }
       }, 100);
       this.keyPressCounter = 0;
       this.initialContent = (' ' + this.content).slice(1);
@@ -137,6 +149,29 @@ export class EditorComponent {
         value.substr(0, currentPos) + '\n' + value.substr(currentPos);
       elem.value = newValue;
       elem.selectionEnd = currentPos + 1;
+    }
+  }
+
+  addSynchronizedScrollEventListeners(markdownEditor: any, previewPanel: any) {
+    markdownEditor.addEventListener('scroll', (event: any) =>
+      this.synchronizeScroll(event)
+    );
+    previewPanel.addEventListener('scroll', (event: any) =>
+      this.synchronizeScroll(event)
+    );
+  }
+
+  synchronizeScroll(event: any) {
+    // Synchronize only in editor preview mode
+    if (this.showPreview) {
+      var scrollTop = event.target.scrollTop;
+      let previewPanel = document.getElementById('markdownPreview');
+      // Synchronize the scrollTop property of the other panel
+      if (event.target === this.markdownTextarea.nativeElement) {
+        previewPanel.scrollTop = scrollTop;
+      } else if (event.target === previewPanel) {
+        this.markdownTextarea.nativeElement.scrollTop = scrollTop;
+      }
     }
   }
 

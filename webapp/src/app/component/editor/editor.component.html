@@ -46,21 +46,15 @@
 
   <textarea
     #markdownTextarea
-    *ngIf="editorMode && showPreview"
+    *ngIf="editorMode"
     class="variable-textarea"
     [(ngModel)]="content"
-    style="resize: none; margin-top: 4px"
-    (keydown)="onKeydown($event)"
-  ></textarea>
-  <textarea
-    #markdownTextareaFullscreen
-    *ngIf="editorMode && !showPreview"
-    class="variable-textarea"
-    [(ngModel)]="content"
-    style="width: 100%; resize: none; margin-top: 4px"
+    style="resize: none; margin-top: 4px; display: inline-block"
+    [style.width]="showPreview ? '' : '100%'"
     (keydown)="onKeydown($event)"
   ></textarea>
   <markdown
+    id="markdownPreview"
     *ngIf="showPreview && editorMode"
     class="variable-binding"
     [data]="content"
