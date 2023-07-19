@@ -106,6 +106,7 @@ export class EditorComponent {
           this.markdownTextarea.nativeElement,
           previewPanel
         );
+        previewPanel.scrollTop = this.markdownTextarea.nativeElement.scrollTop;
       }
     }, 100);
   }
