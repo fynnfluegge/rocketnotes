@@ -222,3 +222,12 @@ div.center {
 .tooltip-base.expand:hover:after {
   transition: all 0.2s 0.1s ease-in-out;
 }
+.suggestion {
+  position: absolute;
+  z-index: 1000; /* Ensure it appears above other content */
+  background-color: #00000000;
+  color: #A1A1A1;
+  padding: 5px;
+  max-width: 200px; /* Adjust as needed */
+  white-space: nowrap; /* Prevent line breaks */
+}

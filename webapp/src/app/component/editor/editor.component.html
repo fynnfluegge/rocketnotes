@@ -45,14 +45,15 @@
   </div>
 
   <textarea
-    #markdownTextarea
+    id="markdownTextarea"
     *ngIf="editorMode"
-    class="variable-textarea"
     [(ngModel)]="content"
-    style="resize: none; margin-top: 4px; display: inline-block"
-    [style.width]="showPreview ? '' : '100%'"
+    class="variable-area"
+    style="resize: none; margin-top: 4px; display: inline-block; height: calc(100% - 4px); width: 100%; overflow-y: scroll; margin-bottom: 4px"
+    [style.width]="showPreview ? 'calc(50% - 4px)' : '100%'"
     (keydown)="onKeydown($event)"
   ></textarea>
+  <div class="suggestion">{{ suggestion }}</div>
   <markdown
     id="markdownPreview"
     *ngIf="showPreview && editorMode"

@@ -30,6 +30,9 @@ export class EditorComponent {
   public editorMode: Boolean = false;
   public fullscreen: Boolean = false;
 
+  suggestion = '';
+  timer: any;
+
   angularVersion = VERSION.full;
   ngxMarkdownVersion = '12.0.1';
 
@@ -42,8 +45,6 @@ export class EditorComponent {
   initialContent: string;
 
   keyPressCounter: number = 0;
-
-  @ViewChild('markdownTextarea') markdownTextarea: ElementRef;
 
   constructor(
     private database: DocumentTree,
@@ -102,11 +103,12 @@ export class EditorComponent {
       // add synchronize scroll event listener
       if (this.showPreview) {
         let previewPanel = document.getElementById('markdownPreview');
+        let markdownTextarea = document.getElementById('markdownTextarea');
         this.addSynchronizedScrollEventListeners(
-          this.markdownTextarea.nativeElement,
+          markdownTextarea,
           previewPanel
         );
-        previewPanel.scrollTop = this.markdownTextarea.nativeElement.scrollTop;
+        previewPanel.scrollTop = markdownTextarea.scrollTop;
       }
     }, 100);
   }
@@ -116,12 +118,13 @@ export class EditorComponent {
     if (this.editorMode) {
       setTimeout(() => {
         // add event listener to visible textarea for handling enter key to prevent scroll issue
-        this.markdownTextarea.nativeElement.addEventListener(
+        let markdownTextarea = document.getElementById('markdownTextarea');
+        markdownTextarea.addEventListener(
           'keydown',
           (event: KeyboardEvent) => {
             this.handleTextareaKeyDown(
               event,
-              this.markdownTextarea.nativeElement
+              markdownTextarea
             );
           }
         );
@@ -130,7 +133,7 @@ export class EditorComponent {
         if (this.showPreview) {
           let previewPanel = document.getElementById('markdownPreview');
           this.addSynchronizedScrollEventListeners(
-            this.markdownTextarea.nativeElement,
+            markdownTextarea,
             previewPanel
           );
         }
@@ -166,11 +169,12 @@ export class EditorComponent {
     if (this.showPreview) {
       var scrollTop = event.target.scrollTop;
       let previewPanel = document.getElementById('markdownPreview');
+      let markdownTextarea = document.getElementById('markdownTextarea');
       // Synchronize the scrollTop property of the other panel
-      if (event.target === this.markdownTextarea.nativeElement) {
+      if (event.target === markdownTextarea) {
         previewPanel.scrollTop = scrollTop;
       } else if (event.target === previewPanel) {
-        this.markdownTextarea.nativeElement.scrollTop = scrollTop;
+        markdownTextarea.scrollTop = scrollTop;
       }
     }
   }
@@ -178,6 +182,7 @@ export class EditorComponent {
   cancelEdit() {
     if (this.editorMode) {
       this.editorMode = false;
+      clearTimeout(this.timer);
       this.submit();
     }
   }
@@ -205,7 +210,97 @@ export class EditorComponent {
         this.submit();
       }
     }
+    clearTimeout(this.timer);
+
+    const markdownTextarea = document.getElementById('markdownTextarea') as HTMLInputElement;
+    var start = markdownTextarea.selectionStart
+    const textAfterCursor = this.content.substr(start);
+
+    if (event.code === 'Tab' && this.suggestion !== '') {
+      event.preventDefault();
+      var end = markdownTextarea.selectionEnd;
+      const textBeforeCursor = this.content.substr(0, start);
+
+      // Insert the suggestion
+      const adjustedText = textBeforeCursor + this.suggestion + textAfterCursor
+      markdownTextarea.value = adjustedText;
+
+      // Restore the cursor position
+      markdownTextarea.selectionStart = start + this.suggestion.length;
+      markdownTextarea.selectionEnd = end + this.suggestion.length;
+      // markdownTextarea.focus();
+      this.suggestion = '';
+    }
+    else {
+      this.suggestion = '';
+
+      if (textAfterCursor === '' || textAfterCursor.startsWith('\n')) {
+        this.timer = setTimeout(() => {
+          const markdownTextarea = document.getElementById('markdownTextarea') as HTMLInputElement;
+          this.suggestion = "This is a suggestion"
+          var position = this.getCaretPosition(markdownTextarea);
+          this.updateSuggestionPosition(position);
+        }, 500);
+      }
+    }
   }
+
+  getCaretPosition(textArea) {
+    var start = textArea.selectionStart;
+    var end = textArea.selectionEnd;
+    var copy = this.createCopy(textArea);
+    var range = document.createRange();
+    range.setStart(copy.firstChild, start);
+    range.setEnd(copy.firstChild, end);
+    var selection = document.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+    var rect = range.getBoundingClientRect();
+    document.body.removeChild(copy);
+    textArea.selectionStart = start;
+    textArea.selectionEnd = end;
+    // textArea.focus();
+    return {
+      x: rect.left - textArea.scrollLeft,
+      y: rect.top - textArea.scrollTop - 4
+    };
+  }
+
+  createCopy(textArea) {
+    var copy = document.createElement('div');
+    copy.textContent = textArea.value;
+    var style = getComputedStyle(textArea);
+    [
+      'fontFamily',
+      'fontSize',
+      'fontWeight',
+      'wordWrap',
+      'whiteSpace',
+      'borderLeftWidth',
+      'borderTopWidth',
+      'borderRightWidth',
+      'borderBottomWidth',
+    ].forEach(function(key) {
+      copy.style[key] = style[key];
+    });
+    copy.style.overflow = 'auto';
+    copy.style.width = textArea.offsetWidth + 'px';
+    copy.style.height = textArea.offsetHeight + 'px';
+    copy.style.position = 'absolute';
+    copy.style.left = textArea.offsetLeft + 'px';
+    copy.style.top = textArea.offsetTop + 'px';
+    document.body.appendChild(copy);
+    return copy;
+  }
+
+  updateSuggestionPosition(cursorPosition) {
+    const suggestionElement = document.querySelector('.suggestion') as HTMLElement;
+    if (suggestionElement) {
+      suggestionElement.style.top = cursorPosition.y + 'px';
+      suggestionElement.style.left = cursorPosition.x + 'px';
+    }
+  }
+
 
   startTimer() {
     setInterval(() => {
