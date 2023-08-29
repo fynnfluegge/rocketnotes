@@ -47,6 +47,8 @@ export class EditorComponent {
 
   private openai: OpenAI;
   private abortController: AbortController;
+  private completionTimeout: NodeJS.Timeout | undefined;
+  private suggestionLinebreak: boolean = false;
 
 
   constructor(
@@ -97,8 +99,6 @@ export class EditorComponent {
       }
     });
 
-    this.startTimer();
-
     this.openai = new OpenAI({
       apiKey: environment.openAiApiKey,
       dangerouslyAllowBrowser: true,
@@ -112,8 +112,8 @@ export class EditorComponent {
     setTimeout(() => {
       // add synchronize scroll event listener
       if (this.showPreview) {
-        let previewPanel = document.getElementById('markdownPreview');
-        let markdownTextarea = document.getElementById('markdownTextarea');
+        const previewPanel = document.getElementById('markdownPreview');
+        const markdownTextarea = document.getElementById('markdownTextarea');
         this.addSynchronizedScrollEventListeners(
           markdownTextarea,
           previewPanel
@@ -128,21 +128,10 @@ export class EditorComponent {
     this.suggestion = '';
     if (this.editorMode) {
       setTimeout(() => {
-        // add event listener to visible textarea for handling enter key to prevent scroll issue
-        let markdownTextarea = document.getElementById('markdownTextarea');
-        markdownTextarea.addEventListener(
-          'keydown',
-          (event: KeyboardEvent) => {
-            this.handleTextareaKeyDown(
-              event,
-              markdownTextarea
-            );
-          }
-        );
-
         // add synchronize scroll event listener
         if (this.showPreview) {
-          let previewPanel = document.getElementById('markdownPreview');
+          const markdownTextarea = document.getElementById('markdownTextarea');
+          const previewPanel = document.getElementById('markdownPreview');
           this.addSynchronizedScrollEventListeners(
             markdownTextarea,
             previewPanel
@@ -151,18 +140,6 @@ export class EditorComponent {
       }, 100);
       this.keyPressCounter = 0;
       this.initialContent = (' ' + this.content).slice(1);
-    }
-  }
-
-  handleTextareaKeyDown(event: KeyboardEvent, elem: any) {
-    if (event.key === 'Enter') {
-      event.preventDefault(); // prevent usual browser behavour
-      var currentPos = elem.selectionStart;
-      var value = elem.value;
-      var newValue =
-        value.substr(0, currentPos) + '\n' + value.substr(currentPos);
-      elem.value = newValue;
-      elem.selectionEnd = currentPos + 1;
     }
   }
 
@@ -179,8 +156,8 @@ export class EditorComponent {
     // Synchronize only in editor preview mode
     if (this.showPreview) {
       var scrollTop = event.target.scrollTop;
-      let previewPanel = document.getElementById('markdownPreview');
-      let markdownTextarea = document.getElementById('markdownTextarea');
+      const previewPanel = document.getElementById('markdownPreview');
+      const markdownTextarea = document.getElementById('markdownTextarea');
       // Synchronize the scrollTop property of the other panel
       if (event.target === markdownTextarea) {
         previewPanel.scrollTop = scrollTop;
@@ -214,7 +191,26 @@ export class EditorComponent {
   }
 
   onKeydown(event: KeyboardEvent) {
-    if (event.code !== 'Escape') {
+    if (event.key === 'Enter') {
+      event.preventDefault(); // prevent usual browser behavour
+      this.abortController.abort();
+      this.abortController = new AbortController();
+      this.suggestion = '';
+      const markdownTextarea = document.getElementById('markdownTextarea') as HTMLInputElement;
+      var currentPos = markdownTextarea.selectionStart;
+      var value = markdownTextarea.value;
+      var newValue =
+        value.substring(0, currentPos) + '\n' + value.substring(currentPos);
+      markdownTextarea.value = newValue;
+      markdownTextarea.selectionStart = currentPos + 1;
+      markdownTextarea.selectionEnd = currentPos + 1;
+      // if cursor is at the bottom of the textarea, scroll down
+      if (markdownTextarea.scrollTop + markdownTextarea.clientHeight >= markdownTextarea.scrollHeight - 32) {
+        // Scroll the markdownTextarea down by one line (adjust the value as needed)
+        markdownTextarea.scrollTop += markdownTextarea.clientHeight;
+      }
+    }
+    else if (event.code !== 'Escape') {
       this.keyPressCounter++;
       if (this.keyPressCounter === 20) {
         this.keyPressCounter = 0;
@@ -224,13 +220,14 @@ export class EditorComponent {
       this.abortController.abort();
       this.abortController = new AbortController();
       const markdownTextarea = document.getElementById('markdownTextarea') as HTMLInputElement;
-      var start = markdownTextarea.selectionStart
-      const textAfterCursor = this.content.substr(start);
+      const start = markdownTextarea.selectionStart
+      const end = markdownTextarea.selectionEnd;
+      const textAfterCursor = this.content.substring(start);
 
+      // Accept completion suggestion
       if (event.code === 'Tab' && this.suggestion !== '') {
         event.preventDefault();
-        var end = markdownTextarea.selectionEnd;
-        const textBeforeCursor = this.content.substr(0, start);
+        const textBeforeCursor = this.content.substring(0, start);
 
         // Insert the suggestion
         const adjustedText = textBeforeCursor + this.suggestion + textAfterCursor
@@ -245,56 +242,64 @@ export class EditorComponent {
       else if (event.code === 'Tab') {
         event.preventDefault();
       }
-      else {
+      // Create new completion suggestion
+      else if (event.code !== 'ArrowDown' && event.code !== 'ArrowUp' && event.code !== 'ArrowLeft' && event.code !== 'ArrowRight') {
         this.suggestion = '';
         if (textAfterCursor === '' || textAfterCursor.startsWith('\n')) {
-          var start = markdownTextarea.selectionStart
-          const textBeforeCursor = this.content.substr(0, start) + (event.key.length === 1 ? event.key : '');
+          const textBeforeCursor = this.content.substring(0, start) + (event.key.length === 1 ? event.key : '');
           var lastParagraph = this.extractLastParagraph(textBeforeCursor);
-          let caretCoordinates = this.getCaretCoordinates(markdownTextarea, start);
-          this.suggestion = lastParagraph + "this is a suggestion"
-          // Find the index where the first string ends in the second string
-          const index = this.suggestion.indexOf(lastParagraph);
-          // Extract the appended text
-          const appendedText = this.suggestion.slice(index + lastParagraph.length);
-          this.suggestion = appendedText;
-          let suggestionFitsInLine = this.suggestionFitsInLine(this.suggestion, caretCoordinates.relativeLeft, markdownTextarea.clientWidth);
-          if (!suggestionFitsInLine) {
-            caretCoordinates = this.getCaretCoordinatesForNextLine(markdownTextarea.getBoundingClientRect().left, caretCoordinates.top, caretCoordinates.height);
-            console.log(markdownTextarea.selectionStart);
-            const currentStart = markdownTextarea.selectionStart;
-            markdownTextarea.value = textBeforeCursor + '\n' + textAfterCursor;
-            console.log(textBeforeCursor);
-            console.log("------------------");
-            console.log(textAfterCursor);
-            markdownTextarea.selectionStart = currentStart + 1;
-            markdownTextarea.selectionEnd = currentStart + 1;
-            markdownTextarea.focus();
-            console.log(markdownTextarea.selectionStart);
-            console.log(currentStart);
+          if (lastParagraph.length < 32 || lastParagraph.length > 256) {
+            lastParagraph = this.extractLast20Words(textBeforeCursor);
           }
-          this.updateSuggestionPosition(caretCoordinates);
-          // this.aiCompletion(this.abortController.signal, this.extractLast20Words(textBeforeCursor)).then((completion) => {
-          // if (completion === undefined) {
-          // return;
-          // }
-          // const markdownTextarea = document.getElementById('markdownTextarea') as HTMLInputElement;
-          // this.suggestion = completion;
-          // var position = this.getCaretPosition(markdownTextarea);
 
+          if (this.completionTimeout !== undefined) {
+            clearTimeout(this.completionTimeout);
+          }
 
-          // this.updateSuggestionPosition(position);
-          // });
+          this.completionTimeout = setTimeout(() => {
+            this.aiCompletion(this.abortController.signal, lastParagraph).then((completion) => {
+              if (completion === undefined) {
+                return;
+              }
+              let caretCoordinates = this.getCaretCoordinates(markdownTextarea, start);
+              this.suggestion = completion;
+              let suggestionFitsInLine = this.suggestionFitsInLine(this.suggestion, caretCoordinates.relativeLeft, markdownTextarea.clientWidth);
+              if (!suggestionFitsInLine) {
+                caretCoordinates = this.getCaretCoordinatesForNextLine(markdownTextarea.getBoundingClientRect().left, caretCoordinates.top, caretCoordinates.height);
+                if (!this.suggestionLinebreak && !textAfterCursor.startsWith('\n\n')) {
+                  this.suggestionLinebreak = true;
+                  const currentStart = markdownTextarea.selectionStart;
+                  markdownTextarea.value = textBeforeCursor + '\n' + textAfterCursor;
+                  markdownTextarea.selectionStart = currentStart;
+                  markdownTextarea.selectionEnd = currentStart;
+                  markdownTextarea.focus();
+                }
+              } else {
+                this.suggestionLinebreak = false;
+                // if a space is in front of the cursor position, move the suggestion 4px to the left, since
+                // the caretCoordinates are shifted right in that case
+                if (textBeforeCursor.endsWith(' ')) {
+                  caretCoordinates.left -= 4;
+                }
+              }
+              this.updateSuggestionPosition(caretCoordinates);
+            });
+          }, 500);
+
         }
+      } else {
+        this.suggestion = '';
       }
     }
   }
 
   async aiCompletion(abortSignal: AbortSignal, text: string) {
     const completion = await this.openai.chat.completions.create({
-      messages: [{ role: 'user', content: 'Complete the following text with 1 to 5 words: ' + text + '.\nReturn the text and append your completion directly after the text. Example: This is a text. This is a text completion.' }],
+      messages: [{
+        role: 'user', content: 'Complete the following text with 1 to 5 words: ' + text
+      }],
       model: 'gpt-3.5-turbo',
-      temperature: 0.3,
+      temperature: 0.9,
       // stop: ["\n", "."]
     });
 
@@ -312,16 +317,6 @@ export class EditorComponent {
     }
 
     return completion.choices[0].message.content;
-  }
-
-  extractLastWord(inputString) {
-    // Split the input string into words using a regular expression
-    const words = inputString.split(/\s+/);
-
-    // Get the last word (if there are words in the string)
-    const lastWord = words.length > 0 ? words[words.length - 1] : '';
-
-    return lastWord;
   }
 
   extractLast20Words(inputString: string): string {
@@ -355,16 +350,6 @@ export class EditorComponent {
     }
   }
 
-
-  startTimer() {
-    setInterval(() => {
-      if (this.keyPressCounter > 0) {
-        this.keyPressCounter = 0;
-        this.submit();
-      }
-    }, 10000);
-  }
-
   submit(): void {
     this.basicRestService
       .post('saveDocument', {
@@ -378,7 +363,7 @@ export class EditorComponent {
         this.showSnackbar = true;
         setTimeout(() => {
           this.showSnackbar = false;
-        }, 2000);
+        }, 1000);
       });
   }
 
@@ -566,7 +551,7 @@ export class EditorComponent {
 
     var coordinates = {
       top: span.offsetTop + parseInt(computed['borderTopWidth']) - element.scrollTop + element.getBoundingClientRect().top - 8,
-      left: span.offsetLeft + parseInt(computed['borderLeftWidth']) + element.getBoundingClientRect().left + 8,
+      left: span.offsetLeft + parseInt(computed['borderLeftWidth']) + element.getBoundingClientRect().left + 4,
       relativeLeft: span.offsetLeft + parseInt(computed['borderLeftWidth']),
       height: parseInt(computed['lineHeight'])
     };
@@ -584,7 +569,7 @@ export class EditorComponent {
     return false;
   }
 
-  getCaretCoordinatesForNextLine(textAreaLeft, positionTop, lineHeight) {
+  getCaretCoordinatesForNextLine(textAreaLeft: number, positionTop: number, lineHeight: number) {
     return {
       top: positionTop + lineHeight - 2,
       left: textAreaLeft + 8,
