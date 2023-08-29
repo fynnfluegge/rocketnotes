@@ -3,13 +3,14 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-    production: false,
-    awsRegion: 'undefined',
-    domainName: 'undefined',
-    cognitoUserPoolId: 'undefined',
-    cognitoAppClientId: 'undefined',
-    redirectSignIn: 'undefined',
-    redirectSignOut: 'undefined',
-    authGuardRedirect: 'undefined',
-    apiUrl: 'undefined'
+  production: false,
+  awsRegion: 'undefined',
+  domainName: 'undefined',
+  cognitoUserPoolId: 'undefined',
+  cognitoAppClientId: 'undefined',
+  redirectSignIn: 'undefined',
+  redirectSignOut: 'undefined',
+  authGuardRedirect: 'undefined',
+  apiUrl: 'undefined',
+  openAiApiKey: 'undefined'
 };

@@ -1,8 +1,6 @@
 import {
   Component,
   Input,
-  ViewChild,
-  ElementRef,
   VERSION,
 } from '@angular/core';
 import { Auth } from 'aws-amplify';
@@ -14,6 +12,8 @@ import { Title } from '@angular/platform-browser';
 import { environment } from 'src/environments/environment';
 import { Location } from '@angular/common';
 import { HostListener } from '@angular/core';
+
+import OpenAI from 'openai';
 
 import '../../../assets/prism-custom.js';
 
@@ -31,7 +31,6 @@ export class EditorComponent {
   public fullscreen: Boolean = false;
 
   suggestion = '';
-  timer: any;
 
   angularVersion = VERSION.full;
   ngxMarkdownVersion = '12.0.1';
@@ -45,6 +44,10 @@ export class EditorComponent {
   initialContent: string;
 
   keyPressCounter: number = 0;
+
+  private openai: OpenAI;
+  private abortController: AbortController;
+
 
   constructor(
     private database: DocumentTree,
@@ -95,10 +98,17 @@ export class EditorComponent {
     });
 
     this.startTimer();
+
+    this.openai = new OpenAI({
+      apiKey: environment.openAiApiKey,
+      dangerouslyAllowBrowser: true,
+    });
+    this.abortController = new AbortController();
   }
 
   togglePreviewPanel() {
     this.showPreview = !this.showPreview;
+    this.suggestion = '';
     setTimeout(() => {
       // add synchronize scroll event listener
       if (this.showPreview) {
@@ -115,6 +125,7 @@ export class EditorComponent {
 
   changeMode() {
     this.editorMode = !this.editorMode;
+    this.suggestion = '';
     if (this.editorMode) {
       setTimeout(() => {
         // add event listener to visible textarea for handling enter key to prevent scroll issue
@@ -182,7 +193,7 @@ export class EditorComponent {
   cancelEdit() {
     if (this.editorMode) {
       this.editorMode = false;
-      clearTimeout(this.timer);
+      this.suggestion = '';
       this.submit();
     }
   }
@@ -209,95 +220,138 @@ export class EditorComponent {
         this.keyPressCounter = 0;
         this.submit();
       }
-    }
-    clearTimeout(this.timer);
 
-    const markdownTextarea = document.getElementById('markdownTextarea') as HTMLInputElement;
-    var start = markdownTextarea.selectionStart
-    const textAfterCursor = this.content.substr(start);
+      this.abortController.abort();
+      this.abortController = new AbortController();
+      const markdownTextarea = document.getElementById('markdownTextarea') as HTMLInputElement;
+      var start = markdownTextarea.selectionStart
+      const textAfterCursor = this.content.substr(start);
 
-    if (event.code === 'Tab' && this.suggestion !== '') {
-      event.preventDefault();
-      var end = markdownTextarea.selectionEnd;
-      const textBeforeCursor = this.content.substr(0, start);
+      if (event.code === 'Tab' && this.suggestion !== '') {
+        event.preventDefault();
+        var end = markdownTextarea.selectionEnd;
+        const textBeforeCursor = this.content.substr(0, start);
 
-      // Insert the suggestion
-      const adjustedText = textBeforeCursor + this.suggestion + textAfterCursor
-      markdownTextarea.value = adjustedText;
+        // Insert the suggestion
+        const adjustedText = textBeforeCursor + this.suggestion + textAfterCursor
+        markdownTextarea.value = adjustedText;
 
-      // Restore the cursor position
-      markdownTextarea.selectionStart = start + this.suggestion.length;
-      markdownTextarea.selectionEnd = end + this.suggestion.length;
-      // markdownTextarea.focus();
-      this.suggestion = '';
-    }
-    else {
-      this.suggestion = '';
+        // Restore the cursor position
+        markdownTextarea.selectionStart = start + this.suggestion.length;
+        markdownTextarea.selectionEnd = end + this.suggestion.length;
+        markdownTextarea.focus();
+        this.suggestion = '';
+      }
+      else if (event.code === 'Tab') {
+        event.preventDefault();
+      }
+      else {
+        this.suggestion = '';
+        if (textAfterCursor === '' || textAfterCursor.startsWith('\n')) {
+          var start = markdownTextarea.selectionStart
+          const textBeforeCursor = this.content.substr(0, start) + (event.key.length === 1 ? event.key : '');
+          var lastParagraph = this.extractLastParagraph(textBeforeCursor);
+          let caretCoordinates = this.getCaretCoordinates(markdownTextarea, start);
+          this.suggestion = lastParagraph + "this is a suggestion"
+          // Find the index where the first string ends in the second string
+          const index = this.suggestion.indexOf(lastParagraph);
+          // Extract the appended text
+          const appendedText = this.suggestion.slice(index + lastParagraph.length);
+          this.suggestion = appendedText;
+          let suggestionFitsInLine = this.suggestionFitsInLine(this.suggestion, caretCoordinates.relativeLeft, markdownTextarea.clientWidth);
+          if (!suggestionFitsInLine) {
+            caretCoordinates = this.getCaretCoordinatesForNextLine(markdownTextarea.getBoundingClientRect().left, caretCoordinates.top, caretCoordinates.height);
+            console.log(markdownTextarea.selectionStart);
+            const currentStart = markdownTextarea.selectionStart;
+            markdownTextarea.value = textBeforeCursor + '\n' + textAfterCursor;
+            console.log(textBeforeCursor);
+            console.log("------------------");
+            console.log(textAfterCursor);
+            markdownTextarea.selectionStart = currentStart + 1;
+            markdownTextarea.selectionEnd = currentStart + 1;
+            markdownTextarea.focus();
+            console.log(markdownTextarea.selectionStart);
+            console.log(currentStart);
+          }
+          this.updateSuggestionPosition(caretCoordinates);
+          // this.aiCompletion(this.abortController.signal, this.extractLast20Words(textBeforeCursor)).then((completion) => {
+          // if (completion === undefined) {
+          // return;
+          // }
+          // const markdownTextarea = document.getElementById('markdownTextarea') as HTMLInputElement;
+          // this.suggestion = completion;
+          // var position = this.getCaretPosition(markdownTextarea);
 
-      if (textAfterCursor === '' || textAfterCursor.startsWith('\n')) {
-        this.timer = setTimeout(() => {
-          const markdownTextarea = document.getElementById('markdownTextarea') as HTMLInputElement;
-          this.suggestion = "This is a suggestion"
-          var position = this.getCaretPosition(markdownTextarea);
-          this.updateSuggestionPosition(position);
-        }, 500);
+
+          // this.updateSuggestionPosition(position);
+          // });
+        }
       }
     }
   }
 
-  getCaretPosition(textArea) {
-    var start = textArea.selectionStart;
-    var end = textArea.selectionEnd;
-    var copy = this.createCopy(textArea);
-    var range = document.createRange();
-    range.setStart(copy.firstChild, start);
-    range.setEnd(copy.firstChild, end);
-    var selection = document.getSelection();
-    selection.removeAllRanges();
-    selection.addRange(range);
-    var rect = range.getBoundingClientRect();
-    document.body.removeChild(copy);
-    textArea.selectionStart = start;
-    textArea.selectionEnd = end;
-    // textArea.focus();
-    return {
-      x: rect.left - textArea.scrollLeft,
-      y: rect.top - textArea.scrollTop - 4
-    };
+  async aiCompletion(abortSignal: AbortSignal, text: string) {
+    const completion = await this.openai.chat.completions.create({
+      messages: [{ role: 'user', content: 'Complete the following text with 1 to 5 words: ' + text + '.\nReturn the text and append your completion directly after the text. Example: This is a text. This is a text completion.' }],
+      model: 'gpt-3.5-turbo',
+      temperature: 0.3,
+      // stop: ["\n", "."]
+    });
+
+    // Check if the signal is aborted
+    if (abortSignal.aborted) {
+      return;
+    }
+
+    if (completion.choices[0].message.content === '0') {
+      return;
+    }
+
+    if (completion.choices[0].message.content.toLowerCase().includes("sorry")) {
+      return;
+    }
+
+    return completion.choices[0].message.content;
   }
 
-  createCopy(textArea) {
-    var copy = document.createElement('div');
-    copy.textContent = textArea.value;
-    var style = getComputedStyle(textArea);
-    [
-      'fontFamily',
-      'fontSize',
-      'fontWeight',
-      'wordWrap',
-      'whiteSpace',
-      'borderLeftWidth',
-      'borderTopWidth',
-      'borderRightWidth',
-      'borderBottomWidth',
-    ].forEach(function(key) {
-      copy.style[key] = style[key];
-    });
-    copy.style.overflow = 'auto';
-    copy.style.width = textArea.offsetWidth + 'px';
-    copy.style.height = textArea.offsetHeight + 'px';
-    copy.style.position = 'absolute';
-    copy.style.left = textArea.offsetLeft + 'px';
-    copy.style.top = textArea.offsetTop + 'px';
-    document.body.appendChild(copy);
-    return copy;
+  extractLastWord(inputString) {
+    // Split the input string into words using a regular expression
+    const words = inputString.split(/\s+/);
+
+    // Get the last word (if there are words in the string)
+    const lastWord = words.length > 0 ? words[words.length - 1] : '';
+
+    return lastWord;
+  }
+
+  extractLast20Words(inputString: string): string {
+    // Split the input string into words using whitespace as the delimiter
+    const words = inputString.split(/\s+/);
+
+    // If there are 20 or more words, slice the last 20 words and join them back into a string
+    if (words.length >= 10) {
+      const last20Words = words.slice(-10).join(' ');
+      return last20Words;
+    }
+
+    // If there are fewer than 20 words, return the whole input string
+    return inputString;
+  }
+
+  extractLastParagraph(inputString: string): string {
+    const paragraphs: string[] = inputString.split("\n");
+
+    // Get the last paragraph from the array
+    const lastParagraph: string = paragraphs[paragraphs.length - 1];
+
+    return lastParagraph;
   }
 
   updateSuggestionPosition(cursorPosition) {
     const suggestionElement = document.querySelector('.suggestion') as HTMLElement;
     if (suggestionElement) {
-      suggestionElement.style.top = cursorPosition.y + 'px';
-      suggestionElement.style.left = cursorPosition.x + 'px';
+      suggestionElement.style.top = cursorPosition.top + 'px';
+      suggestionElement.style.left = cursorPosition.left + 'px';
     }
   }
 
@@ -400,11 +454,142 @@ export class EditorComponent {
     }, 1000);
   }
 
-  getDecodedAccessToken(token: string): any {
-    try {
-      return jwt_decode(token);
-    } catch (Error) {
-      return null;
+
+  properties = [
+    'direction',  // RTL support
+    'boxSizing',
+    'width',  // on Chrome and IE, exclude the scrollbar, so the mirror div wraps exactly as the textarea does
+    'height',
+    'overflowX',
+    'overflowY',  // copy the scrollbar for IE
+
+    'borderTopWidth',
+    'borderRightWidth',
+    'borderBottomWidth',
+    'borderLeftWidth',
+    'borderStyle',
+
+    'paddingTop',
+    'paddingRight',
+    'paddingBottom',
+    'paddingLeft',
+
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/font
+    'fontStyle',
+    'fontVariant',
+    'fontWeight',
+    'fontStretch',
+    'fontSize',
+    'fontSizeAdjust',
+    'lineHeight',
+    'fontFamily',
+
+    'textAlign',
+    'textTransform',
+    'textIndent',
+    'textDecoration',  // might not make a difference, but better be safe
+
+    'letterSpacing',
+    'wordSpacing',
+
+    'tabSize',
+    'MozTabSize'
+
+  ];
+  isBrowser = (typeof window !== 'undefined');
+  // isFirefox = (isBrowser && window.mozInnerScreenX != null);
+  getCaretCoordinates(element, position) {
+
+    // The mirror div will replicate the textarea's style
+    var div = document.createElement('div');
+    div.id = 'input-textarea-caret-position-mirror-div';
+    document.body.appendChild(div);
+
+    var style = div.style;
+    var computed = window.getComputedStyle ? getComputedStyle(element) : element.currentStyle;  // currentStyle for IE < 9
+    var isInput = element.nodeName === 'INPUT';
+
+    // Default textarea styles
+    style.whiteSpace = 'pre-wrap';
+    if (!isInput)
+      style.wordWrap = 'break-word';  // only for textarea-s
+
+    // Position off-screen
+    style.position = 'absolute';  // required to return coordinates properly
+    // if (!debug)
+    //   style.visibility = 'hidden';  // not 'display: none' because we want rendering
+
+    // Transfer the element's properties to the div
+    this.properties.forEach(function(prop) {
+      if (isInput && prop === 'lineHeight') {
+        // Special case for <input>s because text is rendered centered and line height may be != height
+        if (computed.boxSizing === "border-box") {
+          var height = parseInt(computed.height);
+          var outerHeight =
+            parseInt(computed.paddingTop) +
+            parseInt(computed.paddingBottom) +
+            parseInt(computed.borderTopWidth) +
+            parseInt(computed.borderBottomWidth);
+          var targetHeight = outerHeight + parseInt(computed.lineHeight);
+          if (height > targetHeight) {
+            style.lineHeight = height - outerHeight + "px";
+          } else if (height === targetHeight) {
+            style.lineHeight = computed.lineHeight;
+          } else {
+            style.lineHeight = '0';
+          }
+        } else {
+          style.lineHeight = computed.height;
+        }
+      } else {
+        style[prop] = computed[prop];
+      }
+    });
+
+    style.overflow = 'hidden';  // for Chrome to not render a scrollbar; IE keeps overflowY = 'scroll'
+
+    div.textContent = element.value.substring(0, position);
+    // The second special handling for input type="text" vs textarea:
+    // spaces need to be replaced with non-breaking spaces - http://stackoverflow.com/a/13402035/1269037
+    if (isInput)
+      div.textContent = div.textContent.replace(/\s/g, '\u00a0');
+
+    var span = document.createElement('span');
+    // Wrapping must be replicated *exactly*, including when a long word gets
+    // onto the next line, with whitespace at the end of the line before (#7).
+    // The  *only* reliable way to do that is to copy the *entire* rest of the
+    // textarea's content into the <span> created at the caret position.
+    // For inputs, just '.' would be enough, but no need to bother.
+    span.textContent = element.value.substring(position) || '.';  // || because a completely empty faux span doesn't render at all
+    div.appendChild(span);
+
+
+    var coordinates = {
+      top: span.offsetTop + parseInt(computed['borderTopWidth']) - element.scrollTop + element.getBoundingClientRect().top - 8,
+      left: span.offsetLeft + parseInt(computed['borderLeftWidth']) + element.getBoundingClientRect().left + 8,
+      relativeLeft: span.offsetLeft + parseInt(computed['borderLeftWidth']),
+      height: parseInt(computed['lineHeight'])
+    };
+    document.body.removeChild(div);
+
+    return coordinates;
+  }
+
+  suggestionFitsInLine(suggestion: string, position: number, width: number) {
+    const suggestionLength = suggestion.length * 8;
+    const spaceLeftAfterSuggestion = width - position - suggestionLength;
+    if (spaceLeftAfterSuggestion > 0) {
+      return true;
     }
+    return false;
+  }
+
+  getCaretCoordinatesForNextLine(textAreaLeft, positionTop, lineHeight) {
+    return {
+      top: positionTop + lineHeight - 2,
+      left: textAreaLeft + 8,
+      relativeLeft: 8,
+      height: lineHeight
+    };
   }
 }

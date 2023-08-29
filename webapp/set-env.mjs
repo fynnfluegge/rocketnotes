@@ -12,13 +12,14 @@ const envConfigFile = `export const environment = {
     redirectSignIn: '${process.env.REDIRECT_SIGN_IN}',
     redirectSignOut: '${process.env.REDIRECT_SIGN_OUT}',
     authGuardRedirect: '${process.env.AUTH_GUARD_REDIRECT}',
-    apiUrl: '${process.env.API_URL}'
+    apiUrl: '${process.env.API_URL}',
+    openAiApiKey: '${process.env.OPENAI_API_KEY}'
 };
 `;
-writeFile(targetPath, envConfigFile, function (err) {
-   if (err) {
-       throw console.error(err);
-   } else {
-       console.log(`Angular environment.ts file generated correctly at ${targetPath} \n`);
-   }
+writeFile(targetPath, envConfigFile, function(err) {
+  if (err) {
+    throw console.error(err);
+  } else {
+    console.log(`Angular environment.ts file generated correctly at ${targetPath} \n`);
+  }
 });
