@@ -236,15 +236,23 @@ export class EditorComponent {
         // Restore the cursor position
         markdownTextarea.selectionStart = start + this.suggestion.length;
         markdownTextarea.selectionEnd = end + this.suggestion.length;
-        markdownTextarea.focus();
         this.suggestion = '';
+        if (this.suggestionLinebreak) {
+          this.suggestionLinebreak = false;
+        }
       }
       else if (event.code === 'Tab') {
         event.preventDefault();
       }
       // Create new completion suggestion
-      else if (event.code !== 'ArrowDown' && event.code !== 'ArrowUp' && event.code !== 'ArrowLeft' && event.code !== 'ArrowRight') {
+      else if (event.code !== 'ArrowDown' && event.code !== 'ArrowUp' && event.code !== 'ArrowLeft' && event.code !== 'ArrowRight' && event.code !== 'Backspace') {
         this.suggestion = '';
+        if (this.suggestionLinebreak) {
+          this.suggestionLinebreak = false;
+          markdownTextarea.value = this.content.substring(0, start) + this.content.substring(start);
+          markdownTextarea.selectionStart = start;
+          markdownTextarea.selectionEnd = end;
+        }
         if (textAfterCursor === '' || textAfterCursor.startsWith('\n')) {
           const textBeforeCursor = this.content.substring(0, start) + (event.key.length === 1 ? event.key : '');
           var lastParagraph = this.extractLastParagraph(textBeforeCursor);
@@ -262,17 +270,23 @@ export class EditorComponent {
                 return;
               }
               let caretCoordinates = this.getCaretCoordinates(markdownTextarea, start);
-              this.suggestion = completion;
+              this.suggestion = "This is a suggestion"
               let suggestionFitsInLine = this.suggestionFitsInLine(this.suggestion, caretCoordinates.relativeLeft, markdownTextarea.clientWidth);
               if (!suggestionFitsInLine) {
                 caretCoordinates = this.getCaretCoordinatesForNextLine(markdownTextarea.getBoundingClientRect().left, caretCoordinates.top, caretCoordinates.height);
+                console.log(this.suggestionLinebreak);
                 if (!this.suggestionLinebreak && !textAfterCursor.startsWith('\n\n')) {
+                  console.log('insert linebreak')
+                  const cursorPosition = markdownTextarea.selectionStart;
+                  const textBeforeCursor = this.content.substring(0, cursorPosition);
+                  const textAfterCursor = this.content.substring(cursorPosition);
+                  console.log(textBeforeCursor);
+                  console.log(textAfterCursor);
                   this.suggestionLinebreak = true;
                   const currentStart = markdownTextarea.selectionStart;
-                  markdownTextarea.value = textBeforeCursor + '\n' + textAfterCursor;
+                  markdownTextarea.value = textBeforeCursor + ' \n' + textAfterCursor;
                   markdownTextarea.selectionStart = currentStart;
                   markdownTextarea.selectionEnd = currentStart;
-                  markdownTextarea.focus();
                 }
               } else {
                 this.suggestionLinebreak = false;
@@ -289,6 +303,12 @@ export class EditorComponent {
         }
       } else {
         this.suggestion = '';
+        if (this.suggestionLinebreak) {
+          this.suggestionLinebreak = false;
+          markdownTextarea.value = this.content.substring(0, start) + this.content.substring(start);
+          markdownTextarea.selectionStart = start;
+          markdownTextarea.selectionEnd = end;
+        }
       }
     }
   }
