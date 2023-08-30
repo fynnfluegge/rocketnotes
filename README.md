@@ -26,7 +26,7 @@ Check out the [installation guides](INSTALLATION.md#installation) for deploying 
 ## Features
 
 ### AI-powered text completion
-- 🤖 Use the power of AI to get text completion suggestions
+- 🤖 Use the power of AI to get copilot-like text completion suggestions
 <div align="center">
   
   ![ezgif-4-24eaae81cc](https://github.com/fynnfluegge/rocketnotes/assets/16321871/648ae135-0406-4854-a68f-fb6b3d3f0702)
