@@ -4,6 +4,26 @@
   (document:keydown.esc)="cancelEdit()"
 >
   <div style="display: flex">
+    <button
+      *ngIf="aiCompletionEnabled && !isMobileDevice"
+      (click)="toggleAiCompletion()"
+      data-title="Disable AI Text Completion"
+      class="btn btn-default btn-primary tooltip-bottom expand"
+      style="height: 38px; text-align: center; line-height: 19px"
+    >
+    <img src="../../../assets/icons/png/icons8-artificial-intelligence-50.png" alt="" style="height: 24px; margin-top: -2px; margin-left: -4px;"/>
+    Disbale
+    </button>
+    <button
+      *ngIf="!aiCompletionEnabled && !isMobileDevice"
+      (click)="toggleAiCompletion()"
+      data-title="Enable AI Text Completion"
+      class="btn btn-default btn-primary tooltip-bottom expand"
+      style="height: 38px; text-align: center; line-height: 19px"
+    >
+    <img src="../../../assets/icons/png/icons8-artificial-intelligence-50.png" alt="" style="height: 24px; margin-top: -2px; margin-left: -4px;"/>
+    AI Completion
+    </button>
     <span
       class="center"
       style="font-size: 32px; margin: 6px 0px 6px 0px; flex-grow: 1"
@@ -45,14 +65,15 @@
   </div>
 
   <textarea
-    #markdownTextarea
+    id="markdownTextarea"
     *ngIf="editorMode"
-    class="variable-textarea"
     [(ngModel)]="content"
-    style="resize: none; margin-top: 4px; display: inline-block"
-    [style.width]="showPreview ? '' : '100%'"
+    class="variable-textarea"
+    style="resize: none; margin-top: 4px; display: inline-block; height: 100%;"
+    [style.width]="showPreview ? 'calc(50% - 4px)' : '100%'"
     (keydown)="onKeydown($event)"
   ></textarea>
+  <div class="suggestion">{{ suggestion }}</div>
   <markdown
     id="markdownPreview"
     *ngIf="showPreview && editorMode"
@@ -112,4 +133,15 @@
 
 <div id="snackbar" [ngClass]="{ show: showSnackbar }">
   Saved <i class="fa-solid fa-check"></i>
+</div>
+
+<!-- The popup dialog -->
+<div class="overlay" id="overlay">
+  <div class="dialog">
+    <h5>OpenAI API Key</h5>
+    <textarea type="text" id="inputField" rows="2" placeholder="Enter your API key" style="width: 100%;"></textarea>
+    <br><br>
+    <button class="btn btn-default btn-primary" (click)="closeDialog('overlay')" style="margin-right:8px">Close</button>
+    <button class="btn btn-default btn-primary" (click)="saveOpenAiApiKey()">Save</button>
+  </div>
 </div>

@@ -164,7 +164,7 @@ export class DocumentTree {
                 }
               });
             },
-            error: (e) => {},
+            error: (e) => { },
           });
       });
     } else {
@@ -255,7 +255,7 @@ export class DocumentTree {
               }
             });
           },
-          error: (e) => {},
+          error: (e) => { },
         });
     }
   }
@@ -671,7 +671,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
   transformer = (node: DocumentNode, level: number) => {
     let flatNode =
       this.nestedNodeMap.has(node) &&
-      this.nestedNodeMap.get(node)!.name === node.name
+        this.nestedNodeMap.get(node)!.name === node.name
         ? this.nestedNodeMap.get(node)!
         : new DocumentFlatNode();
     flatNode.name = node.name;
@@ -1064,7 +1064,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
     the text field element and an array of possible autocompleted values:*/
     var currentFocus;
     /*execute a function when someone writes in the text field:*/
-    inp.addEventListener('input', async function () {
+    inp.addEventListener('input', async function() {
       var a,
         b,
         i,
@@ -1085,9 +1085,9 @@ export class SidenavComponent implements OnInit, AfterViewInit {
         const result = await testService
           .get(
             'search-documents/' +
-              localStorage.getItem('currentUserId') +
-              '?searchString=' +
-              this.value
+            localStorage.getItem('currentUserId') +
+            '?searchString=' +
+            this.value
           )
           .toPromise();
         const foundElements = JSON.parse(JSON.stringify(result));
@@ -1115,7 +1115,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
           b.innerHTML +=
             "<input type='hidden' value='" + foundElements[i].id + "'>";
           /*execute a function when someone clicks on the item value (DIV element):*/
-          b.addEventListener('click', function (e) {
+          b.addEventListener('click', function(e) {
             router.navigate(
               ['/' + this.getElementsByTagName('input')[0].value],
               { relativeTo: this.route }
@@ -1128,7 +1128,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
       // }
     });
     /*execute a function presses a key on the keyboard:*/
-    inp.addEventListener('keydown', function (e) {
+    inp.addEventListener('keydown', function(e) {
       var x = document.getElementById(this.id + 'autocomplete-list');
       if (x) var suggestionList = x.getElementsByTagName('div');
       if (e.keyCode == 40) {
@@ -1215,8 +1215,15 @@ export class SidenavComponent implements OnInit, AfterViewInit {
       }
     }
     /*execute a function when someone clicks in the document:*/
-    document.addEventListener('click', function (e) {
+    document.addEventListener('click', function(e) {
       closeAllLists(e.target);
     });
+  }
+
+  openOpenAiKeyDialog() {
+    const overlay = document.getElementById("overlay");
+    overlay.style.display = "flex";
+    const inputField = document.getElementById("inputField") as HTMLInputElement;
+    inputField.value = localStorage.getItem("openAiApiKey");
   }
 }
