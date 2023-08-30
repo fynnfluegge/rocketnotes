@@ -13,7 +13,6 @@ const envConfigFile = `export const environment = {
     redirectSignOut: '${process.env.REDIRECT_SIGN_OUT}',
     authGuardRedirect: '${process.env.AUTH_GUARD_REDIRECT}',
     apiUrl: '${process.env.API_URL}',
-    openAiApiKey: '${process.env.OPENAI_API_KEY}'
 };
 `;
 writeFile(targetPath, envConfigFile, function(err) {

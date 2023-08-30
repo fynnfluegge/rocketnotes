@@ -99,14 +99,33 @@ export class EditorComponent {
     });
 
     this.openai = new OpenAI({
-      apiKey: environment.openAiApiKey,
+      apiKey: localStorage.getItem('openAiApiKey'),
       dangerouslyAllowBrowser: true,
     });
     this.abortController = new AbortController();
   }
 
   toggleAiCompletion() {
-    this.aiCompletionEnabled = !this.aiCompletionEnabled;
+    if (!this.aiCompletionEnabled && localStorage.getItem('openAiApiKey') === null) {
+      console.log("openAiApiKey not set");
+      const overlay = document.getElementById("overlay");
+      overlay.style.display = "flex";
+    } else {
+      this.aiCompletionEnabled = !this.aiCompletionEnabled;
+    }
+  }
+
+  saveOpenAiApiKey() {
+    const apiKeyVlue = document.getElementById("inputField") as HTMLInputElement;
+    localStorage.setItem('openAiApiKey', apiKeyVlue.value);
+    this.openai.apiKey = apiKeyVlue.value;
+    this.toggleAiCompletion();
+    this.closeDialog("overlay");
+  }
+
+  closeDialog(id: string) {
+    const overlay = document.getElementById(id);
+    overlay.style.display = "none";
   }
 
   togglePreviewPanel() {

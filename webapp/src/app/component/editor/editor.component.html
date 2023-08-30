@@ -134,3 +134,14 @@
 <div id="snackbar" [ngClass]="{ show: showSnackbar }">
   Saved <i class="fa-solid fa-check"></i>
 </div>
+
+<!-- The popup dialog -->
+<div class="overlay" id="overlay">
+  <div class="dialog">
+    <h4>Enter OpenAI API Key</h4>
+    <input type="text" id="inputField" placeholder="Enter something">
+    <br><br>
+    <button (click)="closeDialog('overlay')">Close</button>
+    <button (click)="saveOpenAiApiKey()">Save</button>
+  </div>
+</div>

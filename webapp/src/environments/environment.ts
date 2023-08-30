@@ -12,5 +12,4 @@ export const environment = {
   redirectSignOut: 'undefined',
   authGuardRedirect: 'undefined',
   apiUrl: 'undefined',
-  openAiApiKey: 'undefined'
 };
