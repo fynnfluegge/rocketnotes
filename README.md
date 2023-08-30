@@ -15,7 +15,7 @@
 </div>
 
 ## What is Rocketnotes?
-Rocketnotes is a Markdown Editor for the Web.
+Rocketnotes is a Markdown Editor with AI-powered text completion for the Web.
 Save, structure and share if you like daily notes and learnings in the browser from any device. 
 You can [sign up](https://takeniftynotes.auth.eu-central-1.amazoncognito.com/login?response_type=code&client_id=tt3v27pnqqh7elqdvq9tgmr9v&redirect_uri=https://app.takeniftynotes.net) for free (Yes, it's free and it will be free forever as far as possible), run it on your local machine with Docker or deploy it with low effort in your personal AWS account and your desired region.
 Check out the [installation guides](INSTALLATION.md#installation) for deploying Rocketnotes at [AWS](INSTALLATION.md#aws-hosting) or running it on your [local machine with Docker](INSTALLATION.md#run-on-your-local-machine-with-docker).
@@ -24,6 +24,15 @@ Check out the [installation guides](INSTALLATION.md#installation) for deploying 
 
 
 ## Features
+
+### AI-powered text completion
+- 🤖 Use the power of AI to get text completion suggestions
+<div align="center">
+  
+  ![ezgif-4-24eaae81cc](https://github.com/fynnfluegge/rocketnotes/assets/16321871/648ae135-0406-4854-a68f-fb6b3d3f0702)
+  
+</div>
+
 
 ### Create code snipptes with syntax highlighting 
 - 📝 Use the power and simplicity of Markdown for your personal notes.
