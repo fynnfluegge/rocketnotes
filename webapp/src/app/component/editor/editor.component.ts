@@ -5,7 +5,6 @@ import {
 } from '@angular/core';
 import { Auth } from 'aws-amplify';
 import { BasicRestService } from 'src/app/service/basic-rest.service';
-import jwt_decode from 'jwt-decode';
 import { ActivatedRoute } from '@angular/router';
 import { DocumentTree } from '../navigation/sidenav.component';
 import { Title } from '@angular/platform-browser';
@@ -49,7 +48,7 @@ export class EditorComponent {
   private abortController: AbortController;
   private completionTimeout: NodeJS.Timeout | undefined;
   private suggestionLinebreak: boolean = false;
-
+  public aiCompletionEnabled: boolean = false;
 
   constructor(
     private database: DocumentTree,
@@ -104,6 +103,10 @@ export class EditorComponent {
       dangerouslyAllowBrowser: true,
     });
     this.abortController = new AbortController();
+  }
+
+  toggleAiCompletion() {
+    this.aiCompletionEnabled = !this.aiCompletionEnabled;
   }
 
   togglePreviewPanel() {
@@ -217,97 +220,95 @@ export class EditorComponent {
         this.submit();
       }
 
-      this.abortController.abort();
-      this.abortController = new AbortController();
-      const markdownTextarea = document.getElementById('markdownTextarea') as HTMLInputElement;
-      const start = markdownTextarea.selectionStart
-      const end = markdownTextarea.selectionEnd;
-      const textAfterCursor = this.content.substring(start);
+      if (this.aiCompletionEnabled) {
+        this.abortController.abort();
+        this.abortController = new AbortController();
+        const markdownTextarea = document.getElementById('markdownTextarea') as HTMLInputElement;
+        const start = markdownTextarea.selectionStart
+        const end = markdownTextarea.selectionEnd;
+        const textAfterCursor = this.content.substring(start);
 
-      // Accept completion suggestion
-      if (event.code === 'Tab' && this.suggestion !== '') {
-        event.preventDefault();
-        const textBeforeCursor = this.content.substring(0, start);
+        // Accept completion suggestion
+        if (event.code === 'Tab' && this.suggestion !== '') {
+          event.preventDefault();
+          const textBeforeCursor = this.content.substring(0, start);
 
-        // Insert the suggestion
-        const adjustedText = textBeforeCursor + this.suggestion + textAfterCursor
-        markdownTextarea.value = adjustedText;
+          // Insert the suggestion
+          const adjustedText = textBeforeCursor + this.suggestion + textAfterCursor
+          markdownTextarea.value = adjustedText;
 
-        // Restore the cursor position
-        markdownTextarea.selectionStart = start + this.suggestion.length;
-        markdownTextarea.selectionEnd = end + this.suggestion.length;
-        this.suggestion = '';
-        if (this.suggestionLinebreak) {
-          this.suggestionLinebreak = false;
-        }
-      }
-      else if (event.code === 'Tab') {
-        event.preventDefault();
-      }
-      // Create new completion suggestion
-      else if (event.code !== 'ArrowDown' && event.code !== 'ArrowUp' && event.code !== 'ArrowLeft' && event.code !== 'ArrowRight' && event.code !== 'Backspace') {
-        this.suggestion = '';
-        if (this.suggestionLinebreak) {
-          this.suggestionLinebreak = false;
-          markdownTextarea.value = this.content.substring(0, start) + this.content.substring(start);
-          markdownTextarea.selectionStart = start;
-          markdownTextarea.selectionEnd = end;
-        }
-        if (textAfterCursor === '' || textAfterCursor.startsWith('\n')) {
-          const textBeforeCursor = this.content.substring(0, start) + (event.key.length === 1 ? event.key : '');
-          var lastParagraph = this.extractLastParagraph(textBeforeCursor);
-          if (lastParagraph.length < 32 || lastParagraph.length > 256) {
-            lastParagraph = this.extractLast20Words(textBeforeCursor);
+          // Restore the cursor position
+          markdownTextarea.selectionStart = start + this.suggestion.length;
+          markdownTextarea.selectionEnd = end + this.suggestion.length;
+          this.suggestion = '';
+          if (this.suggestionLinebreak) {
+            this.suggestionLinebreak = false;
           }
-
-          if (this.completionTimeout !== undefined) {
-            clearTimeout(this.completionTimeout);
-          }
-
-          this.completionTimeout = setTimeout(() => {
-            this.aiCompletion(this.abortController.signal, lastParagraph).then((completion) => {
-              if (completion === undefined) {
-                return;
-              }
-              let caretCoordinates = this.getCaretCoordinates(markdownTextarea, start);
-              this.suggestion = "This is a suggestion"
-              let suggestionFitsInLine = this.suggestionFitsInLine(this.suggestion, caretCoordinates.relativeLeft, markdownTextarea.clientWidth);
-              if (!suggestionFitsInLine) {
-                caretCoordinates = this.getCaretCoordinatesForNextLine(markdownTextarea.getBoundingClientRect().left, caretCoordinates.top, caretCoordinates.height);
-                console.log(this.suggestionLinebreak);
-                if (!this.suggestionLinebreak && !textAfterCursor.startsWith('\n\n')) {
-                  console.log('insert linebreak')
-                  const cursorPosition = markdownTextarea.selectionStart;
-                  const textBeforeCursor = this.content.substring(0, cursorPosition);
-                  const textAfterCursor = this.content.substring(cursorPosition);
-                  console.log(textBeforeCursor);
-                  console.log(textAfterCursor);
-                  this.suggestionLinebreak = true;
-                  const currentStart = markdownTextarea.selectionStart;
-                  markdownTextarea.value = textBeforeCursor + ' \n' + textAfterCursor;
-                  markdownTextarea.selectionStart = currentStart;
-                  markdownTextarea.selectionEnd = currentStart;
-                }
-              } else {
-                this.suggestionLinebreak = false;
-                // if a space is in front of the cursor position, move the suggestion 4px to the left, since
-                // the caretCoordinates are shifted right in that case
-                if (textBeforeCursor.endsWith(' ')) {
-                  caretCoordinates.left -= 4;
-                }
-              }
-              this.updateSuggestionPosition(caretCoordinates);
-            });
-          }, 500);
-
         }
-      } else {
-        this.suggestion = '';
-        if (this.suggestionLinebreak) {
-          this.suggestionLinebreak = false;
-          markdownTextarea.value = this.content.substring(0, start) + this.content.substring(start);
-          markdownTextarea.selectionStart = start;
-          markdownTextarea.selectionEnd = end;
+        else if (event.code === 'Tab') {
+          event.preventDefault();
+        }
+        // Create new completion suggestion
+        else if (event.code !== 'ArrowDown' && event.code !== 'ArrowUp' && event.code !== 'ArrowLeft' && event.code !== 'ArrowRight' && event.code !== 'Backspace') {
+          this.suggestion = '';
+          if (this.suggestionLinebreak) {
+            this.suggestionLinebreak = false;
+            markdownTextarea.value = this.content.substring(0, start) + this.content.substring(start);
+            markdownTextarea.selectionStart = start;
+            markdownTextarea.selectionEnd = end;
+          }
+          if (textAfterCursor === '' || textAfterCursor.startsWith('\n')) {
+            const textBeforeCursor = this.content.substring(0, start) + (event.key.length === 1 ? event.key : '');
+            var lastParagraph = this.extractLastParagraph(textBeforeCursor);
+            if (lastParagraph.length < 32 || lastParagraph.length > 256) {
+              lastParagraph = this.extractLast20Words(textBeforeCursor);
+            }
+
+            if (this.completionTimeout !== undefined) {
+              clearTimeout(this.completionTimeout);
+            }
+
+            this.completionTimeout = setTimeout(() => {
+              this.aiCompletion(this.abortController.signal, lastParagraph).then((completion) => {
+                if (completion === undefined) {
+                  return;
+                }
+                let caretCoordinates = this.getCaretCoordinates(markdownTextarea, start);
+                this.suggestion = completion;
+                let suggestionFitsInLine = this.suggestionFitsInLine(this.suggestion, caretCoordinates.relativeLeft, markdownTextarea.clientWidth);
+                if (!suggestionFitsInLine) {
+                  caretCoordinates = this.getCaretCoordinatesForNextLine(markdownTextarea.getBoundingClientRect().left, caretCoordinates.top, caretCoordinates.height);
+                  if (!this.suggestionLinebreak && !textAfterCursor.startsWith('\n\n')) {
+                    const cursorPosition = markdownTextarea.selectionStart;
+                    const textBeforeCursor = this.content.substring(0, cursorPosition);
+                    const textAfterCursor = this.content.substring(cursorPosition);
+                    this.suggestionLinebreak = true;
+                    const currentStart = markdownTextarea.selectionStart;
+                    markdownTextarea.value = textBeforeCursor + ' \n' + textAfterCursor;
+                    markdownTextarea.selectionStart = currentStart;
+                    markdownTextarea.selectionEnd = currentStart;
+                  }
+                } else {
+                  this.suggestionLinebreak = false;
+                  // if a space is in front of the cursor position, move the suggestion 4px to the left, since
+                  // the caretCoordinates are shifted right in that case
+                  if (textBeforeCursor.endsWith(' ')) {
+                    caretCoordinates.left -= 4;
+                  }
+                }
+                this.updateSuggestionPosition(caretCoordinates);
+              });
+            }, 500);
+
+          }
+        } else {
+          this.suggestion = '';
+          if (this.suggestionLinebreak) {
+            this.suggestionLinebreak = false;
+            markdownTextarea.value = this.content.substring(0, start) + this.content.substring(start);
+            markdownTextarea.selectionStart = start;
+            markdownTextarea.selectionEnd = end;
+          }
         }
       }
     }

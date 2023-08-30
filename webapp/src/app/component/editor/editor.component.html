@@ -4,6 +4,24 @@
   (document:keydown.esc)="cancelEdit()"
 >
   <div style="display: flex">
+    <button
+      *ngIf="aiCompletionEnabled"
+      (click)="toggleAiCompletion()"
+      class="btn btn-default btn-primary"
+      style="height: 38px; text-align: center; line-height: 19px"
+    >
+    <img src="../../../assets/icons/png/icons8-artificial-intelligence-50.png" alt="" style="height: 24px; margin-top: -2px; margin-left: -4px;"/>
+    Disbale AI
+    </button>
+    <button
+      *ngIf="!aiCompletionEnabled"
+      (click)="toggleAiCompletion()"
+      class="btn btn-default btn-primary"
+      style="height: 38px; text-align: center; line-height: 19px"
+    >
+    <img src="../../../assets/icons/png/icons8-artificial-intelligence-50.png" alt="" style="height: 24px; margin-top: -2px; margin-left: -4px;"/>
+    Enable AI
+    </button>
     <span
       class="center"
       style="font-size: 32px; margin: 6px 0px 6px 0px; flex-grow: 1"
