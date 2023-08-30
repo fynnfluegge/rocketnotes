@@ -28,6 +28,7 @@ export class EditorComponent {
   public showSnackbar: Boolean = false;
   public editorMode: Boolean = false;
   public fullscreen: Boolean = false;
+  public isMobileDevice = false;
 
   suggestion = '';
 
@@ -102,12 +103,19 @@ export class EditorComponent {
       apiKey: localStorage.getItem('openAiApiKey'),
       dangerouslyAllowBrowser: true,
     });
+    if (localStorage.getItem('openAiApiKey') !== null) {
+      this.aiCompletionEnabled = true;
+    }
     this.abortController = new AbortController();
+
+    this.isMobileDevice =
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(
+        navigator.userAgent
+      );
   }
 
   toggleAiCompletion() {
     if (!this.aiCompletionEnabled && localStorage.getItem('openAiApiKey') === null) {
-      console.log("openAiApiKey not set");
       const overlay = document.getElementById("overlay");
       overlay.style.display = "flex";
     } else {
@@ -270,12 +278,7 @@ export class EditorComponent {
         // Create new completion suggestion
         else if (event.code !== 'ArrowDown' && event.code !== 'ArrowUp' && event.code !== 'ArrowLeft' && event.code !== 'ArrowRight' && event.code !== 'Backspace') {
           this.suggestion = '';
-          if (this.suggestionLinebreak) {
-            this.suggestionLinebreak = false;
-            markdownTextarea.value = this.content.substring(0, start) + this.content.substring(start);
-            markdownTextarea.selectionStart = start;
-            markdownTextarea.selectionEnd = end;
-          }
+          this.unbreakSuggestionSpace(start, end);
           if (textAfterCursor === '' || textAfterCursor.startsWith('\n')) {
             const textBeforeCursor = this.content.substring(0, start) + (event.key.length === 1 ? event.key : '');
             var lastParagraph = this.extractLastParagraph(textBeforeCursor);
@@ -322,14 +325,20 @@ export class EditorComponent {
           }
         } else {
           this.suggestion = '';
-          if (this.suggestionLinebreak) {
-            this.suggestionLinebreak = false;
-            markdownTextarea.value = this.content.substring(0, start) + this.content.substring(start);
-            markdownTextarea.selectionStart = start;
-            markdownTextarea.selectionEnd = end;
-          }
+          this.unbreakSuggestionSpace(start, end);
         }
       }
+    }
+  }
+
+
+  unbreakSuggestionSpace(start: number, end: number) {
+    if (this.suggestionLinebreak) {
+      this.suggestionLinebreak = false;
+      const markdownTextarea = document.getElementById('markdownTextarea') as HTMLInputElement;
+      markdownTextarea.value = this.content.substring(0, start) + this.content.substring(start);
+      markdownTextarea.selectionStart = start;
+      markdownTextarea.selectionEnd = end;
     }
   }
 
@@ -601,7 +610,7 @@ export class EditorComponent {
   }
 
   suggestionFitsInLine(suggestion: string, position: number, width: number) {
-    const suggestionLength = suggestion.length * 8;
+    const suggestionLength = suggestion.length * 6;
     const spaceLeftAfterSuggestion = width - position - suggestionLength;
     if (spaceLeftAfterSuggestion > 0) {
       return true;

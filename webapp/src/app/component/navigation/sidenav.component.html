@@ -38,6 +38,11 @@
       <div>
         <strong>{{ username }}</strong>
       </div>
+      <button (click)="openOpenAiKeyDialog('overlay')"
+        *ngIf="!isMobileDevice"
+        style="padding: 8px; margin-top: 4px">
+        Show OpenAI API Key
+      </button>
       <button (click)="onLogout()" style="padding: 8px; margin-top: 4px">
         Logout
       </button>

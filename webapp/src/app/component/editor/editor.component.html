@@ -5,7 +5,7 @@
 >
   <div style="display: flex">
     <button
-      *ngIf="aiCompletionEnabled"
+      *ngIf="aiCompletionEnabled && !isMobileDevice"
       (click)="toggleAiCompletion()"
       data-title="Disable AI Text Completion"
       class="btn btn-default btn-primary tooltip-bottom expand"
@@ -15,7 +15,7 @@
     Disbale
     </button>
     <button
-      *ngIf="!aiCompletionEnabled"
+      *ngIf="!aiCompletionEnabled && !isMobileDevice"
       (click)="toggleAiCompletion()"
       data-title="Enable AI Text Completion"
       class="btn btn-default btn-primary tooltip-bottom expand"
@@ -138,10 +138,10 @@
 <!-- The popup dialog -->
 <div class="overlay" id="overlay">
   <div class="dialog">
-    <h4>Enter OpenAI API Key</h4>
-    <input type="text" id="inputField" placeholder="Enter something">
+    <h5>OpenAI API Key</h5>
+    <textarea type="text" id="inputField" rows="2" placeholder="Enter your API key" style="width: 100%;"></textarea>
     <br><br>
-    <button (click)="closeDialog('overlay')">Close</button>
-    <button (click)="saveOpenAiApiKey()">Save</button>
+    <button class="btn btn-default btn-primary" (click)="closeDialog('overlay')" style="margin-right:8px">Close</button>
+    <button class="btn btn-default btn-primary" (click)="saveOpenAiApiKey()">Save</button>
   </div>
 </div>
