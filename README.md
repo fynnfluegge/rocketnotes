@@ -22,21 +22,6 @@ Check out the [installation guides](INSTALLATION.md#installation) for deploying 
 
 > **_NOTE:_**  Hosting on AWS with a Cloudfront distribution for S3, DynamoDB and Lambda will cost you less than $1 per month under normal usage.
 
-## Want to contribute?
-The most comfortable way to get started is to open the project in a ready-to-code Gitpod workspace with all packages & tools preinstalled and a running database with sample data.
-
-<div align="center">
-<a href="https://gitpod.io/#https://github.com/fynnfluegge/rocketnotes">
-    <img src="https://gitpod.io/button/open-in-gitpod.svg" height="48">
-  </a>
-</div>
-
-If you prefer to setup the project on your local machine visit the [get started guide](CONTRIBUTING.md#getting-started) with all required steps to run the project locally in development mode.
-
-You find also the contribution guidelines there.
-Don't hesitate to open an issue for getting some feedback about a potential bug or if you desire a missing feature.
-We also appreciate to check over current [issues](https://github.com/fynnfluegge/rocketnotes/issues) and provide feedback to existing ones or even raise a PR which solves an issue.
-Any contribution is welcome!
 
 ## Features
 
@@ -69,6 +54,22 @@ Any contribution is welcome!
 </div>
 
 &nbsp;
+
+## Want to contribute?
+The most comfortable way to get started is to open the project in a ready-to-code Gitpod workspace with all packages & tools preinstalled and a running database with sample data.
+
+<div align="center">
+<a href="https://gitpod.io/#https://github.com/fynnfluegge/rocketnotes">
+    <img src="https://gitpod.io/button/open-in-gitpod.svg" height="48">
+  </a>
+</div>
+
+If you prefer to setup the project on your local machine visit the [get started guide](CONTRIBUTING.md#getting-started) with all required steps to run the project locally in development mode.
+
+You find also the contribution guidelines there.
+Don't hesitate to open an issue for getting some feedback about a potential bug or if you desire a missing feature.
+We also appreciate to check over current [issues](https://github.com/fynnfluegge/rocketnotes/issues) and provide feedback to existing ones or even raise a PR which solves an issue.
+Any contribution is welcome!
 
 ## 📝 License
 
