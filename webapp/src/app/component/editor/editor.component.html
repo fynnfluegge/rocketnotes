@@ -139,8 +139,14 @@
 <div class="overlay" id="overlay">
   <div class="dialog">
     <h5>OpenAI API Key</h5>
-    <textarea type="text" id="inputField" rows="2" placeholder="Enter your API key" style="width: 100%;"></textarea>
-    <br><br>
+    <textarea type="text" id="inputField" rows="3" placeholder="Enter your API key" style="width: 100%;"></textarea>
+    <br>
+    <div>
+      <span style="text-align: right"><strong>Note</strong>: Your key won't be stored somewhere outside of your device. Your key will only be used for making request to the OpenAI API.
+        This is an experimental feature. Your key is stored in the local storage of your browser until you log out and needs to be re-entered after logging in again.
+      </span>
+    </div>
+    <br>
     <button class="btn btn-default btn-primary" (click)="closeDialog('overlay')" style="margin-right:8px">Close</button>
     <button class="btn btn-default btn-primary" (click)="saveOpenAiApiKey()">Save</button>
   </div>
