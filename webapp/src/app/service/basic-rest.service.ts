@@ -9,10 +9,7 @@ import { retry } from 'rxjs/operators';
 export class BasicRestService {
   backend_url = environment.apiUrl;
 
-  token: any;
-
   constructor(public http: HttpClient) {
-    this.token = '';
   }
 
   public _addStandardHeaders(header: HttpHeaders) {
@@ -32,7 +29,7 @@ export class BasicRestService {
 
     if (params) {
       reqOpts.params = new HttpParams();
-      for (let k in params) {
+      for (const k in params) {
         reqOpts.params = reqOpts.params.set(k, params[k]);
       }
     }
