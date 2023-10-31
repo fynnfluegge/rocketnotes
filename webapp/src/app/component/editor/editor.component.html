@@ -11,8 +11,12 @@
       class="btn btn-default btn-primary tooltip-bottom expand"
       style="height: 38px; text-align: center; line-height: 19px"
     >
-    <img src="../../../assets/icons/png/icons8-artificial-intelligence-50.png" alt="" style="height: 24px; margin-top: -2px; margin-left: -4px;"/>
-    Disbale
+      <img
+        src="../../../assets/icons/png/icons8-artificial-intelligence-50.png"
+        alt=""
+        style="height: 24px; margin-top: -2px; margin-left: -4px"
+      />
+      Disbale
     </button>
     <button
       *ngIf="!aiCompletionEnabled && !isMobileDevice"
@@ -21,8 +25,12 @@
       class="btn btn-default btn-primary tooltip-bottom expand"
       style="height: 38px; text-align: center; line-height: 19px"
     >
-    <img src="../../../assets/icons/png/icons8-artificial-intelligence-50.png" alt="" style="height: 24px; margin-top: -2px; margin-left: -4px;"/>
-    AI Completion
+      <img
+        src="../../../assets/icons/png/icons8-artificial-intelligence-50.png"
+        alt=""
+        style="height: 24px; margin-top: -2px; margin-left: -4px"
+      />
+      AI Completion
     </button>
     <span
       class="center"
@@ -69,7 +77,7 @@
     *ngIf="editorMode"
     [(ngModel)]="content"
     class="variable-textarea"
-    style="resize: none; margin-top: 4px; display: inline-block; height: 100%;"
+    style="resize: none; margin-top: 4px; display: inline-block; height: 100%"
     [style.width]="showPreview ? 'calc(50% - 4px)' : '100%'"
     (keydown)="onKeydown($event)"
   ></textarea>
@@ -139,15 +147,31 @@
 <div class="overlay" id="overlay">
   <div class="dialog">
     <h5>OpenAI API Key</h5>
-    <textarea type="text" id="inputField" rows="3" placeholder="Enter your API key" style="width: 100%;"></textarea>
-    <br>
+    <textarea
+      type="text"
+      id="inputField"
+      rows="3"
+      placeholder="Enter your API key"
+      style="width: 100%"
+    ></textarea>
+    <br />
     <div>
-      <span style="text-align: right"><strong>Note</strong>: Your key won't be stored somewhere outside of your device. Your key will only be used for making request to the OpenAI API.
-        This is an experimental feature. Your key is stored in the local storage of your browser until you log out and needs to be re-entered after logging in again.
+      <span style="text-align: right"
+        ><strong>Note</strong>: Your OpenAI API key is kept secure and is not
+        shared with anyone. You can entirely revoke your API key at any time by
+        clearing the input field and save.
       </span>
     </div>
-    <br>
-    <button class="btn btn-default btn-primary" (click)="closeDialog('overlay')" style="margin-right:8px">Close</button>
-    <button class="btn btn-default btn-primary" (click)="saveOpenAiApiKey()">Save</button>
+    <br />
+    <button
+      class="btn btn-default btn-primary"
+      (click)="closeDialog('overlay')"
+      style="margin-right: 8px"
+    >
+      Close
+    </button>
+    <button class="btn btn-default btn-primary" (click)="saveOpenAiApiKey()">
+      Save
+    </button>
   </div>
 </div>
