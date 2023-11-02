@@ -519,6 +519,8 @@ export class SidenavComponent implements OnInit, AfterViewInit {
 
   showSidebar = true;
 
+  darkmode: boolean;
+
   dragging = false;
   expandTimeout: any;
   expandDelay = 1000;
@@ -577,6 +579,19 @@ export class SidenavComponent implements OnInit, AfterViewInit {
 
     this.getScreenSize();
     this.setOperatingSystem();
+
+    if (localStorage.getItem('darkmode') !== null) {
+      this.darkmode = localStorage.getItem('darkmode') === 'true';
+      this.setTheme();
+    } else {
+      Auth.currentAuthenticatedUser().then((user) => {
+        Auth.userAttributes(user).then((attributes) => {
+          this.darkmode = attributes['custom:darkMode'] === 1;
+          localStorage.setItem('darkmode', this.darkmode.toString());
+          this.setTheme();
+        });
+      });
+    }
   }
 
   setOperatingSystem() {
@@ -1229,5 +1244,31 @@ export class SidenavComponent implements OnInit, AfterViewInit {
     if (apikey !== null)
       inputField.value =
         apikey.substring(0, 8) + '********************************************';
+  }
+
+  toggleDarkMode() {
+    this.darkmode = !this.darkmode;
+    localStorage.setItem('darkmode', this.darkmode.toString());
+    Auth.currentAuthenticatedUser().then((user) => {
+      Auth.updateUserAttributes(user, {
+        'custom:darkMode': this.darkmode ? 1 : 0,
+      });
+    });
+    this.setTheme();
+  }
+
+  setTheme() {
+    document.documentElement.style.setProperty(
+      '--background-color',
+      this.darkmode
+        ? 'var(--dark-theme-background-color)'
+        : 'var(--light-theme-background-color)',
+    );
+    document.documentElement.style.setProperty(
+      '--font-color',
+      this.darkmode
+        ? 'var(--dark-theme-font-color)'
+        : 'var(--light-theme-font-color)',
+    );
   }
 }

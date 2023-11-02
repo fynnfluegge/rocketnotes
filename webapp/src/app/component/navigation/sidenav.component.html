@@ -31,18 +31,38 @@
       <div>New Document:  ⌘ + ⇧ + N</div>
     </div>
   </div> -->
-  <div class="dropdown" style="margin-right: 8px">
-    <button style="height: 100%"><i class="fa-solid fa-user"></i></button>
+  <div class="dropdown" style="width: 48px; color: black">
+    <button style="height: 100%">
+      <i
+        class="fa-solid fa-user fa-lg"
+        style="position: relative; left: 8px"
+      ></i>
+    </button>
     <div class="dropdown-content dropdown-light">
-      <div>Signed in as</div>
       <div>
         <strong>{{ username }}</strong>
       </div>
-      <button (click)="openOpenAiApiKeyDialog('overlay')"
+      <button
+        (click)="openOpenAiApiKeyDialog('overlay')"
         *ngIf="!isMobileDevice"
-        style="padding: 8px; margin-top: 4px">
+        style="padding: 8px; margin-top: 4px"
+      >
         Show OpenAI API Key
       </button>
+      <div style="width: 50%; margin: auto; margin-top: 12px">
+        <label class="switch">
+          <input
+            type="checkbox"
+            (change)="toggleDarkMode()"
+            [checked]="darkmode"
+          />
+          <span class="slider round"></span>
+        </label>
+        <i
+          class="fa-solid fa-moon fa-2xl"
+          style="position: relative; top: 4px; margin-left: 8px"
+        ></i>
+      </div>
       <button (click)="onLogout()" style="padding: 8px; margin-top: 4px">
         Logout
       </button>

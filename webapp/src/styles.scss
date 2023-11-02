@@ -1,7 +1,20 @@
+:root {
+  --light-theme-menu-color: #282828;
+  --light-theme-background-color: white;
+  --light-theme-font-color: black;
+  --dark-theme-menu-color: #282828;
+  --dark-theme-background-color: #3b3a3a;
+  --dark-theme-font-color: #f5f1f0;
+  --background-color: var(--light-theme-background-color);
+  --font-color: var(--light-theme-font-color);
+  --menu-color: var(--light-theme-menu-color);
+}
+
 html,
 body {
   height: 100%;
 }
+
 body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
@@ -64,9 +77,13 @@ pre[class*="language-"] {
   padding: 10px;
   cursor: pointer;
   background-color: #fff;
-  box-shadow: rgba(0, 0, 0, 0.07) 0px 1px 2px, rgba(0, 0, 0, 0.07) 0px 2px 4px,
-    rgba(0, 0, 0, 0.07) 0px 4px 8px, rgba(0, 0, 0, 0.07) 0px 8px 16px,
-    rgba(0, 0, 0, 0.07) 0px 16px 32px, rgba(0, 0, 0, 0.07) 0px 32px 64px;
+  box-shadow:
+    rgba(0, 0, 0, 0.07) 0px 1px 2px,
+    rgba(0, 0, 0, 0.07) 0px 2px 4px,
+    rgba(0, 0, 0, 0.07) 0px 4px 8px,
+    rgba(0, 0, 0, 0.07) 0px 8px 16px,
+    rgba(0, 0, 0, 0.07) 0px 16px 32px,
+    rgba(0, 0, 0, 0.07) 0px 32px 64px;
 }
 
 /*when hovering an item:*/
