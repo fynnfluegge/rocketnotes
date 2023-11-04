@@ -47,9 +47,9 @@
         *ngIf="!isMobileDevice"
         style="padding: 8px; margin-top: 4px"
       >
-        Show OpenAI API Key
+        OpenAI API Key
       </button>
-      <div style="width: 50%; margin: auto; margin-top: 12px">
+      <div style="width: 80%; margin: auto; margin-top: 12px">
         <label class="switch">
           <input
             type="checkbox"
@@ -58,10 +58,11 @@
           />
           <span class="slider round"></span>
         </label>
-        <i
-          class="fa-solid fa-moon fa-2xl"
-          style="position: relative; top: 4px; margin-left: 8px"
-        ></i>
+        <label
+          style="position: relative; top: 4px; margin-left: 4px; font-size: 18px"
+        >
+          Nightmode
+        </label>
       </div>
       <button (click)="onLogout()" style="padding: 8px; margin-top: 4px">
         Logout

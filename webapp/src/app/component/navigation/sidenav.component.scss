@@ -1,6 +1,6 @@
 button {
   color: white;
-  background-color: #282828;
+  background-color: var(--menu-color);
   border: none;
 }
 
@@ -23,6 +23,7 @@ button {
   border-bottom: 1px solid grey;
   font-weight: 280;
   font-size: 16px;
+  transition: background-color 0.25s;
 
   &.cdk-drag-preview {
     // while dragging
@@ -94,7 +95,7 @@ span:hover {
 }
 
 .icon-button-fade {
-  opacity: 0.5;
+  opacity: 0.6;
   width: 24px;
 }
 
@@ -154,7 +155,7 @@ ul {
   display: flex;
   margin: 0;
   padding: 0;
-  background: #282828;
+  background: var(--menu-color);
   position: fixed;
   top: 0;
   width: 100%;
@@ -281,11 +282,11 @@ li a:hover {
 }
 
 input:checked + .slider {
-  background-color: #2196f3;
+  background-color: var(--menu-color);
 }
 
 input:focus + .slider {
-  box-shadow: 0 0 1px #2196f3;
+  box-shadow: 0 0 1px var(--menu-color);
 }
 
 input:checked + .slider:before {
@@ -294,7 +295,6 @@ input:checked + .slider:before {
   transform: translateX(26px);
 }
 
-/* Rounded sliders */
 .slider.round {
   border-radius: 34px;
 }
