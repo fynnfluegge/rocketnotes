@@ -519,6 +519,8 @@ export class SidenavComponent implements OnInit, AfterViewInit {
 
   showSidebar = true;
 
+  darkmode: boolean;
+
   dragging = false;
   expandTimeout: any;
   expandDelay = 1000;
@@ -577,6 +579,19 @@ export class SidenavComponent implements OnInit, AfterViewInit {
 
     this.getScreenSize();
     this.setOperatingSystem();
+
+    if (localStorage.getItem('darkmode') !== null) {
+      this.darkmode = localStorage.getItem('darkmode') === 'true';
+      this.setTheme();
+    } else {
+      Auth.currentAuthenticatedUser().then((user) => {
+        Auth.userAttributes(user).then((attributes) => {
+          this.darkmode = attributes['custom:darkMode'] === 1;
+          localStorage.setItem('darkmode', this.darkmode.toString());
+          this.setTheme();
+        });
+      });
+    }
   }
 
   setOperatingSystem() {
@@ -1058,12 +1073,12 @@ export class SidenavComponent implements OnInit, AfterViewInit {
       .subscribe();
   }
 
-  autocomplete(inp: any, testService: BasicRestService, router: Router) {
+  autocomplete(input: any, testService: BasicRestService, router: Router) {
     /*the autocomplete function takes two arguments,
     the text field element and an array of possible autocompleted values:*/
     let currentFocus;
     /*execute a function when someone writes in the text field:*/
-    inp.addEventListener('input', async function() {
+    input.addEventListener('input', async function() {
       let a,
         b,
         i,
@@ -1127,7 +1142,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
       // }
     });
     /*execute a function presses a key on the keyboard:*/
-    inp.addEventListener('keydown', function(e) {
+    input.addEventListener('keydown', function(e) {
       const x = document.getElementById(this.id + 'autocomplete-list');
       if (x) var suggestionList = x.getElementsByTagName('div');
       if (e.keyCode == 40) {
@@ -1173,7 +1188,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
       except the one passed as an argument:*/
       const x = document.getElementsByClassName('autocomplete-items');
       for (let i = 0; i < x.length; i++) {
-        if (elmnt != x[i] && elmnt != inp) {
+        if (elmnt != x[i] && elmnt != input) {
           x[i].parentNode.removeChild(x[i]);
         }
       }
@@ -1229,5 +1244,43 @@ export class SidenavComponent implements OnInit, AfterViewInit {
     if (apikey !== null)
       inputField.value =
         apikey.substring(0, 8) + '********************************************';
+  }
+
+  toggleDarkMode() {
+    this.darkmode = !this.darkmode;
+    localStorage.setItem('darkmode', this.darkmode.toString());
+    Auth.currentAuthenticatedUser().then((user) => {
+      Auth.updateUserAttributes(user, {
+        'custom:darkMode': this.darkmode ? 1 : 0,
+      });
+    });
+    this.setTheme();
+  }
+
+  setTheme() {
+    document.documentElement.style.setProperty(
+      '--background-color',
+      this.darkmode
+        ? 'var(--dark-theme-background-color)'
+        : 'var(--light-theme-background-color)',
+    );
+    document.documentElement.style.setProperty(
+      '--font-color',
+      this.darkmode
+        ? 'var(--dark-theme-font-color)'
+        : 'var(--light-theme-font-color)',
+    );
+    document.documentElement.style.setProperty(
+      '--menu-color',
+      this.darkmode
+        ? 'var(--dark-theme-menu-color)'
+        : 'var(--light-theme-menu-color)',
+    );
+    document.documentElement.style.setProperty(
+      '--button-fade',
+      this.darkmode
+        ? 'var(--dark-theme-button-fade)'
+        : 'var(--light-theme-button-fade)',
+    );
   }
 }

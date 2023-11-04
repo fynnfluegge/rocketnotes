@@ -119,6 +119,9 @@ export class EditorComponent {
       /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(
         navigator.userAgent,
       );
+
+    this.aiCompletionEnabled =
+      localStorage.getItem('aiCompletionEnabled') === 'true';
   }
 
   toggleAiCompletion() {
@@ -130,6 +133,10 @@ export class EditorComponent {
       overlay.style.display = 'flex';
     } else {
       this.aiCompletionEnabled = !this.aiCompletionEnabled;
+      localStorage.setItem(
+        'aiCompletionEnabled',
+        this.aiCompletionEnabled.toString(),
+      );
     }
   }
 
@@ -406,7 +413,6 @@ export class EditorComponent {
       ],
       model: 'gpt-3.5-turbo',
       temperature: 0.9,
-      // stop: ["\n", "."]
     });
 
     // Check if the signal is aborted
