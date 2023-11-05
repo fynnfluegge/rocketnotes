@@ -47,6 +47,7 @@
         (click)="openOpenAiApiKeyDialog('overlay')"
         *ngIf="!isMobileDevice"
         style="padding: 8px; margin-top: 4px"
+        class="btn-primary"
       >
         OpenAI API Key
       </button>
@@ -70,7 +71,11 @@
           Nightmode
         </label>
       </div>
-      <button (click)="onLogout()" style="padding: 8px; margin-top: 4px">
+      <button
+        (click)="onLogout()"
+        style="padding: 8px; margin-top: 4px"
+        class="btn-primary"
+      >
         Logout
       </button>
     </div>
@@ -290,6 +295,7 @@
         matTreeNodePaddingIndent="8"
         (click)="openItem($event.target, node.id)"
         cdkDrag
+        [cdkDragDisabled]="this.isMobileDevice"
         [cdkDragData]="node"
         (mouseenter)="dragHover(node)"
         (mouseleave)="dragHoverEnd()"

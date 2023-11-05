@@ -8,7 +8,7 @@
       *ngIf="aiCompletionEnabled && !isMobileDevice"
       (click)="toggleAiCompletion()"
       data-title="Disable AI Text Completion"
-      class="btn btn-default btn-primary tooltip-bottom expand"
+      class="btn btn-default btn-primary btn-fade tooltip-bottom expand"
       style="height: 38px; text-align: center; line-height: 19px"
     >
       <img
@@ -22,7 +22,7 @@
       *ngIf="!aiCompletionEnabled && !isMobileDevice"
       (click)="toggleAiCompletion()"
       data-title="Enable AI Text Completion"
-      class="btn btn-default btn-primary tooltip-bottom expand"
+      class="btn btn-default btn-primary btn-fade tooltip-bottom expand"
       style="height: 38px; text-align: center; line-height: 19px"
     >
       <img
@@ -40,7 +40,7 @@
     <button
       *ngIf="!isPublic"
       id="share-button"
-      class="btn btn-default btn-primary"
+      class="btn btn-default btn-primary btn-fade"
       (click)="shareDocument()"
       style="height: 38px; text-align: center; line-height: 19px"
     >
@@ -48,7 +48,7 @@
     </button>
     <button
       *ngIf="isPublic"
-      class="btn btn-default btn-primary tooltip-bottom expand"
+      class="btn btn-default btn-primary btn-fade tooltip-bottom expand"
       data-title="Copy link to clipboard"
       (click)="copyLinkToClipBoard($event, this.publicLink)"
       style="
@@ -64,7 +64,7 @@
     <button
       *ngIf="isPublic"
       id="unshare-button"
-      class="btn btn-default btn-primary"
+      class="btn btn-default btn-primary btn-fade"
       (click)="unshareDocument()"
       style="height: 38px; text-align: center; line-height: 19px"
     >
@@ -111,7 +111,7 @@
 >
   <button
     *ngIf="editorMode"
-    class="btn btn-default btn-primary"
+    class="btn btn-default btn-primary btn-fade"
     (click)="togglePreviewPanel()"
   >
     <i
@@ -122,7 +122,7 @@
     {{ showPreview ? "Preview" : "Preview" }}
   </button>
   &nbsp;&nbsp;
-  <button class="btn btn-default btn-primary" (click)="changeMode()">
+  <button class="btn btn-default btn-primary btn-fade" (click)="changeMode()">
     <i
       [ngClass]="editorMode ? 'fa-solid fa-xmark' : 'fa-solid fa-pen-to-square'"
     ></i>
@@ -131,7 +131,7 @@
   &nbsp;&nbsp;
   <button
     *ngIf="editorMode"
-    class="btn btn-default btn-primary"
+    class="btn btn-default btn-primary btn-fade"
     (click)="undoChanges()"
   >
     <i class="fa-solid fa-undo"></i> Undo

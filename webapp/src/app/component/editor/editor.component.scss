@@ -57,13 +57,11 @@ textarea.md-input {
   box-shadow: none;
 }
 
-.btn-primary {
-  background-color: var(--menu-color);
-  border: 1px groove #c0c0c0;
+.btn-fade {
   opacity: var(--button-fade);
 }
 
-.btn-primary:hover {
+.btn-fade:hover {
   opacity: 1;
 }
 
