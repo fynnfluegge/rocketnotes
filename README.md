@@ -2,23 +2,26 @@
   <a href="https://www.takeniftynotes.net/">
     <img src="landing-page/src/assets/128x128.png" height="128">
   </a>
-  <h1>Rocketnotes</h1>
-  <a href="https://github.com/fynnfluegge/rocketnotes/actions/workflows/build.yml">
-    <img src="https://github.com/fynnfluegge/rocketnotes/actions/workflows/build.yml/badge.svg?branch=main"/> 
-  </a>
-  <a href="https://github.com/fynnfluegge/rocketnotes/actions/workflows/deploy.yml">
-    <img src="https://github.com/fynnfluegge/rocketnotes/actions/workflows/deploy.yml/badge.svg?branch=main"/> 
-  </a>
-  <a href="https://github.com/fynnfluegge/rocketnotes/blob/main/LICENSE">
-    <img src="https://img.shields.io/badge/License-MIT-green.svg"/>
-  </a>
+  
+  # Rocketnotes
+  
+  [![Build](https://github.com/fynnfluegge/rocketnotes/actions/workflows/build.yml/badge.svg)](https://github.com/fynnfluegge/rocketnotes/actions/workflows/build.yml)
+  [![Deploy](https://github.com/fynnfluegge/rocketnotes/actions/workflows/deploy.yml/badge.svg)](https://github.com/fynnfluegge/rocketnotes/actions/workflows/deploy.yml)
+  [![License](https://img.shields.io/badge/License-MIT%20-green.svg)](https://opensource.org/licenses/MIT)
+
 </div>
 
 Rocketnotes is a web-based Markdown note taking app with AI-powered text completion.
-You can [sign up](https://takeniftynotes.auth.eu-central-1.amazoncognito.com/login?response_type=code&client_id=tt3v27pnqqh7elqdvq9tgmr9v&redirect_uri=https://app.takeniftynotes.net) for free (Yes, it's free and it will be free forever as far as possible), run it on your local machine with Docker or deploy it with low effort in your personal AWS account and your desired region.
+You can [sign up](https://takeniftynotes.auth.eu-central-1.amazoncognito.com/login?response_type=code&client_id=tt3v27pnqqh7elqdvq9tgmr9v&redirect_uri=https://app.takeniftynotes.net) for free or deploy it with low effort to your personal AWS account.
 Check out the [installation guides](INSTALLATION.md#installation) for deploying Rocketnotes at [AWS](INSTALLATION.md#aws-hosting) or running it on your [local machine with Docker](INSTALLATION.md#run-on-your-local-machine-with-docker).
 
 > **_NOTE:_**  Hosting on AWS with a Cloudfront distribution for S3, DynamoDB and Lambda will cost you less than $1 per month under normal usage.
+
+<div align="center">
+  
+![rocketnotes_theme](https://github.com/fynnfluegge/rocketnotes/assets/16321871/6f5cf350-4560-4262-896e-44bd059b2f93)
+
+</div>
 
 
 ## Features

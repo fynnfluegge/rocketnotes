@@ -27,7 +27,7 @@ button {
 
   &.cdk-drag-preview {
     // while dragging
-    background-color: #282828;
+    background-color: var(--menu-color);
     color: white;
   }
   &.cdk-drag-placeholder {
@@ -98,6 +98,8 @@ span:hover {
   border-style: groove;
   height: 70%;
   min-width: 110px !important;
+  background-color: initial;
+  background-image: linear-gradient(-180deg, #333131, var(--menu-color));
 }
 
 .icon-button-fade {
@@ -292,7 +294,13 @@ li a:hover {
 }
 
 input:checked + .slider {
-  background-color: var(--menu-color);
+  background-image: linear-gradient(
+    144deg,
+    #4a5675,
+    #3d4761,
+    75%,
+    var(--menu-color)
+  );
 }
 
 input:focus + .slider {

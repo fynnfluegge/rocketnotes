@@ -5,9 +5,9 @@
   --light-theme-button-fade: 0.9;
   --light-theme-hyperlink-color: #007bff;
   --dark-theme-menu-color: #1f1e1e;
-  --dark-theme-background-color: #3b3a3a;
+  --dark-theme-background-color: #363840;
   --dark-theme-font-color: #f5f1f0;
-  --dark-theme-button-fade: 0.6;
+  --dark-theme-button-fade: 0.64;
   --dark-theme-hyperlink-color: #659afc;
   --background-color: var(--light-theme-background-color);
   --font-color: var(--light-theme-font-color);
@@ -36,6 +36,22 @@ body {
 
 button {
   white-space: nowrap;
+}
+
+.btn-primary {
+  background-image: linear-gradient(
+    144deg,
+    #505870,
+    #373f52,
+    60%,
+    var(--menu-color)
+  );
+  border: 1px groove #c0c0c0 !important;
+  opacity: 0.9;
+}
+
+.btn-primary:hover {
+  opacity: 1;
 }
 
 a {
