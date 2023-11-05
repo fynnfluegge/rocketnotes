@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Injectable, OnInit } from '@angular/core';
+import { Injectable, Component, OnInit, AfterViewInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FlatTreeControl } from '@angular/cdk/tree';
 import {
@@ -159,11 +159,9 @@ export class DocumentTree {
                         });
                       });
                   }
-                } else {
                 }
               });
             },
-            error: (e) => { },
           });
       });
     } else {
@@ -250,11 +248,9 @@ export class DocumentTree {
                       });
                     });
                 }
-              } else {
               }
             });
           },
-          error: (e) => { },
         });
     }
   }
@@ -700,16 +696,25 @@ export class SidenavComponent implements OnInit, AfterViewInit {
     return flatNode;
   };
 
-  openItem(id: string) {
-    this.basicRestService.get('document/' + id).subscribe((result) => {
-      const document = JSON.parse(JSON.stringify(result));
-      this.database.initContentChange.next({
-        id: document.id,
-        title: document.title,
-        content: document.content,
-        isPublic: document.isPublic,
+  openItem(el: HTMLElement, id: string) {
+    if (el.tagName === 'SPAN') el = el.parentElement;
+    if (el.tagName === 'MAT-TREE-NODE') {
+      const elems = document.querySelectorAll('.active');
+      [].forEach.call(elems, function(el: HTMLElement) {
+        el.classList.remove('active');
       });
-    });
+      el.classList.add('active');
+
+      this.basicRestService.get('document/' + id).subscribe((result) => {
+        const document = JSON.parse(JSON.stringify(result));
+        this.database.initContentChange.next({
+          id: document.id,
+          title: document.title,
+          content: document.content,
+          isPublic: document.isPublic,
+        });
+      });
+    }
   }
 
   addNewItem(node: DocumentFlatNode) {
@@ -720,11 +725,13 @@ export class SidenavComponent implements OnInit, AfterViewInit {
     const parentInRoot = this.database.insertItem(node, '');
     this.treeControl.expand(this.nestedNodeMap.get(parentInRoot));
     this.refreshTree();
+    document.getElementById('new_document').focus();
   }
 
   editItem(node: DocumentFlatNode) {
     node.editNode = true;
     this.refreshTree();
+    document.getElementById('edit_document_title').focus();
   }
 
   cancelEditItem(node: DocumentFlatNode) {
@@ -1251,7 +1258,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
     localStorage.setItem('darkmode', this.darkmode.toString());
     Auth.currentAuthenticatedUser().then((user) => {
       Auth.updateUserAttributes(user, {
-        'custom:darkMode': this.darkmode ? 1 : 0,
+        'custom:darkmode': this.darkmode ? 1 : 0,
       });
     });
     this.setTheme();
@@ -1281,6 +1288,12 @@ export class SidenavComponent implements OnInit, AfterViewInit {
       this.darkmode
         ? 'var(--dark-theme-button-fade)'
         : 'var(--light-theme-button-fade)',
+    );
+    document.documentElement.style.setProperty(
+      '--hyperlink-color',
+      this.darkmode
+        ? 'var(--dark-theme-hyperlink-color)'
+        : 'var(--light-theme-hyperlink-color)',
     );
   }
 }

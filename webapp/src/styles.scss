@@ -3,14 +3,17 @@
   --light-theme-background-color: white;
   --light-theme-font-color: black;
   --light-theme-button-fade: 0.9;
+  --light-theme-hyperlink-color: #007bff;
   --dark-theme-menu-color: #1f1e1e;
   --dark-theme-background-color: #3b3a3a;
   --dark-theme-font-color: #f5f1f0;
   --dark-theme-button-fade: 0.6;
+  --dark-theme-hyperlink-color: #659afc;
   --background-color: var(--light-theme-background-color);
   --font-color: var(--light-theme-font-color);
   --menu-color: var(--light-theme-menu-color);
   --button-fade: var(--light-theme-button-fade);
+  --hyperlink-color: var(--light-theme-hyperlink-color);
 }
 
 html,
@@ -37,6 +40,7 @@ button {
 
 a {
   text-decoration: none !important;
+  color: var(--hyperlink-color) !important;
 }
 
 // ------- copy to clipboard ------------ //
