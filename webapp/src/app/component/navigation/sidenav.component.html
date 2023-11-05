@@ -10,6 +10,7 @@
   <form autocomplete="off" style="margin-left: auto">
     <div class="autocomplete" style="width: 280px">
       <input
+        class="input-field"
         type="text"
         id="search_documents"
         name="search_documents"
@@ -59,7 +60,12 @@
           <span class="slider round"></span>
         </label>
         <label
-          style="position: relative; top: 4px; margin-left: 4px; font-size: 18px"
+          style="
+            position: relative;
+            top: 4px;
+            margin-left: 4px;
+            font-size: 18px;
+          "
         >
           Nightmode
         </label>
@@ -145,8 +151,7 @@
         matTreeNodeToggle
         matTreeNodePadding
         matTreeNodePaddingIndent="8"
-        (click)="openItem(node.id)"
-        routerLinkActive="active-node"
+        (click)="openItem($event.target, node.id)"
         cdkDrag
         [cdkDragDisabled]="this.isMobileDevice"
         [cdkDragData]="node"
@@ -164,8 +169,11 @@
           "
           >{{ node.name }}</span
         >
-        <div class="dropdown hide" style="margin-left: auto">
-          <button class="dropbtn">
+        <div
+          class="dropdown hide"
+          style="margin-left: auto; position: relative; top: 3px"
+        >
+          <button class="dropbtn" style="position: relative; top: -4px">
             <i class="fas fa-ellipsis-v"></i>
           </button>
           <div class="dropdown-content">
@@ -230,10 +238,13 @@
       >
         <mat-form-field style="padding-left: 24px">
           <input
-            autofocus
+            id="new_document"
             matInput
             #itemValue
+            (keyup.enter)="saveNode(node, itemValue.value, true)"
+            (keyup.escape)="cancelEditItem(node, itemValue.value)"
             placeholder="New document..."
+            class="input-field"
             style="width: 140px; height: 24px"
           />
         </mat-form-field>
@@ -252,10 +263,13 @@
       >
         <mat-form-field style="padding-left: 24px">
           <input
-            autofocus
+            id="edit_document_title"
             matInput
             #itemValue
+            (keyup.enter)="saveNode(node, itemValue.value, false)"
+            (keyup.escape)="cancelEditItem(node, itemValue.value)"
             value="{{ node.name }}"
+            class="input-field"
             style="width: 140px; height: 24px"
           />
         </mat-form-field>
@@ -274,8 +288,7 @@
         *matTreeNodeDef="let node; when: hasChild"
         matTreeNodePadding
         matTreeNodePaddingIndent="8"
-        (click)="openItem(node.id)"
-        routerLinkActive="active-node"
+        (click)="openItem($event.target, node.id)"
         cdkDrag
         [cdkDragData]="node"
         (mouseenter)="dragHover(node)"
@@ -291,8 +304,11 @@
         <span style="overflow: hidden; text-overflow: ellipsis">{{
           node.name
         }}</span>
-        <div class="dropdown hide" style="margin-left: auto">
-          <button class="dropbtn">
+        <div
+          class="dropdown hide"
+          style="margin-left: auto; position: relative; top: 3px"
+        >
+          <button class="dropbtn" style="position: relative; top: -4px">
             <i class="fas fa-ellipsis-v"></i>
           </button>
           <div class="dropdown-content">

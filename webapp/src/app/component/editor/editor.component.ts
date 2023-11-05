@@ -81,7 +81,7 @@ export class EditorComponent {
 
     this.route.paramMap.subscribe((params) => {
       this.id = params.get('id');
-      if (this.id !== '') {
+      if (this.id) {
         this.basicRestService
           .get('document/' + this.id)
           .subscribe((message) => {
@@ -104,10 +104,6 @@ export class EditorComponent {
               apiKey: attribute.Value,
               dangerouslyAllowBrowser: true,
             });
-            this.aiCompletionEnabled = true;
-            if (localStorage.getItem('openAiApiKey') !== null) {
-              this.aiCompletionEnabled = true;
-            }
           }
         });
       });
