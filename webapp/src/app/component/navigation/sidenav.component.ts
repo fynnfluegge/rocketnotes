@@ -1258,7 +1258,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
     localStorage.setItem('darkmode', this.darkmode.toString());
     Auth.currentAuthenticatedUser().then((user) => {
       Auth.updateUserAttributes(user, {
-        'custom:darkmode': this.darkmode ? 1 : 0,
+        'custom:darkmode': this.darkmode ? '1' : '0',
       });
     });
     this.setTheme();
