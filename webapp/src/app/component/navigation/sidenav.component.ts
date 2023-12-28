@@ -681,7 +681,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
   transformer = (node: DocumentNode, level: number) => {
     const flatNode =
       this.nestedNodeMap.has(node) &&
-        this.nestedNodeMap.get(node)!.name === node.name
+      this.nestedNodeMap.get(node)!.name === node.name
         ? this.nestedNodeMap.get(node)!
         : new DocumentFlatNode();
     flatNode.name = node.name;
@@ -700,7 +700,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
     if (el.tagName === 'SPAN') el = el.parentElement;
     if (el.tagName === 'MAT-TREE-NODE') {
       const elems = document.querySelectorAll('.active');
-      [].forEach.call(elems, function(el: HTMLElement) {
+      [].forEach.call(elems, function (el: HTMLElement) {
         el.classList.remove('active');
       });
       el.classList.add('active');
@@ -1072,10 +1072,8 @@ export class SidenavComponent implements OnInit, AfterViewInit {
       .post('saveDocumentTree', {
         id: localStorage.getItem('currentUserId'),
         documents: JSON.parse(JSON.stringify(this.database.rootNode.children)),
-        TRASH_ID: JSON.parse(JSON.stringify(this.database.trashNode.children)),
-        PINNED_ID: JSON.parse(
-          JSON.stringify(this.database.pinnedNode.children),
-        ),
+        trash: JSON.parse(JSON.stringify(this.database.trashNode.children)),
+        pinned: JSON.parse(JSON.stringify(this.database.pinnedNode.children)),
       })
       .subscribe();
   }
@@ -1085,7 +1083,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
     the text field element and an array of possible autocompleted values:*/
     let currentFocus;
     /*execute a function when someone writes in the text field:*/
-    input.addEventListener('input', async function() {
+    input.addEventListener('input', async function () {
       let a,
         b,
         i,
@@ -1106,9 +1104,9 @@ export class SidenavComponent implements OnInit, AfterViewInit {
         const result = await testService
           .get(
             'search-documents/' +
-            localStorage.getItem('currentUserId') +
-            '?searchString=' +
-            this.value,
+              localStorage.getItem('currentUserId') +
+              '?searchString=' +
+              this.value,
           )
           .toPromise();
         const foundElements = JSON.parse(JSON.stringify(result));
@@ -1136,7 +1134,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
           b.innerHTML +=
             "<input type='hidden' value='" + foundElements[i].id + "'>";
           /*execute a function when someone clicks on the item value (DIV element):*/
-          b.addEventListener('click', function(e) {
+          b.addEventListener('click', function (e) {
             router.navigate(
               ['/' + this.getElementsByTagName('input')[0].value],
               { relativeTo: this.route },
@@ -1149,7 +1147,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
       // }
     });
     /*execute a function presses a key on the keyboard:*/
-    input.addEventListener('keydown', function(e) {
+    input.addEventListener('keydown', function (e) {
       const x = document.getElementById(this.id + 'autocomplete-list');
       if (x) var suggestionList = x.getElementsByTagName('div');
       if (e.keyCode == 40) {
@@ -1236,7 +1234,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
       }
     }
     /*execute a function when someone clicks in the document:*/
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
       closeAllLists(e.target);
     });
   }
