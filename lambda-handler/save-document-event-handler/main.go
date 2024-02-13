@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"log"
+	"os"
 	"strings"
 	"time"
 
@@ -13,6 +14,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
+	"github.com/aws/aws-sdk-go/service/sqs"
 )
 
 type Item struct {
@@ -27,6 +29,13 @@ type Document struct {
 	Searchcontent string    `json:"searchContent"`
 	LastModified  time.Time `json:"lastModified"`
 	IsPublic      bool      `json:"isPublic"`
+	OpenAIApiKey  string    `json:"openAIApiKey"`
+}
+
+type SqsMessage struct {
+	DocumentId   string `json:"documentId"`
+	UserId       string `json:"userId"`
+	OpenAIApiKey string `json:"openAiApikey"`
 }
 
 func init() {
@@ -63,6 +72,20 @@ func handleRequest(ctx context.Context, event events.SQSEvent) {
 	_, err = svc.PutItem(input)
 	if err != nil {
 		log.Fatalf("Got error calling PutItem: %s", err)
+	}
+
+	qsvc := sqs.New(sess)
+
+	m := SqsMessage{item.Document.ID, item.Document.UserId, item.Document.OpenAIApiKey}
+	b, err := json.Marshal(m)
+
+	_, err = qsvc.SendMessage(&sqs.SendMessageInput{
+		DelaySeconds: aws.Int64(0),
+		MessageBody:  aws.String(string(b)),
+		QueueUrl:     aws.String(os.Getenv("queueUrl")),
+	})
+	if err != nil {
+		log.Fatalf("Error sending sqs message: %s", err)
 	}
 }
 

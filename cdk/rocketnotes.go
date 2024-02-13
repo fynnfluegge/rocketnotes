@@ -22,6 +22,7 @@ import (
 	"github.com/aws/aws-cdk-go/awscdkapigatewayv2alpha/v2"
 	"github.com/aws/aws-cdk-go/awscdkapigatewayv2integrationsalpha/v2"
 	"github.com/aws/aws-cdk-go/awscdklambdagoalpha/v2"
+	"github.com/aws/aws-cdk-go/awscdklambdapythonalpha/v2"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/constructs-go/constructs/v10"
 	"github.com/aws/jsii-runtime-go"
@@ -47,6 +48,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		AssumedBy: awsiam.NewServicePrincipal(aws.String("lambda.amazonaws.com"), &awsiam.ServicePrincipalOpts{}),
 		ManagedPolicies: &[]awsiam.IManagedPolicy{
 			awsiam.ManagedPolicy_FromManagedPolicyArn(stack, aws.String("AmazonDynamoDBFullAccess"), aws.String("arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess")),
+			awsiam.ManagedPolicy_FromManagedPolicyArn(stack, aws.String("AmazonSQSFullAccess"), aws.String("arn:aws:iam::aws:policy/AmazonSQSFullAccess")),
 			awsiam.ManagedPolicy_FromManagedPolicyArn(stack, aws.String("AWSLambdaBasicExecutionRole"), aws.String("arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole")),
 		},
 	})
@@ -157,6 +159,8 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 
 	// POST delete Document API
 
+	// TODO
+
 	// Eventbridge
 
 	eventBus := awsevents.NewEventBus(stack, jsii.String("myEventBus"), &awsevents.EventBusProps{
@@ -190,6 +194,10 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		VisibilityTimeout: awscdk.Duration_Seconds(jsii.Number(300)),
 	})
 
+	vectorQueue := awssqs.NewQueue(stack, jsii.String("VectorSqsQueue"), &awssqs.QueueProps{
+		VisibilityTimeout: awscdk.Duration_Seconds(jsii.Number(300)),
+	})
+
 	rule.AddTarget(awseventstargets.NewSqsQueue(queue, &awseventstargets.SqsQueueProps{}))
 
 	integration := awscdkapigatewayv2alpha.NewHttpIntegration(stack, jsii.String("myEventBridgeHttpIntegration"), &awscdkapigatewayv2alpha.HttpIntegrationProps{
@@ -214,27 +222,21 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		AuthorizationType: jsii.String("JWT"),
 	})
 
-	postDocumentHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("POST-Document"), &awscdklambdagoalpha.GoFunctionProps{
+	awscdklambdagoalpha.NewGoFunction(stack, jsii.String("POST-Document"), &awscdklambdagoalpha.GoFunctionProps{
 		FunctionName: jsii.String("POST-Document"),
 		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
 		Entry:        jsii.String("../lambda-handler/save-document-event-handler"),
 		Events: &[]awslambda.IEventSource{
 			awslambdaeventsources.NewSqsEventSource(queue, &awslambdaeventsources.SqsEventSourceProps{
-				BatchSize: jsii.Number(10),
+				BatchSize: jsii.Number(1),
 			}),
 		},
 		Bundling: &awscdklambdagoalpha.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
+		Environment: &map[string]*string{"queueUrl": vectorQueue.QueueUrl()},
+		Role:        dynamoDBRole,
 	})
-
-	postDocumentHandler.AddToRolePolicy(
-		awsiam.NewPolicyStatement(&awsiam.PolicyStatementProps{
-			Effect:    awsiam.Effect_ALLOW,
-			Resources: &[]*string{jsii.String("*")},
-			Actions:   &[]*string{jsii.String("dynamodb:*")},
-		}),
-	)
 
 	// POST DocumentTree Api
 
@@ -291,6 +293,37 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		Authorizer:  httpApiAuthorizer,
 		Methods:     &[]awscdkapigatewayv2alpha.HttpMethod{awscdkapigatewayv2alpha.HttpMethod_POST},
 		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("postShareDocumentLambdaIntegration"), postShareDocumentHandler, &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
+	})
+
+	// Save Vector embeddings
+
+	s3Role := awsiam.NewRole(stack, aws.String("s3FullAccessRole"), &awsiam.RoleProps{
+		AssumedBy: awsiam.NewServicePrincipal(aws.String("lambda.amazonaws.com"), &awsiam.ServicePrincipalOpts{}),
+		ManagedPolicies: &[]awsiam.IManagedPolicy{
+			awsiam.ManagedPolicy_FromManagedPolicyArn(stack, aws.String("AmazonS3FullAccess"), aws.String("arn:aws:iam::aws:policy/AmazonS3FullAccess")),
+			awsiam.ManagedPolicy_FromManagedPolicyArn(stack, aws.String("AmazonSQSFullAccessVectorEmbeddings"), aws.String("arn:aws:iam::aws:policy/AmazonSQSFullAccess")),
+			awsiam.ManagedPolicy_FromManagedPolicyArn(stack, aws.String("AWSLambdaBasicExecutionRoleVectorEmbeddings"), aws.String("arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole")),
+		},
+	})
+
+	bucket := awss3.NewBucket(stack, jsii.String("VectorEmbeddingsBucket"), &awss3.BucketProps{
+		BucketName:       jsii.String("rocketnotes-vector-embeddings"),
+		PublicReadAccess: jsii.Bool(false),
+		AccessControl:    awss3.BucketAccessControl_BUCKET_OWNER_FULL_CONTROL,
+	})
+
+	awscdklambdapythonalpha.NewPythonFunction(stack, jsii.String("VectorEmbeddingsHandler"), &awscdklambdapythonalpha.PythonFunctionProps{
+		FunctionName: jsii.String("VectorEmbeddings"),
+		Runtime:      awslambda.Runtime_PYTHON_3_9(),
+		Entry:        jsii.String("../lambda-handler/save-vector-embeddings-handler"),
+		Index:        aws.String("main.py"),
+		Events: &[]awslambda.IEventSource{
+			awslambdaeventsources.NewSqsEventSource(vectorQueue, &awslambdaeventsources.SqsEventSourceProps{
+				BatchSize: jsii.Number(1),
+			}),
+		},
+		Environment: &map[string]*string{"bucketName": bucket.BucketName()},
+		Role:        s3Role,
 	})
 
 	// sign-up confirmation lambda handler
