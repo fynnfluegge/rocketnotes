@@ -53,7 +53,7 @@ export class EditorComponent {
     private route: ActivatedRoute,
     private titleService: Title,
     private location: Location,
-  ) { }
+  ) {}
 
   ngOnInit() {
     if (environment.production) {
@@ -463,11 +463,14 @@ export class EditorComponent {
   submit(): void {
     this.basicRestService
       .post('saveDocument', {
-        id: this.id,
-        userId: localStorage.getItem('currentUserId'),
-        title: this.title,
-        content: this.content,
-        isPublic: this.isPublic,
+        document: {
+          id: this.id,
+          userId: localStorage.getItem('currentUserId'),
+          title: this.title,
+          content: this.content,
+          isPublic: this.isPublic,
+        },
+        openAiApiKey: JSON.parse(localStorage.getItem('openAiApiKey')),
       })
       .subscribe(() => {
         this.showSnackbar = true;
@@ -538,7 +541,7 @@ export class EditorComponent {
     }
     document.execCommand('copy');
     document.body.removeChild(selBox);
-    setTimeout(function() {
+    setTimeout(function () {
       if (event.target.children.length === 0) {
         event.target.classList.toggle('fa-link');
         event.target.classList.toggle('fa-check');
@@ -613,7 +616,7 @@ export class EditorComponent {
     //   style.visibility = 'hidden';  // not 'display: none' because we want rendering
 
     // Transfer the element's properties to the div
-    this.properties.forEach(function(prop) {
+    this.properties.forEach(function (prop) {
       if (isInput && prop === 'lineHeight') {
         // Special case for <input>s because text is rendered centered and line height may be != height
         if (computed.boxSizing === 'border-box') {

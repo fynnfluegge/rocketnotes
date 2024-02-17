@@ -395,10 +395,12 @@ export class DocumentTree {
         if (newItem) {
           this.basicRestService
             .post('saveDocument', {
-              id: node.id,
-              userId: localStorage.getItem('currentUserId'),
-              title: newName,
-              content: 'new document',
+              document: {
+                id: node.id,
+                userId: localStorage.getItem('currentUserId'),
+                title: newName,
+                content: 'new document',
+              },
             })
             .subscribe(() => {
               this.initContentChange.next({

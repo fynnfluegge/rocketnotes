@@ -18,7 +18,12 @@ import (
 )
 
 type Item struct {
-	Document *Document `json:"detail"`
+	Body *Body `json:"detail"`
+}
+
+type Body struct {
+	Document *Document `json:"document"`
+	OpenAiApiKey  string    `json:"openAiApiKey"`
 }
 
 type Document struct {
@@ -29,13 +34,12 @@ type Document struct {
 	Searchcontent string    `json:"searchContent"`
 	LastModified  time.Time `json:"lastModified"`
 	IsPublic      bool      `json:"isPublic"`
-	OpenAIApiKey  string    `json:"openAIApiKey"`
 }
 
 type SqsMessage struct {
 	DocumentId   string `json:"documentId"`
 	UserId       string `json:"userId"`
-	OpenAIApiKey string `json:"openAiApikey"`
+	OpenAiApiKey string `json:"openAiApikey"`
 }
 
 func init() {
@@ -47,9 +51,9 @@ func handleRequest(ctx context.Context, event events.SQSEvent) {
 
 	json.Unmarshal([]byte(event.Records[0].Body), &item)
 
-	item.Document.Searchcontent = strings.ToLower(item.Document.Title + "\n" + item.Document.Content)
+	item.Body.Document.Searchcontent = strings.ToLower(item.Body.Document.Title + "\n" + item.Document.Content)
 
-	item.Document.LastModified = time.Now()
+	item.Body.Document.LastModified = time.Now()
 
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
@@ -59,7 +63,7 @@ func handleRequest(ctx context.Context, event events.SQSEvent) {
 
 	av, err := dynamodbattribute.MarshalMap(item.Document)
 	if err != nil {
-		log.Fatalf("Got error marshalling new movie item: %s", err)
+		log.Fatalf("Got error marshalling new document item: %s", err)
 	}
 
 	tableName := "tnn-Documents"
@@ -76,7 +80,7 @@ func handleRequest(ctx context.Context, event events.SQSEvent) {
 
 	qsvc := sqs.New(sess)
 
-	m := SqsMessage{item.Document.ID, item.Document.UserId, item.Document.OpenAIApiKey}
+	m := SqsMessage{item.Body.Document.ID, item.Body.Document.UserId, item.Body.OpenAiApiKey}
 	b, err := json.Marshal(m)
 
 	_, err = qsvc.SendMessage(&sqs.SendMessageInput{

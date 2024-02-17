@@ -303,6 +303,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 			awsiam.ManagedPolicy_FromManagedPolicyArn(stack, aws.String("AmazonS3FullAccess"), aws.String("arn:aws:iam::aws:policy/AmazonS3FullAccess")),
 			awsiam.ManagedPolicy_FromManagedPolicyArn(stack, aws.String("AmazonSQSFullAccessVectorEmbeddings"), aws.String("arn:aws:iam::aws:policy/AmazonSQSFullAccess")),
 			awsiam.ManagedPolicy_FromManagedPolicyArn(stack, aws.String("AWSLambdaBasicExecutionRoleVectorEmbeddings"), aws.String("arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole")),
+			awsiam.ManagedPolicy_FromManagedPolicyArn(stack, aws.String("AmazonDynamoDBFullAccessVectorEmbeddings"), aws.String("arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess")),
 		},
 	})
 
