@@ -61,7 +61,7 @@ func handleRequest(ctx context.Context, event events.SQSEvent) {
 
 	svc := dynamodb.New(sess)
 
-	av, err := dynamodbattribute.MarshalMap(item.Document)
+	av, err := dynamodbattribute.MarshalMap(item.Body.Document)
 	if err != nil {
 		log.Fatalf("Got error marshalling new document item: %s", err)
 	}
