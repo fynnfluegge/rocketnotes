@@ -51,7 +51,7 @@ func handleRequest(ctx context.Context, event events.SQSEvent) {
 
 	json.Unmarshal([]byte(event.Records[0].Body), &item)
 
-	item.Body.Document.Searchcontent = strings.ToLower(item.Body.Document.Title + "\n" + item.Document.Content)
+	item.Body.Document.Searchcontent = strings.ToLower(item.Body.Document.Title + "\n" + item.Body.Document.Content)
 
 	item.Body.Document.LastModified = time.Now()
 
