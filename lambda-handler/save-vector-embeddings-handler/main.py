@@ -25,6 +25,12 @@ def handler(event, context):
     openAiApiKey = message["openAiApiKey"]
     os.environ["OPENAI_API_KEY"] = openAiApiKey
 
+    if not openAiApiKey:
+        return {
+            "statusCode": 400,
+            "body": json.dumps("openAiApiKey is missing"),
+        }
+
     try:
         file_path = f"/tmp/{userId}"
         Path(file_path).mkdir(parents=True, exist_ok=True)

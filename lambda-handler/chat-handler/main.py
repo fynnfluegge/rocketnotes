@@ -35,6 +35,8 @@ def lambda_handler(event, context):
 
     if "openAiApiKey" in request_body:
         os.environ["OPENAI_API_KEY"] = request_body["openAiApiKey"]
+    else:
+        return {"statusCode": 400, "body": "openAiApiKey is missing"}
 
     file_path = f"/tmp/{userId}"
     load_from_s3(userId + ".faiss", f"{file_path}/{userId}.faiss")

@@ -78,18 +78,21 @@ func handleRequest(ctx context.Context, event events.SQSEvent) {
 		log.Fatalf("Got error calling PutItem: %s", err)
 	}
 
-	qsvc := sqs.New(sess)
 
-	m := SqsMessage{item.Body.Document.ID, item.Body.Document.UserId, item.Body.OpenAiApiKey}
-	b, err := json.Marshal(m)
+	if item.Body.OpenAiApiKey != nil {
+		qsvc := sqs.New(sess)
 
-	_, err = qsvc.SendMessage(&sqs.SendMessageInput{
-		DelaySeconds: aws.Int64(0),
-		MessageBody:  aws.String(string(b)),
-		QueueUrl:     aws.String(os.Getenv("queueUrl")),
-	})
-	if err != nil {
-		log.Fatalf("Error sending sqs message: %s", err)
+		m := SqsMessage{item.Body.Document.ID, item.Body.Document.UserId, item.Body.OpenAiApiKey}
+		b, err := json.Marshal(m)
+
+		_, err = qsvc.SendMessage(&sqs.SendMessageInput{
+			DelaySeconds: aws.Int64(0),
+			MessageBody:  aws.String(string(b)),
+			QueueUrl:     aws.String(os.Getenv("queueUrl")),
+		})
+		if err != nil {
+			log.Fatalf("Error sending sqs message: %s", err)
+		}
 	}
 }
 

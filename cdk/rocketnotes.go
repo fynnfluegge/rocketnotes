@@ -66,6 +66,24 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		},
 	})
 
+	lambdaS3SqsDynamoDbRole := awsiam.NewRole(stack, aws.String("lambdaS3SqsDynamoDbRole"), &awsiam.RoleProps{
+		AssumedBy: awsiam.NewServicePrincipal(aws.String("lambda.amazonaws.com"), &awsiam.ServicePrincipalOpts{}),
+		ManagedPolicies: &[]awsiam.IManagedPolicy{
+			dynamoDbFullAccessPolicy,
+			sqsFullAccessPolicy,
+			lambdaBasicExecutionPolicy,
+			s3FullAccessPolicy,
+		},
+	})
+
+	lambdaS3Role := awsiam.NewRole(stack, aws.String("lambdaS3Role"), &awsiam.RoleProps{
+		AssumedBy: awsiam.NewServicePrincipal(aws.String("lambda.amazonaws.com"), &awsiam.ServicePrincipalOpts{}),
+		ManagedPolicies: &[]awsiam.IManagedPolicy{
+			lambdaBasicExecutionPolicy,
+			s3FullAccessPolicy,
+		},
+	})
+
 	// Http Api with Authorization
 
 	httpApi := awscdkapigatewayv2alpha.NewHttpApi(stack, jsii.String("MyHttpApi"), &awscdkapigatewayv2alpha.HttpApiProps{
@@ -312,16 +330,6 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 
 	// Save Vector embeddings
 
-	s3SqsDynamoDbRole := awsiam.NewRole(stack, aws.String("s3FullAccessRole"), &awsiam.RoleProps{
-		AssumedBy: awsiam.NewServicePrincipal(aws.String("lambda.amazonaws.com"), &awsiam.ServicePrincipalOpts{}),
-		ManagedPolicies: &[]awsiam.IManagedPolicy{
-			dynamoDbFullAccessPolicy,
-			sqsFullAccessPolicy,
-			lambdaBasicExecutionPolicy,
-			s3FullAccessPolicy,
-		},
-	})
-
 	bucket := awss3.NewBucket(stack, jsii.String("VectorEmbeddingsBucket"), &awss3.BucketProps{
 		BucketName:       jsii.String("rocketnotes-vector-embeddings"),
 		PublicReadAccess: jsii.Bool(false),
@@ -339,9 +347,59 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 			}),
 		},
 		Environment: &map[string]*string{"bucketName": bucket.BucketName()},
-		Role:        s3SqsDynamoDbRole,
+		Role:        lambdaS3SqsDynamoDbRole,
 		MemorySize:  jsii.Number(1024),
 		Timeout:     awscdk.Duration_Millis(jsii.Number(900000)),
+	})
+
+	// Semantic search handler
+
+	semanticSearcHandler := awscdklambdapythonalpha.NewPythonFunction(stack, jsii.String("SemanticSearchHandler"), &awscdklambdapythonalpha.PythonFunctionProps{
+		FunctionName: jsii.String("SemanticSearch"),
+		Runtime:      awslambda.Runtime_PYTHON_3_9(),
+		Entry:        jsii.String("../lambda-handler/semantic-search-handler"),
+		Index:        aws.String("main.py"),
+		Events: &[]awslambda.IEventSource{
+			awslambdaeventsources.NewSqsEventSource(vectorQueue, &awslambdaeventsources.SqsEventSourceProps{
+				BatchSize: jsii.Number(1),
+			}),
+		},
+		Environment: &map[string]*string{"bucketName": bucket.BucketName()},
+		Role:        lambdaS3Role,
+		MemorySize:  jsii.Number(1024),
+		Timeout:     awscdk.Duration_Millis(jsii.Number(900000)),
+	})
+
+	httpApi.AddRoutes(&awscdkapigatewayv2alpha.AddRoutesOptions{
+		Path:        jsii.String("/semanticSearch"),
+		Authorizer:  httpApiAuthorizer,
+		Methods:     &[]awscdkapigatewayv2alpha.HttpMethod{awscdkapigatewayv2alpha.HttpMethod_POST},
+		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("semanticSearchLambdaIntegration"), semanticSearcHandler, &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
+	})
+
+	// Chat handler
+
+	chatHandler := awscdklambdapythonalpha.NewPythonFunction(stack, jsii.String("ChatHandler"), &awscdklambdapythonalpha.PythonFunctionProps{
+		FunctionName: jsii.String("Chat"),
+		Runtime:      awslambda.Runtime_PYTHON_3_9(),
+		Entry:        jsii.String("../lambda-handler/chat-handler"),
+		Index:        aws.String("main.py"),
+		Events: &[]awslambda.IEventSource{
+			awslambdaeventsources.NewSqsEventSource(vectorQueue, &awslambdaeventsources.SqsEventSourceProps{
+				BatchSize: jsii.Number(1),
+			}),
+		},
+		Environment: &map[string]*string{"bucketName": bucket.BucketName()},
+		Role:        lambdaS3Role,
+		MemorySize:  jsii.Number(1024),
+		Timeout:     awscdk.Duration_Millis(jsii.Number(900000)),
+	})
+
+	httpApi.AddRoutes(&awscdkapigatewayv2alpha.AddRoutesOptions{
+		Path:        jsii.String("/chat"),
+		Authorizer:  httpApiAuthorizer,
+		Methods:     &[]awscdkapigatewayv2alpha.HttpMethod{awscdkapigatewayv2alpha.HttpMethod_POST},
+		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("chatLambdaIntegration"), chatHandler, &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
 	})
 
 	// sign-up confirmation lambda handler
