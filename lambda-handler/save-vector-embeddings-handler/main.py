@@ -1,14 +1,11 @@
 import json
 import os
-import pickle
 from pathlib import Path
 
 import boto3
 from langchain.schema import Document
-from langchain.text_splitter import (
-    MarkdownHeaderTextSplitter,
-    RecursiveCharacterTextSplitter,
-)
+from langchain.text_splitter import (MarkdownHeaderTextSplitter,
+                                     RecursiveCharacterTextSplitter)
 from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
 
@@ -29,24 +26,11 @@ def handler(event, context):
     os.environ["OPENAI_API_KEY"] = openAiApiKey
 
     try:
-        # Check if faiss db exists in S3
-        # ----------------------------------------
         file_path = f"/tmp/{userId}"
         Path(file_path).mkdir(parents=True, exist_ok=True)
         faiss_index_exists = load_from_s3(
             f"{userId}.faiss", f"{file_path}/{userId}.faiss"
         )
-        # filter_expression = "userId = :value"
-        # expression_attribute_values = {":value": {"S": userId}}
-        #
-        # result = dynamodb.query(
-        #     TableName=vector_table_name,
-        #     IndexName="userId-index",
-        #     KeyConditionExpression=filter_expression,
-        #     ExpressionAttributeValues=expression_attribute_values,
-        # )
-        #
-        # items = result.get("Items", [])
 
         # Vectors already exists, update the index
         # --------------------------------------------
@@ -55,23 +39,16 @@ def handler(event, context):
 
             load_from_s3(f"{userId}.pkl", f"{file_path}/{userId}.pkl")
 
-            # faiss_index_pkl = s3.get_object(Bucket=bucket_name, Key=userId + ".pkl")
-            # with open(os.path.join(file_path, userId + ".pkl"), "wb") as f:
-            #     f.write(pickle.dumps(faiss_index_pkl))
-
-            print("Loading faiss index from disk")
             db = FAISS.load_local(
                 index_name=userId,
                 folder_path=file_path,
                 embeddings=embeddings,
             )
-            print("Faiss index loaded")
             # Get item from DynamoDB table
             document = dynamodb.get_item(
                 TableName="tnn-Documents",
                 Key={"id": {"S": documentId}},
             )
-            print(f"Document: {document}")
             # Check if item exists in the table
             if "Item" not in document:
                 return {
@@ -88,8 +65,6 @@ def handler(event, context):
             # Delete outdated vectors from DynamoDB
             if "Item" in vectors:
                 vectors = vectors["Item"]["vectors"]["SS"]
-                print(f"Deleting vectors for file {documentId}")
-                print(vectors)
                 try:
                     db.delete(vectors)
                 except Exception as e:
@@ -188,13 +163,9 @@ def save_to_s3(key, file_path):
 
 def load_from_s3(key, file_path):
     try:
-        # response = s3.get_object(Bucket=bucket_name, Key=userId + ".faiss")
-        # object_data = response["Body"].read()
         s3.download_file(Bucket=bucket_name, Key=key, Filename=file_path)
-        # return object_data
         return True
     except Exception as e:
-        print(f"Error getting object from S3: {e}")
         return False
 
 
