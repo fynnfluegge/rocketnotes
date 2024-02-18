@@ -470,7 +470,7 @@ export class EditorComponent {
           content: this.content,
           isPublic: this.isPublic,
         },
-        openAiApiKey: JSON.parse(localStorage.getItem('openAiApiKey')),
+        openAiApiKey: localStorage.getItem('openAiApiKey'),
       })
       .subscribe(() => {
         this.showSnackbar = true;

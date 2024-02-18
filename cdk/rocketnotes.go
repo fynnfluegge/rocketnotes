@@ -44,12 +44,25 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 	}
 	stack := awscdk.NewStack(scope, &id, &sprops)
 
-	dynamoDBRole := awsiam.NewRole(stack, aws.String("myDynamoDBFullAccessRole"), &awsiam.RoleProps{
+	lambdaBasicExecutionPolicy := awsiam.ManagedPolicy_FromManagedPolicyArn(stack, aws.String("AWSLambdaBasicExecutionRole"), aws.String("arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"))
+	dynamoDbFullAccessPolicy := awsiam.ManagedPolicy_FromManagedPolicyArn(stack, aws.String("AmazonDynamoDBFullAccess"), aws.String("arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"))
+	sqsFullAccessPolicy := awsiam.ManagedPolicy_FromManagedPolicyArn(stack, aws.String("AmazonSQSFullAccess"), aws.String("arn:aws:iam::aws:policy/AmazonSQSFullAccess"))
+	s3FullAccessPolicy := awsiam.ManagedPolicy_FromManagedPolicyArn(stack, aws.String("AmazonS3FullAccess"), aws.String("arn:aws:iam::aws:policy/AmazonS3FullAccess"))
+
+	lambdaSqsDynamoDbRole := awsiam.NewRole(stack, aws.String("lambdaSqsDynamoDbRole"), &awsiam.RoleProps{
 		AssumedBy: awsiam.NewServicePrincipal(aws.String("lambda.amazonaws.com"), &awsiam.ServicePrincipalOpts{}),
 		ManagedPolicies: &[]awsiam.IManagedPolicy{
-			awsiam.ManagedPolicy_FromManagedPolicyArn(stack, aws.String("AmazonDynamoDBFullAccess"), aws.String("arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess")),
-			awsiam.ManagedPolicy_FromManagedPolicyArn(stack, aws.String("AmazonSQSFullAccess"), aws.String("arn:aws:iam::aws:policy/AmazonSQSFullAccess")),
-			awsiam.ManagedPolicy_FromManagedPolicyArn(stack, aws.String("AWSLambdaBasicExecutionRole"), aws.String("arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole")),
+			lambdaBasicExecutionPolicy,
+			dynamoDbFullAccessPolicy,
+			sqsFullAccessPolicy,
+		},
+	})
+
+	lambdaDynamoDbRole := awsiam.NewRole(stack, aws.String("lambdaDynamoDbRole"), &awsiam.RoleProps{
+		AssumedBy: awsiam.NewServicePrincipal(aws.String("lambda.amazonaws.com"), &awsiam.ServicePrincipalOpts{}),
+		ManagedPolicies: &[]awsiam.IManagedPolicy{
+			lambdaBasicExecutionPolicy,
+			dynamoDbFullAccessPolicy,
 		},
 	})
 
@@ -91,7 +104,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		Bundling: &awscdklambdagoalpha.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
-		Role: dynamoDBRole,
+		Role: lambdaDynamoDbRole,
 	})
 
 	httpApi.AddRoutes(&awscdkapigatewayv2alpha.AddRoutesOptions{
@@ -110,7 +123,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		Bundling: &awscdklambdagoalpha.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
-		Role: dynamoDBRole,
+		Role: lambdaDynamoDbRole,
 	})
 
 	httpApi.AddRoutes(&awscdkapigatewayv2alpha.AddRoutesOptions{
@@ -128,7 +141,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		Bundling: &awscdklambdagoalpha.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
-		Role: dynamoDBRole,
+		Role: lambdaDynamoDbRole,
 	})
 
 	httpApi.AddRoutes(&awscdkapigatewayv2alpha.AddRoutesOptions{
@@ -147,7 +160,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		Bundling: &awscdklambdagoalpha.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
-		Role: dynamoDBRole,
+		Role: lambdaDynamoDbRole,
 	})
 
 	httpApi.AddRoutes(&awscdkapigatewayv2alpha.AddRoutesOptions{
@@ -191,11 +204,13 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 	})
 
 	queue := awssqs.NewQueue(stack, jsii.String("EventbridgeSqsQueue"), &awssqs.QueueProps{
-		VisibilityTimeout: awscdk.Duration_Seconds(jsii.Number(300)),
+		VisibilityTimeout: awscdk.Duration_Seconds(jsii.Number(30)),
+		RetentionPeriod:   awscdk.Duration_Seconds(jsii.Number(60)),
 	})
 
 	vectorQueue := awssqs.NewQueue(stack, jsii.String("VectorSqsQueue"), &awssqs.QueueProps{
-		VisibilityTimeout: awscdk.Duration_Seconds(jsii.Number(300)),
+		VisibilityTimeout: awscdk.Duration_Seconds(jsii.Number(600)),
+		RetentionPeriod:   awscdk.Duration_Seconds(jsii.Number(1200)),
 	})
 
 	rule.AddTarget(awseventstargets.NewSqsQueue(queue, &awseventstargets.SqsQueueProps{}))
@@ -235,7 +250,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
 		Environment: &map[string]*string{"queueUrl": vectorQueue.QueueUrl()},
-		Role:        dynamoDBRole,
+		Role:        lambdaSqsDynamoDbRole,
 	})
 
 	// POST DocumentTree Api
@@ -247,7 +262,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		Bundling: &awscdklambdagoalpha.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
-		Role: dynamoDBRole,
+		Role: lambdaDynamoDbRole,
 	})
 
 	httpApi.AddRoutes(&awscdkapigatewayv2alpha.AddRoutesOptions{
@@ -266,7 +281,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		Bundling: &awscdklambdagoalpha.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
-		Role: dynamoDBRole,
+		Role: lambdaDynamoDbRole,
 	})
 
 	httpApi.AddRoutes(&awscdkapigatewayv2alpha.AddRoutesOptions{
@@ -285,7 +300,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		Bundling: &awscdklambdagoalpha.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
-		Role: dynamoDBRole,
+		Role: lambdaDynamoDbRole,
 	})
 
 	httpApi.AddRoutes(&awscdkapigatewayv2alpha.AddRoutesOptions{
@@ -297,13 +312,13 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 
 	// Save Vector embeddings
 
-	s3Role := awsiam.NewRole(stack, aws.String("s3FullAccessRole"), &awsiam.RoleProps{
+	s3SqsDynamoDbRole := awsiam.NewRole(stack, aws.String("s3FullAccessRole"), &awsiam.RoleProps{
 		AssumedBy: awsiam.NewServicePrincipal(aws.String("lambda.amazonaws.com"), &awsiam.ServicePrincipalOpts{}),
 		ManagedPolicies: &[]awsiam.IManagedPolicy{
-			awsiam.ManagedPolicy_FromManagedPolicyArn(stack, aws.String("AmazonS3FullAccess"), aws.String("arn:aws:iam::aws:policy/AmazonS3FullAccess")),
-			awsiam.ManagedPolicy_FromManagedPolicyArn(stack, aws.String("AmazonSQSFullAccessVectorEmbeddings"), aws.String("arn:aws:iam::aws:policy/AmazonSQSFullAccess")),
-			awsiam.ManagedPolicy_FromManagedPolicyArn(stack, aws.String("AWSLambdaBasicExecutionRoleVectorEmbeddings"), aws.String("arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole")),
-			awsiam.ManagedPolicy_FromManagedPolicyArn(stack, aws.String("AmazonDynamoDBFullAccessVectorEmbeddings"), aws.String("arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess")),
+			dynamoDbFullAccessPolicy,
+			sqsFullAccessPolicy,
+			lambdaBasicExecutionPolicy,
+			s3FullAccessPolicy,
 		},
 	})
 
@@ -324,7 +339,9 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 			}),
 		},
 		Environment: &map[string]*string{"bucketName": bucket.BucketName()},
-		Role:        s3Role,
+		Role:        s3SqsDynamoDbRole,
+		MemorySize:  jsii.Number(1024),
+		Timeout:     awscdk.Duration_Millis(jsii.Number(900000)),
 	})
 
 	// sign-up confirmation lambda handler
@@ -336,7 +353,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		Bundling: &awscdklambdagoalpha.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
-		Role: dynamoDBRole,
+		Role: lambdaSqsDynamoDbRole,
 	})
 
 	// hosted zone & certificate

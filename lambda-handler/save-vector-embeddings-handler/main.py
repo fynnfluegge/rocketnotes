@@ -1,7 +1,10 @@
 import json
 import os
+import pickle
+from pathlib import Path
 
 import boto3
+from langchain.schema import Document
 from langchain.text_splitter import (
     MarkdownHeaderTextSplitter,
     RecursiveCharacterTextSplitter,
@@ -19,7 +22,6 @@ bucket_name = os.environ["bucketName"]
 
 def handler(event, context):
     sqs_message = event["Records"][0]["body"]
-    print("Received message from SQS:", sqs_message)
     message = json.loads(sqs_message)
     userId = message["userId"]
     documentId = message["documentId"]
@@ -27,34 +29,49 @@ def handler(event, context):
     os.environ["OPENAI_API_KEY"] = openAiApiKey
 
     try:
-        # Check if faiss vector present in dynamodb
+        # Check if faiss db exists in S3
         # ----------------------------------------
-        filter_expression = "userId = :value"
-        expression_attribute_values = {":value": {"S": userId}}
-
-        result = dynamodb.query(
-            TableName=vector_table_name,
-            KeyConditionExpression=filter_expression,
-            ExpressionAttributeValues=expression_attribute_values,
+        file_path = f"/tmp/{userId}"
+        Path(file_path).mkdir(parents=True, exist_ok=True)
+        faiss_index_exists = load_from_s3(
+            f"{userId}.faiss", f"{file_path}/{userId}.faiss"
         )
-
-        items = result.get("Items", [])
-
-        print("Items:", items)
+        # filter_expression = "userId = :value"
+        # expression_attribute_values = {":value": {"S": userId}}
+        #
+        # result = dynamodb.query(
+        #     TableName=vector_table_name,
+        #     IndexName="userId-index",
+        #     KeyConditionExpression=filter_expression,
+        #     ExpressionAttributeValues=expression_attribute_values,
+        # )
+        #
+        # items = result.get("Items", [])
 
         # Vectors already exists, update the index
         # --------------------------------------------
-        if items:
-            faiss_index_snapshot = load_from_s3(userId)
+        if faiss_index_exists:
             embeddings = OpenAIEmbeddings(client=None, model="text-embedding-ada-002")
-            db = FAISS.deserialize_from_bytes(
-                embeddings=embeddings, serialized=faiss_index_snapshot
+
+            load_from_s3(f"{userId}.pkl", f"{file_path}/{userId}.pkl")
+
+            # faiss_index_pkl = s3.get_object(Bucket=bucket_name, Key=userId + ".pkl")
+            # with open(os.path.join(file_path, userId + ".pkl"), "wb") as f:
+            #     f.write(pickle.dumps(faiss_index_pkl))
+
+            print("Loading faiss index from disk")
+            db = FAISS.load_local(
+                index_name=userId,
+                folder_path=file_path,
+                embeddings=embeddings,
             )
+            print("Faiss index loaded")
             # Get item from DynamoDB table
             document = dynamodb.get_item(
                 TableName="tnn-Documents",
-                Key={"primaryKey": {"S": documentId}},
+                Key={"id": {"S": documentId}},
             )
+            print(f"Document: {document}")
             # Check if item exists in the table
             if "Item" not in document:
                 return {
@@ -63,22 +80,32 @@ def handler(event, context):
                 }
 
             document = document["Item"]
-            print("Item retrieved:", document)
 
             vectors = dynamodb.get_item(
                 TableName="tnn-Vectors",
-                Key={"primaryKey": {"S": documentId}},
+                Key={"id": {"S": documentId}},
             )
+            # Delete outdated vectors from DynamoDB
             if "Item" in vectors:
-                vectors = vectors["Item"]
-                print("Item retrieved:", vectors)
+                vectors = vectors["Item"]["vectors"]["SS"]
+                print(f"Deleting vectors for file {documentId}")
+                print(vectors)
                 try:
                     db.delete(vectors)
                 except Exception as e:
                     print(f"Error deleting vectors for file {documentId}: {e}")
 
             # Save vector embeddings to faiss index
-            document_splits = split_document(document["content"])
+            try:
+                content = document["content"]["S"]
+                documentId = document["id"]["S"]
+                title = document["title"]["S"]
+            except Exception:
+                return {
+                    "statusCode": 500,
+                    "body": json.dumps("Error getting content from DynamoDB"),
+                }
+            document_splits = split_document(content, documentId, title)
 
             if not document_splits:
                 return {
@@ -86,10 +113,23 @@ def handler(event, context):
                     "body": json.dumps("Error splitting document"),
                 }
 
+            document_vectors = {}
             for document in document_splits:
                 db.add_documents([document])
+                if document.metadata["documentId"] not in document_vectors:
+                    document_vectors[document.metadata["documentId"]] = [
+                        db.index_to_docstore_id[len(db.index_to_docstore_id) - 1]
+                    ]
+                else:
+                    document_vectors[document.metadata["documentId"]].append(
+                        db.index_to_docstore_id[len(db.index_to_docstore_id) - 1]
+                    )
 
-            save_to_s3(userId, db.serialize_to_bytes())
+            file_name = "faiss_index.bin"
+            db.save_local(index_name=file_name, folder_path=file_path)
+            save_to_s3(userId + ".faiss", file_path + "/" + file_name + ".faiss")
+            save_to_s3(userId + ".pkl", file_path + "/" + file_name + ".pkl")
+            add_vectors_to_dynamodb(documentId, document_vectors[documentId])
 
         else:
             # Faiss index does not exist, create the index from scratch
@@ -100,49 +140,65 @@ def handler(event, context):
             # Execute the query
             result = dynamodb.query(
                 TableName=documents_table_name,
+                IndexName="userId-index",
                 KeyConditionExpression=filter_expression,
                 ExpressionAttributeValues=expression_attribute_values,
             )
 
             # Process the query results
             documents = result.get("Items", [])
-            print("Documents:", documents)
             if documents:
                 embeddings = OpenAIEmbeddings(
                     client=None, model="text-embedding-ada-002"
                 )
                 split_documents = []
                 for document in documents:
-                    print("Document:", document)
-                    content = document["content"]
-                    split_documents.extend(split_document(content))
-                db = FAISS.from_documents(documents, embeddings)
-                save_to_s3(userId, db.serialize_to_bytes())
+                    try:
+                        content = document["content"]["S"]
+                        documentId = document["id"]["S"]
+                        title = document["title"]["S"]
+                    except Exception:
+                        continue
+                    split_documents.extend(split_document(content, documentId, title))
+                db = FAISS.from_documents(split_documents, embeddings)
+                file_path = f"/tmp/{userId}"
+                file_name = "faiss_index.bin"
+                Path(file_path).mkdir(parents=True, exist_ok=True)
+                db.save_local(index_name=file_name, folder_path=file_path)
+                save_to_s3(userId + ".faiss", file_path + "/" + file_name + ".faiss")
+                save_to_s3(userId + ".pkl", file_path + "/" + file_name + ".pkl")
+                index_to_docstore_id = db.index_to_docstore_id
+                document_vectors = get_vectors_from_faiss_index(
+                    split_documents, db, index_to_docstore_id
+                )
+                for documentId, vectors in document_vectors.items():
+                    add_vectors_to_dynamodb(documentId, vectors)
 
     except Exception as e:
         print("Error:", e)
         return {"statusCode": 500, "body": json.dumps("Internal server error")}
 
 
-def save_to_s3(userId, memory_snapshot):
+def save_to_s3(key, file_path):
     try:
-        s3.put_object(Bucket=bucket_name, Key=userId + ".faiss", Body=memory_snapshot)
-        return True
+        s3.upload_file(Filename=file_path, Bucket=bucket_name, Key=key)
     except Exception as e:
         print(f"Error saving object to S3: {e}")
 
 
-def load_from_s3(userId):
+def load_from_s3(key, file_path):
     try:
-        response = s3.get_object(Bucket=bucket_name, Key=userId + ".faiss")
-        object_data = response["Body"].read()
-        return object_data
+        # response = s3.get_object(Bucket=bucket_name, Key=userId + ".faiss")
+        # object_data = response["Body"].read()
+        s3.download_file(Bucket=bucket_name, Key=key, Filename=file_path)
+        # return object_data
+        return True
     except Exception as e:
         print(f"Error getting object from S3: {e}")
-        return None
+        return False
 
 
-def split_document(document):
+def split_document(document, documentId, title):
     headers_to_split_on = [
         ("#", "Header 1"),
         ("##", "Header 2"),
@@ -153,10 +209,51 @@ def split_document(document):
     )
     md_header_splits = markdown_splitter.split_text(document)
 
-    chunk_size = 250
-    chunk_overlap = 30
+    chunk_size = 512
+    chunk_overlap = 32
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=chunk_size, chunk_overlap=chunk_overlap
     )
 
-    return text_splitter.split_documents(md_header_splits)
+    splitted_documents = text_splitter.split_documents(md_header_splits)
+
+    documents = []
+    for splitted_document in splitted_documents:
+        document = Document(
+            page_content=splitted_document.page_content,
+            metadata={
+                "documentId": documentId,
+                "title": title,
+            },
+        )
+        documents.append(document)
+
+    return documents
+
+
+def get_vectors_from_faiss_index(documents, db, index_to_docstore_id):
+    document_vectors = {}
+    for i in range(len(documents)):
+        document = db.docstore.search(index_to_docstore_id[i])
+        if document:
+            if document.metadata["documentId"] not in document_vectors:
+                document_vectors[document.metadata["documentId"]] = [
+                    index_to_docstore_id[i]
+                ]
+            else:
+                document_vectors[document.metadata["documentId"]].append(
+                    index_to_docstore_id[i]
+                )
+    return document_vectors
+
+
+def add_vectors_to_dynamodb(documentId, vectors):
+    try:
+        newItem = {"id": {}, "vectors": {}}
+        newItem["id"]["S"] = documentId
+        newItem["vectors"]["SS"] = vectors
+        dynamodb.put_item(TableName=vector_table_name, Item=newItem)
+    except Exception as e:
+        print(f"Error adding vectors to DynamoDB: {e}")
+        return False
+    return True

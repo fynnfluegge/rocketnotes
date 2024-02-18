@@ -39,7 +39,7 @@ type Document struct {
 type SqsMessage struct {
 	DocumentId   string `json:"documentId"`
 	UserId       string `json:"userId"`
-	OpenAiApiKey string `json:"openAiApikey"`
+	OpenAiApiKey string `json:"openAiApiKey"`
 }
 
 func init() {
