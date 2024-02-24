@@ -628,7 +628,9 @@ export class SidenavComponent implements OnInit, AfterViewInit {
   }
 
   @HostListener('document:keydown.meta.k', ['$event'])
-  focusSearchInput() {
+  focusSearchInput(event) {
+    event.preventDefault();
+    this.searchInput.nativeElement.value = '';
     this.openSearchDialog();
   }
 
@@ -1271,6 +1273,11 @@ export class SidenavComponent implements OnInit, AfterViewInit {
     /*execute a function when someone clicks in the document:*/
     document.addEventListener('click', function (e) {
       closeAllLists(e.target);
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        closeAllLists(null);
+      }
     });
   }
 
