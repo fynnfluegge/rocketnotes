@@ -125,7 +125,7 @@ export class EditorComponent {
       !this.aiCompletionEnabled &&
       localStorage.getItem('openAiApiKey') === null
     ) {
-      const overlay = document.getElementById('overlay');
+      const overlay = document.getElementById('openAiDialog');
       overlay.style.display = 'flex';
     } else {
       this.aiCompletionEnabled = !this.aiCompletionEnabled;
@@ -148,7 +148,7 @@ export class EditorComponent {
     localStorage.setItem('openAiApiKey', apiKeyVlue.value);
     this.openai.apiKey = apiKeyVlue.value;
     this.toggleAiCompletion();
-    this.closeDialog('overlay');
+    this.closeDialog('openAiDialog');
   }
 
   closeDialog(id: string) {

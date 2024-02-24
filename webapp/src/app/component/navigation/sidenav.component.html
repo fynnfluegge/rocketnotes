@@ -7,31 +7,16 @@
   <button (click)="addNewItem(null)" class="icon-button-fade nav-bar-button">
     Add Document
   </button>
-  <form autocomplete="off" style="margin-left: auto">
-    <div class="autocomplete" style="width: 280px">
-      <input
-        class="input-field"
-        type="text"
-        id="search_documents"
-        name="search_documents"
-        placeholder="Search | {{
-          this.isMobileDevice
-            ? ''
-            : this.operatingSystem == 'Mac'
-            ? '⌘K'
-            : 'ctrlK'
-        }}"
-      />
-    </div>
-  </form>
-  <!-- <div class="dropdown">
-    <button style="height:100%;"><i class="fa fa-lg fa-question-circle"></i></button>
-    <div class="dropdown-content dropdown-light">
-      <div><strong>Shortcuts</strong></div>
-      <div>Save:          ⌘ + ⇧ + S</div>
-      <div>New Document:  ⌘ + ⇧ + N</div>
-    </div>
-  </div> -->
+  <button
+    type="submit"
+    id="searchButton"
+    style="margin-left: auto"
+    (click)="openSearchDialog()"
+  >
+    <i class="fa-solid fa-magnifying-glass"></i> Search
+    <kbd style="margin-right: 2px">{{ commandKey() }}</kbd
+    ><kbd>K</kbd>
+  </button>
   <div class="dropdown" style="width: 48px; color: black">
     <button style="height: 100%">
       <i
@@ -44,7 +29,7 @@
         <strong>{{ username }}</strong>
       </div>
       <button
-        (click)="openOpenAiApiKeyDialog('overlay')"
+        (click)="openOpenAiApiKeyDialog('openAiDialog')"
         *ngIf="!isMobileDevice"
         style="padding: 8px; margin-top: 4px"
         class="btn-primary"
@@ -81,6 +66,25 @@
     </div>
   </div>
 </ul>
+
+<!-- The popup dialog -->
+<div class="overlay" id="searchDialog">
+  <div class="dialog">
+    <form autocomplete="off" style="margin-left: auto">
+      <div class="autocomplete">
+        <input
+          #searchInput
+          class="input-field"
+          style="margin: 0; margin-bottom: 4px; width: 100%"
+          type="text"
+          id="search_documents"
+          name="search_documents"
+          placeholder="Search..."
+        />
+      </div>
+    </form>
+  </div>
+</div>
 
 <div
   class="sidebar"

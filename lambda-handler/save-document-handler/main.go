@@ -15,6 +15,11 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 )
 
+type Body struct {
+	Document     *Document `json:"document"`
+	OpenAiApiKey string    `json:"openAiApiKey"`
+}
+
 type Document struct {
 	ID            string    `json:"id"`
 	UserId        string    `json:"userId"`
@@ -30,13 +35,13 @@ func init() {
 
 func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 
-	item := Document{}
+	item := Body{}
 
 	json.Unmarshal([]byte(request.Body), &item)
 
-	item.Searchcontent = strings.ToLower(item.Title + "\n" + item.Content)
+	item.Document.Searchcontent = strings.ToLower(item.Document.Title + "\n" + item.Document.Content)
 
-	item.LastModified = time.Now()
+	item.Document.LastModified = time.Now()
 
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
@@ -50,7 +55,7 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		svc = dynamodb.New(sess)
 	}
 
-	av, err := dynamodbattribute.MarshalMap(item)
+	av, err := dynamodbattribute.MarshalMap(item.Document)
 	if err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: 404,

@@ -1,4 +1,11 @@
-import { Injectable, Component, OnInit, AfterViewInit } from '@angular/core';
+import {
+  Injectable,
+  Component,
+  OnInit,
+  AfterViewInit,
+  ViewChild,
+  ElementRef,
+} from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FlatTreeControl } from '@angular/cdk/tree';
 import {
@@ -527,6 +534,8 @@ export class SidenavComponent implements OnInit, AfterViewInit {
 
   operatingSystem: string;
 
+  @ViewChild('searchInput') searchInput: ElementRef;
+
   /** Map from flat node to nested node. This helps us finding the nested node to be modified */
   flatNodeMap: Map<DocumentFlatNode, DocumentNode> = new Map<
     DocumentFlatNode,
@@ -620,7 +629,12 @@ export class SidenavComponent implements OnInit, AfterViewInit {
 
   @HostListener('document:keydown.meta.k', ['$event'])
   focusSearchInput() {
-    document.getElementById('search_documents').focus();
+    this.openSearchDialog();
+  }
+
+  @HostListener('document:keydown.escape', ['$event'])
+  closeDialogs() {
+    document.getElementById('searchDialog').style.display = 'none';
   }
 
   ngAfterViewInit(): void {
@@ -1141,12 +1155,13 @@ export class SidenavComponent implements OnInit, AfterViewInit {
               ['/' + this.getElementsByTagName('input')[0].value],
               { relativeTo: this.route },
             );
+            document.getElementById('searchDialog').style.display = 'none';
+            input.value = '';
             closeAllLists(null);
           });
           a.appendChild(b);
         }
       }
-      // }
     });
     /*execute a function presses a key on the keyboard:*/
     input.addEventListener('keydown', function (e) {
@@ -1155,16 +1170,26 @@ export class SidenavComponent implements OnInit, AfterViewInit {
       if (e.keyCode == 40) {
         /*If the arrow DOWN key is pressed,
         increase the currentFocus variable:*/
+        if (currentFocus == suggestionList.length - 1) return;
         currentFocus++;
         /*and and make the current item more visible:*/
         addActive(suggestionList);
+        if (!isElementVisible(x, suggestionList[currentFocus])) {
+          console.log(suggestionList[currentFocus].offsetHeight);
+          x.scrollTop += suggestionList[currentFocus].offsetHeight;
+        }
       } else if (e.keyCode == 38) {
         //up
         /*If the arrow UP key is pressed,
         decrease the currentFocus variable:*/
+        if (currentFocus == 0) return;
         currentFocus--;
         /*and and make the current item more visible:*/
         addActive(suggestionList);
+        if (!isElementVisible(x, suggestionList[currentFocus])) {
+          console.log(suggestionList[currentFocus].offsetHeight);
+          x.scrollTop -= suggestionList[currentFocus].offsetHeight;
+        }
       } else if (e.keyCode == 13) {
         /*If the ENTER key is pressed, prevent the form from being submitted,*/
         e.preventDefault();
@@ -1174,6 +1199,14 @@ export class SidenavComponent implements OnInit, AfterViewInit {
         }
       }
     });
+    function isElementVisible(container, element) {
+      const elementRect = element.getBoundingClientRect();
+      const containerRect = container.getBoundingClientRect();
+      return (
+        elementRect.top >= containerRect.top &&
+        elementRect.bottom <= containerRect.bottom
+      );
+    }
     function addActive(x: any) {
       /*a function to classify an item as "active":*/
       if (!x) return false;
@@ -1242,7 +1275,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
   }
 
   openOpenAiApiKeyDialog() {
-    const overlay = document.getElementById('overlay');
+    const overlay = document.getElementById('openAiDialog');
     overlay.style.display = 'flex';
     const inputField = document.getElementById(
       'inputField',
@@ -1295,5 +1328,28 @@ export class SidenavComponent implements OnInit, AfterViewInit {
         ? 'var(--dark-theme-hyperlink-color)'
         : 'var(--light-theme-hyperlink-color)',
     );
+  }
+
+  openSearchDialog() {
+    const overlay = document.getElementById('searchDialog');
+    overlay.addEventListener('click', (event) => {
+      this.outsideClickHandler(event);
+    });
+    overlay.style.display = 'flex';
+    const searchField = document.getElementById('search_documents');
+    searchField.focus();
+  }
+
+  outsideClickHandler(event) {
+    const overlay = document.getElementById('searchDialog');
+    // Check if the click event occurred outside the dialog
+    if (event.target === overlay) {
+      overlay.style.display = 'none';
+      this.searchInput.nativeElement.value = '';
+    }
+  }
+
+  commandKey() {
+    return this.operatingSystem === 'Mac' ? '⌘' : 'Ctrl';
   }
 }
