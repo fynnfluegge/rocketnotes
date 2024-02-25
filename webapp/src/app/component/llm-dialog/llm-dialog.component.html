@@ -1,8 +1,8 @@
 <div class="overlay" id="llmDialog" [class.open]="isOpen">
   <div class="dialog">
     <div class="tab">
-      <button class="tablinks" (click)="openTab(event, 'tab1')">Chat</button>
-      <button class="tablinks" (click)="openTab(event, 'tab2')">Search</button>
+      <button class="tablinks" (click)="openTab($event, 'tab1')">Chat</button>
+      <button class="tablinks" (click)="openTab($event, 'tab2')">Search</button>
     </div>
     <div class="tabcontent" id="tab1" style="display: flex; overflow-y: auto">
       <div class="chat-history" #chatHistory>
