@@ -1,0 +1,27 @@
+<div class="overlay" id="llmDialog" [class.open]="isOpen">
+  <div class="dialog">
+    <div class="tab">
+      <button class="tablinks" (click)="openTab(event, 'tab1')">Chat</button>
+      <button class="tablinks" (click)="openTab(event, 'tab2')">Search</button>
+    </div>
+    <div class="tabcontent" id="tab1" style="display: flex; overflow-y: auto">
+      <div class="chat-history" #chatHistory>
+        <div *ngFor="let message of messages">{{ message }}</div>
+      </div>
+      <input
+        id="userInputField"
+        type="text"
+        class="input-field"
+        [(ngModel)]="userInput"
+        (keyup.enter)="sendMessage()"
+        placeholder="Type your message..."
+        autofocus
+      />
+    </div>
+
+    <div class="tabcontent" id="tab2">
+      <h3>Paris</h3>
+      <p>Paris is the capital of France.</p>
+    </div>
+  </div>
+</div>

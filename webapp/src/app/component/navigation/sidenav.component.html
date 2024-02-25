@@ -8,11 +8,18 @@
     Add Document
   </button>
   <button
-    type="submit"
-    id="searchButton"
+    (click)="openLlmDialog()"
+    class="icon-button-fade nav-bar-button"
     style="margin-left: auto"
-    (click)="openSearchDialog()"
   >
+    <img
+      src="../../../assets/icons/png/icons8-artificial-intelligence-50.png"
+      alt=""
+      style="height: 20px; margin-top: -2px; margin-left: -4px"
+    />
+    LLM Chat & Search
+  </button>
+  <button type="submit" id="searchButton" (click)="openSearchDialog()">
     <i class="fa-solid fa-magnifying-glass"></i> Search
     <kbd style="margin-right: 2px">{{ commandKey() }}</kbd
     ><kbd>K</kbd>
@@ -85,6 +92,8 @@
     </form>
   </div>
 </div>
+
+<app-llm-dialog></app-llm-dialog>
 
 <div
   class="sidebar"

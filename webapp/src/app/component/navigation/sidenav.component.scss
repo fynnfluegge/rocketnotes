@@ -88,16 +88,17 @@ span:hover {
 }
 
 .nav-bar-button {
-  font-size: smaller;
   height: 100%;
+  width: fit-content !important;
+  font-size: 14px;
   font-weight: 200;
   border: 1px;
   border-color: darkgrey;
   border-radius: 8px;
   margin: 8px;
+  padding: 0px 12px 0px 12px;
   border-style: groove;
   height: 70%;
-  min-width: 110px !important;
   background-color: initial;
   background-image: linear-gradient(-180deg, #333131, var(--menu-color));
 }
@@ -330,7 +331,11 @@ input:checked + .slider:before {
   color: black;
   align-items: center;
   justify-content: center;
-  z-index: 1;
+  z-index: 2;
+}
+
+.open {
+  display: flex;
 }
 
 /* Styles for the dialog box */

@@ -84,8 +84,6 @@ pre[class*="language-"] {
 
 // ------- autocomplete ------------ //
 .autocomplete {
-  // position: relative;
-  // display: inline-block;
   display: flex;
   flex-direction: column;
   height: 240px; /* Example maximum height */
@@ -94,11 +92,6 @@ pre[class*="language-"] {
 
 .autocomplete-items {
   color: black;
-  // position: absolute;
-  /*position the autocomplete items to be the same width as the container:*/
-  top: 100%;
-  left: 0;
-  right: 0;
   overflow-y: auto;
 }
 

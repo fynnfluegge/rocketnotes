@@ -20,6 +20,7 @@ import { environment } from 'src/environments/environment';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { HostListener } from '@angular/core';
+import { LlmDialogService } from 'src/app/service/llm-dialog.service';
 
 const ROOT_ID: string = 'root';
 const PINNED_ID: string = 'pinned';
@@ -515,7 +516,7 @@ export class DocumentTree {
   selector: 'app-sidenav',
   templateUrl: './sidenav.component.html',
   styleUrls: ['./sidenav.component.scss'],
-  providers: [DocumentTree],
+  providers: [DocumentTree, LlmDialogService],
 })
 export class SidenavComponent implements OnInit, AfterViewInit {
   username: string;
@@ -561,6 +562,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
     private database: DocumentTree,
     private basicRestService: BasicRestService,
     private router: Router,
+    private llmDialogService: LlmDialogService,
   ) {
     this.treeFlattener = new MatTreeFlattener(
       this.transformer,
@@ -637,6 +639,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
   @HostListener('document:keydown.escape', ['$event'])
   closeDialogs() {
     document.getElementById('searchDialog').style.display = 'none';
+    this.llmDialogService.closeDialog();
   }
 
   ngAfterViewInit(): void {
@@ -1339,17 +1342,19 @@ export class SidenavComponent implements OnInit, AfterViewInit {
 
   openSearchDialog() {
     const overlay = document.getElementById('searchDialog');
-    overlay.addEventListener('click', (event) => {
-      this.outsideClickHandler(event);
-    });
     overlay.style.display = 'flex';
+    if (overlay.getAttribute('outsideClickListener') !== 'true') {
+      overlay.addEventListener('click', (event) => {
+        overlay.setAttribute('outsideClickListener', 'true');
+        this.outsideClickHandler(event);
+      });
+    }
     const searchField = document.getElementById('search_documents');
     searchField.focus();
   }
 
-  outsideClickHandler(event) {
+  outsideClickHandler(event: MouseEvent) {
     const overlay = document.getElementById('searchDialog');
-    // Check if the click event occurred outside the dialog
     if (event.target === overlay) {
       overlay.style.display = 'none';
       this.searchInput.nativeElement.value = '';
@@ -1358,5 +1363,9 @@ export class SidenavComponent implements OnInit, AfterViewInit {
 
   commandKey() {
     return this.operatingSystem === 'Mac' ? '⌘' : 'Ctrl';
+  }
+
+  openLlmDialog() {
+    this.llmDialogService.openDialog();
   }
 }
