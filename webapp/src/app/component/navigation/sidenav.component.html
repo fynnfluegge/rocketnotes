@@ -31,14 +31,14 @@
         style="position: relative; left: 8px"
       ></i>
     </button>
-    <div class="dropdown-content dropdown-light">
+    <div class="dropdown-content" style="width: 240px">
       <div>
         <strong>{{ username }}</strong>
       </div>
       <button
         (click)="openOpenAiApiKeyDialog('openAiDialog')"
         *ngIf="!isMobileDevice"
-        style="padding: 8px; margin-top: 4px"
+        style="padding: 8px; margin-top: 4px; border-radius: 4px"
         class="btn-primary"
       >
         OpenAI API Key
@@ -65,7 +65,7 @@
       </div>
       <button
         (click)="onLogout()"
-        style="padding: 8px; margin-top: 4px"
+        style="padding: 8px; margin-top: 4px; border-radius: 4px"
         class="btn-primary"
       >
         Logout

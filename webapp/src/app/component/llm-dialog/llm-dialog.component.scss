@@ -1,18 +1,18 @@
-.chat-history {
+.result {
   display: flex;
   flex-direction: column;
   overflow-y: auto;
   height: 100%;
-  padding: 8px;
+  padding: 8px 16px;
 }
 
 .overlay {
   display: none;
   position: fixed;
-  top: -40%;
+  top: -20%;
   left: 0;
   width: 100%;
-  height: 140%;
+  height: 120%;
   background-color: rgba(0, 0, 0, 0.15);
   color: black;
   align-items: center;
@@ -21,11 +21,13 @@
 }
 
 .dialog {
-  background-color: white;
-  border-radius: 5px;
+  background-color: var(--menu-color);
+  color: lightgray;
+  border-radius: 6px;
+  border: 0.1px solid rgb(63, 66, 65);
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
-  padding: 20px;
-  width: 480px;
+  padding: 12px;
+  width: 640px;
   text-align: center;
 }
 
@@ -33,52 +35,100 @@
   display: flex;
 }
 
-.input-field {
-  border: 1px solid black;
-  border-radius: 4px;
-}
-
-.input-field:focus {
-  outline: none !important;
-  border: 2px solid var(--focus-color);
-}
-
-/* Style the tab */
 .tab {
   overflow: hidden;
-  border: 1px solid #ccc;
-  background-color: #f1f1f1;
+  border: 1px solid gray;
+  border-bottom: none;
+  background-color: black;
 }
 
-/* Style the buttons inside the tab */
 .tab button {
-  background-color: inherit;
   float: left;
   border: none;
   outline: none;
   cursor: pointer;
-  padding: 14px 16px;
+  padding: 12px 14px;
   transition: 0.3s;
-  font-size: 17px;
+  font-size: 18px;
+  color: lightgray;
+  border-radius: 4px 0px 0px 0px !important;
 }
 
-/* Change background color of buttons on hover */
 .tab button:hover {
-  background-color: #ddd;
+  background-color: var(--menu-color);
 }
 
-/* Create an active/current tablink class */
 .tab button.active {
-  background-color: #ccc;
+  background-color: var(--menu-color);
 }
 
-/* Style the tab content */
 .tabcontent {
   display: none;
-  padding: 6px 12px;
-  border: 1px solid #ccc;
+  padding: 6px 6px;
+  border: 1px solid gray;
   border-top: none;
+  border-radius: 0px 0px 4px 4px;
   flex-direction: column;
-  height: 240px;
+  height: 480px;
   overflow-x: hidden;
+}
+
+.input-container {
+  display: inline-flex;
+  align-items: stretch;
+  border-radius: 5px;
+  overflow: hidden;
+  border: 2px solid var(--focus-color);
+}
+
+.input-container input {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  outline: none;
+  background-color: black;
+  color: white;
+}
+
+.input-container button {
+  padding: 8px 12px;
+  background-color: var(--button-color);
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.loading-animation {
+  margin: 12px;
+  text-align: left;
+  transform: translateY(-50%);
+  font-size: 32px;
+  animation: pulse 1s infinite; /* Example animation */
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.2;
+  }
+}
+
+.chat-message {
+  border-radius: 8px;
+  border: 1px solid #545454;
+  padding: 8px;
+  margin-bottom: 6px;
+}
+
+.user-message {
+  float: right;
+}
+
+.bot-message {
+  float: left;
 }

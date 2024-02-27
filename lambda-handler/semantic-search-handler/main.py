@@ -42,12 +42,15 @@ def lambda_handler(event, context):
     )
 
     similarity_search_result = db.similarity_search(search_string, k=4)
-    response = {}
+    response = []
     for result in similarity_search_result:
-        response[result.metadata["documentId"]] = {
-            "title": result.metadata["title"],
-            "content": result.page_content,
-        }
+        response.append(
+            {
+                "documentId": result.metadata["documentId"],
+                "title": result.metadata["title"],
+                "content": result.page_content,
+            }
+        )
 
     return {
         "statusCode": 200,

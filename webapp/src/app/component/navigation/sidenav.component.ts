@@ -639,6 +639,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
   @HostListener('document:keydown.escape', ['$event'])
   closeDialogs() {
     document.getElementById('searchDialog').style.display = 'none';
+    this.searchInput.nativeElement.value = '';
     this.llmDialogService.closeDialog();
   }
 
@@ -1135,6 +1136,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
         for (i = 0; i < foundElements.length; i++) {
           /*create a DIV element for each matching element:*/
           b = document.createElement('DIV');
+          b.setAttribute('class', 'search-item');
           b.innerHTML +=
             "<strong style='font-size:18px;'>" +
             foundElements[i].title +
@@ -1366,6 +1368,12 @@ export class SidenavComponent implements OnInit, AfterViewInit {
   }
 
   openLlmDialog() {
-    this.llmDialogService.openDialog();
+    if (localStorage.getItem('openAiApiKey') === null) {
+      window.alert(
+        'Please set your OpenAI API key in user settings to use this feature.',
+      );
+    } else {
+      this.llmDialogService.openDialog();
+    }
   }
 }
