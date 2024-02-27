@@ -112,7 +112,7 @@ export class LlmDialogComponent implements OnDestroy, OnInit {
       });
   }
 
-  sendSearchPattern() {
+  sendSearchMessage() {
     const searchInput = this.searchInput.trim();
     this.searchResults = [];
     this.isLoading = true;
