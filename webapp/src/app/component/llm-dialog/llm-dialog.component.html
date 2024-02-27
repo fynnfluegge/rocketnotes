@@ -37,7 +37,7 @@
         <input
           type="text"
           [(ngModel)]="chatInput"
-          (keyup.enter)="sendMessage()"
+          (keyup.enter)="sendChatMessage()"
           placeholder="Type your question..."
         />
         <button (click)="sendChatMessage()">
