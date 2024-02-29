@@ -18,7 +18,7 @@
           <div *ngIf="message.isUser">
             <div class="user-message chat-message">
               <div class="message">
-                {{ message.text }}
+                <markdown [data]="message.text"> </markdown>
               </div>
             </div>
           </div>
@@ -26,7 +26,7 @@
             <div class="bot-message chat-message">
               <div class="message">
                 <i class="fa-solid fa-robot"></i>
-                {{ message.text }}
+                <markdown [data]="message.text"> </markdown>
               </div>
             </div>
           </div>
@@ -35,6 +35,7 @@
       </div>
       <div class="input-container">
         <input
+          id="chatInput"
           type="text"
           [(ngModel)]="chatInput"
           (keyup.enter)="sendChatMessage()"
@@ -48,6 +49,7 @@
     <div class="tabcontent" id="tab2">
       <div class="input-container">
         <input
+          id="searchInput"
           type="text"
           [(ngModel)]="searchInput"
           (keyup.enter)="sendSearchMessage()"
@@ -60,7 +62,8 @@
       <div class="result" style="text-align: left" #searchResultList>
         <div *ngIf="isLoading" class="loading-animation">...</div>
         <div *ngFor="let searchResult of searchResults">
-          <div class="search-item">
+          <div class="search-item" (click)="openDocument(searchResult)">
+            <span class="search-item-title">{{ searchResult.title }}</span>
             <markdown [data]="searchResult.text"> </markdown>
           </div>
         </div>

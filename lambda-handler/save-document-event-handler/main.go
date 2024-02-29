@@ -79,7 +79,7 @@ func handleRequest(ctx context.Context, event events.SQSEvent) {
 	}
 
 
-	if item.Body.OpenAiApiKey != nil {
+	if item.Body.OpenAiApiKey != "" {
 		qsvc := sqs.New(sess)
 
 		m := SqsMessage{item.Body.Document.ID, item.Body.Document.UserId, item.Body.OpenAiApiKey}

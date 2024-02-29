@@ -9,8 +9,7 @@ import { retry } from 'rxjs/operators';
 export class BasicRestService {
   backend_url = environment.apiUrl;
 
-  constructor(public http: HttpClient) {
-  }
+  constructor(public http: HttpClient) {}
 
   public _addStandardHeaders(header: HttpHeaders) {
     header = header.append('Content-Type', 'application/json');
@@ -42,18 +41,18 @@ export class BasicRestService {
   post(endpoint: string, body: any, reqOpts?: any) {
     return this.http
       .post<any>(this.backend_url + '/' + endpoint, body, reqOpts)
-      .pipe(retry(3));
+      .pipe(retry(1));
   }
 
   put(endpoint: string, body: any, reqOpts?: any) {
     return this.http
       .put(this.backend_url + '/' + endpoint, body, reqOpts)
-      .pipe(retry(3));
+      .pipe(retry(1));
   }
 
   delete(endpoint: string, reqOpts?: any) {
     return this.http
       .delete(this.backend_url + '/' + endpoint, reqOpts)
-      .pipe(retry(3));
+      .pipe(retry(1));
   }
 }

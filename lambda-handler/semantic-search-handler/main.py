@@ -1,5 +1,6 @@
 import json
 import os
+from pathlib import Path
 
 import boto3
 from langchain_community.vectorstores import FAISS
@@ -11,7 +12,7 @@ documents_table_name = "tnn-Documents"
 bucket_name = os.environ["bucketName"]
 
 
-def lambda_handler(event, context):
+def handler(event, context):
     if "body" in event:
         try:
             request_body = json.loads(event["body"])
@@ -21,16 +22,22 @@ def lambda_handler(event, context):
         return {"statusCode": 400, "body": "Request body is missing"}
 
     if "userId" in request_body:
-        userId = request_body["name"]
+        userId = request_body["userId"]
     else:
         return {"statusCode": 400, "body": "userId is missing"}
 
-    if "search_string" in request_body:
-        search_string = request_body["search_string"]
+    if "searchString" in request_body:
+        search_string = request_body["searchString"]
     else:
         return {"statusCode": 400, "body": "search_string is missing"}
 
+    if "openAiApiKey" in request_body:
+        os.environ["OPENAI_API_KEY"] = request_body["openAiApiKey"]
+    else:
+        return {"statusCode": 400, "body": "openAiApiKey is missing"}
+
     file_path = f"/tmp/{userId}"
+    Path(file_path).mkdir(parents=True, exist_ok=True)
     load_from_s3(userId + ".faiss", f"{file_path}/{userId}.faiss")
     load_from_s3(userId + ".pkl", f"{file_path}/{userId}.pkl")
 

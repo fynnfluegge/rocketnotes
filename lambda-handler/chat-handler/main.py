@@ -14,7 +14,7 @@ documents_table_name = "tnn-Documents"
 bucket_name = os.environ["bucketName"]
 
 
-def lambda_handler(event, context):
+def handler(event, context):
     if "body" in event:
         try:
             request_body = json.loads(event["body"])
@@ -24,7 +24,7 @@ def lambda_handler(event, context):
         return {"statusCode": 400, "body": "Request body is missing"}
 
     if "userId" in request_body:
-        userId = request_body["name"]
+        userId = request_body["userId"]
     else:
         return {"statusCode": 400, "body": "userId is missing"}
 
@@ -39,6 +39,7 @@ def lambda_handler(event, context):
         return {"statusCode": 400, "body": "openAiApiKey is missing"}
 
     file_path = f"/tmp/{userId}"
+    Path(file_path).mkdir(parents=True, exist_ok=True)
     load_from_s3(userId + ".faiss", f"{file_path}/{userId}.faiss")
     load_from_s3(userId + ".pkl", f"{file_path}/{userId}.pkl")
 
@@ -59,7 +60,7 @@ def lambda_handler(event, context):
     )
     result = qa(prompt)
 
-    return {"statusCode": 200, "body": json.dumps(result)}
+    return {"statusCode": 200, "body": json.dumps(result["answer"])}
 
 
 def load_from_s3(key, file_path):

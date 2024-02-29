@@ -8,6 +8,7 @@ import {
 import { Subscription } from 'rxjs';
 import { LlmDialogService } from 'src/app/service/llm-dialog.service';
 import { BasicRestService } from 'src/app/service/basic-rest.service';
+import { DocumentTree } from '../navigation/sidenav.component';
 
 type ChatMessage = {
   text: string;
@@ -36,10 +37,12 @@ export class LlmDialogComponent implements OnDestroy, OnInit {
   isOpen: boolean = false;
   subscription: Subscription;
   isLoading: boolean = false;
+  activeTab: string = 'tab1';
 
   constructor(
     private llmDialogService: LlmDialogService,
     private restService: BasicRestService,
+    private database: DocumentTree,
   ) {
     this.subscription = this.llmDialogService.isOpen$.subscribe((isOpen) => {
       this.isOpen = isOpen;
@@ -58,28 +61,12 @@ export class LlmDialogComponent implements OnDestroy, OnInit {
         }
       }
       setTimeout(() => {
-        document.getElementById('userInputField').focus();
+        if (this.activeTab === 'tab1') {
+          document.getElementById('chatInput').focus();
+        } else {
+          document.getElementById('searchInput').focus();
+        }
       }, 0);
-      // for (let i = 0; i < 10; i++) {
-      //   setTimeout(() => {
-      //     this.messages.push({
-      //       text: 'Hello, how can I help you?',
-      //       isUser: false,
-      //     });
-      //     this.messages.push({
-      //       text: 'Hello, how can I help you? Hello, how can I help you?',
-      //       isUser: true,
-      //     });
-      //     this.searchResults.push({
-      //       title: 'Title',
-      //       documentId: 'Document ID',
-      //       text: '## header\n\nparagraph',
-      //     });
-      //     setTimeout(() => {
-      //       this.scrollToBottom();
-      //     }, 0);
-      //   }, 1000);
-      // }
     });
   }
 
@@ -99,13 +86,13 @@ export class LlmDialogComponent implements OnDestroy, OnInit {
 
     this.restService
       .post('chat', {
-        userId: localStorage.getItem('userId'),
-        openAiApuKey: localStorage.getItem('openAiApuKey'),
+        userId: localStorage.getItem('currentUserId'),
+        openAiApiKey: localStorage.getItem('openAiApiKey'),
         prompt: userMessage,
       })
       .subscribe((result) => {
         this.isLoading = false;
-        this.messages.push({ text: result['answer'], isUser: false });
+        this.messages.push({ text: JSON.stringify(result), isUser: false });
         setTimeout(() => {
           this.scrollToBottom();
         }, 0);
@@ -118,8 +105,9 @@ export class LlmDialogComponent implements OnDestroy, OnInit {
     this.isLoading = true;
 
     this.restService
-      .post('search', {
-        userId: localStorage.getItem('userId'),
+      .post('semanticSearch', {
+        userId: localStorage.getItem('currentUserId'),
+        openAiApiKey: localStorage.getItem('openAiApiKey'),
         searchString: searchInput,
       })
       .subscribe((result) => {
@@ -133,29 +121,6 @@ export class LlmDialogComponent implements OnDestroy, OnInit {
           });
         });
       });
-
-    // Simulate response processing (replace with actual HTTP request)
-    // setTimeout(() => {
-    //   // Your response processing logic
-    //   this.searchResults.push({
-    //     title: 'Title',
-    //     documentId: 'Document ID',
-    //     text: '## header\n\nparagraph',
-    //   });
-    //   this.searchResults.push({
-    //     title: 'Title',
-    //     documentId: 'Document ID',
-    //     text: '## header\n\nparagraph',
-    //   });
-    //   this.searchResults.push({
-    //     title: 'Title',
-    //     documentId: 'Document ID',
-    //     text: '## header\n\nparagraph',
-    //   });
-    //
-    //   // Set isLoading to false when response is received
-    //   this.isLoading = false;
-    // }, 2000); // Simulated delay of 2 seconds
   }
 
   scrollToBottom() {
@@ -166,6 +131,7 @@ export class LlmDialogComponent implements OnDestroy, OnInit {
   }
 
   openTab(evt: any, tabId: string) {
+    this.activeTab = tabId;
     var i: number, tabcontent: any, tablinks: any;
     tabcontent = document.getElementsByClassName('tabcontent');
     for (i = 0; i < tabcontent.length; i++) {
@@ -177,5 +143,23 @@ export class LlmDialogComponent implements OnDestroy, OnInit {
     }
     document.getElementById(tabId).style.display = 'flex';
     evt.currentTarget.className += ' active';
+    if (tabId === 'tab1') {
+      setTimeout(() => {
+        document.getElementById('chatInput').focus();
+      }, 0);
+    } else {
+      setTimeout(() => {
+        document.getElementById('searchInput').focus();
+      }, 0);
+    }
+  }
+
+  openDocument(searchResult: SearchResult) {
+    this.database.initContentChange.next({
+      id: searchResult.documentId,
+      title: searchResult.title,
+      content: searchResult.text,
+      isPublic: false,
+    });
   }
 }

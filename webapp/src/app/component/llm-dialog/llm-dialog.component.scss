@@ -27,7 +27,7 @@
   border: 0.1px solid rgb(63, 66, 65);
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
   padding: 12px;
-  width: 640px;
+  width: 800px;
   text-align: center;
 }
 
@@ -123,6 +123,7 @@
   border: 1px solid #545454;
   padding: 8px;
   margin-bottom: 6px;
+  text-align: left;
 }
 
 .user-message {
@@ -131,4 +132,14 @@
 
 .bot-message {
   float: left;
+}
+
+.search-item:hover {
+  background-color: var(--dark-theme-background-color);
+  cursor: pointer;
+}
+
+.search-item-title {
+  text-decoration: underline;
+  font-weight: bold;
 }

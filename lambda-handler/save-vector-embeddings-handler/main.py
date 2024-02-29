@@ -4,8 +4,10 @@ from pathlib import Path
 
 import boto3
 from langchain.schema import Document
-from langchain.text_splitter import (MarkdownHeaderTextSplitter,
-                                     RecursiveCharacterTextSplitter)
+from langchain.text_splitter import (
+    MarkdownHeaderTextSplitter,
+    RecursiveCharacterTextSplitter,
+)
 from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
 
@@ -192,10 +194,10 @@ def split_document(document, documentId, title):
         chunk_size=chunk_size, chunk_overlap=chunk_overlap
     )
 
-    splitted_documents = text_splitter.split_documents(md_header_splits)
+    # splitted_documents = text_splitter.split_documents(md_header_splits)
 
     documents = []
-    for splitted_document in splitted_documents:
+    for splitted_document in md_header_splits:
         document = Document(
             page_content=splitted_document.page_content,
             metadata={

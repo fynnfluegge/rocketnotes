@@ -227,7 +227,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 	})
 
 	vectorQueue := awssqs.NewQueue(stack, jsii.String("VectorSqsQueue"), &awssqs.QueueProps{
-		VisibilityTimeout: awscdk.Duration_Seconds(jsii.Number(600)),
+		VisibilityTimeout: awscdk.Duration_Seconds(jsii.Number(900)),
 		RetentionPeriod:   awscdk.Duration_Seconds(jsii.Number(1200)),
 	})
 
@@ -359,11 +359,6 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		Runtime:      awslambda.Runtime_PYTHON_3_9(),
 		Entry:        jsii.String("../lambda-handler/semantic-search-handler"),
 		Index:        aws.String("main.py"),
-		Events: &[]awslambda.IEventSource{
-			awslambdaeventsources.NewSqsEventSource(vectorQueue, &awslambdaeventsources.SqsEventSourceProps{
-				BatchSize: jsii.Number(1),
-			}),
-		},
 		Environment: &map[string]*string{"bucketName": bucket.BucketName()},
 		Role:        lambdaS3Role,
 		MemorySize:  jsii.Number(1024),
@@ -384,11 +379,6 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		Runtime:      awslambda.Runtime_PYTHON_3_9(),
 		Entry:        jsii.String("../lambda-handler/chat-handler"),
 		Index:        aws.String("main.py"),
-		Events: &[]awslambda.IEventSource{
-			awslambdaeventsources.NewSqsEventSource(vectorQueue, &awslambdaeventsources.SqsEventSourceProps{
-				BatchSize: jsii.Number(1),
-			}),
-		},
 		Environment: &map[string]*string{"bucketName": bucket.BucketName()},
 		Role:        lambdaS3Role,
 		MemorySize:  jsii.Number(1024),
