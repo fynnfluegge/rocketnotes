@@ -79,23 +79,28 @@
   border-radius: 5px;
   overflow: hidden;
   border: 2px solid var(--focus-color);
+  background-color: black;
 }
 
-.input-container input {
+.input-container textarea {
   flex: 1;
   padding: 8px;
   border: none;
   outline: none;
-  background-color: black;
   color: white;
+  resize: none;
+  line-height: 1.5;
+  height: 32px;
+  background-color: inherit;
+  overflow: hidden;
 }
 
 .input-container button {
   padding: 8px 12px;
-  background-color: var(--button-color);
   color: white;
   border: none;
   cursor: pointer;
+  background-color: var(--menu-color);
 }
 
 .loading-animation {

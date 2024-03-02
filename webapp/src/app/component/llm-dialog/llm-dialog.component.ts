@@ -162,4 +162,9 @@ export class LlmDialogComponent implements OnDestroy, OnInit {
       isPublic: false,
     });
   }
+
+  resizeTextarea(event: any) {
+    // event.target.style.height = 'auto';
+    // event.target.style.height = event.target.scrollHeight + 'px';
+  }
 }

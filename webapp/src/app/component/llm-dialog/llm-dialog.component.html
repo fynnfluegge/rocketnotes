@@ -34,13 +34,13 @@
         <div *ngIf="isLoading" class="loading-animation">...</div>
       </div>
       <div class="input-container">
-        <input
+        <textarea
           id="chatInput"
-          type="text"
           [(ngModel)]="chatInput"
           (keyup.enter)="sendChatMessage()"
           placeholder="Type your question..."
-        />
+          (keyup)="resizeTextarea($event)"
+        ></textarea>
         <button (click)="sendChatMessage()">
           <i class="fa fa-paper-plane" aria-hidden="true"></i>
         </button>
@@ -48,13 +48,13 @@
     </div>
     <div class="tabcontent" id="tab2">
       <div class="input-container">
-        <input
+        <textarea
           id="searchInput"
-          type="text"
           [(ngModel)]="searchInput"
           (keyup.enter)="sendSearchMessage()"
           placeholder="Type your search pattern..."
-        />
+          (keyup)="resizeTextarea($event)"
+        ></textarea>
         <button (click)="sendSearchMessage()">
           <i class="fa fa-paper-plane" aria-hidden="true"></i>
         </button>

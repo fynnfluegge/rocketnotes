@@ -29,7 +29,7 @@ def handler(event, context):
         return {"statusCode": 400, "body": "userId is missing"}
 
     if "prompt" in request_body:
-        prompt = request_body["prompt"]
+        prompt = request_body["prompt"] + "/nRespond in valid markdown syntax"
     else:
         return {"statusCode": 400, "body": "search_string is missing"}
 
