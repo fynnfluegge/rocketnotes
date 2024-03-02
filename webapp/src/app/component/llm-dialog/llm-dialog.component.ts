@@ -77,12 +77,18 @@ export class LlmDialogComponent implements OnDestroy, OnInit {
   }
 
   sendChatMessage() {
+    const chatMessage = this.chatInput.trim();
+    if (chatMessage === '' || this.isLoading) {
+      return;
+    }
     this.messages.push({ text: this.chatInput, isUser: true });
     this.isLoading = true;
     setTimeout(() => {
       this.scrollToBottom();
     }, 0);
+
     const userMessage = this.chatInput.trim();
+    this.chatInput = '';
 
     this.restService
       .post('chat', {
@@ -92,7 +98,12 @@ export class LlmDialogComponent implements OnDestroy, OnInit {
       })
       .subscribe((result) => {
         this.isLoading = false;
-        this.messages.push({ text: JSON.stringify(result), isUser: false });
+        const resultString = JSON.stringify(result);
+        const formattedResult = resultString
+          .substring(1, resultString.length - 1)
+          .split('\\n')
+          .join('<br>');
+        this.messages.push({ text: formattedResult, isUser: false });
         setTimeout(() => {
           this.scrollToBottom();
         }, 0);
@@ -101,8 +112,12 @@ export class LlmDialogComponent implements OnDestroy, OnInit {
 
   sendSearchMessage() {
     const searchInput = this.searchInput.trim();
+    if (searchInput === '' || this.isLoading) {
+      return;
+    }
     this.searchResults = [];
     this.isLoading = true;
+    this.searchInput = '';
 
     this.restService
       .post('semanticSearch', {
@@ -166,5 +181,16 @@ export class LlmDialogComponent implements OnDestroy, OnInit {
   resizeTextarea(event: any) {
     // event.target.style.height = 'auto';
     // event.target.style.height = event.target.scrollHeight + 'px';
+  }
+
+  onKeydown(event: any) {
+    if (event.code === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      // if (this.activeTab === 'tab1') {
+      //   this.sendChatMessage();
+      // } else {
+      //   this.sendSearchMessage();
+      // }
+    }
   }
 }

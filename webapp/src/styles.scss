@@ -112,7 +112,7 @@ pre[class*="language-"] {
 
 /*when hovering an item:*/
 .autocomplete-items div:hover {
-  background-color: rgba(0, 0, 0, 0.25);
+  background-color: var(--dark-theme-background-color);
 }
 
 /*when navigating through the items using the arrow keys:*/

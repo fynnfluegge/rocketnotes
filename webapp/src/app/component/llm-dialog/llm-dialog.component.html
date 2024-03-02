@@ -18,7 +18,7 @@
           <div *ngIf="message.isUser">
             <div class="user-message chat-message">
               <div class="message">
-                <markdown [data]="message.text"> </markdown>
+                {{ message.text }}
               </div>
             </div>
           </div>
@@ -37,6 +37,7 @@
         <textarea
           id="chatInput"
           [(ngModel)]="chatInput"
+          (keydown.enter)="onKeydown($event)"
           (keyup.enter)="sendChatMessage()"
           placeholder="Type your question..."
           (keyup)="resizeTextarea($event)"
@@ -51,6 +52,7 @@
         <textarea
           id="searchInput"
           [(ngModel)]="searchInput"
+          (keydown.enter)="onKeydown($event)"
           (keyup.enter)="sendSearchMessage()"
           placeholder="Type your search pattern..."
           (keyup)="resizeTextarea($event)"

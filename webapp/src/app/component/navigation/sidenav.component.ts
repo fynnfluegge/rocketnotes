@@ -1249,28 +1249,33 @@ export class SidenavComponent implements OnInit, AfterViewInit {
         .toLocaleLowerCase()
         .indexOf(searchPattern.toLocaleLowerCase());
       const endOffset = offset - startOffset;
-      if (offset >= 28 && startOffset >= 0) {
-        if (startOffset >= 14 && endOffset >= 14) {
+      const maxOffset = 48;
+      const midOffset = 24;
+      if (offset >= maxOffset && startOffset >= 0) {
+        if (startOffset >= midOffset && endOffset >= midOffset) {
           return (
             '...' +
             content.substring(
-              startOffset - 14,
-              startOffset + searchPattern.length + 14,
+              startOffset - midOffset,
+              startOffset + searchPattern.length + midOffset,
             ) +
             '...'
           );
         }
-        if (startOffset < 14) {
-          return content.substring(0, searchPattern.length + 28) + '...';
+        if (startOffset < midOffset) {
+          return content.substring(0, searchPattern.length + maxOffset) + '...';
         }
-        if (endOffset < 14) {
+        if (endOffset < midOffset) {
           return (
             '...' +
-            content.substring(startOffset - 28 + endOffset, content.length)
+            content.substring(
+              startOffset - maxOffset + endOffset,
+              content.length,
+            )
           );
         }
-      } else if (startOffset === -1 && content.length > 28) {
-        return content.substring(0, 28) + '...';
+      } else if (startOffset === -1 && content.length > maxOffset) {
+        return content.substring(0, maxOffset) + '...';
       } else {
         return content;
       }
