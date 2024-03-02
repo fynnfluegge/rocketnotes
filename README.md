@@ -27,11 +27,17 @@ Check out the [installation guides](INSTALLATION.md#installation) for deploying 
 ## Features
 
 ### AI-powered text completion
-- 🤖 Use the power of AI to get copilot-like text completion suggestions
+- 🤖 Get Copilot-like text completion autosuggestions.
 <div align="center">
   
   ![ezgif-4-24eaae81cc](https://github.com/fynnfluegge/rocketnotes/assets/16321871/648ae135-0406-4854-a68f-fb6b3d3f0702)
   
+</div>
+
+### Chat with your notes or do semantic search
+- 🤖 Use the power of LLMs together with vector embeddings to chat with your notes or search for them semantically.
+<div align="center">
+  <img src="https://github.com/fynnfluegge/rocketnotes/assets/16321871/6bb831ff-e7f2-41ab-824b-609fbb62853b" width="800">
 </div>
 
 
@@ -57,7 +63,7 @@ Check out the [installation guides](INSTALLATION.md#installation) for deploying 
 &nbsp;
 
 ### Superfast Document Search
-- 🔎 Search all your documents by content
+- 🔎 Search through all your documents by content.
 - 🚀 Get an autosuggestion panel with all documents matching you search pattern - superfast!
 <div align="center">
   <img src="landing-page/src/assets/searchbar.gif">
