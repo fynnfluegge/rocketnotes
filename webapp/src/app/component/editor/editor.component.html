@@ -16,7 +16,7 @@
         alt=""
         style="height: 24px; margin-top: -2px; margin-left: -4px"
       />
-      Disbale
+      Disbale LLM Copilot
     </button>
     <button
       *ngIf="!aiCompletionEnabled && !isMobileDevice"
@@ -30,7 +30,7 @@
         alt=""
         style="height: 24px; margin-top: -2px; margin-left: -4px"
       />
-      AI Completion
+      Enable LLM Copilot
     </button>
     <span
       class="center"
@@ -144,7 +144,7 @@
 </div>
 
 <!-- The popup dialog -->
-<div class="overlay" id="overlay">
+<div class="overlay" id="openAiDialog">
   <div class="dialog">
     <h5>OpenAI API Key</h5>
     <textarea
@@ -165,7 +165,7 @@
     <br />
     <button
       class="btn btn-default btn-primary"
-      (click)="closeDialog('overlay')"
+      (click)="closeDialog('openAiDialog')"
       style="margin-right: 8px"
     >
       Close

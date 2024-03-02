@@ -7,31 +7,23 @@
   <button (click)="addNewItem(null)" class="icon-button-fade nav-bar-button">
     Add Document
   </button>
-  <form autocomplete="off" style="margin-left: auto">
-    <div class="autocomplete" style="width: 280px">
-      <input
-        class="input-field"
-        type="text"
-        id="search_documents"
-        name="search_documents"
-        placeholder="Search | {{
-          this.isMobileDevice
-            ? ''
-            : this.operatingSystem == 'Mac'
-            ? '⌘K'
-            : 'ctrlK'
-        }}"
-      />
-    </div>
-  </form>
-  <!-- <div class="dropdown">
-    <button style="height:100%;"><i class="fa fa-lg fa-question-circle"></i></button>
-    <div class="dropdown-content dropdown-light">
-      <div><strong>Shortcuts</strong></div>
-      <div>Save:          ⌘ + ⇧ + S</div>
-      <div>New Document:  ⌘ + ⇧ + N</div>
-    </div>
-  </div> -->
+  <button
+    (click)="openLlmDialog()"
+    class="icon-button-fade nav-bar-button"
+    style="margin-left: auto"
+  >
+    <img
+      src="../../../assets/icons/png/icons8-artificial-intelligence-50.png"
+      alt=""
+      style="height: 20px; margin-top: -2px; margin-left: -4px"
+    />
+    LLM Chat & Search
+  </button>
+  <button type="submit" id="searchButton" (click)="openSearchDialog()">
+    <i class="fa-solid fa-magnifying-glass"></i> Search
+    <kbd style="margin-right: 2px">{{ commandKey() }}</kbd
+    ><kbd>K</kbd>
+  </button>
   <div class="dropdown" style="width: 48px; color: black">
     <button style="height: 100%">
       <i
@@ -39,14 +31,14 @@
         style="position: relative; left: 8px"
       ></i>
     </button>
-    <div class="dropdown-content dropdown-light">
+    <div class="dropdown-content" style="width: 240px">
       <div>
         <strong>{{ username }}</strong>
       </div>
       <button
-        (click)="openOpenAiApiKeyDialog('overlay')"
+        (click)="openOpenAiApiKeyDialog('openAiDialog')"
         *ngIf="!isMobileDevice"
-        style="padding: 8px; margin-top: 4px"
+        style="padding: 8px; margin-top: 4px; border-radius: 4px"
         class="btn-primary"
       >
         OpenAI API Key
@@ -73,7 +65,7 @@
       </div>
       <button
         (click)="onLogout()"
-        style="padding: 8px; margin-top: 4px"
+        style="padding: 8px; margin-top: 4px; border-radius: 4px"
         class="btn-primary"
       >
         Logout
@@ -81,6 +73,27 @@
     </div>
   </div>
 </ul>
+
+<!-- The popup dialog -->
+<div class="overlay" id="searchDialog">
+  <div class="dialog">
+    <form autocomplete="off" style="margin-left: auto">
+      <div class="autocomplete">
+        <input
+          #searchInput
+          class="input-field"
+          style="margin: 0; margin-bottom: 4px; width: 100%"
+          type="text"
+          id="search_documents"
+          name="search_documents"
+          placeholder="Search..."
+        />
+      </div>
+    </form>
+  </div>
+</div>
+
+<app-llm-dialog></app-llm-dialog>
 
 <div
   class="sidebar"
@@ -250,7 +263,7 @@
             (keyup.escape)="cancelEditItem(node, itemValue.value)"
             placeholder="New document..."
             class="input-field"
-            style="width: 140px; height: 24px"
+            style="width: 140px; height: 24px; font-size: 14px; padding: 4px"
           />
         </mat-form-field>
         <button mat-icon-button (click)="saveNode(node, itemValue.value, true)">

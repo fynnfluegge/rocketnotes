@@ -1,0 +1,75 @@
+<div class="overlay" id="llmDialog" [class.open]="isOpen">
+  <div class="dialog">
+    <div class="tab">
+      <button class="tablinks" (click)="openTab($event, 'tab1')" #chatButton>
+        Chat
+      </button>
+      <button
+        class="tablinks"
+        (click)="openTab($event, 'tab2')"
+        style="border-radius: 0px !important"
+      >
+        Semantic Search
+      </button>
+    </div>
+    <div class="tabcontent" id="tab1">
+      <div class="result" #chatHistory>
+        <div *ngFor="let message of messages">
+          <div *ngIf="message.isUser">
+            <div class="user-message chat-message">
+              <div class="message">
+                {{ message.text }}
+              </div>
+            </div>
+          </div>
+          <div *ngIf="!message.isUser">
+            <div class="bot-message chat-message">
+              <div class="message">
+                <i class="fa-solid fa-robot"></i>
+                <markdown [data]="message.text"> </markdown>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="isLoading" class="loading-animation">...</div>
+      </div>
+      <div class="input-container">
+        <textarea
+          id="chatInput"
+          [(ngModel)]="chatInput"
+          (keydown.enter)="onKeydown($event)"
+          (keyup.enter)="sendChatMessage()"
+          placeholder="Type your question..."
+          (keyup)="resizeTextarea($event)"
+        ></textarea>
+        <button (click)="sendChatMessage()">
+          <i class="fa fa-paper-plane" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+    <div class="tabcontent" id="tab2">
+      <div class="input-container">
+        <textarea
+          id="searchInput"
+          [(ngModel)]="searchInput"
+          (keydown.enter)="onKeydown($event)"
+          (keyup.enter)="sendSearchMessage()"
+          placeholder="Type your search pattern..."
+          (keyup)="resizeTextarea($event)"
+        ></textarea>
+        <button (click)="sendSearchMessage()">
+          <i class="fa fa-paper-plane" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div class="result" style="text-align: left" #searchResultList>
+        <div *ngIf="isLoading" class="loading-animation">...</div>
+        <div *ngFor="let searchResult of searchResults">
+          <div class="search-item" (click)="openDocument(searchResult)">
+            <span class="search-item-title">{{ searchResult.title }}</span>
+            <markdown [data]="searchResult.text"> </markdown>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

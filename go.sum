@@ -9,6 +9,8 @@ github.com/aws/aws-cdk-go/awscdkapigatewayv2integrationsalpha/v2 v2.14.0-alpha.0
 github.com/aws/aws-cdk-go/awscdkapigatewayv2integrationsalpha/v2 v2.14.0-alpha.0/go.mod h1:5o1w0idxF1qQbA97JUC1OjnK1t7VfKiB8Z8cZCzmhvU=
 github.com/aws/aws-cdk-go/awscdklambdagoalpha/v2 v2.14.0-alpha.0 h1:73OIK00h4S3RBBS9RzivBkBYaQI37m8FYvLGcoWS+pE=
 github.com/aws/aws-cdk-go/awscdklambdagoalpha/v2 v2.14.0-alpha.0/go.mod h1:n0EXvZq9DPGUs1I+WxY/lwzlOZPmYenxl/Z05SpRFyw=
+github.com/aws/aws-cdk-go/awscdklambdapythonalpha/v2 v2.14.0-alpha.0 h1:5QI4YnYkPtwfa3/Z/3g2mt/CPEP1VGM4AwAddKpkCHc=
+github.com/aws/aws-cdk-go/awscdklambdapythonalpha/v2 v2.14.0-alpha.0/go.mod h1:7/kQpwQEsN/yW9m9CCEMCD1w0UmnbBPk2czJDeX8iHQ=
 github.com/aws/aws-lambda-go v1.28.0 h1:fZiik1PZqW2IyAN4rj+Y0UBaO1IDFlsNo9Zz/XnArK4=
 github.com/aws/aws-lambda-go v1.28.0/go.mod h1:jJmlefzPfGnckuHdXX7/80O3BvUUi12XOkbv4w9SGLU=
 github.com/aws/aws-sdk-go v1.43.26 h1:/ABcm/2xp+Vu+iUx8+TmlwXMGjO7fmZqJMoZjml4y/4=

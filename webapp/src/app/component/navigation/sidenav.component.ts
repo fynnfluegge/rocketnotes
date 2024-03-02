@@ -1,4 +1,11 @@
-import { Injectable, Component, OnInit, AfterViewInit } from '@angular/core';
+import {
+  Injectable,
+  Component,
+  OnInit,
+  AfterViewInit,
+  ViewChild,
+  ElementRef,
+} from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FlatTreeControl } from '@angular/cdk/tree';
 import {
@@ -13,6 +20,7 @@ import { environment } from 'src/environments/environment';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { HostListener } from '@angular/core';
+import { LlmDialogService } from 'src/app/service/llm-dialog.service';
 
 const ROOT_ID: string = 'root';
 const PINNED_ID: string = 'pinned';
@@ -395,10 +403,12 @@ export class DocumentTree {
         if (newItem) {
           this.basicRestService
             .post('saveDocument', {
-              id: node.id,
-              userId: localStorage.getItem('currentUserId'),
-              title: newName,
-              content: 'new document',
+              document: {
+                id: node.id,
+                userId: localStorage.getItem('currentUserId'),
+                title: newName,
+                content: 'new document',
+              },
             })
             .subscribe(() => {
               this.initContentChange.next({
@@ -506,7 +516,7 @@ export class DocumentTree {
   selector: 'app-sidenav',
   templateUrl: './sidenav.component.html',
   styleUrls: ['./sidenav.component.scss'],
-  providers: [DocumentTree],
+  providers: [DocumentTree, LlmDialogService],
 })
 export class SidenavComponent implements OnInit, AfterViewInit {
   username: string;
@@ -524,6 +534,8 @@ export class SidenavComponent implements OnInit, AfterViewInit {
   isMobileDevice = false;
 
   operatingSystem: string;
+
+  @ViewChild('searchInput') searchInput: ElementRef;
 
   /** Map from flat node to nested node. This helps us finding the nested node to be modified */
   flatNodeMap: Map<DocumentFlatNode, DocumentNode> = new Map<
@@ -550,6 +562,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
     private database: DocumentTree,
     private basicRestService: BasicRestService,
     private router: Router,
+    private llmDialogService: LlmDialogService,
   ) {
     this.treeFlattener = new MatTreeFlattener(
       this.transformer,
@@ -617,8 +630,17 @@ export class SidenavComponent implements OnInit, AfterViewInit {
   }
 
   @HostListener('document:keydown.meta.k', ['$event'])
-  focusSearchInput() {
-    document.getElementById('search_documents').focus();
+  focusSearchInput(event) {
+    event.preventDefault();
+    this.searchInput.nativeElement.value = '';
+    this.openSearchDialog();
+  }
+
+  @HostListener('document:keydown.escape', ['$event'])
+  closeDialogs() {
+    document.getElementById('searchDialog').style.display = 'none';
+    this.searchInput.nativeElement.value = '';
+    this.llmDialogService.closeDialog();
   }
 
   ngAfterViewInit(): void {
@@ -1114,6 +1136,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
         for (i = 0; i < foundElements.length; i++) {
           /*create a DIV element for each matching element:*/
           b = document.createElement('DIV');
+          b.setAttribute('class', 'search-item');
           b.innerHTML +=
             "<strong style='font-size:18px;'>" +
             foundElements[i].title +
@@ -1139,12 +1162,13 @@ export class SidenavComponent implements OnInit, AfterViewInit {
               ['/' + this.getElementsByTagName('input')[0].value],
               { relativeTo: this.route },
             );
+            document.getElementById('searchDialog').style.display = 'none';
+            input.value = '';
             closeAllLists(null);
           });
           a.appendChild(b);
         }
       }
-      // }
     });
     /*execute a function presses a key on the keyboard:*/
     input.addEventListener('keydown', function (e) {
@@ -1153,16 +1177,26 @@ export class SidenavComponent implements OnInit, AfterViewInit {
       if (e.keyCode == 40) {
         /*If the arrow DOWN key is pressed,
         increase the currentFocus variable:*/
+        if (currentFocus == suggestionList.length - 1) return;
         currentFocus++;
         /*and and make the current item more visible:*/
         addActive(suggestionList);
+        if (!isElementVisible(x, suggestionList[currentFocus])) {
+          console.log(suggestionList[currentFocus].offsetHeight);
+          x.scrollTop += suggestionList[currentFocus].offsetHeight;
+        }
       } else if (e.keyCode == 38) {
         //up
         /*If the arrow UP key is pressed,
         decrease the currentFocus variable:*/
+        if (currentFocus == 0) return;
         currentFocus--;
         /*and and make the current item more visible:*/
         addActive(suggestionList);
+        if (!isElementVisible(x, suggestionList[currentFocus])) {
+          console.log(suggestionList[currentFocus].offsetHeight);
+          x.scrollTop -= suggestionList[currentFocus].offsetHeight;
+        }
       } else if (e.keyCode == 13) {
         /*If the ENTER key is pressed, prevent the form from being submitted,*/
         e.preventDefault();
@@ -1172,6 +1206,14 @@ export class SidenavComponent implements OnInit, AfterViewInit {
         }
       }
     });
+    function isElementVisible(container, element) {
+      const elementRect = element.getBoundingClientRect();
+      const containerRect = container.getBoundingClientRect();
+      return (
+        elementRect.top >= containerRect.top &&
+        elementRect.bottom <= containerRect.bottom
+      );
+    }
     function addActive(x: any) {
       /*a function to classify an item as "active":*/
       if (!x) return false;
@@ -1207,28 +1249,33 @@ export class SidenavComponent implements OnInit, AfterViewInit {
         .toLocaleLowerCase()
         .indexOf(searchPattern.toLocaleLowerCase());
       const endOffset = offset - startOffset;
-      if (offset >= 28 && startOffset >= 0) {
-        if (startOffset >= 14 && endOffset >= 14) {
+      const maxOffset = 48;
+      const midOffset = 24;
+      if (offset >= maxOffset && startOffset >= 0) {
+        if (startOffset >= midOffset && endOffset >= midOffset) {
           return (
             '...' +
             content.substring(
-              startOffset - 14,
-              startOffset + searchPattern.length + 14,
+              startOffset - midOffset,
+              startOffset + searchPattern.length + midOffset,
             ) +
             '...'
           );
         }
-        if (startOffset < 14) {
-          return content.substring(0, searchPattern.length + 28) + '...';
+        if (startOffset < midOffset) {
+          return content.substring(0, searchPattern.length + maxOffset) + '...';
         }
-        if (endOffset < 14) {
+        if (endOffset < midOffset) {
           return (
             '...' +
-            content.substring(startOffset - 28 + endOffset, content.length)
+            content.substring(
+              startOffset - maxOffset + endOffset,
+              content.length,
+            )
           );
         }
-      } else if (startOffset === -1 && content.length > 28) {
-        return content.substring(0, 28) + '...';
+      } else if (startOffset === -1 && content.length > maxOffset) {
+        return content.substring(0, maxOffset) + '...';
       } else {
         return content;
       }
@@ -1237,10 +1284,15 @@ export class SidenavComponent implements OnInit, AfterViewInit {
     document.addEventListener('click', function (e) {
       closeAllLists(e.target);
     });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        closeAllLists(null);
+      }
+    });
   }
 
   openOpenAiApiKeyDialog() {
-    const overlay = document.getElementById('overlay');
+    const overlay = document.getElementById('openAiDialog');
     overlay.style.display = 'flex';
     const inputField = document.getElementById(
       'inputField',
@@ -1293,5 +1345,40 @@ export class SidenavComponent implements OnInit, AfterViewInit {
         ? 'var(--dark-theme-hyperlink-color)'
         : 'var(--light-theme-hyperlink-color)',
     );
+  }
+
+  openSearchDialog() {
+    const overlay = document.getElementById('searchDialog');
+    overlay.style.display = 'flex';
+    if (overlay.getAttribute('outsideClickListener') !== 'true') {
+      overlay.addEventListener('click', (event) => {
+        overlay.setAttribute('outsideClickListener', 'true');
+        this.outsideClickHandler(event);
+      });
+    }
+    const searchField = document.getElementById('search_documents');
+    searchField.focus();
+  }
+
+  outsideClickHandler(event: MouseEvent) {
+    const overlay = document.getElementById('searchDialog');
+    if (event.target === overlay) {
+      overlay.style.display = 'none';
+      this.searchInput.nativeElement.value = '';
+    }
+  }
+
+  commandKey() {
+    return this.operatingSystem === 'Mac' ? '⌘' : 'Ctrl';
+  }
+
+  openLlmDialog() {
+    // if (localStorage.getItem('openAiApiKey') === null) {
+    //   window.alert(
+    //     'Please set your OpenAI API key in user settings to use this feature.',
+    //   );
+    // } else {
+    this.llmDialogService.openDialog();
+    // }
   }
 }

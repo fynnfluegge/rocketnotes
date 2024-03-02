@@ -88,16 +88,17 @@ span:hover {
 }
 
 .nav-bar-button {
-  font-size: smaller;
   height: 100%;
+  width: fit-content !important;
+  font-size: 14px;
   font-weight: 200;
   border: 1px;
   border-color: darkgrey;
   border-radius: 8px;
   margin: 8px;
+  padding: 0px 12px 0px 12px;
   border-style: groove;
   height: 70%;
-  min-width: 110px !important;
   background-color: initial;
   background-image: linear-gradient(-180deg, #333131, var(--menu-color));
 }
@@ -209,14 +210,11 @@ li a:hover {
   background-color: black;
   box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.4);
   z-index: 1;
-}
-
-.dropdown-light {
   left: auto;
   right: 0;
-  background-color: rgba(255, 255, 255, 1);
+  background-color: var(--menu-color);
+  color: lightgray;
   padding: 12px;
-  width: 240px;
 }
 
 .dropdown-content button {
@@ -236,22 +234,20 @@ li a:hover {
 }
 
 .input-field {
-  border: 1px solid black;
+  border: 2px solid var(--focus-color);
   border-radius: 4px;
-  background-color: lightgray;
+  background-color: black;
+  color: white;
 }
 
 .input-field:focus {
   outline: none !important;
-  border: 2px solid #719ece;
-  box-shadow: 0 0 2px #719ece;
-  background-color: white;
 }
 
 #search_documents {
   height: 36px;
   width: 260px;
-  border-radius: 32px;
+  border-radius: 5px;
   margin: 8px;
   padding: 3px 10px 3px 10px;
 }
@@ -319,4 +315,60 @@ input:checked + .slider:before {
 
 .slider.round:before {
   border-radius: 50%;
+}
+
+.overlay {
+  display: none;
+  position: fixed;
+  top: -30%;
+  left: 0;
+  width: 100%;
+  height: 130%;
+  background-color: rgba(0, 0, 0, 0.15);
+  color: black;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.open {
+  display: flex;
+}
+
+.dialog {
+  background-color: var(--menu-color);
+  color: var(--font-color);
+  border-radius: 6px;
+  border: 0.1px solid rgb(63, 66, 65);
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+  padding: 12px;
+  width: 600px;
+  text-align: center;
+}
+
+#searchButton {
+  border: 1px solid #ccc;
+  background-color: #fff;
+  color: #333;
+  padding: 5px 10px;
+  border-radius: 16px;
+  font-size: 16px;
+  height: 70%;
+  margin: 8px;
+}
+
+kbd {
+  height: 24px;
+  display: inline-block;
+  padding: 0.2em 0.4em;
+  color: black;
+  border: 1px solid #ccc;
+  border-radius: 0.3em;
+  background-color: #f7f7f7;
+  box-shadow:
+    0 2px 0 #ccc,
+    0 3px 0 #666;
+  transition:
+    transform 0.1s ease-in-out,
+    box-shadow 0.1s ease-in-out;
 }
