@@ -2,34 +2,43 @@
   <a href="https://www.takeniftynotes.net/">
     <img src="landing-page/src/assets/128x128.png" height="128">
   </a>
-  <h1>Rocketnotes</h1>
-  <a href="https://github.com/fynnfluegge/rocketnotes/actions/workflows/build.yml">
-    <img src="https://github.com/fynnfluegge/rocketnotes/actions/workflows/build.yml/badge.svg?branch=main"/> 
-  </a>
-  <a href="https://github.com/fynnfluegge/rocketnotes/actions/workflows/deploy.yml">
-    <img src="https://github.com/fynnfluegge/rocketnotes/actions/workflows/deploy.yml/badge.svg?branch=main"/> 
-  </a>
-  <a href="https://github.com/fynnfluegge/rocketnotes/blob/main/LICENSE">
-    <img src="https://img.shields.io/badge/License-MIT-green.svg"/>
-  </a>
+  
+  # Rocketnotes
+  
+  [![Build](https://github.com/fynnfluegge/rocketnotes/actions/workflows/build.yml/badge.svg)](https://github.com/fynnfluegge/rocketnotes/actions/workflows/build.yml)
+  [![Deploy](https://github.com/fynnfluegge/rocketnotes/actions/workflows/deploy.yml/badge.svg)](https://github.com/fynnfluegge/rocketnotes/actions/workflows/deploy.yml)
+  [![License](https://img.shields.io/badge/License-MIT%20-green.svg)](https://opensource.org/licenses/MIT)
+
 </div>
 
-## What is Rocketnotes?
-Rocketnotes is a Markdown Editor for the Web.
-Save, structure and share if you like daily notes and learnings in the browser from any device. 
-You can [sign up](https://takeniftynotes.auth.eu-central-1.amazoncognito.com/login?response_type=code&client_id=tt3v27pnqqh7elqdvq9tgmr9v&redirect_uri=https://app.takeniftynotes.net) for free (Yes, it's free and it will be free forever as far as possible), run it on your local machine with Docker or deploy it with low effort in your personal AWS account and your desired region.
-Check out the [installation guides](INSTALLATION.md#installation) for deploying Rocketnotes at [AWS](INSTALLATION.md#aws-hosting) or running it on your [local machine with Docker](INSTALLATION.md#run-on-your-local-machine-with-docker).
+Rocketnotes is a web-based Markdown note taking app with AI-powered text completion.
+You can [sign up](https://takeniftynotes.auth.eu-central-1.amazoncognito.com/login?response_type=code&client_id=tt3v27pnqqh7elqdvq9tgmr9v&redirect_uri=https://app.takeniftynotes.net) for free or deploy it with low effort to your personal AWS account.
+Check out the [installation guides](INSTALLATION.md#installation) for deploying Rocketnotes at [AWS](INSTALLATION.md#aws-hosting) or running it [locally with Docker](INSTALLATION.md#run-on-your-local-machine-with-docker).
 
-> **_NOTE:_**  Hosting on AWS with a Cloudfront distribution for S3, DynamoDB and Lambda will cost you less than $1 per month under normal usage.
+> [!NOTE]  
+> Hosting on AWS with a Cloudfront distribution for S3, DynamoDB and Lambda will cost you less than **$1 per month** under normal usage.
 
-## Want to contribute?
-👉 [Get started](CONTRIBUTING.md#getting-started) with all required steps to run the project locally in development mode.
-You find also the contribution guidelines there.
-Don't hesitate to open an issue for getting some feedback about a potential bug or if you desire a missing feature.
-We also appreciate to check over current [issues](https://github.com/fynnfluegge/rocketnotes/issues) and provide feedback to existing ones or even raise a PR which solves an issue.
-Any contribution is welcome!
+<div align="center">
+  
+![rocketnotes_theme](https://github.com/fynnfluegge/rocketnotes/assets/16321871/6f5cf350-4560-4262-896e-44bd059b2f93)
+
+</div>
+
 
 ## Features
+
+### AI-powered text completion
+- 🤖 Get Copilot-like text completion autosuggestions.
+<div align="center">
+  <img src="https://github.com/fynnfluegge/rocketnotes/assets/16321871/648ae135-0406-4854-a68f-fb6b3d3f0702" width="800">
+</div>
+
+### Chat with your notes or do semantic search
+- 🤖 Use the power of LLMs together with vector embeddings to chat with your notes or search for them semantically.
+<div align="center">
+  <img src="https://github.com/fynnfluegge/rocketnotes/assets/16321871/6bb831ff-e7f2-41ab-824b-609fbb62853b" width="800">
+</div>
+
 
 ### Create code snipptes with syntax highlighting 
 - 📝 Use the power and simplicity of Markdown for your personal notes.
@@ -38,6 +47,15 @@ Any contribution is welcome!
 - 📖 Share documents with external users.
 <div align="center">
   <img src="landing-page/src/assets/code_editor.gif">
+</div>
+
+&nbsp;
+
+### Superfast Document Search
+- 🔎 Search through all your documents by content.
+- 🚀 Get an autosuggestion panel with all documents matching you search pattern - superfast!
+<div align="center">
+  <img src="https://github.com/fynnfluegge/rocketnotes/assets/16321871/0d1582fa-120f-4cc5-89c2-a490cc1a750a" width="800">
 </div>
 
 &nbsp;
@@ -52,14 +70,21 @@ Any contribution is welcome!
 
 &nbsp;
 
-### Superfast Document Search
-- 🔎 Search all your documents by content
-- 🚀 Get an autosuggestion panel with all documents matching you search pattern - superfast!
+## Want to contribute?
+The most comfortable way to get started is to open the project in a ready-to-code Gitpod workspace with all packages & tools preinstalled and a running database with sample data.
+
 <div align="center">
-  <img src="landing-page/src/assets/searchbar.gif">
+<a href="https://gitpod.io/#https://github.com/fynnfluegge/rocketnotes">
+    <img src="https://gitpod.io/button/open-in-gitpod.svg" height="48">
+  </a>
 </div>
 
-&nbsp;
+If you prefer to setup the project on your local machine visit the [get started guide](CONTRIBUTING.md#getting-started) with all required steps to run the project locally in development mode.
+
+You find also the contribution guidelines there.
+Don't hesitate to open an issue for getting some feedback about a potential bug or if you desire a missing feature.
+We also appreciate to check over current [issues](https://github.com/fynnfluegge/rocketnotes/issues) and provide feedback to existing ones or even raise a PR which solves an issue.
+Any contribution is welcome!
 
 ## 📝 License
 

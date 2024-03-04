@@ -5,8 +5,7 @@
 /build
 /tmp
 /out-tsc
-/release-builds
-/release
+/electron-release
 # Only exists if Bazel was run
 /bazel-out
 *.dmg

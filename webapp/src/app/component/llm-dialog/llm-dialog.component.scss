@@ -1,0 +1,150 @@
+.result {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  height: 100%;
+  padding: 8px 16px;
+}
+
+.overlay {
+  display: none;
+  position: fixed;
+  top: -20%;
+  left: 0;
+  width: 100%;
+  height: 120%;
+  background-color: rgba(0, 0, 0, 0.15);
+  color: black;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.dialog {
+  background-color: var(--menu-color);
+  color: lightgray;
+  border-radius: 6px;
+  border: 0.1px solid rgb(63, 66, 65);
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+  padding: 12px;
+  width: 800px;
+  text-align: center;
+}
+
+.open {
+  display: flex;
+}
+
+.tab {
+  overflow: hidden;
+  border: 1px solid gray;
+  border-bottom: none;
+  background-color: black;
+}
+
+.tab button {
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 12px 14px;
+  transition: 0.3s;
+  font-size: 18px;
+  color: lightgray;
+  border-radius: 4px 0px 0px 0px !important;
+}
+
+.tab button:hover {
+  background-color: var(--menu-color);
+}
+
+.tab button.active {
+  background-color: var(--menu-color);
+}
+
+.tabcontent {
+  display: none;
+  padding: 6px 6px;
+  border: 1px solid gray;
+  border-top: none;
+  border-radius: 0px 0px 4px 4px;
+  flex-direction: column;
+  height: 480px;
+  overflow-x: hidden;
+}
+
+.input-container {
+  display: inline-flex;
+  align-items: stretch;
+  border-radius: 5px;
+  overflow: hidden;
+  border: 2px solid var(--focus-color);
+  background-color: black;
+}
+
+.input-container textarea {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  outline: none;
+  color: white;
+  resize: none;
+  line-height: 1.5;
+  height: 32px;
+  background-color: inherit;
+  overflow: hidden;
+}
+
+.input-container button {
+  padding: 8px 12px;
+  color: white;
+  border: none;
+  cursor: pointer;
+  background-color: var(--menu-color);
+}
+
+.loading-animation {
+  margin: 12px;
+  text-align: left;
+  transform: translateY(-50%);
+  font-size: 32px;
+  animation: pulse 1s infinite; /* Example animation */
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.2;
+  }
+}
+
+.chat-message {
+  border-radius: 8px;
+  border: 1px solid #545454;
+  padding: 8px;
+  margin-bottom: 6px;
+  text-align: left;
+}
+
+.user-message {
+  float: right;
+}
+
+.bot-message {
+  float: left;
+}
+
+.search-item:hover {
+  background-color: var(--dark-theme-background-color);
+  cursor: pointer;
+}
+
+.search-item-title {
+  text-decoration: underline;
+  font-weight: bold;
+}

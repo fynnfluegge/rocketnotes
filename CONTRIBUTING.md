@@ -24,7 +24,6 @@ Second, fork the repository, and then run the following commands to clone the re
 ```
 $ git clone https://github.com/{your-account}/rocketnotes.git
 $ cd rocketnotes
-$ npm install
 ```
 
 #### 1. Start DynamoDB and docker network
@@ -38,7 +37,7 @@ $ sh ./dynamodb-init.sh
 #### 3. Build and start Lambda functions with AWS SAM
 ```
 $ sam build
-$ sam local rocketnotes-serverless-api --docker-network rocketnotes_local-serverless-network --warm-containers EAGER 
+$ sam local start-api --docker-network rocketnotes_local-serverless-network --warm-containers EAGER 
 ```
 #### 4. Start Angular app
 ```

@@ -4,136 +4,394 @@
       <mat-icon>menu</mat-icon>
     </a>
   </li>
-  <button (click)="addNewItem(null)" class="icon-button-fade nav-bar-button">Add Document</button>
-  <form autocomplete="off" style="margin-left:auto;">
-    <div class="autocomplete" style="width:280px;">
-      <input type="text" id="search_documents" name="search_documents" placeholder="Search">
-    </div>
-  </form>
-  <!-- <div class="dropdown">
-    <button style="height:100%;"><i class="fa fa-lg fa-question-circle"></i></button>
-    <div class="dropdown-content dropdown-light">
-      <div><strong>Shortcuts</strong></div>
-      <div>Save:          ⌘ + ⇧ + S</div>
-      <div>New Document:  ⌘ + ⇧ + N</div>
-    </div>
-  </div> -->
-  <div class="dropdown" style="margin-right:8px;">
-    <button style="height:100%;"><i class="fa-solid fa-user"></i></button>
-    <div class="dropdown-content dropdown-light">
-      <div>Signed in as</div>
-      <div><strong>{{ username }}</strong></div>
-      <button (click)="onLogout()" style="padding:8px;margin-top:4px;">Logout</button>
+  <button (click)="addNewItem(null)" class="icon-button-fade nav-bar-button">
+    Add Document
+  </button>
+  <button
+    (click)="openLlmDialog()"
+    class="icon-button-fade nav-bar-button"
+    style="margin-left: auto"
+  >
+    <img
+      src="../../../assets/icons/png/icons8-artificial-intelligence-50.png"
+      alt=""
+      style="height: 20px; margin-top: -2px; margin-left: -4px"
+    />
+    LLM Chat & Search
+  </button>
+  <button type="submit" id="searchButton" (click)="openSearchDialog()">
+    <i class="fa-solid fa-magnifying-glass"></i> Search
+    <kbd style="margin-right: 2px">{{ commandKey() }}</kbd
+    ><kbd>K</kbd>
+  </button>
+  <div class="dropdown" style="width: 48px; color: black">
+    <button style="height: 100%">
+      <i
+        class="fa-solid fa-user fa-lg"
+        style="position: relative; left: 8px"
+      ></i>
+    </button>
+    <div class="dropdown-content" style="width: 240px">
+      <div>
+        <strong>{{ username }}</strong>
+      </div>
+      <button
+        (click)="openOpenAiApiKeyDialog('openAiDialog')"
+        *ngIf="!isMobileDevice"
+        style="padding: 8px; margin-top: 4px; border-radius: 4px"
+        class="btn-primary"
+      >
+        OpenAI API Key
+      </button>
+      <div style="width: 80%; margin: auto; margin-top: 12px">
+        <label class="switch">
+          <input
+            type="checkbox"
+            (change)="toggleDarkMode()"
+            [checked]="darkmode"
+          />
+          <span class="slider round"></span>
+        </label>
+        <label
+          style="
+            position: relative;
+            top: 4px;
+            margin-left: 4px;
+            font-size: 18px;
+          "
+        >
+          Nightmode
+        </label>
+      </div>
+      <button
+        (click)="onLogout()"
+        style="padding: 8px; margin-top: 4px; border-radius: 4px"
+        class="btn-primary"
+      >
+        Logout
+      </button>
     </div>
   </div>
 </ul>
 
-<div class="sidebar" [style.left.px]="showSidebar ? '0' : '-200'" (document:keydown.meta.control.n)="addNewItem(null)">
-    <div [ngClass]="{'hide': !showSidebar}">
-      
-      <mat-tree [dataSource]="dataSource" [treeControl]="treeControl"
-        cdkDropList (cdkDropListDropped)="drop($event)">
-  
-        <mat-tree-node *matTreeNodeDef="let node; when: isPinned" matTreeNodePadding matTreeNodePaddingIndent="6">
-          <mat-icon>star</mat-icon>
-          <button mat-icon-button matTreeNodeToggle *ngIf="node.expandable" class="icon-button-chevron">
-            <mat-icon>
-              {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
-            </mat-icon>
+<!-- The popup dialog -->
+<div class="overlay" id="searchDialog">
+  <div class="dialog">
+    <form autocomplete="off" style="margin-left: auto">
+      <div class="autocomplete">
+        <input
+          #searchInput
+          class="input-field"
+          style="margin: 0; margin-bottom: 4px; width: 100%; height: 36px"
+          type="text"
+          id="search_documents"
+          name="search_documents"
+          placeholder="Search..."
+        />
+      </div>
+    </form>
+  </div>
+</div>
+
+<app-llm-dialog></app-llm-dialog>
+
+<div
+  class="sidebar"
+  [style.left.px]="showSidebar ? '0' : '-200'"
+  (document:keydown.meta.control.n)="addNewItem(null)"
+>
+  <div [ngClass]="{ hide: !showSidebar }">
+    <mat-tree
+      [dataSource]="dataSource"
+      [treeControl]="treeControl"
+      cdkDropList
+      (cdkDropListDropped)="drop($event)"
+    >
+      <mat-tree-node
+        *matTreeNodeDef="let node; when: isPinned"
+        matTreeNodePadding
+        matTreeNodePaddingIndent="6"
+      >
+        <mat-icon>star</mat-icon>
+        <button
+          mat-icon-button
+          matTreeNodeToggle
+          *ngIf="node.expandable"
+          class="icon-button-chevron"
+        >
+          <mat-icon>
+            {{ treeControl.isExpanded(node) ? "expand_more" : "chevron_right" }}
+          </mat-icon>
+        </button>
+        Pinned
+      </mat-tree-node>
+
+      <mat-tree-node
+        *matTreeNodeDef="let node; when: isRoot"
+        matTreeNodePadding
+        matTreeNodePaddingIndent="8"
+      >
+        <mat-icon>insert_drive_file</mat-icon>
+        <button
+          mat-icon-button
+          matTreeNodeToggle
+          *ngIf="node.expandable"
+          class="icon-button-chevron"
+        >
+          <mat-icon>
+            {{ treeControl.isExpanded(node) ? "expand_more" : "chevron_right" }}
+          </mat-icon>
+        </button>
+        <span>Documents</span>
+      </mat-tree-node>
+
+      <mat-tree-node
+        *matTreeNodeDef="let node; when: isTrash"
+        matTreeNodePadding
+        matTreeNodePaddingIndent="matTreeNodePaddingIndent"
+      >
+        <mat-icon>delete</mat-icon>
+        <button
+          mat-icon-button
+          matTreeNodeToggle
+          *ngIf="node.expandable"
+          class="icon-button-chevron"
+        >
+          <mat-icon>
+            {{ treeControl.isExpanded(node) ? "expand_more" : "chevron_right" }}
+          </mat-icon>
+        </button>
+        Trash
+      </mat-tree-node>
+
+      <mat-tree-node
+        *matTreeNodeDef="let node"
+        matTreeNodeToggle
+        matTreeNodePadding
+        matTreeNodePaddingIndent="8"
+        (click)="openItem($event.target, node.id)"
+        cdkDrag
+        [cdkDragDisabled]="this.isMobileDevice"
+        [cdkDragData]="node"
+        (mouseenter)="dragHover(node)"
+        (mouseleave)="dragHoverEnd()"
+        (cdkDragStarted)="dragStart()"
+        (cdkDragReleased)="dragEnd()"
+      >
+        <span
+          style="
+            padding-left: 24px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          "
+          >{{ node.name }}</span
+        >
+        <div
+          class="dropdown hide"
+          style="margin-left: auto; position: relative; top: 3px"
+        >
+          <button class="dropbtn" style="position: relative; top: -4px">
+            <i class="fas fa-ellipsis-v"></i>
           </button>
-          Pinned
-        </mat-tree-node>
-  
-        <mat-tree-node *matTreeNodeDef="let node; when: isRoot" matTreeNodePadding matTreeNodePaddingIndent="8">
-          <mat-icon>insert_drive_file</mat-icon>
-          <button mat-icon-button matTreeNodeToggle *ngIf="node.expandable" class="icon-button-chevron">
-            <mat-icon>
-              {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
-            </mat-icon>
-          </button>
-          <span>Documents</span>
-        </mat-tree-node>
-  
-        <mat-tree-node *matTreeNodeDef="let node; when: isTrash" matTreeNodePadding matTreeNodePaddingIndent="matTreeNodePaddingIndent">
-          <mat-icon>delete</mat-icon>
-          <button mat-icon-button matTreeNodeToggle *ngIf="node.expandable" class="icon-button-chevron">
-            <mat-icon>
-              {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
-            </mat-icon>
-          </button>
-          Trash
-        </mat-tree-node>
-  
-        <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle matTreeNodePadding matTreeNodePaddingIndent="8" [routerLink]="'/' + node.id" routerLinkActive="active-node"
-          cdkDrag [cdkDragData]="node" (mouseenter)="dragHover(node)" (mouseleave)="dragHoverEnd()" (cdkDragStarted)="dragStart()" (cdkDragReleased)="dragEnd()">
-          <span style="padding-left:24px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{node.name}}</span>
-          <div class="dropdown hide" style="margin-left:auto;">
-            <button class="dropbtn">
-              <i class="fas fa-ellipsis-v"></i>
+          <div class="dropdown-content">
+            <button
+              *ngIf="!node.deleted"
+              mat-icon-button
+              [ngClass]="node.pinned ? 'icon-button-star' : 'icon-button-fade'"
+              (click)="pinItem(node)"
+            >
+              <mat-icon [style.color]="node.pinned ? 'gold' : 'lightgray'"
+                >star</mat-icon
+              >
             </button>
-            <div class="dropdown-content">
-              <button *ngIf="!node.deleted" mat-icon-button [ngClass]="node.pinned ? 'icon-button-star' : 'icon-button-fade'" (click)="pinItem(node)"><mat-icon [style.color] = "node.pinned ? 'gold' : 'lightgray'">star</mat-icon></button>
-              <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="addNewItem(node)"><mat-icon>note_add</mat-icon></button>
-              <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="editItem(node)"><mat-icon>edit</mat-icon></button>
-              <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="moveToTrash(node)"><mat-icon>delete</mat-icon></button>
-              <button *ngIf="node.deleted" mat-icon-button class="icon-button-fade" (click)="restoreItem(node)"><mat-icon>restore_from_trash</mat-icon></button>
-              <button *ngIf="node.deleted" mat-icon-button class="icon-button-fade" (click)="removeFromTrash(node)"><mat-icon>delete_forever</mat-icon></button>
-            </div>
-          </div>
-        </mat-tree-node>
-  
-        <mat-tree-node *matTreeNodeDef="let node; when: hasNoContent" matTreeNodePadding matTreeNodePaddingIndent="8">
-          <mat-form-field style="padding-left:24px;">
-            <input autofocus matInput #itemValue placeholder="New document..." style="width:140px;height:24px;">
-          </mat-form-field>
-            <button mat-icon-button (click)="saveNode(node, itemValue.value, true)">
-              <mat-icon>save</mat-icon>
+            <button
+              *ngIf="!node.deleted"
+              mat-icon-button
+              class="icon-button-fade"
+              (click)="addNewItem(node)"
+            >
+              <mat-icon>note_add</mat-icon>
             </button>
-            <button mat-icon-button (click)="deleteEmptyItem(node)">
+            <button
+              *ngIf="!node.deleted"
+              mat-icon-button
+              class="icon-button-fade"
+              (click)="editItem(node)"
+            >
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button
+              *ngIf="!node.deleted"
+              mat-icon-button
+              class="icon-button-fade"
+              (click)="moveToTrash(node)"
+            >
               <mat-icon>delete</mat-icon>
             </button>
-        </mat-tree-node>
-  
-        <mat-tree-node *matTreeNodeDef="let node; when: editNode" matTreeNodePadding matTreeNodePaddingIndent="8">
-          <mat-form-field style="padding-left:24px;">
-            <input autofocus matInput #itemValue value="{{node.name}}" style="width:140px;height:24px;">
-          </mat-form-field>
-            <button mat-icon-button (click)="saveNode(node, itemValue.value, false)">
-              <mat-icon>save</mat-icon>
+            <button
+              *ngIf="node.deleted"
+              mat-icon-button
+              class="icon-button-fade"
+              (click)="restoreItem(node)"
+            >
+              <mat-icon>restore_from_trash</mat-icon>
             </button>
-            <button mat-icon-button (click)="cancelEditItem(node, itemValue.value)">
-              <mat-icon>cancel</mat-icon>
+            <button
+              *ngIf="node.deleted"
+              mat-icon-button
+              class="icon-button-fade"
+              (click)="removeFromTrash(node)"
+            >
+              <mat-icon>delete_forever</mat-icon>
             </button>
-        </mat-tree-node>
-      
-        <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding matTreeNodePaddingIndent="8" [routerLink]="'/' + node.id" routerLinkActive="active-node"
-          cdkDrag [cdkDragData]="node" (mouseenter)="dragHover(node)" (mouseleave)="dragHoverEnd()" (cdkDragStarted)="dragStart()" (cdkDragReleased)="dragEnd()">
-          <button mat-icon-button matTreeNodeToggle class="icon-button-chevron">
-            <mat-icon>
-              {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
-            </mat-icon>
-          </button>
-          <span style="overflow:hidden;text-overflow: ellipsis;">{{node.name}}</span>
-          <div class="dropdown hide" style="margin-left:auto;">
-            <button class="dropbtn">
-              <i class="fas fa-ellipsis-v"></i>
-            </button>
-            <div class="dropdown-content">
-              <button *ngIf="!node.deleted" mat-icon-button [ngClass]="node.pinned ? 'icon-button-star' : 'icon-button-fade'" (click)="pinItem(node)"><mat-icon [style.color] = "node.pinned ? 'gold' : 'lightgray'">star</mat-icon></button>
-              <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="addNewItem(node)"><mat-icon>note_add</mat-icon></button>
-              <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="editItem(node)"><mat-icon>edit</mat-icon></button>
-              <button *ngIf="!node.deleted" mat-icon-button class="icon-button-fade" (click)="moveToTrash(node)"><mat-icon>delete</mat-icon></button>
-              <button *ngIf="node.deleted" mat-icon-button class="icon-button-fade" (click)="restoreItem(node)"><mat-icon>restore_from_trash</mat-icon></button>
-              <button *ngIf="node.deleted" mat-icon-button class="icon-button-fade" (click)="removeFromTrash(node)"><mat-icon>delete_forever</mat-icon></button>
-            </div>
           </div>
-        </mat-tree-node>
-  
-      </mat-tree>
-  
-    </div>
-  </div>
+        </div>
+      </mat-tree-node>
 
-  <div class="container-t" [style.margin-left.px]="showSidebar ? '260' : '60'" [style.width]="showSidebar ? 'calc(100% - 280px)' : 'calc(100% - 80px)'">
-      <app-editor [showSidebar]="showSidebar"></app-editor>
+      <mat-tree-node
+        *matTreeNodeDef="let node; when: hasNoContent"
+        matTreeNodePadding
+        matTreeNodePaddingIndent="8"
+      >
+        <mat-form-field style="padding-left: 24px">
+          <input
+            id="new_document"
+            matInput
+            #itemValue
+            (keyup.enter)="saveNode(node, itemValue.value, true)"
+            (keyup.escape)="cancelEditItem(node, itemValue.value)"
+            placeholder="New document..."
+            class="input-field"
+            style="width: 140px; height: 24px; font-size: 14px; padding: 4px"
+          />
+        </mat-form-field>
+        <button mat-icon-button (click)="saveNode(node, itemValue.value, true)">
+          <mat-icon>save</mat-icon>
+        </button>
+        <button mat-icon-button (click)="deleteEmptyItem(node)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </mat-tree-node>
+
+      <mat-tree-node
+        *matTreeNodeDef="let node; when: editNode"
+        matTreeNodePadding
+        matTreeNodePaddingIndent="8"
+      >
+        <mat-form-field style="padding-left: 24px">
+          <input
+            id="edit_document_title"
+            matInput
+            #itemValue
+            (keyup.enter)="saveNode(node, itemValue.value, false)"
+            (keyup.escape)="cancelEditItem(node, itemValue.value)"
+            value="{{ node.name }}"
+            class="input-field"
+            style="width: 140px; height: 24px"
+          />
+        </mat-form-field>
+        <button
+          mat-icon-button
+          (click)="saveNode(node, itemValue.value, false)"
+        >
+          <mat-icon>save</mat-icon>
+        </button>
+        <button mat-icon-button (click)="cancelEditItem(node, itemValue.value)">
+          <mat-icon>cancel</mat-icon>
+        </button>
+      </mat-tree-node>
+
+      <mat-tree-node
+        *matTreeNodeDef="let node; when: hasChild"
+        matTreeNodePadding
+        matTreeNodePaddingIndent="8"
+        (click)="openItem($event.target, node.id)"
+        cdkDrag
+        [cdkDragDisabled]="this.isMobileDevice"
+        [cdkDragData]="node"
+        (mouseenter)="dragHover(node)"
+        (mouseleave)="dragHoverEnd()"
+        (cdkDragStarted)="dragStart()"
+        (cdkDragReleased)="dragEnd()"
+      >
+        <button mat-icon-button matTreeNodeToggle class="icon-button-chevron">
+          <mat-icon>
+            {{ treeControl.isExpanded(node) ? "expand_more" : "chevron_right" }}
+          </mat-icon>
+        </button>
+        <span style="overflow: hidden; text-overflow: ellipsis">{{
+          node.name
+        }}</span>
+        <div
+          class="dropdown hide"
+          style="margin-left: auto; position: relative; top: 3px"
+        >
+          <button class="dropbtn" style="position: relative; top: -4px">
+            <i class="fas fa-ellipsis-v"></i>
+          </button>
+          <div class="dropdown-content">
+            <button
+              *ngIf="!node.deleted"
+              mat-icon-button
+              [ngClass]="node.pinned ? 'icon-button-star' : 'icon-button-fade'"
+              (click)="pinItem(node)"
+            >
+              <mat-icon [style.color]="node.pinned ? 'gold' : 'lightgray'"
+                >star</mat-icon
+              >
+            </button>
+            <button
+              *ngIf="!node.deleted"
+              mat-icon-button
+              class="icon-button-fade"
+              (click)="addNewItem(node)"
+            >
+              <mat-icon>note_add</mat-icon>
+            </button>
+            <button
+              *ngIf="!node.deleted"
+              mat-icon-button
+              class="icon-button-fade"
+              (click)="editItem(node)"
+            >
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button
+              *ngIf="!node.deleted"
+              mat-icon-button
+              class="icon-button-fade"
+              (click)="moveToTrash(node)"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+            <button
+              *ngIf="node.deleted"
+              mat-icon-button
+              class="icon-button-fade"
+              (click)="restoreItem(node)"
+            >
+              <mat-icon>restore_from_trash</mat-icon>
+            </button>
+            <button
+              *ngIf="node.deleted"
+              mat-icon-button
+              class="icon-button-fade"
+              (click)="removeFromTrash(node)"
+            >
+              <mat-icon>delete_forever</mat-icon>
+            </button>
+          </div>
+        </div>
+      </mat-tree-node>
+    </mat-tree>
   </div>
+</div>
+
+<div
+  class="container-t"
+  [style.margin-left.px]="showSidebar ? '260' : '60'"
+  [style.width]="showSidebar ? 'calc(100% - 280px)' : 'calc(100% - 80px)'"
+>
+  <app-editor [showSidebar]="showSidebar"></app-editor>
+</div>

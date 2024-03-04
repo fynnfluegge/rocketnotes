@@ -1,37 +1,177 @@
-<div style="margin-top: 50px; height:calc(100% - 160px);"
+<div
+  style="margin-top: 50px; height: calc(100% - 160px)"
   (document:keydown.meta.shift.s)="submit()"
-  (document:keydown.esc)="cancelEdit()">
-
-  <div style="display:flex;">
-    <span class="center" style="font-size:32px;margin: 6px 0px 6px 0px;flex-grow:1;">{{ title }}</span>
-    <button *ngIf="!isPublic" id="share-button" class="btn btn-default btn-primary" (click)="shareDocument()" style="height:38px;text-align:center;line-height:19px;"><i class="fas fa-share"></i> Share</button>
-    <button *ngIf="isPublic" class="btn btn-default btn-primary tooltip-bottom expand" data-title="Copy link to clipboard" (click)="copyLinkToClipBoard($event, this.publicLink)" style="margin-right:4px;height:38px;width:48px;text-align:center;line-height:19px;">
+  (document:keydown.esc)="cancelEdit()"
+>
+  <div style="display: flex">
+    <button
+      *ngIf="aiCompletionEnabled && !isMobileDevice"
+      (click)="toggleAiCompletion()"
+      data-title="Disable AI Text Completion"
+      class="btn btn-default btn-primary btn-fade tooltip-bottom expand"
+      style="height: 38px; text-align: center; line-height: 19px"
+    >
+      <img
+        src="../../../assets/icons/png/icons8-artificial-intelligence-50.png"
+        alt=""
+        style="height: 24px; margin-top: -2px; margin-left: -4px"
+      />
+      Disbale LLM Autocompletion
+    </button>
+    <button
+      *ngIf="!aiCompletionEnabled && !isMobileDevice"
+      (click)="toggleAiCompletion()"
+      data-title="Enable AI Text Completion"
+      class="btn btn-default btn-primary btn-fade tooltip-bottom expand"
+      style="height: 38px; text-align: center; line-height: 19px"
+    >
+      <img
+        src="../../../assets/icons/png/icons8-artificial-intelligence-50.png"
+        alt=""
+        style="height: 24px; margin-top: -2px; margin-left: -4px"
+      />
+      Enable LLM Autocompletion
+    </button>
+    <span
+      class="center"
+      style="font-size: 32px; margin: 6px 0px 6px 0px; flex-grow: 1"
+      >{{ title }}</span
+    >
+    <button
+      *ngIf="!isPublic"
+      id="share-button"
+      class="btn btn-default btn-primary btn-fade"
+      (click)="shareDocument()"
+      style="height: 38px; text-align: center; line-height: 19px"
+    >
+      <i class="fas fa-share"></i> Share
+    </button>
+    <button
+      *ngIf="isPublic"
+      class="btn btn-default btn-primary btn-fade tooltip-bottom expand"
+      data-title="Copy link to clipboard"
+      (click)="copyLinkToClipBoard($event, this.publicLink)"
+      style="
+        margin-right: 4px;
+        height: 38px;
+        width: 48px;
+        text-align: center;
+        line-height: 19px;
+      "
+    >
       <i class="fas fa-link"></i>
     </button>
-    <button *ngIf="isPublic" id="unshare-button" class="btn btn-default btn-primary" (click)="unshareDocument()" style="height:38px;text-align:center;line-height:19px;"><i class="fas fa-ban"></i> Stop Share</button>
+    <button
+      *ngIf="isPublic"
+      id="unshare-button"
+      class="btn btn-default btn-primary btn-fade"
+      (click)="unshareDocument()"
+      style="height: 38px; text-align: center; line-height: 19px"
+    >
+      <i class="fas fa-ban"></i> Stop Share
+    </button>
   </div>
 
-  <textarea *ngIf="editorMode && showPreview" class="variable-textarea" [(ngModel)]="content" style="resize:none;margin-top:4px;" (keydown)="onKeydown($event)"></textarea>
-  <textarea *ngIf="editorMode && !showPreview" class="variable-textarea" [(ngModel)]="content" style="width:100%;resize:none;margin-top:4px;" (keydown)="onKeydown($event)"></textarea>
-  <markdown *ngIf="showPreview && editorMode" class="variable-binding" [data]="content" style="height: 100%; overflow-y: scroll;margin-top:4px;"></markdown>
-  <markdown *ngIf="!editorMode" class="variable-binding" [data]="content" style="width:100%;height:100%;max-width:1320px;float:none;margin:auto;overflow-y:scroll;margin-bottom:4px;"></markdown>
-
+  <textarea
+    id="markdownTextarea"
+    *ngIf="editorMode"
+    [(ngModel)]="content"
+    class="variable-textarea"
+    style="resize: none; margin-top: 4px; display: inline-block; height: 100%"
+    [style.width]="showPreview ? 'calc(50% - 4px)' : '100%'"
+    (keydown)="onKeydown($event)"
+  ></textarea>
+  <div class="suggestion">{{ suggestion }}</div>
+  <markdown
+    id="markdownPreview"
+    *ngIf="showPreview && editorMode"
+    class="variable-binding"
+    [data]="content"
+    style="height: 100%; overflow-y: scroll; margin-top: 4px"
+  ></markdown>
+  <markdown
+    *ngIf="!editorMode"
+    class="variable-binding"
+    [data]="content"
+    style="
+      width: 100%;
+      height: 100%;
+      max-width: 1320px;
+      float: none;
+      margin: auto;
+      overflow-y: scroll;
+      margin-bottom: 4px;
+    "
+  ></markdown>
 </div>
 
-<div class="center"
-  [style.transform]="showSidebar ? 'translateX(-8px)' : 'translateX(90px)'">
-  <button *ngIf="editorMode" class="btn btn-default btn-primary" (click)="togglePreviewPanel()">
-    <i [ngClass]="showPreview ? 'fa-solid fa-eye-slash' : 'fa-solid fa-magnifying-glass'"></i>
-      {{ showPreview ? 'Preview' : 'Preview' }}
+<div
+  class="center"
+  [style.transform]="showSidebar ? 'translateX(-8px)' : 'translateX(90px)'"
+>
+  <button
+    *ngIf="editorMode"
+    class="btn btn-default btn-primary btn-fade"
+    (click)="togglePreviewPanel()"
+  >
+    <i
+      [ngClass]="
+        showPreview ? 'fa-solid fa-eye-slash' : 'fa-solid fa-magnifying-glass'
+      "
+    ></i>
+    {{ showPreview ? "Preview" : "Preview" }}
   </button>
   &nbsp;&nbsp;
-  <button class="btn btn-default btn-primary" (click)="changeMode()">
-    <i [ngClass]="editorMode ? 'fa-solid fa-xmark' : 'fa-solid fa-pen-to-square'"></i>
-      {{ editorMode ? 'Cancel Edit' : 'Edit' }}
+  <button class="btn btn-default btn-primary btn-fade" (click)="changeMode()">
+    <i
+      [ngClass]="editorMode ? 'fa-solid fa-xmark' : 'fa-solid fa-pen-to-square'"
+    ></i>
+    {{ editorMode ? "Cancel Edit" : "Edit" }}
   </button>
   &nbsp;&nbsp;
-  <button *ngIf="editorMode" class="btn btn-default btn-primary" (click)="undoChanges()"><i class="fa-solid fa-undo"></i> Undo</button>
+  <button
+    *ngIf="editorMode"
+    class="btn btn-default btn-primary btn-fade"
+    (click)="undoChanges()"
+  >
+    <i class="fa-solid fa-undo"></i> Undo
+  </button>
   &nbsp;&nbsp;
 </div>
 
-<div id="snackbar" [ngClass]="{'show': showSnackbar}">Saved <i class="fa-solid fa-check"></i></div>
+<div id="snackbar" [ngClass]="{ show: showSnackbar }">
+  Saved <i class="fa-solid fa-check"></i>
+</div>
+
+<!-- The popup dialog -->
+<div class="overlay" id="openAiDialog">
+  <div class="dialog">
+    <h5>OpenAI API Key</h5>
+    <textarea
+      type="text"
+      id="inputField"
+      rows="3"
+      placeholder="Enter your API key"
+      style="width: 100%"
+    ></textarea>
+    <br />
+    <div>
+      <span style="text-align: right"
+        ><strong>Note</strong>: Your OpenAI API key is kept secure and is not
+        shared with anyone. You can entirely revoke your API key at any time by
+        clearing the input field and save.
+      </span>
+    </div>
+    <br />
+    <button
+      class="btn btn-default btn-primary"
+      (click)="closeDialog('openAiDialog')"
+      style="margin-right: 8px"
+    >
+      Close
+    </button>
+    <button class="btn btn-default btn-primary" (click)="saveOpenAiApiKey()">
+      Save
+    </button>
+  </div>
+</div>

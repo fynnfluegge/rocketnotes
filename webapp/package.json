@@ -6,11 +6,13 @@
     "ng": "ng",
     "config-dev": "ts-node set-env.mjs",
     "config-prod": "ts-node set-env.mjs -- prod",
-    "start": "export API_URL='http://localhost:3000' && npm run config-dev && ng serve",
-    "electron": "electron .",
+    "start": "export API_URL='http://localhost:3000' && npm run config-dev && ng serve --disable-host-check",
+    "start-gitpod": "export API_URL=$(gp url 3000) && npm run config-dev && ng serve --disable-host-check",
+    "start-electron": "electron .",
     "build": "npm run config-prod && ng build --configuration production",
     "build-local": "export API_URL='http://localhost:3002' && npm run config-dev && ng build",
     "build-electron": "npm run config-prod && ng build --configuration production --base-href ./",
+    "bundle-electron": "./node_modules/.bin/electron-builder",
     "test": "ng test"
   },
   "private": true,
@@ -36,6 +38,7 @@
     "jwt-decode": "^3.1.2",
     "marked": "^4.3.0",
     "ngx-markdown": "^13.1.0",
+    "openai": "^4.3.0",
     "prismjs": "^1.29.0",
     "rxjs": "~7.5.0",
     "tslib": "^2.3.0",
@@ -48,12 +51,12 @@
     "@types/jasmine": "~3.10.0",
     "@types/marked": "^4.0.8",
     "@types/node": "^12.11.1",
-    "electron": "^18.3.7",
+    "electron": "^24.1.3",
     "electron-builder": "^24.3.0",
     "electron-icon-maker": "^0.0.5",
     "electron-installer-dmg": "^4.0.0",
     "electron-notarize": "^1.2.1",
-    "electron-packager": "^15.5.1",
+    "electron-packager": "^17.1.2",
     "jasmine-core": "~4.0.0",
     "karma": "~6.3.0",
     "karma-chrome-launcher": "~3.1.0",
@@ -62,5 +65,8 @@
     "karma-jasmine-html-reporter": "~1.7.0",
     "ts-node": "~5.0.1",
     "typescript": "~4.5.2"
+  },
+  "optionalDependencies": {
+    "appdmg": "^0.6.6"
   }
 }
