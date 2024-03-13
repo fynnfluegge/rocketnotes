@@ -9,7 +9,7 @@ from langchain_openai import OpenAIEmbeddings
 s3 = boto3.client("s3")
 
 documents_table_name = "tnn-Documents"
-bucket_name = os.environ["bucketName"]
+bucket_name = os.environ["BUCKET_NAME"]
 
 
 def handler(event, context):

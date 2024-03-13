@@ -13,6 +13,13 @@ services:
     networks:
       - local-serverless-network
 
+  s3:
+    image: adobe/s3mock:latest
+    environment:
+      - initialBuckets=faissIndexBucket
+    ports:
+      - 9090:9090
+
   api:
     build:
       context: .
@@ -35,6 +42,8 @@ services:
     platform: linux/amd64
     ports:
       - "3001:3001"
+    environment:
+      API_URL: "http://localhost:3002"
 
 volumes:
   dynamodb-volume:

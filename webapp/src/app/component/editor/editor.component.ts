@@ -266,7 +266,7 @@ export class EditorComponent {
       }
     } else if (event.code !== 'Escape') {
       this.keyPressCounter++;
-      if (this.keyPressCounter === 20) {
+      if (this.keyPressCounter === 100) {
         this.keyPressCounter = 0;
         this.submit();
       }
@@ -477,6 +477,23 @@ export class EditorComponent {
         setTimeout(() => {
           this.showSnackbar = false;
         }, 1000);
+        if (!environment.production) {
+          this.basicRestService
+            .post('vector-embeddings', {
+              Records: [
+                {
+                  body: {
+                    userId: localStorage.getItem('currentUserId'),
+                    documentId: this.id,
+                    openAiApiKey: localStorage.getItem('openAiApiKey'),
+                  },
+                },
+              ],
+            })
+            .subscribe(() => {
+              console.log('Vector embeddings updated');
+            });
+        }
       });
   }
 
