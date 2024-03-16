@@ -49,20 +49,30 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 
 	tableName := "tnn-Documents"
 
+	expressionAttributeNames := map[string]*string{
+		"#content": jsii.String("searchContent"),
+	}
+
+	if os.Getenv("USE_LOCAL_DYNAMODB") == "1" {
+		expressionAttributeNames["#userId"] = jsii.String("userId")
+	}
+
+	expressionAttributeValues := map[string]*dynamodb.AttributeValue{
+		":content": {
+			S: aws.String(searchString),
+		},
+	}
+
+	if os.Getenv("USE_LOCAL_DYNAMODB") == "1" {
+		expressionAttributeValues[":userId"] = &dynamodb.AttributeValue{
+			S: aws.String(userId),
+		}
+	}
+
 	result, err := svc.Scan(&dynamodb.ScanInput{
 		TableName: aws.String(tableName),
-		ExpressionAttributeNames: map[string]*string{
-			"#userId":  jsii.String("userId"),
-			"#content": jsii.String("searchContent"),
-		},
-		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
-			":userId": {
-				S: aws.String(userId),
-			},
-			":content": {
-				S: aws.String(searchString),
-			},
-		},
+		ExpressionAttributeNames: expressionAttributeNames,
+		ExpressionAttributeValues: expressionAttributeValues,
 		FilterExpression: jsii.String("(#userId = :userId) and contains(#content, :content)"),
 	})
 

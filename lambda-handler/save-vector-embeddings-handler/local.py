@@ -11,8 +11,16 @@ from langchain.text_splitter import (
 from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
 
-s3 = boto3.client("s3", endpoint_url="http://s3:9090")
-dynamodb = boto3.client("dynamodb", endpoint_url="http://dynamodb:8000")
+is_local = os.environ.get("LOCAL", False)
+s3_args = {}
+dynamodb_args = {}
+
+if is_local:
+    s3_args["endpoint_url"] = "http://s3:9090"
+    dynamodb_args["endpoint_url"] = "http://dynamodb:8000"
+
+s3 = boto3.client("s3", **s3_args)
+dynamodb = boto3.client("dynamodb", **dynamodb_args)
 
 documents_table_name = "tnn-Documents"
 vector_table_name = "tnn-Vectors"

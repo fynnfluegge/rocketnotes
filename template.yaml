@@ -236,7 +236,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: lambda-handler/save-vector-embeddings-handler
-      Handler: local.handler
+      Handler: main.handler
       Runtime: python3.9
       Architectures:
         - x86_64
@@ -247,7 +247,7 @@ Resources:
             TableName: tnn-documents
       Environment:
         Variables:
-          USE_LOCAL_DYNAMODB: 1
+          LOCAL: 1
           BUCKET_NAME: faissIndexBucket
       Events:
         Api:
@@ -255,4 +255,53 @@ Resources:
           Properties:
             Path: /vector-embeddings
             Method: POST
+
+  semanticSearchFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda-handler/semantic-search-handler
+      Handler: main.handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      MemorySize: 1024
+      Timeout: 100
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: tnn-documents
+      Environment:
+        Variables:
+          LOCAL: 1
+          BUCKET_NAME: faissIndexBucket
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /semanticSearch
+            Method: POST
+
+  chatFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda-handler/chat-handler
+      Handler: main.handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      MemorySize: 1024
+      Timeout: 100
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: tnn-documents
+      Environment:
+        Variables:
+          LOCAL: 1
+          BUCKET_NAME: faissIndexBucket
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /chat
+            Method: POST
+
 
