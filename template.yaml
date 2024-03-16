@@ -236,7 +236,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: lambda-handler/save-vector-embeddings-handler
-      Handler: local.py
+      Handler: local.handler
       Runtime: python3.9
       Architectures:
         - x86_64

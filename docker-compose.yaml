@@ -18,7 +18,9 @@ services:
     environment:
       - initialBuckets=faissIndexBucket
     ports:
-      - 9090:9090
+      - 9091:9090
+    networks:
+      - local-serverless-network
 
   api:
     build:

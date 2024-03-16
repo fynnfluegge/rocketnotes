@@ -477,7 +477,10 @@ export class EditorComponent {
         setTimeout(() => {
           this.showSnackbar = false;
         }, 1000);
-        if (!environment.production) {
+        // Explicitly update the vector embeddings after the document has been saved
+        // only in local mode. In deployed production mode, the vector embeddings are updated
+        // via sqs event after the document has been saved
+        if (!environment.production && localStorage.getItem('openAiApiKey')) {
           this.basicRestService
             .post('vector-embeddings', {
               Records: [
