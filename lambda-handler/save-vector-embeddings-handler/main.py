@@ -30,8 +30,9 @@ bucket_name = os.environ["BUCKET_NAME"]
 def handler(event, context):
     if is_local:
         event = json.loads(event["body"])
-    sqs_message = event["Records"][0]["body"]
-    message = json.loads(sqs_message)
+    message = event["Records"][0]["body"]
+    if not is_local:
+        message = json.loads(message)
     userId = message["userId"]
     documentId = message["documentId"]
     openAiApiKey = message["openAiApiKey"]
@@ -169,7 +170,23 @@ def handler(event, context):
 
     except Exception as e:
         print("Error:", e)
-        return {"statusCode": 500, "body": json.dumps("Internal server error")}
+        return {
+            "statusCode": 500,
+            "headers": {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+            },
+            "body": json.dumps("Internal server error"),
+        }
+
+    return {
+        "statusCode": 200,
+        "headers": {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+        },
+        "body": json.dumps("Success"),
+    }
 
 
 def save_to_s3(key, file_path):

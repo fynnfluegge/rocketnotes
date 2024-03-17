@@ -52,28 +52,28 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 	expressionAttributeNames := map[string]*string{
 		"#content": jsii.String("searchContent"),
 	}
-
-	if os.Getenv("USE_LOCAL_DYNAMODB") == "1" {
-		expressionAttributeNames["#userId"] = jsii.String("userId")
-	}
-
 	expressionAttributeValues := map[string]*dynamodb.AttributeValue{
 		":content": {
 			S: aws.String(searchString),
 		},
 	}
+	filterExpression := jsii.String("contains(#content, :content)")
 
-	if os.Getenv("USE_LOCAL_DYNAMODB") == "1" {
+	if os.Getenv("USE_LOCAL_DYNAMODB") != "1" {
+		expressionAttributeNames["#userId"] = jsii.String("userId")
 		expressionAttributeValues[":userId"] = &dynamodb.AttributeValue{
 			S: aws.String(userId),
 		}
+		filterExpression = jsii.String("#userId = :userId) and contains(#content, :content)")
 	}
+
+
 
 	result, err := svc.Scan(&dynamodb.ScanInput{
 		TableName: aws.String(tableName),
 		ExpressionAttributeNames: expressionAttributeNames,
 		ExpressionAttributeValues: expressionAttributeValues,
-		FilterExpression: jsii.String("(#userId = :userId) and contains(#content, :content)"),
+		FilterExpression: filterExpression,
 	})
 
 	if err != nil {
