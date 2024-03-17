@@ -10,12 +10,11 @@ The following tools need to be installed on your system prior to build and deplo
 
 First fork the repository, and then run the following commands to clone the repository locally.
 
+```bash
+git clone https://github.com/{your-account}/rocketnotes.git
+cd rocketnotes
+npm install
 ```
-$ git clone https://github.com/{your-account}/rocketnotes.git
-$ cd rocketnotes
-$ npm install
-```
-
 </br>
 
 ## AWS hosting
@@ -38,21 +37,21 @@ How to create a hosted zone and configure Route 53 as a DNS service with your do
 
 ### Deploy all AWS resources
 The following environment variables are required for the deployment:
-```console
-$ export AWS_ACCOUNT="<YOUR_AWS_ACCOUNT_ID>"
-$ export AWS_REGION="<YOUR_AWS_REGION>"
-$ export COGNITO_USER_POOL_ID="<YOUR_COGNITO_USER_POOL_ID>"
-$ export COGNITO_APP_CLIENT_ID="<YOUR_COGNITO_APP_CLIENT_ID>"
-$ export DOMAIN_NAME="<YOUR_DOMAIN_NAME>"
-$ export DOMAIN="<YOUR_DOMAIN>"
-$ export SUBDOMAIN="<YOUR_SUBDOMAIN>" # <- use "www" here if you don't have a subdomain configured in your hosted zone (e.g app)
+```bash
+export AWS_ACCOUNT="<YOUR_AWS_ACCOUNT_ID>"
+export AWS_REGION="<YOUR_AWS_REGION>"
+export COGNITO_USER_POOL_ID="<YOUR_COGNITO_USER_POOL_ID>"
+export COGNITO_APP_CLIENT_ID="<YOUR_COGNITO_APP_CLIENT_ID>"
+export DOMAIN_NAME="<YOUR_DOMAIN_NAME>"
+export DOMAIN="<YOUR_DOMAIN>"
+export SUBDOMAIN="<YOUR_SUBDOMAIN>" # <- use "www" here if you don't have a subdomain configured in your hosted zone (e.g app)
 ```
 > **_NOTE:_** <YOUR_DOMAIN_NAME> is your domain **without** extension like ".com" while <YOUR_DOMAIN> is your domain **with** extension in this context.
 
 Once your environment variables are specified run:
-```
-$ cd cdk
-$ cdk deploy
+```bash
+cd cdk
+cdk deploy
 ```
 
 The first deployment will take some minutes, since all the resources and lambda functions need to be initially created. If the deployment was successfull the api url should be logged in the console as `HTTP API endpoint URL`.
@@ -60,24 +59,24 @@ The first deployment will take some minutes, since all the resources and lambda 
 ### Build webapp
 The Angular webapp need to be bundled in production mode.
 The following environment variables are required for the production build:
-```console
-$ export REDIRECT_SIGN_IN="<YOUR_DOMAIN_URL>"
-$ export REDIRECT_SIGN_OUT="<YOUR_DOMAIN_URL/logout>"
-$ export AUTH_GUARD_REDIRECT="<AUTH_GUARD_REDIRECT_URL>" # <- "https://<YOUR_DOMAIN_NAME>.auth.<AWS_REGION>.amazoncognito.com/login?response_type=code&client_id=<YOUR_COGNITO_APP_CLIENT_ID>&redirect_uri=https://<YOUR_SUBDOMAIN>.<YOUR_DOMAIN>"
-$ export API_URL="<YOUR_API_URL>" # <- HTTP API endpoint URL from deployment console log
+```bash
+export REDIRECT_SIGN_IN="<YOUR_DOMAIN_URL>"
+export REDIRECT_SIGN_OUT="<YOUR_DOMAIN_URL/logout>"
+export AUTH_GUARD_REDIRECT="<AUTH_GUARD_REDIRECT_URL>" # <- "https://<YOUR_DOMAIN_NAME>.auth.<AWS_REGION>.amazoncognito.com/login?response_type=code&client_id=<YOUR_COGNITO_APP_CLIENT_ID>&redirect_uri=https://<YOUR_SUBDOMAIN>.<YOUR_DOMAIN>"
+export API_URL="<YOUR_API_URL>" # <- HTTP API endpoint URL from deployment console log
 ```
 Once your environment variables are specified run:
-```
-$ cd webapp
-$ npm install
-$ npm run build
+```bash
+cd webapp
+npm install
+npm run build
 ```
 
 ### Deploy webapp
 Finally, the Angular app can be deployed to S3 with again:
-```
-$ cd cdk
-$ cdk deploy
+```bash
+cd cdk
+cdk deploy
 ```
 This deployment will only deploy the webapp build to the S3 bucket and will be much faster than the previous one.
 
@@ -85,7 +84,7 @@ This deployment will only deploy the webapp build to the S3 bucket and will be m
 
 ## Run on your local machine with Docker
 ```bash
-$ docker-compuse up -d
+docker-compuse up -d
 ```
 Docker-compose will create and start the following containers with a docker network:
 - the DynamoDB with a volume
