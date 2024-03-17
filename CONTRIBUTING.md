@@ -26,9 +26,9 @@ $ git clone https://github.com/{your-account}/rocketnotes.git
 $ cd rocketnotes
 ```
 
-#### 1. Start DynamoDB and docker network
+#### 1. Start DynamoDB and S3 mock with docker
 ```
-$ docker-compose up dynamodb -d
+$ docker-compose up dynamodb s3 -d
 ```
 #### 2. Init tables and create data for default user
 ```
