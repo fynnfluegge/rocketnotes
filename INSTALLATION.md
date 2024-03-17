@@ -7,11 +7,8 @@ The following tools need to be installed on your system prior to build and deplo
 - [Node.js >= 14.x](https://nodejs.org/download/release/latest-v14.x/)
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 
-
-First fork the repository, and then run the following commands to clone the repository locally.
-
-```bash
-git clone https://github.com/{your-account}/rocketnotes.git
+```
+git clone https://github.com/fynnfluegge/rocketnotes.git
 cd rocketnotes
 npm install
 ```
@@ -49,7 +46,7 @@ export SUBDOMAIN="<YOUR_SUBDOMAIN>" # <- use "www" here if you don't have a subd
 > **_NOTE:_** <YOUR_DOMAIN_NAME> is your domain **without** extension like ".com" while <YOUR_DOMAIN> is your domain **with** extension in this context.
 
 Once your environment variables are specified run:
-```bash
+```
 cd cdk
 cdk deploy
 ```
@@ -66,7 +63,7 @@ export AUTH_GUARD_REDIRECT="<AUTH_GUARD_REDIRECT_URL>" # <- "https://<YOUR_DOMAI
 export API_URL="<YOUR_API_URL>" # <- HTTP API endpoint URL from deployment console log
 ```
 Once your environment variables are specified run:
-```bash
+```
 cd webapp
 npm install
 npm run build
@@ -74,7 +71,7 @@ npm run build
 
 ### Deploy webapp
 Finally, the Angular app can be deployed to S3 with again:
-```bash
+```
 cd cdk
 cdk deploy
 ```
@@ -83,7 +80,8 @@ This deployment will only deploy the webapp build to the S3 bucket and will be m
 </br>
 
 ## Run on your local machine with Docker
-```bash
+```
+cd rocketnotes
 docker-compuse up -d
 ```
 Docker-compose will create and start the following containers with a docker network:
