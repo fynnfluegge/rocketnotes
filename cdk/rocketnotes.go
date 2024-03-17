@@ -258,7 +258,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 	awscdklambdagoalpha.NewGoFunction(stack, jsii.String("POST-Document"), &awscdklambdagoalpha.GoFunctionProps{
 		FunctionName: jsii.String("POST-Document"),
 		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
-		Entry:        jsii.String("../lambda-handler/save-document-handler"),
+		Entry:        jsii.String("../lambda-handler/save-document-handler/main.go"),
 		Events: &[]awslambda.IEventSource{
 			awslambdaeventsources.NewSqsEventSource(queue, &awslambdaeventsources.SqsEventSourceProps{
 				BatchSize: jsii.Number(1),
