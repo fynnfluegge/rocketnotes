@@ -266,7 +266,7 @@ export class EditorComponent {
       }
     } else if (event.code !== 'Escape') {
       this.keyPressCounter++;
-      if (this.keyPressCounter === 20) {
+      if (this.keyPressCounter === 100) {
         this.keyPressCounter = 0;
         this.submit();
       }
@@ -477,6 +477,26 @@ export class EditorComponent {
         setTimeout(() => {
           this.showSnackbar = false;
         }, 1000);
+        // Explicitly update the vector embeddings after the document has been saved
+        // only in local mode. In deployed production mode, the vector embeddings are updated
+        // via sqs event after the document has been saved
+        if (!environment.production && localStorage.getItem('openAiApiKey')) {
+          this.basicRestService
+            .post('vector-embeddings', {
+              Records: [
+                {
+                  body: {
+                    userId: localStorage.getItem('currentUserId'),
+                    documentId: this.id,
+                    openAiApiKey: localStorage.getItem('openAiApiKey'),
+                  },
+                },
+              ],
+            })
+            .subscribe(() => {
+              console.log('Vector embeddings updated');
+            });
+        }
       });
   }
 

@@ -1,4 +1,4 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 
 Globals:
@@ -12,12 +12,33 @@ Globals:
       AllowCredentials: "'*'"
 
 Resources:
+  helloWorldFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: go1.x
+    Properties:
+      CodeUri: lambda-handler/hello-world-handler
+      Handler: local.go
+      Runtime: provided.al2
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /hello-world
+            Method: GET
+
   getDocumentFunction:
     Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: go1.x
     Properties:
       CodeUri: lambda-handler/get-document-handler
       Handler: get-document-handler
-      Runtime: go1.x
+      Runtime: provided.al2
       Architectures:
         - x86_64
       MemorySize: 128
@@ -34,13 +55,15 @@ Resources:
           Properties:
             Path: /document/{documentId}
             Method: GET
-            
+
   getDocumentTreeFunction:
     Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: go1.x
     Properties:
       CodeUri: lambda-handler/get-document-tree-handler
       Handler: get-document-tree-handler
-      Runtime: go1.x
+      Runtime: provided.al2
       Architectures:
         - x86_64
       MemorySize: 128
@@ -60,10 +83,12 @@ Resources:
 
   saveDocumentFunction:
     Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: go1.x
     Properties:
       CodeUri: lambda-handler/save-document-handler
-      Handler: save-document-handler
-      Runtime: go1.x
+      Handler: local.go
+      Runtime: provided.al2
       Architectures:
         - x86_64
       MemorySize: 128
@@ -83,10 +108,12 @@ Resources:
 
   saveDocumentTreeFunction:
     Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: go1.x
     Properties:
       CodeUri: lambda-handler/save-document-tree-handler
       Handler: save-document-tree-handler
-      Runtime: go1.x
+      Runtime: provided.al2
       Architectures:
         - x86_64
       MemorySize: 128
@@ -106,10 +133,12 @@ Resources:
 
   saveDocumentPublicFunction:
     Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: go1.x
     Properties:
       CodeUri: lambda-handler/save-document-public-handler
       Handler: save-document-public-handler
-      Runtime: go1.x
+      Runtime: provided.al2
       Architectures:
         - x86_64
       MemorySize: 128
@@ -129,10 +158,13 @@ Resources:
 
   saveDocumentTitleFunction:
     Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: go1.x
     Properties:
       CodeUri: lambda-handler/save-document-title-handler
       Handler: save-document-title-handler
       Runtime: go1.x
+      Runtime: provided.al2
       Architectures:
         - x86_64
       MemorySize: 128
@@ -152,10 +184,12 @@ Resources:
 
   searchDocumentFunction:
     Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: go1.x
     Properties:
       CodeUri: lambda-handler/search-document-handler
       Handler: search-document-handler
-      Runtime: go1.x
+      Runtime: provided.al2
       Architectures:
         - x86_64
       MemorySize: 128
@@ -175,10 +209,12 @@ Resources:
 
   getSharedDocumentFunction:
     Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: go1.x
     Properties:
       CodeUri: lambda-handler/get-shared-document-handler
       Handler: get-shared-document-handler
-      Runtime: go1.x
+      Runtime: provided.al2
       Architectures:
         - x86_64
       MemorySize: 128
@@ -195,3 +231,77 @@ Resources:
           Properties:
             Path: /shared/{documentId}
             Method: GET
+
+  saveVectorEmbeddingsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda-handler/save-vector-embeddings-handler
+      Handler: main.handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      MemorySize: 1024
+      Timeout: 100
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: tnn-documents
+      Environment:
+        Variables:
+          LOCAL: 1
+          BUCKET_NAME: faissIndexBucket
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /vector-embeddings
+            Method: POST
+
+  semanticSearchFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda-handler/semantic-search-handler
+      Handler: main.handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      MemorySize: 1024
+      Timeout: 100
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: tnn-documents
+      Environment:
+        Variables:
+          LOCAL: 1
+          BUCKET_NAME: faissIndexBucket
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /semanticSearch
+            Method: POST
+
+  chatFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda-handler/chat-handler
+      Handler: main.handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      MemorySize: 1024
+      Timeout: 100
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: tnn-documents
+      Environment:
+        Variables:
+          LOCAL: 1
+          BUCKET_NAME: faissIndexBucket
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /chat
+            Method: POST
+
+

@@ -6,10 +6,16 @@ import boto3
 from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
 
-s3 = boto3.client("s3")
+is_local = os.environ.get("LOCAL", False)
+s3_args = {}
+
+if is_local:
+    s3_args["endpoint_url"] = "http://s3:9090"
+
+s3 = boto3.client("s3", **s3_args)
 
 documents_table_name = "tnn-Documents"
-bucket_name = os.environ["bucketName"]
+bucket_name = os.environ["BUCKET_NAME"]
 
 
 def handler(event, context):

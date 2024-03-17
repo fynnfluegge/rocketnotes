@@ -11,17 +11,28 @@ from langchain.text_splitter import (
 from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
 
-s3 = boto3.client("s3")
-dynamodb = boto3.client("dynamodb")
+is_local = os.environ.get("LOCAL", False)
+s3_args = {}
+dynamodb_args = {}
+
+if is_local:
+    s3_args["endpoint_url"] = "http://s3:9090"
+    dynamodb_args["endpoint_url"] = "http://dynamodb:8000"
+
+s3 = boto3.client("s3", **s3_args)
+dynamodb = boto3.client("dynamodb", **dynamodb_args)
 
 documents_table_name = "tnn-Documents"
 vector_table_name = "tnn-Vectors"
-bucket_name = os.environ["bucketName"]
+bucket_name = os.environ["BUCKET_NAME"]
 
 
 def handler(event, context):
-    sqs_message = event["Records"][0]["body"]
-    message = json.loads(sqs_message)
+    if is_local:
+        event = json.loads(event["body"])
+    message = event["Records"][0]["body"]
+    if not is_local:
+        message = json.loads(message)
     userId = message["userId"]
     documentId = message["documentId"]
     openAiApiKey = message["openAiApiKey"]
@@ -159,7 +170,23 @@ def handler(event, context):
 
     except Exception as e:
         print("Error:", e)
-        return {"statusCode": 500, "body": json.dumps("Internal server error")}
+        return {
+            "statusCode": 500,
+            "headers": {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+            },
+            "body": json.dumps("Internal server error"),
+        }
+
+    return {
+        "statusCode": 200,
+        "headers": {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+        },
+        "body": json.dumps("Success"),
+    }
 
 
 def save_to_s3(key, file_path):

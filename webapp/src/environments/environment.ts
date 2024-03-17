@@ -11,5 +11,5 @@ export const environment = {
   redirectSignIn: 'undefined',
   redirectSignOut: 'undefined',
   authGuardRedirect: 'undefined',
-  apiUrl: 'undefined',
+  apiUrl: 'http://localhost:3002',
 };

@@ -10,6 +10,7 @@
     "start-gitpod": "export API_URL=$(gp url 3000) && npm run config-dev && ng serve --disable-host-check",
     "start-electron": "electron .",
     "build": "npm run config-prod && ng build --configuration production",
+    "build-local": "export API_URL='http://localhost:3002' && npm run config-dev && ng build",
     "build-electron": "npm run config-prod && ng build --configuration production --base-href ./",
     "bundle-electron": "./node_modules/.bin/electron-builder",
     "test": "ng test"

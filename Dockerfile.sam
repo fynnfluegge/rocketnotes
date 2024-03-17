@@ -1,0 +1,11 @@
+FROM public.ecr.aws/sam/build-provided.al2:latest
+
+WORKDIR /var/task
+
+COPY template.yaml .
+COPY go.mod .
+COPY go.sum .
+COPY lambda-handler ./lambda-handler
+COPY .aws-sam ./.aws-sam
+
+EXPOSE 3002

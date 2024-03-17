@@ -1373,12 +1373,12 @@ export class SidenavComponent implements OnInit, AfterViewInit {
   }
 
   openLlmDialog() {
-    // if (localStorage.getItem('openAiApiKey') === null) {
-    //   window.alert(
-    //     'Please set your OpenAI API key in user settings to use this feature.',
-    //   );
-    // } else {
-    this.llmDialogService.openDialog();
-    // }
+    if (localStorage.getItem('openAiApiKey') === null) {
+      window.alert(
+        'Please set your OpenAI API key in user settings to use the LLM feature.',
+      );
+    } else {
+      this.llmDialogService.openDialog();
+    }
   }
 }

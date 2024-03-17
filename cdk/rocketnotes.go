@@ -258,7 +258,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 	awscdklambdagoalpha.NewGoFunction(stack, jsii.String("POST-Document"), &awscdklambdagoalpha.GoFunctionProps{
 		FunctionName: jsii.String("POST-Document"),
 		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
-		Entry:        jsii.String("../lambda-handler/save-document-event-handler"),
+		Entry:        jsii.String("../lambda-handler/save-document-handler"),
 		Events: &[]awslambda.IEventSource{
 			awslambdaeventsources.NewSqsEventSource(queue, &awslambdaeventsources.SqsEventSourceProps{
 				BatchSize: jsii.Number(1),
@@ -346,7 +346,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 				BatchSize: jsii.Number(1),
 			}),
 		},
-		Environment: &map[string]*string{"bucketName": bucket.BucketName()},
+		Environment: &map[string]*string{"BUCKET_NAME": bucket.BucketName()},
 		Role:        lambdaS3SqsDynamoDbRole,
 		MemorySize:  jsii.Number(1024),
 		Timeout:     awscdk.Duration_Millis(jsii.Number(900000)),
@@ -359,7 +359,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		Runtime:      awslambda.Runtime_PYTHON_3_9(),
 		Entry:        jsii.String("../lambda-handler/semantic-search-handler"),
 		Index:        aws.String("main.py"),
-		Environment: &map[string]*string{"bucketName": bucket.BucketName()},
+		Environment: &map[string]*string{"BUCKET_NAME": bucket.BucketName()},
 		Role:        lambdaS3Role,
 		MemorySize:  jsii.Number(1024),
 		Timeout:     awscdk.Duration_Millis(jsii.Number(900000)),
@@ -379,7 +379,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		Runtime:      awslambda.Runtime_PYTHON_3_9(),
 		Entry:        jsii.String("../lambda-handler/chat-handler"),
 		Index:        aws.String("main.py"),
-		Environment: &map[string]*string{"bucketName": bucket.BucketName()},
+		Environment: &map[string]*string{"BUCKET_NAME": bucket.BucketName()},
 		Role:        lambdaS3Role,
 		MemorySize:  jsii.Number(1024),
 		Timeout:     awscdk.Duration_Millis(jsii.Number(900000)),
