@@ -64,10 +64,8 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		expressionAttributeValues[":userId"] = &dynamodb.AttributeValue{
 			S: aws.String(userId),
 		}
-		filterExpression = jsii.String("#userId = :userId) and contains(#content, :content)")
+		filterExpression = jsii.String("#userId = :userId and contains(#content, :content)")
 	}
-
-
 
 	result, err := svc.Scan(&dynamodb.ScanInput{
 		TableName: aws.String(tableName),
