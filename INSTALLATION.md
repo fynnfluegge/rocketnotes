@@ -84,8 +84,14 @@ This deployment will only deploy the webapp build to the S3 bucket and will be m
 </br>
 
 ## Run on your local machine with Docker
-All you need to do is hitting
+```bash
+$ docker-compuse up -d
 ```
-docker-compuse up -d
-```
-Docker-compose will create and start three docker containers and a network for you. First, the DynamoDB with a volume. Second the Webapp with Node. And last, all the lambda functions in a single container. On initial startup it may take a moment. Once it's done you can open http://localhost:3001 in the browser and you should see the initially created Cheat Sheet document 🚀
+Docker-compose will create and start the following containers with a docker network:
+- the DynamoDB with a volume
+- the S3 mock
+- the Angular app
+- all the lambda functions
+On initial startup it may take a moment.
+Once it's done execute `sh ./dynamodb-init.sh` as a last step to initialize the dynamodb.
+Now you can open http://localhost:3001 in the browser and you should see the initially created Cheat Sheet document 🚀
