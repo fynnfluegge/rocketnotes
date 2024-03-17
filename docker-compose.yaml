@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile.dynamodb
     hostname: dynamodb-local
-    container_name: dynamodb-local
+    container_name: rocketnotes-dynamodb
     command: -jar DynamoDBLocal.jar -sharedDb -dbPath /home/dynamodblocal/data/
     ports:
       - "8041:8000"
@@ -15,6 +15,7 @@ services:
 
   s3:
     image: adobe/s3mock:latest
+    container_name: rocketnotes-s3
     environment:
       - initialBuckets=faissIndexBucket
     ports:
