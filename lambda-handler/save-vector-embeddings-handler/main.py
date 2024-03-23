@@ -57,12 +57,17 @@ def handler(event, context):
             embeddings = OpenAIEmbeddings(client=None, model="text-embedding-ada-002")
 
             load_from_s3(f"{userId}.pkl", f"{file_path}/{userId}.pkl")
+            load_from_s3(f"{userId}.faiss.bytes", f"{file_path}/{userId}.faiss.bytes")
 
-            db = FAISS.load_local(
-                index_name=userId,
-                folder_path=file_path,
-                embeddings=embeddings,
-            )
+            with open(os.path.join(file_path, f"{userId}.faiss.bytes"), "rb") as file:
+                index = file.read()
+
+            db = FAISS.deserialize_from_bytes(embeddings=embeddings, serialized=index)
+            # db = FAISS.load_local(
+            #     index_name=userId,
+            #     folder_path=file_path,
+            #     embeddings=embeddings,
+            # )
             # Get item from DynamoDB table
             document = dynamodb.get_item(
                 TableName="tnn-Documents",
@@ -121,6 +126,14 @@ def handler(event, context):
 
             file_name = "faiss_index.bin"
             db.save_local(index_name=file_name, folder_path=file_path)
+            faiss_index_bytes = db.serialize_to_bytes()
+            with open(
+                os.path.join(file_path, f"{userId}.faiss.bytes"), "wb"
+            ) as binary_file:
+                binary_file.write(faiss_index_bytes)
+            save_to_s3(
+                userId + ".faiss.bytes", file_path + "/" + file_name + ".faiss.bytes"
+            )
             save_to_s3(userId + ".faiss", file_path + "/" + file_name + ".faiss")
             save_to_s3(userId + ".pkl", file_path + "/" + file_name + ".pkl")
             add_vectors_to_dynamodb(documentId, document_vectors[documentId])
@@ -159,6 +172,15 @@ def handler(event, context):
                 file_name = "faiss_index.bin"
                 Path(file_path).mkdir(parents=True, exist_ok=True)
                 db.save_local(index_name=file_name, folder_path=file_path)
+                faiss_index_bytes = db.serialize_to_bytes()
+                with open(
+                    os.path.join(file_path, f"{userId}.faiss.bytes"), "wb"
+                ) as binary_file:
+                    binary_file.write(faiss_index_bytes)
+                save_to_s3(
+                    userId + ".faiss.bytes",
+                    file_path + "/" + file_name + ".faiss.bytes",
+                )
                 save_to_s3(userId + ".faiss", file_path + "/" + file_name + ".faiss")
                 save_to_s3(userId + ".pkl", file_path + "/" + file_name + ".pkl")
                 index_to_docstore_id = db.index_to_docstore_id
