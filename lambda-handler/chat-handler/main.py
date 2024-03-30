@@ -5,6 +5,8 @@ from pathlib import Path
 import boto3
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationSummaryMemory
+from langchain_community.chat_models import ChatAnthropic
+from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 
@@ -42,17 +44,32 @@ def handler(event, context):
     else:
         return {"statusCode": 400, "body": "search_string is missing"}
 
+    if "embeddingsModel" in request_body:
+        embeddings_model = request_body["embeddingsModel"]
+    else:
+        return {"statusCode": 400, "body": "embeddings model is missing"}
+
+    if "llmModel" in request_body:
+        llm_model = request_body["llmModel"]
+    else:
+        return {"statusCode": 400, "body": "llm model is missing"}
+
     if "openAiApiKey" in request_body:
         os.environ["OPENAI_API_KEY"] = request_body["openAiApiKey"]
+
+    if "anthropicApiKey" in request_body:
+        os.environ["ANTHROPIC_API_KEY"] = request_body["anthropicApiKey"]
+
+    if embeddings_model == "text-embedding-ada-002":
+        embeddings = OpenAIEmbeddings(client=None, model="text-embedding-ada-002")
     else:
-        return {"statusCode": 400, "body": "openAiApiKey is missing"}
+        embeddings = HuggingFaceEmbeddings(model=embeddings_model)
 
     file_path = f"/tmp/{userId}"
     Path(file_path).mkdir(parents=True, exist_ok=True)
     load_from_s3(userId + ".faiss", f"{file_path}/{userId}.faiss")
     load_from_s3(userId + ".pkl", f"{file_path}/{userId}.pkl")
 
-    embeddings = OpenAIEmbeddings(client=None, model="text-embedding-ada-002")
     db = FAISS.load_local(
         index_name=userId,
         folder_path=file_path,
@@ -60,7 +77,20 @@ def handler(event, context):
     )
     retriever = db.as_retriever(search_type="mmr", search_kwargs={"k": 8})
 
-    chat_model = ChatOpenAI(temperature=0.9, max_tokens=2048, model="gpt-3.5-turbo")
+    if llm_model == "gpt-3.5-turbo":
+        chat_model = ChatOpenAI(temperature=0.9, max_tokens=2048, model=llm_model)
+    elif (
+        llm_model == "claude-3-opus-20240229"
+        or llm_model == "claude-3-sonnet-20240229"
+        or llm_model == "claude-3-haiku-20240307"
+    ):
+        chat_model = ChatAnthropic(temperature=0.9, max_tokens=2048, model=llm_model)
+    else:
+        return {
+            "statusCode": 400,
+            "body": "Invalid LLM model. Please use one of the following models: gpt-3.5-turbo, claude-3-opus-20240229, claude-3-sonnet-20240229, claude-3-haiku-20240307",
+        }
+
     memory = ConversationSummaryMemory(
         llm=chat_model, memory_key="chat_history", return_messages=True
     )

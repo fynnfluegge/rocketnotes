@@ -271,6 +271,25 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		Role:        lambdaSqsDynamoDbRole,
 	})
 
+	// POST Save User Config Api
+	postUserConfigHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("POST-UserConfig"), &awscdklambdagoalpha.GoFunctionProps{
+		FunctionName: jsii.String("POST-UserConfig"),
+		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
+		Entry:        jsii.String("../lambda-handler/save-user-config-handler"),
+		Bundling: &awscdklambdagoalpha.BundlingOptions{
+			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
+		},
+		Environment: &map[string]*string{"queueUrl": vectorQueue.QueueUrl()},
+		Role: lambdaSqsDynamoDbRole,
+	})
+
+	httpApi.AddRoutes(&awscdkapigatewayv2alpha.AddRoutesOptions{
+		Path:        jsii.String("/saveUserConfig"),
+		Authorizer:  httpApiAuthorizer,
+		Methods:     &[]awscdkapigatewayv2alpha.HttpMethod{awscdkapigatewayv2alpha.HttpMethod_POST},
+		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("postUserConfigLambdaIntegration"), postUserConfigHandler, &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
+	})
+
 	// POST DocumentTree Api
 
 	postDocumentTreeHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("POST-DocumentTree"), &awscdklambdagoalpha.GoFunctionProps{

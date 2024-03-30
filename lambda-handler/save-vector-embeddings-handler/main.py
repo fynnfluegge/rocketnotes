@@ -8,6 +8,7 @@ from langchain.text_splitter import (
     MarkdownHeaderTextSplitter,
     RecursiveCharacterTextSplitter,
 )
+from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
 
@@ -34,96 +35,145 @@ def handler(event, context):
     if not is_local:
         message = json.loads(message)
     userId = message["userId"]
-    documentId = message["documentId"]
-    openAiApiKey = message["openAiApiKey"]
+    documentId = message.get("documentId", None)
+    openAiApiKey = message.get("openAiApiKey", None)
+    anthropicApiKey = message.get("anthropicApiKey", None)
+    recreateIndex = message.get("recreateIndex", False)
     os.environ["OPENAI_API_KEY"] = openAiApiKey
+    os.environ["ANTHROPIC_API_KEY"] = anthropicApiKey
 
-    if not openAiApiKey:
+    userConfig = dynamodb.get_item(
+        TableName="tnn-UserConfig",
+        Key={"id": {"S": userId}},
+    )
+
+    if "Item" not in userConfig:
         return {
-            "statusCode": 400,
-            "body": json.dumps("openAiApiKey is missing"),
+            "statusCode": 404,
+            "body": json.dumps("User not found"),
         }
 
+    userConfig = userConfig["Item"]
+    embeddingsModel = userConfig["embeddingsModel"]["S"]
+
     try:
-        file_path = f"/tmp/{userId}"
+        file_path = f"/tmp/{userId}/{embeddingsModel}"
         Path(file_path).mkdir(parents=True, exist_ok=True)
         faiss_index_exists = load_from_s3(
-            f"{userId}.faiss", f"{file_path}/{userId}.faiss"
+            f"{embeddingsModel}_{userId}.faiss",
+            f"{file_path}/{embeddingsModel}_{userId}.faiss",
         )
 
         # Vectors already exists, update the index
         # --------------------------------------------
         if faiss_index_exists:
-            embeddings = OpenAIEmbeddings(client=None, model="text-embedding-ada-002")
-
-            load_from_s3(f"{userId}.pkl", f"{file_path}/{userId}.pkl")
+            load_from_s3(
+                f"{embeddingsModel}_{userId}.pkl",
+                f"{file_path}/{embeddingsModel}_{userId}.pkl",
+            )
+            if (
+                userConfig.get("embeddingsModel", {}).get("S")
+                == "text-embedding-ada-002"
+            ):
+                embeddings = OpenAIEmbeddings(
+                    client=None, model="text-embedding-ada-002"
+                )
+            else:
+                embeddings = HuggingFaceEmbeddings()
 
             db = FAISS.load_local(
                 index_name=userId,
                 folder_path=file_path,
                 embeddings=embeddings,
             )
-            # Get item from DynamoDB table
-            document = dynamodb.get_item(
-                TableName="tnn-Documents",
-                Key={"id": {"S": documentId}},
-            )
-            # Check if item exists in the table
-            if "Item" not in document:
-                return {
-                    "statusCode": 404,
-                    "body": json.dumps("Item not found in DynamoDB table"),
-                }
-
-            document = document["Item"]
-
-            vectors = dynamodb.get_item(
-                TableName="tnn-Vectors",
-                Key={"id": {"S": documentId}},
-            )
-            # Delete outdated vectors from DynamoDB
-            if "Item" in vectors:
-                vectors = vectors["Item"]["vectors"]["SS"]
-                try:
-                    db.delete(vectors)
-                except Exception as e:
-                    print(f"Error deleting vectors for file {documentId}: {e}")
-
-            # Save vector embeddings to faiss index
-            try:
-                content = document["content"]["S"]
-                documentId = document["id"]["S"]
-                title = document["title"]["S"]
-            except Exception:
-                return {
-                    "statusCode": 500,
-                    "body": json.dumps("Error getting content from DynamoDB"),
-                }
-            document_splits = split_document(content, documentId, title)
-
-            if not document_splits:
-                return {
-                    "statusCode": 500,
-                    "body": json.dumps("Error splitting document"),
-                }
-
-            document_vectors = {}
-            for document in document_splits:
-                db.add_documents([document])
-                if document.metadata["documentId"] not in document_vectors:
-                    document_vectors[document.metadata["documentId"]] = [
-                        db.index_to_docstore_id[len(db.index_to_docstore_id) - 1]
-                    ]
-                else:
-                    document_vectors[document.metadata["documentId"]].append(
-                        db.index_to_docstore_id[len(db.index_to_docstore_id) - 1]
+            # If recreateIndex is set to True, recreate the index
+            # Uodate any document vectors that have changed since last index creation
+            if recreateIndex:
+                metadata = head_object_from_s3(f"{embeddingsModel}_{userId}.faiss")
+                if metadata:
+                    last_modified = metadata["LastModified"]
+                    documents = dynamodb.scan(
+                        TableName="tnn-Documents",
+                        FilterExpression="userId = :userId",
+                        ExpressionAttributeValues={":userId": {"S": userId}},
                     )
+                    for document in documents["Items"]:
+                        if document["lastModified"]["S"] > last_modified:
+                            documentId = document["id"]["S"]
+                            vectors = dynamodb.get_item(
+                                TableName="tnn-Vectors",
+                                Key={"id": {"S": documentId}},
+                            )
+                            if "Item" in vectors:
+                                vectors = vectors["Item"]["vectors"]["SS"]
+                                try:
+                                    db.delete(vectors)
+                                except Exception as e:
+                                    print(
+                                        f"Error deleting vectors for file {documentId}: {e}"
+                                    )
+            else:
+                # Get item from DynamoDB table
+                document = dynamodb.get_item(
+                    TableName="tnn-Documents",
+                    Key={"id": {"S": documentId}},
+                )
+                # Check if item exists in the table
+                if "Item" not in document:
+                    return {
+                        "statusCode": 404,
+                        "body": json.dumps("Item not found in DynamoDB table"),
+                    }
+
+                document = document["Item"]
+
+                vectors = dynamodb.get_item(
+                    TableName="tnn-Vectors",
+                    Key={"id": {"S": documentId}},
+                )
+                # Delete outdated vectors from DynamoDB
+                if "Item" in vectors:
+                    vectors = vectors["Item"]["vectors"]["SS"]
+                    try:
+                        db.delete(vectors)
+                    except Exception as e:
+                        print(f"Error deleting vectors for file {documentId}: {e}")
+
+                # Save vector embeddings to faiss index
+                try:
+                    content = document["content"]["S"]
+                    documentId = document["id"]["S"]
+                    title = document["title"]["S"]
+                except Exception:
+                    return {
+                        "statusCode": 500,
+                        "body": json.dumps("Error getting content from DynamoDB"),
+                    }
+                document_splits = split_document(content, documentId, title)
+
+                if not document_splits:
+                    return {
+                        "statusCode": 500,
+                        "body": json.dumps("Error splitting document"),
+                    }
+
+                document_vectors = {}
+                for document in document_splits:
+                    db.add_documents([document])
+                    if document.metadata["documentId"] not in document_vectors:
+                        document_vectors[document.metadata["documentId"]] = [
+                            db.index_to_docstore_id[len(db.index_to_docstore_id) - 1]
+                        ]
+                    else:
+                        document_vectors[document.metadata["documentId"]].append(
+                            db.index_to_docstore_id[len(db.index_to_docstore_id) - 1]
+                        )
+                add_vectors_to_dynamodb(documentId, document_vectors[documentId])
 
             file_name = "faiss_index.bin"
             db.save_local(index_name=file_name, folder_path=file_path)
             save_to_s3(userId + ".faiss", file_path + "/" + file_name + ".faiss")
             save_to_s3(userId + ".pkl", file_path + "/" + file_name + ".pkl")
-            add_vectors_to_dynamodb(documentId, document_vectors[documentId])
 
         else:
             # Faiss index does not exist, create the index from scratch
@@ -202,6 +252,14 @@ def load_from_s3(key, file_path):
         return True
     except Exception as e:
         return False
+
+
+def head_object_from_s3(key):
+    try:
+        response = s3.head_object(Bucket=bucket_name, Key=key)
+        return response
+    except Exception as e:
+        return None
 
 
 def split_document(document, documentId, title):
