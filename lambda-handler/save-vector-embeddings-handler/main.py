@@ -36,11 +36,7 @@ def handler(event, context):
         message = json.loads(message)
     userId = message["userId"]
     documentId = message.get("documentId", None)
-    openAiApiKey = message.get("openAiApiKey", None)
-    anthropicApiKey = message.get("anthropicApiKey", None)
     recreateIndex = message.get("recreateIndex", False)
-    os.environ["OPENAI_API_KEY"] = openAiApiKey
-    os.environ["ANTHROPIC_API_KEY"] = anthropicApiKey
 
     userConfig = dynamodb.get_item(
         TableName="tnn-UserConfig",
@@ -54,7 +50,11 @@ def handler(event, context):
         }
 
     userConfig = userConfig["Item"]
-    embeddingsModel = userConfig["embeddingsModel"]["S"]
+    embeddingsModel = userConfig.get("embeddingsModel", {}).get("S", None)
+    openAiApiKey = userConfig.get("openAiApiKey", {}).get("S", None)
+    anthropicApiKey = userConfig.get("anthropicApiKey", {}).get("S", None)
+    os.environ["OPENAI_API_KEY"] = openAiApiKey
+    os.environ["ANTHROPIC_API_KEY"] = anthropicApiKey
 
     try:
         file_path = f"/tmp/{userId}/{embeddingsModel}"

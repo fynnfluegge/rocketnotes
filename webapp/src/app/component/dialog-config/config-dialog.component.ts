@@ -26,7 +26,7 @@ export class ConfigDialogComponent implements OnDestroy, OnInit {
       this.isOpen = isOpen;
       if (isOpen) {
         this.restService
-          .get('/userConfig/' + localStorage.getItem('userId'))
+          .get('userConfig/' + localStorage.getItem('currentUserId'))
           .subscribe((config) => {
             this.currentEmbeddingsModel = config['embeddingsModel'];
             this.selectedEmbeddingsModel = config['embeddingsModel'];
@@ -54,41 +54,66 @@ export class ConfigDialogComponent implements OnDestroy, OnInit {
   ngOnInit(): void {}
 
   submit() {
-    this.restService
-      .get('/userConfig', {
-        userId: localStorage.getItem('currentUserId'),
-        embeddingsModel: this.selectedEmbeddingsModel,
-        llmModel: this.selectedLlmModel,
-        openAiApiKey: this.openAiApiKey,
-        anthropicApiKey: this.anthropicApiKey,
-        recreateIndex:
-          this.currentEmbeddingsModel !== this.selectedEmbeddingsModel,
-      })
-      .subscribe(() => {
-        if (
-          this.currentEmbeddingsModel !== this.selectedEmbeddingsModel &&
-          !environment.production
-        ) {
-          this.restService
-            .get('/vector-embeddings', {
-              Records: [
-                {
-                  body: {
-                    userId: localStorage.getItem('currentUserId'),
-                    openAiApiKey: this.openAiApiKey,
-                    anthropicApiKey: this.anthropicApiKey,
-                    recreateIndex: true,
+    if (
+      (this.selectedEmbeddingsModel === 'text-embeddings-ada-002' ||
+        this.selectedLlmModel === 'gpt-3.5-turbo' ||
+        this.selectedLlmModel === 'gpt-4') &&
+      !this.openAiApiKey
+    ) {
+      const openAiApiKeyRequiredWarning = document.getElementById(
+        'openAiApiKeyRequired',
+      );
+      openAiApiKeyRequiredWarning.style.display = 'block';
+    } else if (this.selectedLlmModel.startsWith('claude')) {
+      const anthropicApiKeyRequiredWarning = document.getElementById(
+        'anthropicApiKeyRequired',
+      );
+      anthropicApiKeyRequiredWarning.style.display = 'block';
+      const openAiApiKeyRequiredWarning = document.getElementById(
+        'openAiApiKeyRequired',
+      );
+      openAiApiKeyRequiredWarning.style.display = 'none';
+    } else {
+      const anthropicApiKeyRequiredWarning = document.getElementById(
+        'anthropicApiKeyRequired',
+      );
+      anthropicApiKeyRequiredWarning.style.display = 'none';
+      this.restService
+        .get('/userConfig', {
+          userId: localStorage.getItem('currentUserId'),
+          embeddingsModel: this.selectedEmbeddingsModel,
+          llmModel: this.selectedLlmModel,
+          openAiApiKey: this.openAiApiKey,
+          anthropicApiKey: this.anthropicApiKey,
+          recreateIndex:
+            this.currentEmbeddingsModel !== this.selectedEmbeddingsModel,
+        })
+        .subscribe(() => {
+          if (
+            this.currentEmbeddingsModel !== this.selectedEmbeddingsModel &&
+            !environment.production
+          ) {
+            this.restService
+              .get('/vector-embeddings', {
+                Records: [
+                  {
+                    body: {
+                      userId: localStorage.getItem('currentUserId'),
+                      openAiApiKey: this.openAiApiKey,
+                      anthropicApiKey: this.anthropicApiKey,
+                      recreateIndex: true,
+                    },
                   },
-                },
-              ],
-            })
-            .subscribe(() => {
-              this.configDialogService.closeDialog();
-            });
-        }
-      });
+                ],
+              })
+              .subscribe(() => {
+                this.configDialogService.closeDialog();
+              });
+          }
+        });
 
-    this.configDialogService.closeDialog();
+      this.configDialogService.closeDialog();
+    }
   }
 
   closeDialog() {

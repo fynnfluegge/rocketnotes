@@ -19,6 +19,7 @@
           value="Sentence-Transformers"
         />Sentence-Transformers
       </label>
+      <hr />
       <h5>LLM Model</h5>
       <label class="radio-inline">
         <input
@@ -61,24 +62,47 @@
           value="claude-3-sonnet-20240229"
         />Claude-3-Sonnet
       </label>
+      <hr />
       <h5>OpenAI API Key</h5>
       <textarea
         type="text"
         id="openaiApiKey"
         rows="2"
         [placeholder]="'Enter your OpenAI API key...'"
-        style="width: 100%"
+        style="width: 94%"
         [(ngModel)]="openAiApiKey"
+        #message="ngModel"
+        name="message"
       ></textarea>
+      <div>
+        <span
+          id="openAiApiKeyRequired"
+          style="text-align: center; color: var(--warning-color); display: none"
+        >
+          For the selected configuration, you need to provide an OpenAI API key
+        </span>
+      </div>
       <h5>Anthropic API Key</h5>
       <textarea
         type="text"
         id="anthropicApiKey"
         rows="2"
         [placeholder]="'Enter your Anthropic API key...'"
-        style="width: 100%"
+        style="width: 94%"
         [(ngModel)]="anthropicApiKey"
+        #message="ngModel"
+        name="message"
       ></textarea>
+      <div>
+        <span
+          id="anthropicApiKeyRequired"
+          style="text-align: center; color: var(--warning-color); display: none"
+        >
+          For the selected configuration, you need to provide an Anthropic API
+          key
+        </span>
+      </div>
+      <br />
       <div>
         <span style="text-align: right"
           ><strong>Note</strong>: Your OpenAI/Anthropic API key is kept secure
@@ -86,8 +110,8 @@
           any time by clearing the input field and save.
         </span>
       </div>
-      <br />
     </form>
+    <hr />
     <button
       class="btn btn-default btn-primary"
       (click)="closeDialog()"
