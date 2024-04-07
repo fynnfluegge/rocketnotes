@@ -11,6 +11,7 @@ import { HostListener } from '@angular/core';
 import OpenAI from 'openai';
 
 import '../../../assets/prism-custom.js';
+import { Anthropic } from '@anthropic-ai/sdk';
 
 @Component({
   selector: 'app-editor',
@@ -42,6 +43,7 @@ export class EditorComponent {
   keyPressCounter: number = 0;
 
   private openai: OpenAI;
+  private anthropic: Anthropic;
   private abortController: AbortController;
   private completionTimeout: NodeJS.Timeout | undefined;
   private suggestionLinebreak: boolean = false;
@@ -95,19 +97,24 @@ export class EditorComponent {
       }
     });
 
-    Auth.currentAuthenticatedUser().then((user) => {
-      Auth.userAttributes(user).then((attributes) => {
-        attributes.forEach((attribute) => {
-          if (attribute.Name === 'custom:OpenAIapikey') {
-            localStorage.setItem('openAiApiKey', attribute.Value);
-            this.openai = new OpenAI({
-              apiKey: attribute.Value,
-              dangerouslyAllowBrowser: true,
-            });
-          }
-        });
+    this.basicRestService
+      .get('userConfig/' + localStorage.getItem('currentUserId'))
+      .subscribe((config) => {
+        localStorage.setItem('config', JSON.stringify(config));
+        if (
+          config['llmModel'] === 'gpt-3.5-turbo' ||
+          config['llmModel'] === 'gpt-4'
+        ) {
+          this.openai = new OpenAI({
+            apiKey: config['openAiApiKey'],
+            dangerouslyAllowBrowser: true,
+          });
+        } else if (config['llmModel'] === 'claude') {
+          this.anthropic = new Anthropic({
+            apiKey: config['anthropicApiKey'],
+          });
+        }
       });
-    });
 
     this.abortController = new AbortController();
 
@@ -134,21 +141,6 @@ export class EditorComponent {
         this.aiCompletionEnabled.toString(),
       );
     }
-  }
-
-  saveOpenAiApiKey() {
-    const apiKeyVlue = document.getElementById(
-      'inputField',
-    ) as HTMLInputElement;
-    Auth.currentAuthenticatedUser().then((user) => {
-      Auth.updateUserAttributes(user, {
-        'custom:OpenAIapikey': apiKeyVlue.value,
-      });
-    });
-    localStorage.setItem('openAiApiKey', apiKeyVlue.value);
-    this.openai.apiKey = apiKeyVlue.value;
-    this.toggleAiCompletion();
-    this.closeDialog('openAiDialog');
   }
 
   closeDialog(id: string) {
@@ -400,31 +392,51 @@ export class EditorComponent {
   }
 
   async aiCompletion(abortSignal: AbortSignal, text: string) {
-    const completion = await this.openai.chat.completions.create({
-      messages: [
-        {
-          role: 'user',
-          content: 'Complete the following text with 1 to 5 words: ' + text,
-        },
-      ],
-      model: 'gpt-3.5-turbo',
-      temperature: 0.9,
-    });
+    const config = JSON.parse(localStorage.getItem('config'));
+    const prompt = 'Complete the following text with 1 to 5 words: ' + text;
+    let message = '';
+    if (
+      config['llmModel'] === 'gpt-3.5-turbo' ||
+      config['llmModel'] === 'gpt-4'
+    ) {
+      const completion = await this.openai.chat.completions.create({
+        messages: [
+          {
+            role: 'user',
+            content: prompt,
+          },
+        ],
+        model: config['llmModel'],
+        temperature: 0.9,
+      });
+      message = completion.choices[0].message.content;
+    } else if (
+      config['llmModel'] === 'claude-3-opus-20240229' ||
+      config['llmModel'] == 'claude-3-sonnet-20240229' ||
+      config['llmModel'] == 'claude-3-haiku-20240307'
+    ) {
+      const completion = await this.anthropic.messages.create({
+        max_tokens: 1024,
+        messages: [{ role: 'user', content: prompt }],
+        model: config['llmModel'],
+      });
+      message = completion.content[0].text;
+    }
 
     // Check if the signal is aborted
     if (abortSignal.aborted) {
       return;
     }
 
-    if (completion.choices[0].message.content === '0') {
+    if (message === '0') {
       return;
     }
 
-    if (completion.choices[0].message.content.toLowerCase().includes('sorry')) {
+    if (message.toLowerCase().includes('sorry')) {
       return;
     }
 
-    return completion.choices[0].message.content;
+    return message;
   }
 
   extractLast20Words(inputString: string): string {

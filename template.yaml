@@ -304,4 +304,48 @@ Resources:
             Path: /chat
             Method: POST
 
+  saveUserConfigFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda-handler/save-user-config-handler
+      Handler: main.handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: tnn-userConfig
+      Environment:
+        Variables:
+          LOCAL: 1
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /userConfig
+            Method: POST
 
+  getUserConfigFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda-handler/get-user-config-handler
+      Handler: main.handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: tnn-userConfig
+      Environment:
+        Variables:
+          LOCAL: 1
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /userConfig/{userId}
+            Method: GET 

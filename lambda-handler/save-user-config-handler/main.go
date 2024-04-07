@@ -24,6 +24,7 @@ type RequestBody struct {
 	LlModel string `json:"llModel"`
 	OpenAiApiKey string `json:"openAiApiKey"`
 	AnthropicApiKey string `json:"anthropicApiKey"`
+	RecreateIndex bool `json:"recreateIndex"`
 }
 
 type SqsMessage struct {
@@ -73,18 +74,20 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 	}
 
 
-	qsvc := sqs.New(sess)
+	if os.Getenv("USE_LOCAL_DYNAMODB") != "1" {
+		qsvc := sqs.New(sess)
 
-	m := SqsMessage{item.Id, item.OpenAiApiKey, item.AnthropicApiKey, true}
-	b, err := json.Marshal(m)
+		m := SqsMessage{item.Id, item.OpenAiApiKey, item.AnthropicApiKey, item.RecreateIndex}
+		b, err := json.Marshal(m)
 
-	_, err = qsvc.SendMessage(&sqs.SendMessageInput{
-		DelaySeconds: aws.Int64(0),
-		MessageBody:  aws.String(string(b)),
-		QueueUrl:     aws.String(os.Getenv("queueUrl")),
-	})
-	if err != nil {
-		log.Fatalf("Error sending sqs message: %s", err)
+		_, err = qsvc.SendMessage(&sqs.SendMessageInput{
+			DelaySeconds: aws.Int64(0),
+			MessageBody:  aws.String(string(b)),
+			QueueUrl:     aws.String(os.Getenv("queueUrl")),
+		})
+		if err != nil {
+			log.Fatalf("Error sending sqs message: %s", err)
+		}
 	}
 }
 

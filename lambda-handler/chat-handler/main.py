@@ -77,7 +77,7 @@ def handler(event, context):
     )
     retriever = db.as_retriever(search_type="mmr", search_kwargs={"k": 8})
 
-    if llm_model == "gpt-3.5-turbo":
+    if llm_model == "gpt-3.5-turbo" or llm_model == "gpt-4":
         chat_model = ChatOpenAI(temperature=0.9, max_tokens=2048, model=llm_model)
     elif (
         llm_model == "claude-3-opus-20240229"

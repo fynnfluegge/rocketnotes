@@ -132,7 +132,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("MyHttpLambdaIntegration"), getDocumentHandler, &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
 	})
 
-	// Get User Config Api
+	// GET User Config Api
 	getUserConfigHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("GET-UserConfig"), &awscdklambdagoalpha.GoFunctionProps{
 		FunctionName: jsii.String("GET-UserConfig"),
 		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
@@ -302,7 +302,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 	})
 
 	httpApi.AddRoutes(&awscdkapigatewayv2alpha.AddRoutesOptions{
-		Path:        jsii.String("/saveUserConfig"),
+		Path:        jsii.String("/userConfig"),
 		Authorizer:  httpApiAuthorizer,
 		Methods:     &[]awscdkapigatewayv2alpha.HttpMethod{awscdkapigatewayv2alpha.HttpMethod_POST},
 		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("postUserConfigLambdaIntegration"), postUserConfigHandler, &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),

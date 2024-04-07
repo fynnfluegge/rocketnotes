@@ -21,6 +21,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { HostListener } from '@angular/core';
 import { LlmDialogService } from 'src/app/service/llm-dialog.service';
+import { ConfigDialogService } from 'src/app/service/config-dialog-service';
 
 const ROOT_ID: string = 'root';
 const PINNED_ID: string = 'pinned';
@@ -516,7 +517,7 @@ export class DocumentTree {
   selector: 'app-sidenav',
   templateUrl: './sidenav.component.html',
   styleUrls: ['./sidenav.component.scss'],
-  providers: [DocumentTree, LlmDialogService],
+  providers: [DocumentTree, LlmDialogService, ConfigDialogService],
 })
 export class SidenavComponent implements OnInit, AfterViewInit {
   username: string;
@@ -563,6 +564,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
     private basicRestService: BasicRestService,
     private router: Router,
     private llmDialogService: LlmDialogService,
+    private configDialogService: ConfigDialogService,
   ) {
     this.treeFlattener = new MatTreeFlattener(
       this.transformer,
@@ -641,6 +643,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
     document.getElementById('searchDialog').style.display = 'none';
     this.searchInput.nativeElement.value = '';
     this.llmDialogService.closeDialog();
+    this.configDialogService.closeDialog();
   }
 
   ngAfterViewInit(): void {
@@ -1291,18 +1294,6 @@ export class SidenavComponent implements OnInit, AfterViewInit {
     });
   }
 
-  openOpenAiApiKeyDialog() {
-    const overlay = document.getElementById('openAiDialog');
-    overlay.style.display = 'flex';
-    const inputField = document.getElementById(
-      'inputField',
-    ) as HTMLInputElement;
-    const apikey = localStorage.getItem('openAiApiKey');
-    if (apikey !== null)
-      inputField.value =
-        apikey.substring(0, 8) + '********************************************';
-  }
-
   toggleDarkMode() {
     this.darkmode = !this.darkmode;
     localStorage.setItem('darkmode', this.darkmode.toString());
@@ -1380,5 +1371,9 @@ export class SidenavComponent implements OnInit, AfterViewInit {
     } else {
       this.llmDialogService.openDialog();
     }
+  }
+
+  openConfigDialog() {
+    this.configDialogService.openDialog();
   }
 }
