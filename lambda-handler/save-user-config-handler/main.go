@@ -74,7 +74,7 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 	}
 
 
-	if os.Getenv("USE_LOCAL_DYNAMODB") != "1" {
+	if os.Getenv("USE_LOCAL_DYNAMODB") != "1" && item.RecreateIndex {
 		qsvc := sqs.New(sess)
 
 		m := SqsMessage{item.Id, item.OpenAiApiKey, item.AnthropicApiKey, item.RecreateIndex}

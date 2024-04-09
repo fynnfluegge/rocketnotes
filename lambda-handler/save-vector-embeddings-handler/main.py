@@ -56,6 +56,11 @@ def handler(event, context):
     os.environ["OPENAI_API_KEY"] = openAiApiKey
     os.environ["ANTHROPIC_API_KEY"] = anthropicApiKey
 
+    if embeddingsModel == "text-embedding-ada-002":
+        embeddings = OpenAIEmbeddings(client=None, model=embeddingsModel)
+    else:
+        embeddings = HuggingFaceEmbeddings()
+
     try:
         file_path = f"/tmp/{userId}/{embeddingsModel}"
         Path(file_path).mkdir(parents=True, exist_ok=True)
@@ -71,15 +76,6 @@ def handler(event, context):
                 f"{embeddingsModel}_{userId}.pkl",
                 f"{file_path}/{embeddingsModel}_{userId}.pkl",
             )
-            if (
-                userConfig.get("embeddingsModel", {}).get("S")
-                == "text-embedding-ada-002"
-            ):
-                embeddings = OpenAIEmbeddings(
-                    client=None, model="text-embedding-ada-002"
-                )
-            else:
-                embeddings = HuggingFaceEmbeddings()
 
             db = FAISS.load_local(
                 index_name=userId,
@@ -192,9 +188,6 @@ def handler(event, context):
             # Process the query results
             documents = result.get("Items", [])
             if documents:
-                embeddings = OpenAIEmbeddings(
-                    client=None, model="text-embedding-ada-002"
-                )
                 split_documents = []
                 for document in documents:
                     try:

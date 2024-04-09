@@ -395,10 +395,7 @@ export class EditorComponent {
     const config = JSON.parse(localStorage.getItem('config'));
     const prompt = 'Complete the following text with 1 to 5 words: ' + text;
     let message = '';
-    if (
-      config['llmModel'] === 'gpt-3.5-turbo' ||
-      config['llmModel'] === 'gpt-4'
-    ) {
+    if (config['llmModel'].startsWith('gpt')) {
       const completion = await this.openai.chat.completions.create({
         messages: [
           {
@@ -410,11 +407,7 @@ export class EditorComponent {
         temperature: 0.9,
       });
       message = completion.choices[0].message.content;
-    } else if (
-      config['llmModel'] === 'claude-3-opus-20240229' ||
-      config['llmModel'] == 'claude-3-sonnet-20240229' ||
-      config['llmModel'] == 'claude-3-haiku-20240307'
-    ) {
+    } else if (config['llmModel'].startsWith('claude')) {
       const completion = await this.anthropic.messages.create({
         max_tokens: 1024,
         messages: [{ role: 'user', content: prompt }],
