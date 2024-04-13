@@ -97,24 +97,35 @@ export class EditorComponent {
       }
     });
 
-    this.basicRestService
-      .get('userConfig/' + localStorage.getItem('currentUserId'))
-      .subscribe((config) => {
-        localStorage.setItem('config', JSON.stringify(config));
-        if (
-          config['llmModel'] === 'gpt-3.5-turbo' ||
-          config['llmModel'] === 'gpt-4'
-        ) {
-          this.openai = new OpenAI({
-            apiKey: config['openAiApiKey'],
-            dangerouslyAllowBrowser: true,
-          });
-        } else if (config['llmModel'] === 'claude') {
-          this.anthropic = new Anthropic({
-            apiKey: config['anthropicApiKey'],
-          });
-        }
+    let hasConfig = true;
+    if (environment.production) {
+      Auth.currentAuthenticatedUser().then((user) => {
+        Auth.userAttributes(user).then((attributes) => {
+          hasConfig = attributes['custom:config'] === 1;
+        });
       });
+    }
+
+    if (hasConfig) {
+      this.basicRestService
+        .get('userConfig/' + localStorage.getItem('currentUserId'))
+        .subscribe((config) => {
+          localStorage.setItem('config', JSON.stringify(config));
+          if (
+            config['llmModel'] === 'gpt-3.5-turbo' ||
+            config['llmModel'] === 'gpt-4'
+          ) {
+            this.openai = new OpenAI({
+              apiKey: config['openAiApiKey'],
+              dangerouslyAllowBrowser: true,
+            });
+          } else if (config['llmModel'] === 'claude') {
+            this.anthropic = new Anthropic({
+              apiKey: config['anthropicApiKey'],
+            });
+          }
+        });
+    }
 
     this.abortController = new AbortController();
 

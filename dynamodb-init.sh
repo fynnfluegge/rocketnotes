@@ -25,7 +25,6 @@ aws dynamodb create-table --endpoint-url http://localhost:8041 --table-name tnn-
 --provisioned-throughput ReadCapacityUnits=2,WriteCapacityUnits=2 \
 > /dev/null 2>&1
 
-
 aws dynamodb create-table --endpoint-url http://localhost:8041 --table-name tnn-UserConfig \
 --attribute-definitions AttributeName=id,AttributeType=S \
 --key-schema AttributeName=id,KeyType=HASH \

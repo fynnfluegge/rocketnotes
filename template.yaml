@@ -306,10 +306,12 @@ Resources:
 
   saveUserConfigFunction:
     Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: go1.x
     Properties:
       CodeUri: lambda-handler/save-user-config-handler
-      Handler: main.handler
-      Runtime: python3.9
+      Handler: main.go
+      Runtime: provided.al2
       Architectures:
         - x86_64
       MemorySize: 128
@@ -319,7 +321,7 @@ Resources:
             TableName: tnn-userConfig
       Environment:
         Variables:
-          LOCAL: 1
+          USE_LOCAL_DYNAMODB: 1
       Events:
         Api:
           Type: Api
@@ -329,10 +331,12 @@ Resources:
 
   getUserConfigFunction:
     Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: go1.x
     Properties:
       CodeUri: lambda-handler/get-user-config-handler
-      Handler: main.handler
-      Runtime: python3.9
+      Handler: main.go
+      Runtime: provided.al2
       Architectures:
         - x86_64
       MemorySize: 128
@@ -342,7 +346,7 @@ Resources:
             TableName: tnn-userConfig
       Environment:
         Variables:
-          LOCAL: 1
+          USE_LOCAL_DYNAMODB: 1
       Events:
         Api:
           Type: Api

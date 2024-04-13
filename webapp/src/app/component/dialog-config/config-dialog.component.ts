@@ -3,6 +3,7 @@ import { Subscription } from 'rxjs';
 import { BasicRestService } from 'src/app/service/basic-rest.service';
 import { ConfigDialogService } from 'src/app/service/config-dialog-service';
 import { environment } from 'src/environments/environment';
+import { Auth } from 'aws-amplify';
 
 @Component({
   selector: 'app-config-dialog',
@@ -56,8 +57,7 @@ export class ConfigDialogComponent implements OnDestroy, OnInit {
   submit() {
     if (
       (this.selectedEmbeddingsModel === 'text-embeddings-ada-002' ||
-        this.selectedLlmModel === 'gpt-3.5-turbo' ||
-        this.selectedLlmModel === 'gpt-4') &&
+        this.selectedLlmModel.startsWith('gpt')) &&
       !this.openAiApiKey
     ) {
       const openAiApiKeyRequiredWarning = document.getElementById(
@@ -79,8 +79,8 @@ export class ConfigDialogComponent implements OnDestroy, OnInit {
       );
       anthropicApiKeyRequiredWarning.style.display = 'none';
       this.restService
-        .get('/userConfig', {
-          userId: localStorage.getItem('currentUserId'),
+        .post('userConfig', {
+          id: localStorage.getItem('currentUserId'),
           embeddingsModel: this.selectedEmbeddingsModel,
           llmModel: this.selectedLlmModel,
           openAiApiKey: this.openAiApiKey,
@@ -111,6 +111,14 @@ export class ConfigDialogComponent implements OnDestroy, OnInit {
               });
           }
         });
+
+      if (environment.production) {
+        Auth.currentAuthenticatedUser().then((user) => {
+          Auth.updateUserAttributes(user, {
+            'custom:config': '1',
+          });
+        });
+      }
 
       this.configDialogService.closeDialog();
     }

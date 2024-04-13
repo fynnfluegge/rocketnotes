@@ -5,8 +5,6 @@ import (
 	"encoding/json"
 	"log"
 	"os"
-	"strings"
-	"time"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -18,7 +16,7 @@ import (
 )
 
 type RequestBody struct {
-	Id    string `json:"userId"`
+	Id    string `json:"id"`
 	TextCompletionModel string `json:"textCompletionModel"`
 	EmbeddingsModel string `json:"embeddingsModel"`
 	LlModel string `json:"llModel"`
@@ -40,7 +38,7 @@ func init() {
 
 func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 
-	item := Item{}
+	item := RequestBody{}
 
 	json.Unmarshal([]byte(request.Body), &item)
 
@@ -89,6 +87,13 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 			log.Fatalf("Error sending sqs message: %s", err)
 		}
 	}
+
+	return events.APIGatewayProxyResponse{
+		StatusCode: 200,
+		Headers: map[string]string{
+			"Access-Control-Allow-Origin": "*", // Required for CORS support to work locally
+		},
+	}, nil
 }
 
 func main() {
