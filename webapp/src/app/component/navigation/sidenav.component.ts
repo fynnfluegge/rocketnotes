@@ -595,13 +595,15 @@ export class SidenavComponent implements OnInit, AfterViewInit {
       this.darkmode = localStorage.getItem('darkmode') === 'true';
       this.setTheme();
     } else {
-      Auth.currentAuthenticatedUser().then((user) => {
-        Auth.userAttributes(user).then((attributes) => {
-          this.darkmode = attributes['custom:darkmode'] === 1;
-          localStorage.setItem('darkmode', this.darkmode.toString());
-          this.setTheme();
+      if (environment.production) {
+        Auth.currentAuthenticatedUser().then((user) => {
+          Auth.userAttributes(user).then((attributes) => {
+            this.darkmode = attributes['custom:darkmode'] === 1;
+            localStorage.setItem('darkmode', this.darkmode.toString());
+            this.setTheme();
+          });
         });
-      });
+      }
     }
   }
 
@@ -1185,7 +1187,6 @@ export class SidenavComponent implements OnInit, AfterViewInit {
         /*and and make the current item more visible:*/
         addActive(suggestionList);
         if (!isElementVisible(x, suggestionList[currentFocus])) {
-          console.log(suggestionList[currentFocus].offsetHeight);
           x.scrollTop += suggestionList[currentFocus].offsetHeight;
         }
       } else if (e.keyCode == 38) {
@@ -1197,7 +1198,6 @@ export class SidenavComponent implements OnInit, AfterViewInit {
         /*and and make the current item more visible:*/
         addActive(suggestionList);
         if (!isElementVisible(x, suggestionList[currentFocus])) {
-          console.log(suggestionList[currentFocus].offsetHeight);
           x.scrollTop -= suggestionList[currentFocus].offsetHeight;
         }
       } else if (e.keyCode == 13) {
@@ -1297,11 +1297,13 @@ export class SidenavComponent implements OnInit, AfterViewInit {
   toggleDarkMode() {
     this.darkmode = !this.darkmode;
     localStorage.setItem('darkmode', this.darkmode.toString());
-    Auth.currentAuthenticatedUser().then((user) => {
-      Auth.updateUserAttributes(user, {
-        'custom:darkmode': this.darkmode ? '1' : '0',
+    if (environment.production) {
+      Auth.currentAuthenticatedUser().then((user) => {
+        Auth.updateUserAttributes(user, {
+          'custom:darkmode': this.darkmode ? '1' : '0',
+        });
       });
-    });
+    }
     this.setTheme();
   }
 
@@ -1364,9 +1366,9 @@ export class SidenavComponent implements OnInit, AfterViewInit {
   }
 
   openLlmDialog() {
-    if (localStorage.getItem('openAiApiKey') === null) {
+    if (localStorage.getItem('config') === null) {
       window.alert(
-        'Please set your OpenAI API key in user settings to use the LLM feature.',
+        'Please configure your LLM settings first. Click on the LLM config button in the user menu popup.',
       );
     } else {
       this.llmDialogService.openDialog();

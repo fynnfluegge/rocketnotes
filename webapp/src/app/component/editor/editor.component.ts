@@ -12,11 +12,13 @@ import OpenAI from 'openai';
 
 import '../../../assets/prism-custom.js';
 import { Anthropic } from '@anthropic-ai/sdk';
+import { ConfigDialogService } from 'src/app/service/config-dialog-service';
 
 @Component({
   selector: 'app-editor',
   templateUrl: './editor.component.html',
   styleUrls: ['./editor.component.scss'],
+  providers: [ConfigDialogService],
 })
 export class EditorComponent {
   @Input() showSidebar: boolean;
@@ -55,6 +57,7 @@ export class EditorComponent {
     private route: ActivatedRoute,
     private titleService: Title,
     private location: Location,
+    private configDialogService: ConfigDialogService,
   ) {}
 
   ngOnInit() {
@@ -111,18 +114,17 @@ export class EditorComponent {
         .get('userConfig/' + localStorage.getItem('currentUserId'))
         .subscribe((config) => {
           localStorage.setItem('config', JSON.stringify(config));
-          if (
-            config['llmModel'] === 'gpt-3.5-turbo' ||
-            config['llmModel'] === 'gpt-4'
-          ) {
-            this.openai = new OpenAI({
-              apiKey: config['openAiApiKey'],
-              dangerouslyAllowBrowser: true,
-            });
-          } else if (config['llmModel'] === 'claude') {
-            this.anthropic = new Anthropic({
-              apiKey: config['anthropicApiKey'],
-            });
+          if (config['llmModel']) {
+            if (config['llmModel'].startsWith('gpt')) {
+              this.openai = new OpenAI({
+                apiKey: config['openAiApiKey'],
+                dangerouslyAllowBrowser: true,
+              });
+            } else if (config['llmModel'] === 'claude') {
+              this.anthropic = new Anthropic({
+                apiKey: config['anthropicApiKey'],
+              });
+            }
           }
         });
     }
@@ -139,12 +141,8 @@ export class EditorComponent {
   }
 
   toggleAiCompletion() {
-    if (
-      !this.aiCompletionEnabled &&
-      localStorage.getItem('openAiApiKey') === null
-    ) {
-      const overlay = document.getElementById('openAiDialog');
-      overlay.style.display = 'flex';
+    if (!this.aiCompletionEnabled && localStorage.getItem('config') === null) {
+      this.configDialogService.openDialog();
     } else {
       this.aiCompletionEnabled = !this.aiCompletionEnabled;
       localStorage.setItem(
@@ -485,8 +483,8 @@ export class EditorComponent {
           title: this.title,
           content: this.content,
           isPublic: this.isPublic,
+          recreateIndex: localStorage.getItem('config') !== null,
         },
-        openAiApiKey: localStorage.getItem('openAiApiKey'),
       })
       .subscribe(() => {
         this.showSnackbar = true;
@@ -496,7 +494,7 @@ export class EditorComponent {
         // Explicitly update the vector embeddings after the document has been saved
         // only in local mode. In deployed production mode, the vector embeddings are updated
         // via sqs event after the document has been saved
-        if (!environment.production && localStorage.getItem('openAiApiKey')) {
+        if (!environment.production && localStorage.getItem('config') !== null) {
           this.basicRestService
             .post('vector-embeddings', {
               Records: [
@@ -504,7 +502,7 @@ export class EditorComponent {
                   body: {
                     userId: localStorage.getItem('currentUserId'),
                     documentId: this.id,
-                    openAiApiKey: localStorage.getItem('openAiApiKey'),
+                    recreateIndex: true,
                   },
                 },
               ],

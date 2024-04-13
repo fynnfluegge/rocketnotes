@@ -26,15 +26,14 @@ export class ConfigDialogComponent implements OnDestroy, OnInit {
     this.subscription = this.configDialogService.isOpen$.subscribe((isOpen) => {
       this.isOpen = isOpen;
       if (isOpen) {
-        this.restService
-          .get('userConfig/' + localStorage.getItem('currentUserId'))
-          .subscribe((config) => {
-            this.currentEmbeddingsModel = config['embeddingsModel'];
-            this.selectedEmbeddingsModel = config['embeddingsModel'];
-            this.selectedLlmModel = config['llmModel'];
-            this.openAiApiKey = config['openAiApiKey'];
-            this.anthropicApiKey = config['anthropicApiKey'];
-          });
+        if (localStorage.getItem('config') !== null) {
+          const config = localStorage.getItem('config');
+          this.currentEmbeddingsModel = config['embeddingsModel'];
+          this.selectedEmbeddingsModel = config['embeddingsModel'];
+          this.selectedLlmModel = config['llmModel'];
+          this.openAiApiKey = config['openAiApiKey'];
+          this.anthropicApiKey = config['anthropicApiKey'];
+        }
         const overlay = document.getElementById('configDialog');
         if (overlay.getAttribute('outsideClickListener') !== 'true') {
           overlay.addEventListener('click', (event) => {
@@ -89,6 +88,13 @@ export class ConfigDialogComponent implements OnDestroy, OnInit {
             this.currentEmbeddingsModel !== this.selectedEmbeddingsModel,
         })
         .subscribe(() => {
+          if (environment.production) {
+            Auth.currentAuthenticatedUser().then((user) => {
+              Auth.updateUserAttributes(user, {
+                'custom:config': '1',
+              });
+            });
+          }
           if (
             this.currentEmbeddingsModel !== this.selectedEmbeddingsModel &&
             !environment.production
@@ -111,14 +117,6 @@ export class ConfigDialogComponent implements OnDestroy, OnInit {
               });
           }
         });
-
-      if (environment.production) {
-        Auth.currentAuthenticatedUser().then((user) => {
-          Auth.updateUserAttributes(user, {
-            'custom:config': '1',
-          });
-        });
-      }
 
       this.configDialogService.closeDialog();
     }

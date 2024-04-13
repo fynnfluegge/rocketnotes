@@ -83,7 +83,7 @@ def handler(event, context):
                 embeddings=embeddings,
             )
             # If recreateIndex is set to True, recreate the index
-            # Uodate any document vectors that have changed since last index creation
+            # Update any document vectors that have changed since last index creation
             if recreateIndex:
                 metadata = head_object_from_s3(f"{embeddingsModel}_{userId}.faiss")
                 if metadata:
@@ -96,18 +96,8 @@ def handler(event, context):
                     for document in documents["Items"]:
                         if document["lastModified"]["S"] > last_modified:
                             documentId = document["id"]["S"]
-                            vectors = dynamodb.get_item(
-                                TableName="tnn-Vectors",
-                                Key={"id": {"S": documentId}},
-                            )
-                            if "Item" in vectors:
-                                vectors = vectors["Item"]["vectors"]["SS"]
-                                try:
-                                    db.delete(vectors)
-                                except Exception as e:
-                                    print(
-                                        f"Error deleting vectors for file {documentId}: {e}"
-                                    )
+                            delete_document_vectors_from_faiss_index(documentId, db)
+                            save_document_vectors_to_faiss_index(document, db)
             else:
                 # Get item from DynamoDB table
                 document = dynamodb.get_item(
@@ -122,49 +112,8 @@ def handler(event, context):
                     }
 
                 document = document["Item"]
-
-                vectors = dynamodb.get_item(
-                    TableName="tnn-Vectors",
-                    Key={"id": {"S": documentId}},
-                )
-                # Delete outdated vectors from DynamoDB
-                if "Item" in vectors:
-                    vectors = vectors["Item"]["vectors"]["SS"]
-                    try:
-                        db.delete(vectors)
-                    except Exception as e:
-                        print(f"Error deleting vectors for file {documentId}: {e}")
-
-                # Save vector embeddings to faiss index
-                try:
-                    content = document["content"]["S"]
-                    documentId = document["id"]["S"]
-                    title = document["title"]["S"]
-                except Exception:
-                    return {
-                        "statusCode": 500,
-                        "body": json.dumps("Error getting content from DynamoDB"),
-                    }
-                document_splits = split_document(content, documentId, title)
-
-                if not document_splits:
-                    return {
-                        "statusCode": 500,
-                        "body": json.dumps("Error splitting document"),
-                    }
-
-                document_vectors = {}
-                for document in document_splits:
-                    db.add_documents([document])
-                    if document.metadata["documentId"] not in document_vectors:
-                        document_vectors[document.metadata["documentId"]] = [
-                            db.index_to_docstore_id[len(db.index_to_docstore_id) - 1]
-                        ]
-                    else:
-                        document_vectors[document.metadata["documentId"]].append(
-                            db.index_to_docstore_id[len(db.index_to_docstore_id) - 1]
-                        )
-                add_vectors_to_dynamodb(documentId, document_vectors[documentId])
+                delete_document_vectors_from_faiss_index(documentId, db)
+                save_document_vectors_to_faiss_index(document, db)
 
             file_name = "faiss_index.bin"
             db.save_local(index_name=file_name, folder_path=file_path)
@@ -314,3 +263,48 @@ def add_vectors_to_dynamodb(documentId, vectors):
         print(f"Error adding vectors to DynamoDB: {e}")
         return False
     return True
+
+
+def save_document_vectors_to_faiss_index(document, db):
+    try:
+        content = document["content"]["S"]
+        documentId = document["id"]["S"]
+        title = document["title"]["S"]
+    except Exception:
+        return {
+            "statusCode": 500,
+            "body": json.dumps("Error getting content from DynamoDB"),
+        }
+    document_splits = split_document(content, documentId, title)
+
+    if not document_splits:
+        return {
+            "statusCode": 500,
+            "body": json.dumps("Error splitting document"),
+        }
+
+    document_vectors = {}
+    for document in document_splits:
+        db.add_documents([document])
+        if document.metadata["documentId"] not in document_vectors:
+            document_vectors[document.metadata["documentId"]] = [
+                db.index_to_docstore_id[len(db.index_to_docstore_id) - 1]
+            ]
+        else:
+            document_vectors[document.metadata["documentId"]].append(
+                db.index_to_docstore_id[len(db.index_to_docstore_id) - 1]
+            )
+    add_vectors_to_dynamodb(documentId, document_vectors[documentId])
+
+
+def delete_document_vectors_from_faiss_index(documentId, db):
+    vectors = dynamodb.get_item(
+        TableName="tnn-Vectors",
+        Key={"id": {"S": documentId}},
+    )
+    if "Item" in vectors:
+        vectors = vectors["Item"]["vectors"]["SS"]
+        try:
+            db.delete(vectors)
+        except Exception as e:
+            print(f"Error deleting vectors for file {documentId}: {e}")
