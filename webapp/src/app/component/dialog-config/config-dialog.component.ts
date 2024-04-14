@@ -13,24 +13,26 @@ import { Auth } from 'aws-amplify';
 export class ConfigDialogComponent implements OnDestroy, OnInit {
   subscription: Subscription;
   isOpen: boolean = false;
-  currentEmbeddingsModel: string;
-  selectedEmbeddingsModel: string = 'text-embeddings-ada-002';
-  selectedLlmModel: string = 'gpt-3.5-turbo';
+  currentEmbeddingModel: string;
+  selectedEmbeddingModel: string = 'text-embeddings-ada-002';
+  selectedLlm: string = 'gpt-3.5-turbo';
   openAiApiKey: string;
   anthropicApiKey: string;
 
   constructor(
     private configDialogService: ConfigDialogService,
     private restService: BasicRestService,
-  ) {
+  ) {}
+
+  ngOnInit(): void {
     this.subscription = this.configDialogService.isOpen$.subscribe((isOpen) => {
       this.isOpen = isOpen;
       if (isOpen) {
-        if (localStorage.getItem('config') !== null) {
-          const config = localStorage.getItem('config');
-          this.currentEmbeddingsModel = config['embeddingsModel'];
-          this.selectedEmbeddingsModel = config['embeddingsModel'];
-          this.selectedLlmModel = config['llmModel'];
+        if (localStorage.getItem('config')) {
+          const config = JSON.parse(localStorage.getItem('config'));
+          this.currentEmbeddingModel = config['embeddingModel'];
+          this.selectedEmbeddingModel = config['embeddingModel'];
+          this.selectedLlm = config['llm'];
           this.openAiApiKey = config['openAiApiKey'];
           this.anthropicApiKey = config['anthropicApiKey'];
         }
@@ -48,22 +50,20 @@ export class ConfigDialogComponent implements OnDestroy, OnInit {
   }
 
   ngOnDestroy(): void {
-    throw new Error('Method not implemented.');
+    this.subscription.unsubscribe();
   }
-
-  ngOnInit(): void {}
 
   submit() {
     if (
-      (this.selectedEmbeddingsModel === 'text-embeddings-ada-002' ||
-        this.selectedLlmModel.startsWith('gpt')) &&
+      (this.selectedEmbeddingModel === 'text-embeddings-ada-002' ||
+        this.selectedLlm.startsWith('gpt')) &&
       !this.openAiApiKey
     ) {
       const openAiApiKeyRequiredWarning = document.getElementById(
         'openAiApiKeyRequired',
       );
       openAiApiKeyRequiredWarning.style.display = 'block';
-    } else if (this.selectedLlmModel.startsWith('claude')) {
+    } else if (this.selectedLlm.startsWith('claude')) {
       const anthropicApiKeyRequiredWarning = document.getElementById(
         'anthropicApiKeyRequired',
       );
@@ -80,12 +80,12 @@ export class ConfigDialogComponent implements OnDestroy, OnInit {
       this.restService
         .post('userConfig', {
           id: localStorage.getItem('currentUserId'),
-          embeddingsModel: this.selectedEmbeddingsModel,
-          llmModel: this.selectedLlmModel,
+          embeddingModel: this.selectedEmbeddingModel,
+          llm: this.selectedLlm,
           openAiApiKey: this.openAiApiKey,
           anthropicApiKey: this.anthropicApiKey,
           recreateIndex:
-            this.currentEmbeddingsModel !== this.selectedEmbeddingsModel,
+            this.currentEmbeddingModel !== this.selectedEmbeddingModel,
         })
         .subscribe(() => {
           if (environment.production) {
@@ -96,11 +96,11 @@ export class ConfigDialogComponent implements OnDestroy, OnInit {
             });
           }
           if (
-            this.currentEmbeddingsModel !== this.selectedEmbeddingsModel &&
+            this.currentEmbeddingModel !== this.selectedEmbeddingModel &&
             !environment.production
           ) {
             this.restService
-              .get('/vector-embeddings', {
+              .post('/vector-embeddings', {
                 Records: [
                   {
                     body: {

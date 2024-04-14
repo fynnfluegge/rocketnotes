@@ -1366,7 +1366,11 @@ export class SidenavComponent implements OnInit, AfterViewInit {
   }
 
   openLlmDialog() {
-    if (localStorage.getItem('config') === null) {
+    let config = localStorage.getItem('config');
+    if (config) {
+      config = JSON.parse(config);
+    }
+    if (!config || config['llm'] === '') {
       window.alert(
         'Please configure your LLM settings first. Click on the LLM config button in the user menu popup.',
       );

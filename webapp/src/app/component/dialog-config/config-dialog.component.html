@@ -5,17 +5,16 @@
       <label class="radio-inline">
         <input
           type="radio"
-          name="embeddingsModel"
-          [(ngModel)]="selectedEmbeddingsModel"
+          name="embeddingModel"
+          [(ngModel)]="selectedEmbeddingModel"
           value="text-embeddings-ada-002"
-          checked
         />Text-Embeddings-Ada-002
       </label>
       <label class="radio-inline">
         <input
           type="radio"
-          name="embeddingsModel"
-          [(ngModel)]="selectedEmbeddingsModel"
+          name="embeddingModel"
+          [(ngModel)]="selectedEmbeddingModel"
           value="Sentence-Transformers"
         />Sentence-Transformers
       </label>
@@ -24,17 +23,16 @@
       <label class="radio-inline">
         <input
           type="radio"
-          name="llmModel"
-          [(ngModel)]="selectedLlmModel"
+          name="llm"
+          [(ngModel)]="selectedLlm"
           value="gpt-3.5-turbo"
-          checked
         />GPT-3.5-Turbo
       </label>
       <label class="radio-inline">
         <input
           type="radio"
-          name="llmModel"
-          [(ngModel)]="selectedLlmModel"
+          name="llm"
+          [(ngModel)]="selectedLlm"
           value="gpt-4"
         />GPT-4
       </label>
@@ -42,24 +40,24 @@
       <label class="radio-inline">
         <input
           type="radio"
-          name="optradio"
-          [(ngModel)]="selectedLlmModel"
+          name="llm"
+          [(ngModel)]="selectedLlm"
           value="claude-3-haiku-20240307"
         />Claude-3-Haiku
       </label>
       <label class="radio-inline">
         <input
           type="radio"
-          name="LLMModel"
-          [(ngModel)]="selectedLlmModel"
+          name="llm"
+          [(ngModel)]="selectedLlm"
           value="claude-3-opus-20240229"
         />Claude-3-Opus
       </label>
       <label class="radio-inline">
         <input
           type="radio"
-          name="LLMModel"
-          [(ngModel)]="selectedLlmModel"
+          name="llm"
+          [(ngModel)]="selectedLlm"
           value="claude-3-sonnet-20240229"
         />Claude-3-Sonnet
       </label>

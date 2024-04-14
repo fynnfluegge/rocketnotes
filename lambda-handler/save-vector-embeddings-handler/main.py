@@ -4,10 +4,8 @@ from pathlib import Path
 
 import boto3
 from langchain.schema import Document
-from langchain.text_splitter import (
-    MarkdownHeaderTextSplitter,
-    RecursiveCharacterTextSplitter,
-)
+from langchain.text_splitter import (MarkdownHeaderTextSplitter,
+                                     RecursiveCharacterTextSplitter)
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
@@ -53,13 +51,20 @@ def handler(event, context):
     embeddingsModel = userConfig.get("embeddingsModel", {}).get("S", None)
     openAiApiKey = userConfig.get("openAiApiKey", {}).get("S", None)
     anthropicApiKey = userConfig.get("anthropicApiKey", {}).get("S", None)
-    os.environ["OPENAI_API_KEY"] = openAiApiKey
-    os.environ["ANTHROPIC_API_KEY"] = anthropicApiKey
+    if openAiApiKey is not None:
+        os.environ["OPENAI_API_KEY"] = openAiApiKey
+    if anthropicApiKey is not None:
+        os.environ["ANTHROPIC_API_KEY"] = anthropicApiKey
 
     if embeddingsModel == "text-embedding-ada-002":
+        if openAiApiKey is None:
+            return {
+                "statusCode": 400,
+                "body": json.dumps("OpenAI API key not found"),
+            }
         embeddings = OpenAIEmbeddings(client=None, model=embeddingsModel)
     else:
-        embeddings = HuggingFaceEmbeddings()
+        embeddings = HuggingFaceEmbeddings(model_kwargs={"device": "cpu"})
 
     try:
         file_path = f"/tmp/{userId}/{embeddingsModel}"

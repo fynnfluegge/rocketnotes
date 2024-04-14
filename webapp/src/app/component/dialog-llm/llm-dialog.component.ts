@@ -43,7 +43,9 @@ export class LlmDialogComponent implements OnDestroy, OnInit {
     private llmDialogService: LlmDialogService,
     private restService: BasicRestService,
     private database: DocumentTree,
-  ) {
+  ) {}
+
+  ngOnInit() {
     this.subscription = this.llmDialogService.isOpen$.subscribe((isOpen) => {
       this.isOpen = isOpen;
       if (isOpen) {
@@ -69,8 +71,6 @@ export class LlmDialogComponent implements OnDestroy, OnInit {
       }, 0);
     });
   }
-
-  ngOnInit() {}
 
   ngOnDestroy() {
     this.subscription.unsubscribe();

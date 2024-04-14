@@ -141,8 +141,10 @@ export class EditorComponent {
   }
 
   toggleAiCompletion() {
-    if (!this.aiCompletionEnabled && localStorage.getItem('config') === null) {
-      this.configDialogService.openDialog();
+    if (!this.aiCompletionEnabled && !localStorage.getItem('config')) {
+      window.alert(
+        'Please configure your LLM settings first. Click on the LLM config button in the user menu popup.',
+      );
     } else {
       this.aiCompletionEnabled = !this.aiCompletionEnabled;
       localStorage.setItem(
@@ -494,7 +496,10 @@ export class EditorComponent {
         // Explicitly update the vector embeddings after the document has been saved
         // only in local mode. In deployed production mode, the vector embeddings are updated
         // via sqs event after the document has been saved
-        if (!environment.production && localStorage.getItem('config') !== null) {
+        if (
+          !environment.production &&
+          localStorage.getItem('config') !== null
+        ) {
           this.basicRestService
             .post('vector-embeddings', {
               Records: [

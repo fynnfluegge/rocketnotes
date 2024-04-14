@@ -17,9 +17,8 @@ import (
 
 type UserConfig struct {
 	Id    string `json:"userId"`
-	TextCompletionModel string `json:"textCompletionModel"`
-	EmbeddingsModel string `json:"embeddingsModel"`
-	LlModel string `json:"llModel"`
+	EmbeddingModel string `json:"embeddingModel"`
+	Llm string `json:"llm"`
 	OpenAiApiKey string `json:"openAiApiKey"`
 	AnthropicApiKey string `json:"anthropicApiKey"`
 }

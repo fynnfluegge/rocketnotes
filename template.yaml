@@ -235,11 +235,7 @@ Resources:
   saveVectorEmbeddingsFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: lambda-handler/save-vector-embeddings-handler
-      Handler: main.handler
-      Runtime: python3.9
-      Architectures:
-        - x86_64
+      PackageType: Image
       MemorySize: 1024
       Timeout: 100
       Policies:
@@ -255,6 +251,10 @@ Resources:
           Properties:
             Path: /vector-embeddings
             Method: POST
+    Metadata:
+      DockerTag: python3_9_x86_64
+      DockerContext: lambda-handler/save-vector-embeddings-handler
+      Dockerfile: Dockerfile
 
   semanticSearchFunction:
     Type: AWS::Serverless::Function

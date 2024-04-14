@@ -17,9 +17,8 @@ import (
 
 type RequestBody struct {
 	Id    string `json:"id"`
-	TextCompletionModel string `json:"textCompletionModel"`
-	EmbeddingsModel string `json:"embeddingsModel"`
-	LlModel string `json:"llModel"`
+	EmbeddingModel string `json:"embeddingModel"`
+	Llm string `json:"llm"`
 	OpenAiApiKey string `json:"openAiApiKey"`
 	AnthropicApiKey string `json:"anthropicApiKey"`
 	RecreateIndex bool `json:"recreateIndex"`
