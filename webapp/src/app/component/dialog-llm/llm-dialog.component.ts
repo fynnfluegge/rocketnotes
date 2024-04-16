@@ -93,7 +93,6 @@ export class LlmDialogComponent implements OnDestroy, OnInit {
     this.restService
       .post('chat', {
         userId: localStorage.getItem('currentUserId'),
-        openAiApiKey: localStorage.getItem('openAiApiKey'),
         prompt: userMessage,
       })
       .subscribe((result) => {
@@ -122,7 +121,6 @@ export class LlmDialogComponent implements OnDestroy, OnInit {
     this.restService
       .post('semanticSearch', {
         userId: localStorage.getItem('currentUserId'),
-        openAiApiKey: localStorage.getItem('openAiApiKey'),
         searchString: searchInput,
       })
       .subscribe((result) => {

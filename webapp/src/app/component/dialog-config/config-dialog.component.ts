@@ -14,7 +14,7 @@ export class ConfigDialogComponent implements OnDestroy, OnInit {
   subscription: Subscription;
   isOpen: boolean = false;
   currentEmbeddingModel: string;
-  selectedEmbeddingModel: string = 'text-embeddings-ada-002';
+  selectedEmbeddingModel: string = 'text-embedding-ada-002';
   selectedLlm: string = 'gpt-3.5-turbo';
   openAiApiKey: string;
   anthropicApiKey: string;
@@ -30,11 +30,20 @@ export class ConfigDialogComponent implements OnDestroy, OnInit {
       if (isOpen) {
         if (localStorage.getItem('config')) {
           const config = JSON.parse(localStorage.getItem('config'));
-          this.currentEmbeddingModel = config['embeddingModel'];
-          this.selectedEmbeddingModel = config['embeddingModel'];
-          this.selectedLlm = config['llm'];
-          this.openAiApiKey = config['openAiApiKey'];
-          this.anthropicApiKey = config['anthropicApiKey'];
+          console.log(config);
+          if (config['embeddingModel']) {
+            this.currentEmbeddingModel = config['embeddingModel'];
+            this.selectedEmbeddingModel = config['embeddingModel'];
+          }
+          if (config['llm']) {
+            this.selectedLlm = config['llm'];
+          }
+          if (config['openAiApiKey']) {
+            this.openAiApiKey = config['openAiApiKey'];
+          }
+          if (config['anthropicApiKey']) {
+            this.anthropicApiKey = config['anthropicApiKey'];
+          }
         }
         const overlay = document.getElementById('configDialog');
         if (overlay.getAttribute('outsideClickListener') !== 'true') {
@@ -63,7 +72,7 @@ export class ConfigDialogComponent implements OnDestroy, OnInit {
         'openAiApiKeyRequired',
       );
       openAiApiKeyRequiredWarning.style.display = 'block';
-    } else if (this.selectedLlm.startsWith('claude')) {
+    } else if (this.selectedLlm.startsWith('claude') && !this.anthropicApiKey) {
       const anthropicApiKeyRequiredWarning = document.getElementById(
         'anthropicApiKeyRequired',
       );
@@ -95,26 +104,31 @@ export class ConfigDialogComponent implements OnDestroy, OnInit {
               });
             });
           }
+          localStorage.setItem(
+            'config',
+            JSON.stringify({
+              embeddingModel: this.selectedEmbeddingModel,
+              llm: this.selectedLlm,
+              openAiApiKey: this.openAiApiKey,
+              anthropicApiKey: this.anthropicApiKey,
+            }),
+          );
           if (
             this.currentEmbeddingModel !== this.selectedEmbeddingModel &&
             !environment.production
           ) {
             this.restService
-              .post('/vector-embeddings', {
+              .post('vector-embeddings', {
                 Records: [
                   {
                     body: {
                       userId: localStorage.getItem('currentUserId'),
-                      openAiApiKey: this.openAiApiKey,
-                      anthropicApiKey: this.anthropicApiKey,
                       recreateIndex: true,
                     },
                   },
                 ],
               })
-              .subscribe(() => {
-                this.configDialogService.closeDialog();
-              });
+              .subscribe();
           }
         });
 

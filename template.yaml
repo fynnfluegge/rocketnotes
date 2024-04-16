@@ -236,11 +236,15 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       PackageType: Image
-      MemorySize: 1024
-      Timeout: 100
+      MemorySize: 4096
+      Timeout: 900
       Policies:
         - DynamoDBCrudPolicy:
             TableName: tnn-documents
+        - DynamoDBCrudPolicy:
+            TableName: tnn-vectors
+        - DynamoDBCrudPolicy:
+            TableName: tnn-userConfig
       Environment:
         Variables:
           LOCAL: 1
@@ -259,16 +263,12 @@ Resources:
   semanticSearchFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: lambda-handler/semantic-search-handler
-      Handler: main.handler
-      Runtime: python3.9
-      Architectures:
-        - x86_64
+      PackageType: Image
       MemorySize: 1024
       Timeout: 100
       Policies:
         - DynamoDBCrudPolicy:
-            TableName: tnn-documents
+            TableName: tnn-userConfig
       Environment:
         Variables:
           LOCAL: 1
@@ -279,20 +279,22 @@ Resources:
           Properties:
             Path: /semanticSearch
             Method: POST
+    Metadata:
+      DockerTag: python3_9_x86_64
+      DockerContext: lambda-handler/semantic-search-handler
+      Dockerfile: Dockerfile
 
   chatFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: lambda-handler/chat-handler
-      Handler: main.handler
-      Runtime: python3.9
-      Architectures:
-        - x86_64
+      PackageType: Image
       MemorySize: 1024
       Timeout: 100
       Policies:
         - DynamoDBCrudPolicy:
             TableName: tnn-documents
+        - DynamoDBCrudPolicy:
+            TableName: tnn-userConfig
       Environment:
         Variables:
           LOCAL: 1
@@ -303,6 +305,10 @@ Resources:
           Properties:
             Path: /chat
             Method: POST
+    Metadata:
+      DockerTag: python3_9_x86_64
+      DockerContext: lambda-handler/chat-handler
+      Dockerfile: Dockerfile
 
   saveUserConfigFunction:
     Type: AWS::Serverless::Function
