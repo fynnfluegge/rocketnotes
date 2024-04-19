@@ -24,7 +24,9 @@ services:
       - local-serverless-network
 
   api:
-    image: fynnfluegge/rocketnotes-api:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.sam
     command:
       bash -c "sam local start-api --host 0.0.0.0 --container-host host.docker.internal --port 3002 --docker-volume-basedir ${PWD}/.aws-sam/build --debug
       --docker-network rocketnotes_local-serverless-network"
@@ -38,7 +40,7 @@ services:
       - "3002:3002"
 
   webapp:
-    image: fynnfluegge/rocketnotes-webapp:latest
+    build: webapp/.
     container_name: rocketnotes-webapp
     platform: linux/amd64
     ports:

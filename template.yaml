@@ -256,7 +256,6 @@ Resources:
             Path: /vector-embeddings
             Method: POST
     Metadata:
-      DockerTag: python3_9_x86_64
       DockerContext: lambda-handler/save-vector-embeddings-handler
       Dockerfile: Dockerfile
 
@@ -280,7 +279,6 @@ Resources:
             Path: /semanticSearch
             Method: POST
     Metadata:
-      DockerTag: python3_9_x86_64
       DockerContext: lambda-handler/semantic-search-handler
       Dockerfile: Dockerfile
 
@@ -306,7 +304,6 @@ Resources:
             Path: /chat
             Method: POST
     Metadata:
-      DockerTag: python3_9_x86_64
       DockerContext: lambda-handler/chat-handler
       Dockerfile: Dockerfile
 
@@ -359,3 +356,21 @@ Resources:
           Properties:
             Path: /userConfig/{userId}
             Method: GET 
+
+  textCompletionFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda-handler/completion-handler
+      Handler: main.handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /textCompletion
+            Method: POST
+

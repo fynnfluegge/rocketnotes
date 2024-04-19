@@ -11,7 +11,6 @@ import { HostListener } from '@angular/core';
 import OpenAI from 'openai';
 
 import '../../../assets/prism-custom.js';
-import { Anthropic } from '@anthropic-ai/sdk';
 import { ConfigDialogService } from 'src/app/service/config-dialog-service';
 
 @Component({
@@ -45,7 +44,6 @@ export class EditorComponent {
   keyPressCounter: number = 0;
 
   private openai: OpenAI;
-  private anthropic: Anthropic;
   private abortController: AbortController;
   private completionTimeout: NodeJS.Timeout | undefined;
   private suggestionLinebreak: boolean = false;
@@ -57,7 +55,6 @@ export class EditorComponent {
     private route: ActivatedRoute,
     private titleService: Title,
     private location: Location,
-    private configDialogService: ConfigDialogService,
   ) {}
 
   ngOnInit() {
@@ -114,16 +111,14 @@ export class EditorComponent {
         .get('userConfig/' + localStorage.getItem('currentUserId'))
         .subscribe((config) => {
           localStorage.setItem('config', JSON.stringify(config));
-          if (config['llmModel']) {
-            if (config['llmModel'].startsWith('gpt')) {
+          if (config['llm']) {
+            if (config['llm'].startsWith('gpt')) {
               this.openai = new OpenAI({
                 apiKey: config['openAiApiKey'],
                 dangerouslyAllowBrowser: true,
               });
-            } else if (config['llmModel'] === 'claude') {
-              this.anthropic = new Anthropic({
-                apiKey: config['anthropicApiKey'],
-              });
+            } else if (config['llm'] === 'claude') {
+              // use lambda proxy
             }
           }
         });
@@ -403,10 +398,14 @@ export class EditorComponent {
   }
 
   async aiCompletion(abortSignal: AbortSignal, text: string) {
+    // Check if the signal is aborted
+    if (abortSignal.aborted) {
+      return;
+    }
     const config = JSON.parse(localStorage.getItem('config'));
     const prompt = 'Complete the following text with 1 to 5 words: ' + text;
     let message = '';
-    if (config['llmModel'].startsWith('gpt')) {
+    if (config['llm'].startsWith('gpt')) {
       const completion = await this.openai.chat.completions.create({
         messages: [
           {
@@ -414,22 +413,20 @@ export class EditorComponent {
             content: prompt,
           },
         ],
-        model: config['llmModel'],
+        model: config['llm'],
         temperature: 0.9,
       });
       message = completion.choices[0].message.content;
-    } else if (config['llmModel'].startsWith('claude')) {
-      const completion = await this.anthropic.messages.create({
-        max_tokens: 1024,
-        messages: [{ role: 'user', content: prompt }],
-        model: config['llmModel'],
-      });
-      message = completion.content[0].text;
-    }
-
-    // Check if the signal is aborted
-    if (abortSignal.aborted) {
-      return;
+    } else if (config['llm'].startsWith('claude')) {
+      this.basicRestService
+        .post('textCompletion', {
+          prompt: prompt,
+          api_key: config['anthropicApiKey'],
+          model: config['llm'],
+        })
+        .subscribe((response) => {
+          message = JSON.stringify(response);
+        });
     }
 
     if (message === '0') {

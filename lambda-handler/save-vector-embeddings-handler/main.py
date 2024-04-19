@@ -48,8 +48,6 @@ def handler(event, context):
             "body": json.dumps("User not found"),
         }
 
-    print(f"User config: {userConfig}")
-
     userConfig = userConfig["Item"]
     embeddingsModel = userConfig.get("embeddingModel", {}).get("S", None)
     openAiApiKey = userConfig.get("openAiApiKey", {}).get("S", None)
@@ -76,8 +74,6 @@ def handler(event, context):
             f"{embeddingsModel}_{userId}.faiss",
             f"{file_path}/{embeddingsModel}_{userId}.faiss",
         )
-
-        print(f"Faiss index exists: {faiss_index_exists}")
 
         # Vectors already exists, update the index
         # --------------------------------------------
@@ -144,8 +140,6 @@ def handler(event, context):
                 ExpressionAttributeValues=expression_attribute_values,
             )
 
-            print(f"Query result: {result}")
-
             # Process the query results
             documents = result.get("Items", [])
             if documents:
@@ -158,7 +152,6 @@ def handler(event, context):
                     except Exception:
                         continue
                     split_documents.extend(split_document(content, documentId, title))
-                print(f"Split documents: {split_documents}")
                 db = FAISS.from_documents(split_documents, embeddings)
                 file_path = f"/tmp/{userId}"
                 file_name = "faiss_index.bin"
@@ -167,23 +160,20 @@ def handler(event, context):
                 save_to_s3(userId + ".faiss", file_path + "/" + file_name + ".faiss")
                 save_to_s3(userId + ".pkl", file_path + "/" + file_name + ".pkl")
                 index_to_docstore_id = db.index_to_docstore_id
-                print(f"Index to docstore id: {index_to_docstore_id}")
                 document_vectors = get_vectors_from_faiss_index(
                     split_documents, db, index_to_docstore_id
                 )
-                print(f"Document vectors: {document_vectors}")
                 for documentId, vectors in document_vectors.items():
                     add_vectors_to_dynamodb(documentId, vectors)
 
     except Exception as e:
-        print("Error:", e)
         return {
             "statusCode": 500,
             "headers": {
                 "Content-Type": "application/json",
                 "Access-Control-Allow-Origin": "*",
             },
-            "body": json.dumps("Internal server error"),
+            "body": json.dumps(f"Internal server error, {e}"),
         }
 
     return {
@@ -269,7 +259,6 @@ def get_vectors_from_faiss_index(documents, db, index_to_docstore_id):
 
 
 def add_vectors_to_dynamodb(documentId, vectors):
-    print(f"Adding vectors to DynamoDB: {vectors}")
     try:
         newItem = {"id": {}, "vectors": {}}
         newItem["id"]["S"] = documentId

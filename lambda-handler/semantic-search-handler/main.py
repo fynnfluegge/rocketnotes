@@ -79,9 +79,7 @@ def handler(event, context):
         embeddings=embeddings,
     )
 
-    print(f"Searching for: {search_string}")
     similarity_search_result = db.similarity_search(search_string, k=4)
-    print(f"Results: {similarity_search_result}")
     response = []
     for result in similarity_search_result:
         response.append(

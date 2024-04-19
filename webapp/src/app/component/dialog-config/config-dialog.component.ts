@@ -30,7 +30,6 @@ export class ConfigDialogComponent implements OnDestroy, OnInit {
       if (isOpen) {
         if (localStorage.getItem('config')) {
           const config = JSON.parse(localStorage.getItem('config'));
-          console.log(config);
           if (config['embeddingModel']) {
             this.currentEmbeddingModel = config['embeddingModel'];
             this.selectedEmbeddingModel = config['embeddingModel'];
