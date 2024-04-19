@@ -429,6 +429,24 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("chatLambdaIntegration"), chatHandler, &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
 	})
 
+	// Completion handler
+
+	textCompletionHandler := awscdklambdapythonalpha.NewPythonFunction(stack, jsii.String("TextCompletionHandler"), &awscdklambdapythonalpha.PythonFunctionProps{
+		FunctionName: jsii.String("TextCompletion"),
+		Runtime:      awslambda.Runtime_PYTHON_3_9(),
+		Entry:        jsii.String("../lambda-handler/text-completion-handler"),
+		Index:        aws.String("main.py"),
+		MemorySize:  jsii.Number(1024),
+		Timeout:     awscdk.Duration_Millis(jsii.Number(900000)),
+	})
+
+	httpApi.AddRoutes(&awscdkapigatewayv2alpha.AddRoutesOptions{
+		Path:        jsii.String("/text-completion"),
+		Authorizer:  httpApiAuthorizer,
+		Methods:     &[]awscdkapigatewayv2alpha.HttpMethod{awscdkapigatewayv2alpha.HttpMethod_POST},
+		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("textCompletionLambdaIntegration"), textCompletionHandler, &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
+	})
+
 	// sign-up confirmation lambda handler
 
 	awscdklambdagoalpha.NewGoFunction(stack, jsii.String("Sign-up-confirmation-handler"), &awscdklambdagoalpha.GoFunctionProps{

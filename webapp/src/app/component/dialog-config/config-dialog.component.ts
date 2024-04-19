@@ -18,6 +18,7 @@ export class ConfigDialogComponent implements OnDestroy, OnInit {
   selectedLlm: string = 'gpt-3.5-turbo';
   openAiApiKey: string;
   anthropicApiKey: string;
+  isLocal: boolean = !environment.production;
 
   constructor(
     private configDialogService: ConfigDialogService,

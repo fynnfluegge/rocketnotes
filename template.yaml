@@ -360,7 +360,7 @@ Resources:
   textCompletionFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: lambda-handler/completion-handler
+      CodeUri: lambda-handler/text-completion-handler
       Handler: main.handler
       Runtime: python3.9
       Architectures:
@@ -371,6 +371,6 @@ Resources:
         Api:
           Type: Api
           Properties:
-            Path: /textCompletion
+            Path: /text-completion
             Method: POST
 

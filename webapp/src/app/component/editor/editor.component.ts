@@ -419,7 +419,7 @@ export class EditorComponent {
       message = completion.choices[0].message.content;
     } else if (config['llm'].startsWith('claude')) {
       this.basicRestService
-        .post('textCompletion', {
+        .post('text-completion', {
           prompt: prompt,
           api_key: config['anthropicApiKey'],
           model: config['llm'],

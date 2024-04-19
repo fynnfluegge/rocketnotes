@@ -10,7 +10,7 @@
           value="text-embedding-ada-002"
         />Text-Embedding-Ada-002
       </label>
-      <label class="radio-inline">
+      <label class="radio-inline" *ngIf="isLocal">
         <input
           type="radio"
           name="embeddingModel"
