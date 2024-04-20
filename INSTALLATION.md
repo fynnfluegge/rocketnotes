@@ -1,6 +1,6 @@
 # Installation
 
-This document describes how to deploy your personal Rocketnotes installation in the cloud at AWS or on-premise on your own server.
+This document describes how to deploy your personal Rocketnotes installation in the cloud at AWS or run it locally with Docker.
 
 ### Prerequisites
 
