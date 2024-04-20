@@ -11,11 +11,14 @@
 
 </div>
 
-Rocketnotes is a web-based Markdown note taking app with LLM-powered text completion, chat and semantic search.
-You can [sign up](https://takeniftynotes.auth.eu-central-1.amazoncognito.com/login?response_type=code&client_id=tt3v27pnqqh7elqdvq9tgmr9v&redirect_uri=https://app.takeniftynotes.net) for free, run it locally or deploy with low effort to your personal AWS account.
-Check out the [installation guides](INSTALLATION.md#installation) for deploying Rocketnotes at [AWS](INSTALLATION.md#aws-hosting) or running it [locally with Docker](INSTALLATION.md#run-on-your-local-machine-with-docker).
+Rocketnotes is a web-based Markdown note taking app with LLM-powered text completion, chat and semantic search. It utilizes a 100% serverless RAG pipeline build with [langchain](https://github.com/langchain-ai/langchain), [sentence-transformers](https://github.com/UKPLab/sentence-transformers),
+[faiss](https://github.com/facebookresearch/faiss) and OpenAI or Anthropic API.  
+Checkout how the serverless RAG pipeline works here [Serverless RAG on AWS](https://medium.com/@fynnfluegge/serverless-rag-on-aws-bf8029f8bffd).
 
-> Hosting on your own AWS account will cost you less than **$1 per month** under normal usage.
+## How to run
+- You can [Sign Up](https://takeniftynotes.auth.eu-central-1.amazoncognito.com/login?response_type=code&client_id=tt3v27pnqqh7elqdvq9tgmr9v&redirect_uri=https://app.takeniftynotes.net) for free
+- Run it 100% [locally with Docker](INSTALLATION.md#run-on-your-local-machine-with-docker)
+- Deploy to [AWS](INSTALLATION.md#aws-hosting).
 
 ## ✨ Features
 
@@ -23,10 +26,10 @@ Check out the [installation guides](INSTALLATION.md#installation) for deploying 
 - 🌳 Hierarchical document tree
 - 🔍 Content search
 - 🌐 Document sharing
-- ✍️ Text completion
-- 🤖 Chat
+- ✍️ Text completion  
+- 🤖 Chat with your documents
 - 🔦 Semantic search
-- 📦 100% Local mode
+- 📦 Local mode with Docker
 
 &nbsp;
 
