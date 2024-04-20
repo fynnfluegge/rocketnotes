@@ -23,7 +23,7 @@ type Item struct {
 
 type Body struct {
 	Document *Document `json:"document"`
-	OpenAiApiKey  string    `json:"openAiApiKey"`
+	RecreateIndex bool `json:"recreateIndex"`
 }
 
 type Document struct {
@@ -39,7 +39,7 @@ type Document struct {
 type SqsMessage struct {
 	DocumentId   string `json:"documentId"`
 	UserId       string `json:"userId"`
-	OpenAiApiKey string `json:"openAiApiKey"`
+	RecreateIndex bool `json:"recreateIndex"`
 }
 
 func init() {
@@ -78,11 +78,10 @@ func handleRequest(ctx context.Context, event events.SQSEvent) {
 		log.Fatalf("Got error calling PutItem: %s", err)
 	}
 
-
-	if item.Body.OpenAiApiKey != "" {
+	if item.Body.RecreateIndex == true {
 		qsvc := sqs.New(sess)
 
-		m := SqsMessage{item.Body.Document.ID, item.Body.Document.UserId, item.Body.OpenAiApiKey}
+		m := SqsMessage{item.Body.Document.ID, item.Body.Document.UserId, item.Body.RecreateIndex}
 		b, err := json.Marshal(m)
 
 		_, err = qsvc.SendMessage(&sqs.SendMessageInput{

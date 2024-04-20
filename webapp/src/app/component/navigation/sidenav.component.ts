@@ -21,6 +21,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { HostListener } from '@angular/core';
 import { LlmDialogService } from 'src/app/service/llm-dialog.service';
+import { ConfigDialogService } from 'src/app/service/config-dialog-service';
 
 const ROOT_ID: string = 'root';
 const PINNED_ID: string = 'pinned';
@@ -516,7 +517,7 @@ export class DocumentTree {
   selector: 'app-sidenav',
   templateUrl: './sidenav.component.html',
   styleUrls: ['./sidenav.component.scss'],
-  providers: [DocumentTree, LlmDialogService],
+  providers: [DocumentTree, LlmDialogService, ConfigDialogService],
 })
 export class SidenavComponent implements OnInit, AfterViewInit {
   username: string;
@@ -563,6 +564,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
     private basicRestService: BasicRestService,
     private router: Router,
     private llmDialogService: LlmDialogService,
+    private configDialogService: ConfigDialogService,
   ) {
     this.treeFlattener = new MatTreeFlattener(
       this.transformer,
@@ -593,13 +595,15 @@ export class SidenavComponent implements OnInit, AfterViewInit {
       this.darkmode = localStorage.getItem('darkmode') === 'true';
       this.setTheme();
     } else {
-      Auth.currentAuthenticatedUser().then((user) => {
-        Auth.userAttributes(user).then((attributes) => {
-          this.darkmode = attributes['custom:darkmode'] === 1;
-          localStorage.setItem('darkmode', this.darkmode.toString());
-          this.setTheme();
+      if (environment.production) {
+        Auth.currentAuthenticatedUser().then((user) => {
+          Auth.userAttributes(user).then((attributes) => {
+            this.darkmode = attributes['custom:darkmode'] === 1;
+            localStorage.setItem('darkmode', this.darkmode.toString());
+            this.setTheme();
+          });
         });
-      });
+      }
     }
   }
 
@@ -641,6 +645,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
     document.getElementById('searchDialog').style.display = 'none';
     this.searchInput.nativeElement.value = '';
     this.llmDialogService.closeDialog();
+    this.configDialogService.closeDialog();
   }
 
   ngAfterViewInit(): void {
@@ -1182,7 +1187,6 @@ export class SidenavComponent implements OnInit, AfterViewInit {
         /*and and make the current item more visible:*/
         addActive(suggestionList);
         if (!isElementVisible(x, suggestionList[currentFocus])) {
-          console.log(suggestionList[currentFocus].offsetHeight);
           x.scrollTop += suggestionList[currentFocus].offsetHeight;
         }
       } else if (e.keyCode == 38) {
@@ -1194,7 +1198,6 @@ export class SidenavComponent implements OnInit, AfterViewInit {
         /*and and make the current item more visible:*/
         addActive(suggestionList);
         if (!isElementVisible(x, suggestionList[currentFocus])) {
-          console.log(suggestionList[currentFocus].offsetHeight);
           x.scrollTop -= suggestionList[currentFocus].offsetHeight;
         }
       } else if (e.keyCode == 13) {
@@ -1291,26 +1294,16 @@ export class SidenavComponent implements OnInit, AfterViewInit {
     });
   }
 
-  openOpenAiApiKeyDialog() {
-    const overlay = document.getElementById('openAiDialog');
-    overlay.style.display = 'flex';
-    const inputField = document.getElementById(
-      'inputField',
-    ) as HTMLInputElement;
-    const apikey = localStorage.getItem('openAiApiKey');
-    if (apikey !== null)
-      inputField.value =
-        apikey.substring(0, 8) + '********************************************';
-  }
-
   toggleDarkMode() {
     this.darkmode = !this.darkmode;
     localStorage.setItem('darkmode', this.darkmode.toString());
-    Auth.currentAuthenticatedUser().then((user) => {
-      Auth.updateUserAttributes(user, {
-        'custom:darkmode': this.darkmode ? '1' : '0',
+    if (environment.production) {
+      Auth.currentAuthenticatedUser().then((user) => {
+        Auth.updateUserAttributes(user, {
+          'custom:darkmode': this.darkmode ? '1' : '0',
+        });
       });
-    });
+    }
     this.setTheme();
   }
 
@@ -1373,12 +1366,20 @@ export class SidenavComponent implements OnInit, AfterViewInit {
   }
 
   openLlmDialog() {
-    if (localStorage.getItem('openAiApiKey') === null) {
+    let config = localStorage.getItem('config');
+    if (config) {
+      config = JSON.parse(config);
+    }
+    if (!config || config['llm'] === '') {
       window.alert(
-        'Please set your OpenAI API key in user settings to use the LLM feature.',
+        'Please configure your LLM settings first. Click on the LLM config button in the user menu popup.',
       );
     } else {
       this.llmDialogService.openDialog();
     }
+  }
+
+  openConfigDialog() {
+    this.configDialogService.openDialog();
   }
 }

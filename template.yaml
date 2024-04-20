@@ -235,16 +235,16 @@ Resources:
   saveVectorEmbeddingsFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: lambda-handler/save-vector-embeddings-handler
-      Handler: main.handler
-      Runtime: python3.9
-      Architectures:
-        - x86_64
-      MemorySize: 1024
-      Timeout: 100
+      PackageType: Image
+      MemorySize: 4096
+      Timeout: 900
       Policies:
         - DynamoDBCrudPolicy:
             TableName: tnn-documents
+        - DynamoDBCrudPolicy:
+            TableName: tnn-vectors
+        - DynamoDBCrudPolicy:
+            TableName: tnn-userConfig
       Environment:
         Variables:
           LOCAL: 1
@@ -255,20 +255,19 @@ Resources:
           Properties:
             Path: /vector-embeddings
             Method: POST
+    Metadata:
+      DockerContext: lambda-handler/save-vector-embeddings-handler
+      Dockerfile: Dockerfile
 
   semanticSearchFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: lambda-handler/semantic-search-handler
-      Handler: main.handler
-      Runtime: python3.9
-      Architectures:
-        - x86_64
+      PackageType: Image
       MemorySize: 1024
       Timeout: 100
       Policies:
         - DynamoDBCrudPolicy:
-            TableName: tnn-documents
+            TableName: tnn-userConfig
       Environment:
         Variables:
           LOCAL: 1
@@ -279,20 +278,21 @@ Resources:
           Properties:
             Path: /semanticSearch
             Method: POST
+    Metadata:
+      DockerContext: lambda-handler/semantic-search-handler
+      Dockerfile: Dockerfile
 
   chatFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: lambda-handler/chat-handler
-      Handler: main.handler
-      Runtime: python3.9
-      Architectures:
-        - x86_64
+      PackageType: Image
       MemorySize: 1024
       Timeout: 100
       Policies:
         - DynamoDBCrudPolicy:
             TableName: tnn-documents
+        - DynamoDBCrudPolicy:
+            TableName: tnn-userConfig
       Environment:
         Variables:
           LOCAL: 1
@@ -303,5 +303,74 @@ Resources:
           Properties:
             Path: /chat
             Method: POST
+    Metadata:
+      DockerContext: lambda-handler/chat-handler
+      Dockerfile: Dockerfile
 
+  saveUserConfigFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: go1.x
+    Properties:
+      CodeUri: lambda-handler/save-user-config-handler
+      Handler: main.go
+      Runtime: provided.al2
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: tnn-userConfig
+      Environment:
+        Variables:
+          USE_LOCAL_DYNAMODB: 1
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /userConfig
+            Method: POST
+
+  getUserConfigFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: go1.x
+    Properties:
+      CodeUri: lambda-handler/get-user-config-handler
+      Handler: main.go
+      Runtime: provided.al2
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: tnn-userConfig
+      Environment:
+        Variables:
+          USE_LOCAL_DYNAMODB: 1
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /userConfig/{userId}
+            Method: GET 
+
+  textCompletionFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda-handler/text-completion-handler
+      Handler: main.handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /text-completion
+            Method: POST
 

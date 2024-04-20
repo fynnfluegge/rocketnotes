@@ -11,11 +11,13 @@ import { HostListener } from '@angular/core';
 import OpenAI from 'openai';
 
 import '../../../assets/prism-custom.js';
+import { ConfigDialogService } from 'src/app/service/config-dialog-service';
 
 @Component({
   selector: 'app-editor',
   templateUrl: './editor.component.html',
   styleUrls: ['./editor.component.scss'],
+  providers: [ConfigDialogService],
 })
 export class EditorComponent {
   @Input() showSidebar: boolean;
@@ -95,19 +97,32 @@ export class EditorComponent {
       }
     });
 
-    Auth.currentAuthenticatedUser().then((user) => {
-      Auth.userAttributes(user).then((attributes) => {
-        attributes.forEach((attribute) => {
-          if (attribute.Name === 'custom:OpenAIapikey') {
-            localStorage.setItem('openAiApiKey', attribute.Value);
-            this.openai = new OpenAI({
-              apiKey: attribute.Value,
-              dangerouslyAllowBrowser: true,
-            });
-          }
+    let hasConfig = true;
+    if (environment.production) {
+      Auth.currentAuthenticatedUser().then((user) => {
+        Auth.userAttributes(user).then((attributes) => {
+          hasConfig = attributes['custom:config'] === 1;
         });
       });
-    });
+    }
+
+    if (hasConfig) {
+      this.basicRestService
+        .get('userConfig/' + localStorage.getItem('currentUserId'))
+        .subscribe((config) => {
+          localStorage.setItem('config', JSON.stringify(config));
+          if (config['llm']) {
+            if (config['llm'].startsWith('gpt')) {
+              this.openai = new OpenAI({
+                apiKey: config['openAiApiKey'],
+                dangerouslyAllowBrowser: true,
+              });
+            } else if (config['llm'] === 'claude') {
+              // use lambda proxy
+            }
+          }
+        });
+    }
 
     this.abortController = new AbortController();
 
@@ -121,12 +136,10 @@ export class EditorComponent {
   }
 
   toggleAiCompletion() {
-    if (
-      !this.aiCompletionEnabled &&
-      localStorage.getItem('openAiApiKey') === null
-    ) {
-      const overlay = document.getElementById('openAiDialog');
-      overlay.style.display = 'flex';
+    if (!this.aiCompletionEnabled && !localStorage.getItem('config')) {
+      window.alert(
+        'Please configure your LLM settings first. Click on the LLM config button in the user menu popup.',
+      );
     } else {
       this.aiCompletionEnabled = !this.aiCompletionEnabled;
       localStorage.setItem(
@@ -134,21 +147,6 @@ export class EditorComponent {
         this.aiCompletionEnabled.toString(),
       );
     }
-  }
-
-  saveOpenAiApiKey() {
-    const apiKeyVlue = document.getElementById(
-      'inputField',
-    ) as HTMLInputElement;
-    Auth.currentAuthenticatedUser().then((user) => {
-      Auth.updateUserAttributes(user, {
-        'custom:OpenAIapikey': apiKeyVlue.value,
-      });
-    });
-    localStorage.setItem('openAiApiKey', apiKeyVlue.value);
-    this.openai.apiKey = apiKeyVlue.value;
-    this.toggleAiCompletion();
-    this.closeDialog('openAiDialog');
   }
 
   closeDialog(id: string) {
@@ -400,31 +398,46 @@ export class EditorComponent {
   }
 
   async aiCompletion(abortSignal: AbortSignal, text: string) {
-    const completion = await this.openai.chat.completions.create({
-      messages: [
-        {
-          role: 'user',
-          content: 'Complete the following text with 1 to 5 words: ' + text,
-        },
-      ],
-      model: 'gpt-3.5-turbo',
-      temperature: 0.9,
-    });
-
     // Check if the signal is aborted
     if (abortSignal.aborted) {
       return;
     }
+    const config = JSON.parse(localStorage.getItem('config'));
+    const prompt = 'Complete the following text with 1 to 5 words: ' + text;
+    let message = '';
+    if (config['llm'].startsWith('gpt')) {
+      const completion = await this.openai.chat.completions.create({
+        messages: [
+          {
+            role: 'user',
+            content: prompt,
+          },
+        ],
+        model: config['llm'],
+        temperature: 0.9,
+      });
+      message = completion.choices[0].message.content;
+    } else if (config['llm'].startsWith('claude')) {
+      this.basicRestService
+        .post('text-completion', {
+          prompt: prompt,
+          api_key: config['anthropicApiKey'],
+          model: config['llm'],
+        })
+        .subscribe((response) => {
+          message = JSON.stringify(response);
+        });
+    }
 
-    if (completion.choices[0].message.content === '0') {
+    if (message === '0') {
       return;
     }
 
-    if (completion.choices[0].message.content.toLowerCase().includes('sorry')) {
+    if (message.toLowerCase().includes('sorry')) {
       return;
     }
 
-    return completion.choices[0].message.content;
+    return message;
   }
 
   extractLast20Words(inputString: string): string {
@@ -469,8 +482,8 @@ export class EditorComponent {
           title: this.title,
           content: this.content,
           isPublic: this.isPublic,
+          recreateIndex: localStorage.getItem('config') !== null,
         },
-        openAiApiKey: localStorage.getItem('openAiApiKey'),
       })
       .subscribe(() => {
         this.showSnackbar = true;
@@ -480,7 +493,10 @@ export class EditorComponent {
         // Explicitly update the vector embeddings after the document has been saved
         // only in local mode. In deployed production mode, the vector embeddings are updated
         // via sqs event after the document has been saved
-        if (!environment.production && localStorage.getItem('openAiApiKey')) {
+        if (
+          !environment.production &&
+          localStorage.getItem('config') !== null
+        ) {
           this.basicRestService
             .post('vector-embeddings', {
               Records: [
@@ -488,7 +504,7 @@ export class EditorComponent {
                   body: {
                     userId: localStorage.getItem('currentUserId'),
                     documentId: this.id,
-                    openAiApiKey: localStorage.getItem('openAiApiKey'),
+                    recreateIndex: true,
                   },
                 },
               ],
