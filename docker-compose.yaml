@@ -20,18 +20,18 @@ services:
       - initialBuckets=faissIndexBucket
     ports:
       - 9091:9090
+    volumes:
+      - s3-volume:/home/data
     networks:
       - local-serverless-network
 
   api:
-    build:
-      context: .
-      dockerfile: Dockerfile.sam
+    image: fynnfluegge/rocketnotes-api:0.0.1
     command:
       bash -c "sam local start-api --host 0.0.0.0 --container-host host.docker.internal --port 3002 --docker-volume-basedir ${PWD}/.aws-sam/build --debug
       --docker-network rocketnotes_local-serverless-network"
     container_name: rocketnotes-api
-    mem_limit: "1g"
+    mem_limit: "8g"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ${PWD}:${PWD}:ro
@@ -40,7 +40,7 @@ services:
       - "3002:3002"
 
   webapp:
-    build: webapp/.
+    image: fynnfluegge/rocketnotes-webapp:0.0.1
     container_name: rocketnotes-webapp
     platform: linux/amd64
     ports:
@@ -48,8 +48,24 @@ services:
     environment:
       API_URL: "http://localhost:3002"
 
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - 11434:11434
+    volumes:
+      - .:/code
+      - ./ollama/ollama:/root/.ollama
+    container_name: ollama
+    pull_policy: always
+    tty: true
+    restart: always
+    networks:
+      - local-serverless-network
+
 volumes:
   dynamodb-volume:
+    driver: local
+  s3-volume:
     driver: local
 
 networks:

@@ -16,9 +16,10 @@ Rocketnotes is a web-based Markdown note taking app with LLM-powered text comple
 Checkout how the serverless RAG pipeline works here [Serverless RAG on AWS](https://medium.com/@fynnfluegge/serverless-rag-on-aws-bf8029f8bffd).
 
 ## How to run
+
 - You can [Sign Up](https://takeniftynotes.auth.eu-central-1.amazoncognito.com/login?response_type=code&client_id=tt3v27pnqqh7elqdvq9tgmr9v&redirect_uri=https://app.takeniftynotes.net) for free
 - Run it 100% [locally with Docker](INSTALLATION.md#run-on-your-local-machine-with-docker)
-- Deploy to [AWS](INSTALLATION.md#aws-hosting).
+- Deploy to [AWS](INSTALLATION.md#aws-hosting)
 
 ## ✨ Features
 
@@ -26,7 +27,7 @@ Checkout how the serverless RAG pipeline works here [Serverless RAG on AWS](http
 - 🌳 Hierarchical document tree
 - 🔍 Content search
 - 🌐 Document sharing
-- ✍️ Text completion  
+- ✍️ Text completion
 - 🤖 Chat with your documents
 - 🔦 Semantic search
 - 📦 Local mode with Docker
