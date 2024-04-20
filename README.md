@@ -14,9 +14,11 @@
 Rocketnotes is a web-based Markdown note taking app with LLM-powered text completion, chat and semantic search.
 You can [sign up](https://takeniftynotes.auth.eu-central-1.amazoncognito.com/login?response_type=code&client_id=tt3v27pnqqh7elqdvq9tgmr9v&redirect_uri=https://app.takeniftynotes.net) for free, run it locally or deploy with low effort to your personal AWS account.
 Check out the [installation guides](INSTALLATION.md#installation) for deploying Rocketnotes at [AWS](INSTALLATION.md#aws-hosting) or running it [locally with Docker](INSTALLATION.md#run-on-your-local-machine-with-docker).
+
 > Hosting on your own AWS account will cost you less than **$1 per month** under normal usage.
 
 ## ✨ Features
+
 - 📝 Code syntax highlighting
 - 🌳 Hierarchical document tree
 - 🔍 Content search
@@ -24,7 +26,7 @@ Check out the [installation guides](INSTALLATION.md#installation) for deploying 
 - ✍️ Text completion
 - 🤖 Chat
 - 🔦 Semantic search
-- 📦 Local mode
+- 📦 100% Local mode
 
 &nbsp;
 
@@ -34,21 +36,22 @@ Check out the [installation guides](INSTALLATION.md#installation) for deploying 
 
 </div>
 
-
 ## LLM-powered text completion
+
 - 🤖 Get Copilot-like text completion autosuggestions.
 <div align="center">
   <img src="https://github.com/fynnfluegge/rocketnotes/assets/16321871/648ae135-0406-4854-a68f-fb6b3d3f0702" width="800">
 </div>
 
 ## Chat with your documents or do semantic search
+
 - 🤖 Use the power of LLMs together with vector embeddings to chat with your notes or search for them semantically.
 <div align="center">
   <img src="https://github.com/fynnfluegge/rocketnotes/assets/16321871/6bb831ff-e7f2-41ab-824b-609fbb62853b" width="800">
 </div>
 
+## Create code snipptes with syntax highlighting
 
-## Create code snipptes with syntax highlighting 
 - 📝 Use the power and simplicity of Markdown for your personal notes.
 - 💻 Create useful code snippets in your favourite programming language with syntax highlighting.
 - 📖 Share documents with external users.
@@ -59,6 +62,7 @@ Check out the [installation guides](INSTALLATION.md#installation) for deploying 
 &nbsp;
 
 ## Superfast Document Search
+
 - 🔎 Search through all your documents by content.
 - 🚀 Get an autosuggestion panel with all documents matching you search pattern - superfast!
 <div align="center">
@@ -68,6 +72,7 @@ Check out the [installation guides](INSTALLATION.md#installation) for deploying 
 &nbsp;
 
 ## Hierarchical Document Tree
+
 - 📚 Save your note documents hierarchical with unlimited depth of subdocuments.
 - 🗂️ Structure your notes by simply drag and drop the desired document.
 - 🌟 Pin favourite documents for fast top-level access.
@@ -78,6 +83,7 @@ Check out the [installation guides](INSTALLATION.md#installation) for deploying 
 &nbsp;
 
 ## 🌟 Contributing
+
 The most comfortable way to get started is to open the project in a ready-to-code Gitpod workspace with all packages & tools preinstalled and a running database with sample data.
 
 <div align="center">
