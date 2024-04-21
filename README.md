@@ -24,13 +24,15 @@ Checkout how the serverless RAG pipeline works here [Serverless RAG on AWS](http
 ## ✨ Features
 
 - 📝 Code syntax highlighting
-- 🌳 Hierarchical document tree
-- 🔍 Content search
+- 🌳 Hierarchical document tree with draggable nodes
 - 🌐 Document sharing
-- ✍️ Text completion
-- 🤖 Chat with your documents
+- 🔍 Content search
 - 🔦 Semantic search
+- ✍️ Copilot-like text completion
+- 🤖 Chat with your documents
+  - Servlerless RAG with faiss, OpenAI and/or Anthropic 
 - 📦 Local mode with Docker
+  - use Ollama and/or Sentence Transformers for 100% local RAG 
 
 &nbsp;
 
