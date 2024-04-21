@@ -30,9 +30,9 @@ Checkout how the serverless RAG pipeline works here [Serverless RAG on AWS](http
 - 🔦 Semantic search
 - ✍️ Copilot-like text completion
 - 🤖 Chat with your documents
-  - Servlerless RAG with faiss, OpenAI and/or Anthropic 
+  - Servlerless RAG with faiss, OpenAI and/or Anthropic
 - 📦 Local mode with Docker
-  - use Ollama and/or Sentence Transformers for 100% local RAG 
+  - use Ollama and/or Sentence Transformers for 100% local RAG
 
 &nbsp;
 
@@ -42,18 +42,18 @@ Checkout how the serverless RAG pipeline works here [Serverless RAG on AWS](http
 
 </div>
 
-## LLM-powered text completion
-
-- 🤖 Get Copilot-like text completion autosuggestions.
-<div align="center">
-  <img src="https://github.com/fynnfluegge/rocketnotes/assets/16321871/648ae135-0406-4854-a68f-fb6b3d3f0702" width="800">
-</div>
-
 ## Chat with your documents or do semantic search
 
 - 🤖 Use the power of LLMs together with vector embeddings to chat with your notes or search for them semantically.
 <div align="center">
   <img src="https://github.com/fynnfluegge/rocketnotes/assets/16321871/6bb831ff-e7f2-41ab-824b-609fbb62853b" width="800">
+</div>
+
+## LLM-powered text completion
+
+- 🤖 Get Copilot-like text completion autosuggestions.
+<div align="center">
+  <img src="https://github.com/fynnfluegge/rocketnotes/assets/16321871/648ae135-0406-4854-a68f-fb6b3d3f0702" width="800">
 </div>
 
 ## Create code snipptes with syntax highlighting
