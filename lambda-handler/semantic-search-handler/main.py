@@ -68,7 +68,9 @@ def handler(event, context):
     elif embeddings_model == "Sentence-Transformers":
         embeddings = HuggingFaceEmbeddings(model_kwargs={"device": "cpu"})
     elif embeddings_model == "Ollama-nomic-embed-text":
-        embeddings = OllamaEmbeddings()
+        embeddings = OllamaEmbeddings(
+            base_url="http://ollama:11434", model=embeddings_model.split("Ollama-")[1]
+        )
     else:
         return {
             "statusCode": 400,

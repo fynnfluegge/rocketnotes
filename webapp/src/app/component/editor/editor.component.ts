@@ -452,8 +452,6 @@ export class EditorComponent {
       return;
     }
 
-    console.log(message);
-
     return message;
   }
 
