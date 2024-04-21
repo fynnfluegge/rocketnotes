@@ -44,7 +44,7 @@ Checkout how the serverless RAG pipeline works here [Serverless RAG on AWS](http
 
 ## Chat with your documents or do semantic search
 
-- 🤖 Use the power of LLMs together with vector embeddings to chat with your notes or search for them semantically.
+- 🤖 Use the power of LLMs together with vector embeddings to chat with your notes or search them semantically.
 <div align="center">
   <img src="https://github.com/fynnfluegge/rocketnotes/assets/16321871/6bb831ff-e7f2-41ab-824b-609fbb62853b" width="800">
 </div>
