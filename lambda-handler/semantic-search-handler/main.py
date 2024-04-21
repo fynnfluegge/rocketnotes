@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 
 import boto3
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings, OllamaEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
 
@@ -65,8 +65,17 @@ def handler(event, context):
         else:
             return {"statusCode": 400, "body": "OpenAI API key is missing"}
         embeddings = OpenAIEmbeddings(client=None, model="text-embedding-ada-002")
-    else:
+    elif embeddings_model == "Sentence-Transformers":
         embeddings = HuggingFaceEmbeddings(model_kwargs={"device": "cpu"})
+    elif embeddings_model == "Ollama-nomic-embed-text":
+        embeddings = OllamaEmbeddings(
+            base_url="http://ollama:11434", model=embeddings_model.split("Ollama-")[1]
+        )
+    else:
+        return {
+            "statusCode": 400,
+            "body": json.dumps("Embeddings model not found"),
+        }
 
     file_path = f"/tmp/{userId}"
     Path(file_path).mkdir(parents=True, exist_ok=True)

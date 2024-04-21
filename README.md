@@ -12,24 +12,27 @@
 </div>
 
 Rocketnotes is a web-based Markdown note taking app with LLM-powered text completion, chat and semantic search. It utilizes a 100% serverless RAG pipeline build with [langchain](https://github.com/langchain-ai/langchain), [sentence-transformers](https://github.com/UKPLab/sentence-transformers),
-[faiss](https://github.com/facebookresearch/faiss) and OpenAI or Anthropic API.  
+[faiss](https://github.com/facebookresearch/faiss), [Ollama](https://github.com/jmorganca/ollama) and OpenAI or Anthropic API.  
 Checkout how the serverless RAG pipeline works here [Serverless RAG on AWS](https://medium.com/@fynnfluegge/serverless-rag-on-aws-bf8029f8bffd).
 
 ## How to run
+
 - You can [Sign Up](https://takeniftynotes.auth.eu-central-1.amazoncognito.com/login?response_type=code&client_id=tt3v27pnqqh7elqdvq9tgmr9v&redirect_uri=https://app.takeniftynotes.net) for free
 - Run it 100% [locally with Docker](INSTALLATION.md#run-on-your-local-machine-with-docker)
-- Deploy to [AWS](INSTALLATION.md#aws-hosting).
+- Deploy to [AWS](INSTALLATION.md#aws-hosting)
 
 ## ✨ Features
 
 - 📝 Code syntax highlighting
-- 🌳 Hierarchical document tree
-- 🔍 Content search
+- 🌳 Hierarchical document tree with draggable nodes
 - 🌐 Document sharing
-- ✍️ Text completion  
-- 🤖 Chat with your documents
+- 🔍 Content search
 - 🔦 Semantic search
+- ✍️ Copilot-like text completion
+- 🤖 Chat with your documents
+  - Servlerless RAG with faiss, OpenAI and/or Anthropic
 - 📦 Local mode with Docker
+  - use Ollama and/or Sentence Transformers for 100% local RAG
 
 &nbsp;
 
@@ -39,18 +42,18 @@ Checkout how the serverless RAG pipeline works here [Serverless RAG on AWS](http
 
 </div>
 
+## Chat with your documents or do semantic search
+
+- 🤖 Use the power of LLMs together with vector embeddings to chat with your notes or search them semantically.
+<div align="center">
+  <img src="https://github.com/fynnfluegge/rocketnotes/assets/16321871/6bb831ff-e7f2-41ab-824b-609fbb62853b" width="800">
+</div>
+
 ## LLM-powered text completion
 
 - 🤖 Get Copilot-like text completion autosuggestions.
 <div align="center">
   <img src="https://github.com/fynnfluegge/rocketnotes/assets/16321871/648ae135-0406-4854-a68f-fb6b3d3f0702" width="800">
-</div>
-
-## Chat with your documents or do semantic search
-
-- 🤖 Use the power of LLMs together with vector embeddings to chat with your notes or search for them semantically.
-<div align="center">
-  <img src="https://github.com/fynnfluegge/rocketnotes/assets/16321871/6bb831ff-e7f2-41ab-824b-609fbb62853b" width="800">
 </div>
 
 ## Create code snipptes with syntax highlighting

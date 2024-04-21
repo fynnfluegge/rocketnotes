@@ -236,7 +236,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       PackageType: Image
-      MemorySize: 4096
+      MemorySize: 8192
       Timeout: 900
       Policies:
         - DynamoDBCrudPolicy:

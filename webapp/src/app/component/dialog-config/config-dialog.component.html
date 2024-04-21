@@ -18,6 +18,14 @@
           value="Sentence-Transformers"
         />Sentence-Transformers
       </label>
+      <label class="radio-inline" *ngIf="isLocal">
+        <input
+          type="radio"
+          name="embeddingModel"
+          [(ngModel)]="selectedEmbeddingModel"
+          value="Ollama-nomic-embed-text"
+        />Ollama-nomic-embed-text
+      </label>
       <hr />
       <h5>LLM Model</h5>
       <label class="radio-inline">
@@ -60,6 +68,39 @@
           [(ngModel)]="selectedLlm"
           value="claude-3-opus-20240229"
         />Claude-3-Opus
+      </label>
+      <br />
+      <label class="radio-inline" *ngIf="isLocal">
+        <input
+          type="radio"
+          name="llm"
+          [(ngModel)]="selectedLlm"
+          value="Ollama-llama3"
+        />Ollama-llama3
+      </label>
+      <label class="radio-inline" *ngIf="isLocal">
+        <input
+          type="radio"
+          name="llm"
+          [(ngModel)]="selectedLlm"
+          value="Ollama-llama2"
+        />Ollama-llama2
+      </label>
+      <label class="radio-inline" *ngIf="isLocal">
+        <input
+          type="radio"
+          name="llm"
+          [(ngModel)]="selectedLlm"
+          value="Ollama-mistral"
+        />Ollama-mistral
+      </label>
+      <label class="radio-inline" *ngIf="isLocal">
+        <input
+          type="radio"
+          name="llm"
+          [(ngModel)]="selectedLlm"
+          value="Ollama-orca-mini"
+        />Ollama-orca-mini
       </label>
       <hr />
       <h5>OpenAI API Key</h5>

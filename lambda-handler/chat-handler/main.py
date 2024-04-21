@@ -6,7 +6,8 @@ import boto3
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationSummaryMemory
 from langchain_anthropic import ChatAnthropic
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings, OllamaEmbeddings
+from langchain_community.llms import Ollama
 from langchain_community.vectorstores import FAISS
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 
@@ -92,6 +93,11 @@ def handler(event, context):
         else:
             return {"statusCode": 400, "body": "Anthropic API key is missing"}
         chat_model = ChatAnthropic(temperature=0.9, max_tokens=2048, model=llm_model)
+    elif llm_model.startswith("Ollama"):
+        chat_model = Ollama(
+            base_url="http://ollama:11434",
+            model=llm_model.split("Ollama-")[1],
+        )
     else:
         return {
             "statusCode": 400,
@@ -100,8 +106,17 @@ def handler(event, context):
 
     if embeddings_model == "text-embedding-ada-002":
         embeddings = OpenAIEmbeddings(client=None, model="text-embedding-ada-002")
-    else:
+    elif embeddings_model == "Sentence-Transformers":
         embeddings = HuggingFaceEmbeddings(model_kwargs={"device": "cpu"})
+    elif embeddings_model == "Ollama-nomic-embed-text":
+        embeddings = OllamaEmbeddings(
+            base_url="http://ollama:11434", model=embeddings_model.split("Ollama-")[1]
+        )
+    else:
+        return {
+            "statusCode": 400,
+            "body": json.dumps("Embeddings model not found"),
+        }
 
     file_path = f"/tmp/{userId}"
     Path(file_path).mkdir(parents=True, exist_ok=True)
@@ -114,6 +129,7 @@ def handler(event, context):
         embeddings=embeddings,
         allow_dangerous_deserialization=True,
     )
+
     retriever = db.as_retriever(search_type="mmr", search_kwargs={"k": 8})
 
     memory = ConversationSummaryMemory(
