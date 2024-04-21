@@ -6,7 +6,7 @@ import boto3
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationSummaryMemory
 from langchain_anthropic import ChatAnthropic
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings, OllamaEmbeddings
 from langchain_community.llms import Ollama
 from langchain_community.vectorstores import FAISS
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
@@ -106,8 +106,15 @@ def handler(event, context):
 
     if embeddings_model == "text-embedding-ada-002":
         embeddings = OpenAIEmbeddings(client=None, model="text-embedding-ada-002")
-    else:
+    elif embeddings_model == "Sentence-Transformers":
         embeddings = HuggingFaceEmbeddings(model_kwargs={"device": "cpu"})
+    elif embeddings_model == "Ollama-nomic-embed-text":
+        embeddings = OllamaEmbeddings()
+    else:
+        return {
+            "statusCode": 400,
+            "body": json.dumps("Embeddings model not found"),
+        }
 
     file_path = f"/tmp/{userId}"
     Path(file_path).mkdir(parents=True, exist_ok=True)

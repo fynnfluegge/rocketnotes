@@ -18,6 +18,14 @@
           value="Sentence-Transformers"
         />Sentence-Transformers
       </label>
+      <label class="radio-inline" *ngIf="isLocal">
+        <input
+          type="radio"
+          name="embeddingModel"
+          [(ngModel)]="selectedEmbeddingModel"
+          value="Ollama-nomic-embed-text"
+        />Ollama-nomic-embed-text
+      </label>
       <hr />
       <h5>LLM Model</h5>
       <label class="radio-inline">

@@ -4,9 +4,11 @@ from pathlib import Path
 
 import boto3
 from langchain.schema import Document
-from langchain.text_splitter import (MarkdownHeaderTextSplitter,
-                                     RecursiveCharacterTextSplitter)
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain.text_splitter import (
+    MarkdownHeaderTextSplitter,
+    RecursiveCharacterTextSplitter,
+)
+from langchain_community.embeddings import HuggingFaceEmbeddings, OllamaEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
 
@@ -64,8 +66,15 @@ def handler(event, context):
                 "body": json.dumps("OpenAI API key not found"),
             }
         embeddings = OpenAIEmbeddings(client=None, model=embeddingsModel)
-    else:
+    elif embeddingsModel == "Sentence-Transformers":
         embeddings = HuggingFaceEmbeddings(model_kwargs={"device": "cpu"})
+    elif embeddingsModel == "Ollama-nomic-embed-text":
+        embeddings = OllamaEmbeddings()
+    else:
+        return {
+            "statusCode": 400,
+            "body": json.dumps("Embeddings model not found"),
+        }
 
     try:
         file_path = f"/tmp/{userId}/{embeddingsModel}"

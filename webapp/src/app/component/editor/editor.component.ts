@@ -7,11 +7,13 @@ import { Title } from '@angular/platform-browser';
 import { environment } from 'src/environments/environment';
 import { Location } from '@angular/common';
 import { HostListener } from '@angular/core';
+import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 
 import OpenAI from 'openai';
 
 import '../../../assets/prism-custom.js';
 import { ConfigDialogService } from 'src/app/service/config-dialog-service';
+import { lastValueFrom, retry } from 'rxjs';
 
 @Component({
   selector: 'app-editor',
@@ -55,6 +57,7 @@ export class EditorComponent {
     private route: ActivatedRoute,
     private titleService: Title,
     private location: Location,
+    private http: HttpClient,
   ) {}
 
   ngOnInit() {
@@ -427,6 +430,18 @@ export class EditorComponent {
         .subscribe((response) => {
           message = JSON.stringify(response);
         });
+    } else if (config['llm'].startsWith('Ollama')) {
+      await lastValueFrom(
+        this.http
+          .post('http://localhost:11434/api/generate', {
+            prompt: prompt,
+            model: config['llm'].split('Ollama-')[1],
+            stream: false,
+          })
+          .pipe(retry(1)),
+      ).then((response) => {
+        message = response['response'];
+      });
     }
 
     if (message === '0') {
@@ -436,6 +451,8 @@ export class EditorComponent {
     if (message.toLowerCase().includes('sorry')) {
       return;
     }
+
+    console.log(message);
 
     return message;
   }
