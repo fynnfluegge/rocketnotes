@@ -19,7 +19,8 @@ import { MarkdownModule } from 'ngx-markdown';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { SidenavComponent } from './component/navigation/sidenav.component';
 import { PublicDocumentViewerComponent } from './component/public-document-viewer/public-document-viewer.component';
-import { LlmDialogComponent } from './component/llm-dialog/llm-dialog.component';
+import { LlmDialogComponent } from './component/dialog-llm/llm-dialog.component';
+import { ConfigDialogComponent } from './component/dialog-config/config-dialog.component';
 
 @NgModule({
   declarations: [
@@ -28,6 +29,7 @@ import { LlmDialogComponent } from './component/llm-dialog/llm-dialog.component'
     SidenavComponent,
     PublicDocumentViewerComponent,
     LlmDialogComponent,
+    ConfigDialogComponent,
   ],
   imports: [
     BrowserModule,

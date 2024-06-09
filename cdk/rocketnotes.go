@@ -132,6 +132,24 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("MyHttpLambdaIntegration"), getDocumentHandler, &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
 	})
 
+	// GET User Config Api
+	getUserConfigHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("GET-UserConfig"), &awscdklambdagoalpha.GoFunctionProps{
+		FunctionName: jsii.String("GET-UserConfig"),
+		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
+		Entry:        jsii.String("../lambda-handler/get-user-config-handler"),
+		Bundling: &awscdklambdagoalpha.BundlingOptions{
+			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
+		},
+		Role: lambdaDynamoDbRole,
+	})
+
+	httpApi.AddRoutes(&awscdkapigatewayv2alpha.AddRoutesOptions{
+		Path:        jsii.String("/userConfig/{userId}"),
+		Authorizer:  httpApiAuthorizer,
+		Methods:     &[]awscdkapigatewayv2alpha.HttpMethod{awscdkapigatewayv2alpha.HttpMethod_GET},
+		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("MyHttpLambdaIntegration"), getUserConfigHandler, &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
+	})
+
 	// GET Shared Document Api
 
 	getSharedDocumentHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("GET-Shared-Document"), &awscdklambdagoalpha.GoFunctionProps{
@@ -258,7 +276,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 	awscdklambdagoalpha.NewGoFunction(stack, jsii.String("POST-Document"), &awscdklambdagoalpha.GoFunctionProps{
 		FunctionName: jsii.String("POST-Document"),
 		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
-		Entry:        jsii.String("../lambda-handler/save-document-event-handler"),
+		Entry:        jsii.String("../lambda-handler/save-document-handler/main.go"),
 		Events: &[]awslambda.IEventSource{
 			awslambdaeventsources.NewSqsEventSource(queue, &awslambdaeventsources.SqsEventSourceProps{
 				BatchSize: jsii.Number(1),
@@ -269,6 +287,25 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		},
 		Environment: &map[string]*string{"queueUrl": vectorQueue.QueueUrl()},
 		Role:        lambdaSqsDynamoDbRole,
+	})
+
+	// POST Save User Config Api
+	postUserConfigHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("POST-UserConfig"), &awscdklambdagoalpha.GoFunctionProps{
+		FunctionName: jsii.String("POST-UserConfig"),
+		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
+		Entry:        jsii.String("../lambda-handler/save-user-config-handler"),
+		Bundling: &awscdklambdagoalpha.BundlingOptions{
+			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
+		},
+		Environment: &map[string]*string{"queueUrl": vectorQueue.QueueUrl()},
+		Role: lambdaSqsDynamoDbRole,
+	})
+
+	httpApi.AddRoutes(&awscdkapigatewayv2alpha.AddRoutesOptions{
+		Path:        jsii.String("/userConfig"),
+		Authorizer:  httpApiAuthorizer,
+		Methods:     &[]awscdkapigatewayv2alpha.HttpMethod{awscdkapigatewayv2alpha.HttpMethod_POST},
+		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("postUserConfigLambdaIntegration"), postUserConfigHandler, &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
 	})
 
 	// POST DocumentTree Api
@@ -346,7 +383,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 				BatchSize: jsii.Number(1),
 			}),
 		},
-		Environment: &map[string]*string{"bucketName": bucket.BucketName()},
+		Environment: &map[string]*string{"BUCKET_NAME": bucket.BucketName()},
 		Role:        lambdaS3SqsDynamoDbRole,
 		MemorySize:  jsii.Number(1024),
 		Timeout:     awscdk.Duration_Millis(jsii.Number(900000)),
@@ -359,7 +396,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		Runtime:      awslambda.Runtime_PYTHON_3_9(),
 		Entry:        jsii.String("../lambda-handler/semantic-search-handler"),
 		Index:        aws.String("main.py"),
-		Environment: &map[string]*string{"bucketName": bucket.BucketName()},
+		Environment: &map[string]*string{"BUCKET_NAME": bucket.BucketName()},
 		Role:        lambdaS3Role,
 		MemorySize:  jsii.Number(1024),
 		Timeout:     awscdk.Duration_Millis(jsii.Number(900000)),
@@ -379,7 +416,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		Runtime:      awslambda.Runtime_PYTHON_3_9(),
 		Entry:        jsii.String("../lambda-handler/chat-handler"),
 		Index:        aws.String("main.py"),
-		Environment: &map[string]*string{"bucketName": bucket.BucketName()},
+		Environment: &map[string]*string{"BUCKET_NAME": bucket.BucketName()},
 		Role:        lambdaS3Role,
 		MemorySize:  jsii.Number(1024),
 		Timeout:     awscdk.Duration_Millis(jsii.Number(900000)),
@@ -390,6 +427,24 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		Authorizer:  httpApiAuthorizer,
 		Methods:     &[]awscdkapigatewayv2alpha.HttpMethod{awscdkapigatewayv2alpha.HttpMethod_POST},
 		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("chatLambdaIntegration"), chatHandler, &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
+	})
+
+	// Completion handler
+
+	textCompletionHandler := awscdklambdapythonalpha.NewPythonFunction(stack, jsii.String("TextCompletionHandler"), &awscdklambdapythonalpha.PythonFunctionProps{
+		FunctionName: jsii.String("TextCompletion"),
+		Runtime:      awslambda.Runtime_PYTHON_3_9(),
+		Entry:        jsii.String("../lambda-handler/text-completion-handler"),
+		Index:        aws.String("main.py"),
+		MemorySize:  jsii.Number(1024),
+		Timeout:     awscdk.Duration_Millis(jsii.Number(900000)),
+	})
+
+	httpApi.AddRoutes(&awscdkapigatewayv2alpha.AddRoutesOptions{
+		Path:        jsii.String("/text-completion"),
+		Authorizer:  httpApiAuthorizer,
+		Methods:     &[]awscdkapigatewayv2alpha.HttpMethod{awscdkapigatewayv2alpha.HttpMethod_POST},
+		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("textCompletionLambdaIntegration"), textCompletionHandler, &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
 	})
 
 	// sign-up confirmation lambda handler

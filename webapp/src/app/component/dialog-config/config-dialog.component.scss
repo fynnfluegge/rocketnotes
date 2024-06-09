@@ -1,0 +1,37 @@
+.overlay {
+  display: none;
+  position: fixed;
+  top: -20%;
+  left: 0;
+  width: 100%;
+  height: 120%;
+  background-color: rgba(0, 0, 0, 0.15);
+  color: black;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.dialog {
+  background-color: var(--menu-color);
+  color: lightgray;
+  border-radius: 6px;
+  border: 0.1px solid rgb(63, 66, 65);
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+  padding: 12px;
+  width: 700px;
+  text-align: center;
+}
+
+.open {
+  display: flex;
+}
+
+.radio-inline {
+  display: inline-block;
+  margin-right: 10px;
+}
+
+input[type="radio"] {
+  margin-right: 5px;
+}

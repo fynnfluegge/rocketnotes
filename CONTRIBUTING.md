@@ -22,29 +22,29 @@ First, the following tools and frameworks need to be installed on your system pr
 Second, fork the repository, and then run the following commands to clone the repository locally.
 
 ```
-$ git clone https://github.com/{your-account}/rocketnotes.git
-$ cd rocketnotes
+git clone https://github.com/{your-account}/rocketnotes.git
+cd rocketnotes
 ```
 
-#### 1. Start DynamoDB and docker network
+#### 1. Start DynamoDB and S3 mock with docker
 ```
-$ docker-compose up -d
+docker-compose up dynamodb s3 -d
 ```
 #### 2. Init tables and create data for default user
 ```
-$ sh ./dynamodb-init.sh
+sh ./dynamodb-init.sh
 ```
 #### 3. Build and start Lambda functions with AWS SAM
 ```
-$ sam build
-$ sam local start-api --docker-network rocketnotes_local-serverless-network --warm-containers EAGER 
+sam build
+sam local start-api --docker-network rocketnotes_local-serverless-network --warm-containers EAGER 
 ```
 #### 4. Start Angular app
-```
-$ export BASE_API_URL="http://localhost:3000"
-$ cd webapp
-$ npm install
-$ npm run start
+```bash
+export BASE_API_URL="http://localhost:3000"
+cd webapp
+npm install
+npm run start
 ```
 Open http://localhost:4200 in your browser and you should see the Rocketnotes webapp with the cheat sheet of the default user displayed.
 

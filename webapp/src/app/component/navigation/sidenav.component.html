@@ -36,12 +36,12 @@
         <strong>{{ username }}</strong>
       </div>
       <button
-        (click)="openOpenAiApiKeyDialog('openAiDialog')"
+        (click)="openConfigDialog()"
         *ngIf="!isMobileDevice"
         style="padding: 8px; margin-top: 4px; border-radius: 4px"
         class="btn-primary"
       >
-        OpenAI API Key
+        LLM Config
       </button>
       <div style="width: 80%; margin: auto; margin-top: 12px">
         <label class="switch">
@@ -74,7 +74,6 @@
   </div>
 </ul>
 
-<!-- The popup dialog -->
 <div class="overlay" id="searchDialog">
   <div class="dialog">
     <form autocomplete="off" style="margin-left: auto">
@@ -94,6 +93,7 @@
 </div>
 
 <app-llm-dialog></app-llm-dialog>
+<app-config-dialog></app-config-dialog>
 
 <div
   class="sidebar"

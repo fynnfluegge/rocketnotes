@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"os"
 	"strings"
 	"time"
@@ -13,11 +14,16 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
+	"github.com/aws/aws-sdk-go/service/sqs"
 )
 
+type Item struct {
+	Body *Body `json:"detail"`
+}
+
 type Body struct {
-	Document     *Document `json:"document"`
-	OpenAiApiKey string    `json:"openAiApiKey"`
+	Document *Document `json:"document"`
+	RecreateIndex bool `json:"recreateIndex"`
 }
 
 type Document struct {
@@ -30,36 +36,34 @@ type Document struct {
 	IsPublic      bool      `json:"isPublic"`
 }
 
+type SqsMessage struct {
+	DocumentId   string `json:"documentId"`
+	UserId       string `json:"userId"`
+	RecreateIndex bool `json:"recreateIndex"`
+}
+
 func init() {
 }
 
-func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+func handleRequest(ctx context.Context, event events.SQSEvent) {
 
-	item := Body{}
+	item := Item{}
 
-	json.Unmarshal([]byte(request.Body), &item)
+	json.Unmarshal([]byte(event.Records[0].Body), &item)
 
-	item.Document.Searchcontent = strings.ToLower(item.Document.Title + "\n" + item.Document.Content)
+	item.Body.Document.Searchcontent = strings.ToLower(item.Body.Document.Title + "\n" + item.Body.Document.Content)
 
-	item.Document.LastModified = time.Now()
+	item.Body.Document.LastModified = time.Now()
 
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
 	}))
 
-	var svc *dynamodb.DynamoDB
+	svc := dynamodb.New(sess)
 
-	if os.Getenv("USE_LOCAL_DYNAMODB") == "1" {
-		svc = dynamodb.New(sess, aws.NewConfig().WithEndpoint("http://dynamodb:8000"))
-	} else {
-		svc = dynamodb.New(sess)
-	}
-
-	av, err := dynamodbattribute.MarshalMap(item.Document)
+	av, err := dynamodbattribute.MarshalMap(item.Body.Document)
 	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 404,
-		}, nil
+		log.Fatalf("Got error marshalling new document item: %s", err)
 	}
 
 	tableName := "tnn-Documents"
@@ -71,17 +75,24 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 
 	_, err = svc.PutItem(input)
 	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 404,
-		}, nil
+		log.Fatalf("Got error calling PutItem: %s", err)
 	}
 
-	return events.APIGatewayProxyResponse{
-		StatusCode: 200,
-		Headers: map[string]string{
-			"Access-Control-Allow-Origin": "*", // Required for CORS support to work locally
-		},
-	}, nil
+	if item.Body.RecreateIndex == true {
+		qsvc := sqs.New(sess)
+
+		m := SqsMessage{item.Body.Document.ID, item.Body.Document.UserId, item.Body.RecreateIndex}
+		b, err := json.Marshal(m)
+
+		_, err = qsvc.SendMessage(&sqs.SendMessageInput{
+			DelaySeconds: aws.Int64(0),
+			MessageBody:  aws.String(string(b)),
+			QueueUrl:     aws.String(os.Getenv("queueUrl")),
+		})
+		if err != nil {
+			log.Fatalf("Error sending sqs message: %s", err)
+		}
+	}
 }
 
 func main() {

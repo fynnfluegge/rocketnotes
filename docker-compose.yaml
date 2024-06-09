@@ -1,8 +1,10 @@
 services:
   dynamodb:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.dynamodb
     hostname: dynamodb-local
-    container_name: dynamodb-local
+    container_name: rocketnotes-dynamodb
     command: -jar DynamoDBLocal.jar -sharedDb -dbPath /home/dynamodblocal/data/
     ports:
       - "8041:8000"
@@ -11,10 +13,61 @@ services:
     networks:
       - local-serverless-network
 
+  s3:
+    image: adobe/s3mock:latest
+    container_name: rocketnotes-s3
+    environment:
+      - initialBuckets=faissIndexBucket
+    ports:
+      - 9091:9090
+    volumes:
+      - s3-volume:/home/data
+    networks:
+      - local-serverless-network
+
+  api:
+    image: fynnfluegge/rocketnotes-api:latest
+    command:
+      bash -c "sam local start-api --host 0.0.0.0 --container-host host.docker.internal --port 3002 --docker-volume-basedir ${PWD}/.aws-sam/build --debug
+      --docker-network rocketnotes_local-serverless-network"
+    container_name: rocketnotes-api
+    mem_limit: "8g"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${PWD}:${PWD}:ro
+    platform: linux/amd64
+    ports:
+      - "3002:3002"
+
+  webapp:
+    image: fynnfluegge/rocketnotes-webapp:latest
+    container_name: rocketnotes-webapp
+    platform: linux/amd64
+    ports:
+      - "3001:3001"
+    environment:
+      API_URL: "http://localhost:3002"
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - 11434:11434
+    volumes:
+      - .:/code
+      - ./ollama/ollama:/root/.ollama
+    container_name: ollama
+    pull_policy: always
+    tty: true
+    restart: always
+    networks:
+      - local-serverless-network
+
 volumes:
   dynamodb-volume:
-   driver: local
+    driver: local
+  s3-volume:
+    driver: local
 
 networks:
-   local-serverless-network:
-     driver: "bridge"
+  local-serverless-network:
+    driver: "bridge"

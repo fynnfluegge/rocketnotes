@@ -43,7 +43,9 @@ export class LlmDialogComponent implements OnDestroy, OnInit {
     private llmDialogService: LlmDialogService,
     private restService: BasicRestService,
     private database: DocumentTree,
-  ) {
+  ) {}
+
+  ngOnInit() {
     this.subscription = this.llmDialogService.isOpen$.subscribe((isOpen) => {
       this.isOpen = isOpen;
       if (isOpen) {
@@ -70,8 +72,6 @@ export class LlmDialogComponent implements OnDestroy, OnInit {
     });
   }
 
-  ngOnInit() {}
-
   ngOnDestroy() {
     this.subscription.unsubscribe();
   }
@@ -93,7 +93,6 @@ export class LlmDialogComponent implements OnDestroy, OnInit {
     this.restService
       .post('chat', {
         userId: localStorage.getItem('currentUserId'),
-        openAiApiKey: localStorage.getItem('openAiApiKey'),
         prompt: userMessage,
       })
       .subscribe((result) => {
@@ -122,7 +121,6 @@ export class LlmDialogComponent implements OnDestroy, OnInit {
     this.restService
       .post('semanticSearch', {
         userId: localStorage.getItem('currentUserId'),
-        openAiApiKey: localStorage.getItem('openAiApiKey'),
         searchString: searchInput,
       })
       .subscribe((result) => {
