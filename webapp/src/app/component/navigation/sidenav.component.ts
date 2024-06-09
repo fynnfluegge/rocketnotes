@@ -1,5 +1,11 @@
-import { AfterViewInit, Component, Injectable, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import {
+  Injectable,
+  Component,
+  OnInit,
+  AfterViewInit,
+  ViewChild,
+  ElementRef,
+} from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FlatTreeControl } from '@angular/cdk/tree';
 import {
@@ -11,9 +17,11 @@ import * as uuid from 'uuid';
 import { BasicRestService } from 'src/app/service/basic-rest.service';
 import { Auth } from 'aws-amplify';
 import { environment } from 'src/environments/environment';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { HostListener } from '@angular/core';
+import { LlmDialogService } from 'src/app/service/llm-dialog.service';
+import { ConfigDialogService } from 'src/app/service/config-dialog-service';
 
 const ROOT_ID: string = 'root';
 const PINNED_ID: string = 'pinned';
@@ -68,7 +76,7 @@ export class DocumentTree {
   constructor(
     public http: HttpClient,
     private basicRestService: BasicRestService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
   ) {
     this.initialize();
   }
@@ -139,7 +147,7 @@ export class DocumentTree {
                     this.basicRestService
                       .get('document/' + this.pinnedNode.children[0].id)
                       .subscribe((result) => {
-                        var document = JSON.parse(JSON.stringify(result));
+                        const document = JSON.parse(JSON.stringify(result));
                         this.initContentChange.next({
                           id: document.id,
                           title: document.title,
@@ -151,7 +159,7 @@ export class DocumentTree {
                     this.basicRestService
                       .get('document/' + this.rootNode.children[0].id)
                       .subscribe((result) => {
-                        var document = JSON.parse(JSON.stringify(result));
+                        const document = JSON.parse(JSON.stringify(result));
                         this.initContentChange.next({
                           id: document.id,
                           title: document.title,
@@ -160,11 +168,9 @@ export class DocumentTree {
                         });
                       });
                   }
-                } else {
                 }
               });
             },
-            error: (e) => { },
           });
       });
     } else {
@@ -230,7 +236,7 @@ export class DocumentTree {
                   this.basicRestService
                     .get('document/' + this.pinnedNode.children[0].id)
                     .subscribe((result) => {
-                      var document = JSON.parse(JSON.stringify(result));
+                      const document = JSON.parse(JSON.stringify(result));
                       this.initContentChange.next({
                         id: document.id,
                         title: document.title,
@@ -242,7 +248,7 @@ export class DocumentTree {
                   this.basicRestService
                     .get('document/' + this.rootNode.children[0].id)
                     .subscribe((result) => {
-                      var document = JSON.parse(JSON.stringify(result));
+                      const document = JSON.parse(JSON.stringify(result));
                       this.initContentChange.next({
                         id: document.id,
                         title: document.title,
@@ -251,11 +257,9 @@ export class DocumentTree {
                       });
                     });
                 }
-              } else {
               }
             });
           },
-          error: (e) => { },
         });
     }
   }
@@ -377,11 +381,11 @@ export class DocumentTree {
   }
 
   saveItem(node: DocumentNode, newName: string, newItem: boolean) {
-    var node_ = this.rootNodeMap.get(node.id);
+    const node_ = this.rootNodeMap.get(node.id);
     node_.name = newName;
 
     if (node.pinned) {
-      var pinnedNode = this.pinnedNodeMap.get(node.id);
+      const pinnedNode = this.pinnedNodeMap.get(node.id);
       pinnedNode.name = newName;
     }
 
@@ -400,10 +404,12 @@ export class DocumentTree {
         if (newItem) {
           this.basicRestService
             .post('saveDocument', {
-              id: node.id,
-              userId: localStorage.getItem('currentUserId'),
-              title: newName,
-              content: 'new document',
+              document: {
+                id: node.id,
+                userId: localStorage.getItem('currentUserId'),
+                title: newName,
+                content: 'new document',
+              },
             })
             .subscribe(() => {
               this.initContentChange.next({
@@ -426,7 +432,7 @@ export class DocumentTree {
   restoreItem(
     node: DocumentNode,
     parentToInsertId: string,
-    parentToRemoveId: string = null
+    parentToRemoveId: string = null,
   ) {
     this.setNotDeleted(node);
 
@@ -467,7 +473,7 @@ export class DocumentTree {
       if (!this.pinnedNode.children) this.pinnedNode.children = [];
 
       // add copy of pinned node to pinnedNodeTree
-      var nodeCopy = <DocumentNode>{
+      const nodeCopy = <DocumentNode>{
         id: node.id,
         name: node.name,
         parent: PINNED_ID,
@@ -485,7 +491,7 @@ export class DocumentTree {
     // unpin Node
     else {
       this.pinnedNode.children = this.pinnedNode.children.filter(
-        (c) => c.id !== node.id
+        (c) => c.id !== node.id,
       );
 
       if (this.pinnedNode.children.length === 0)
@@ -511,7 +517,7 @@ export class DocumentTree {
   selector: 'app-sidenav',
   templateUrl: './sidenav.component.html',
   styleUrls: ['./sidenav.component.scss'],
-  providers: [DocumentTree],
+  providers: [DocumentTree, LlmDialogService, ConfigDialogService],
 })
 export class SidenavComponent implements OnInit, AfterViewInit {
   username: string;
@@ -520,6 +526,8 @@ export class SidenavComponent implements OnInit, AfterViewInit {
 
   showSidebar = true;
 
+  darkmode: boolean;
+
   dragging = false;
   expandTimeout: any;
   expandDelay = 1000;
@@ -527,6 +535,8 @@ export class SidenavComponent implements OnInit, AfterViewInit {
   isMobileDevice = false;
 
   operatingSystem: string;
+
+  @ViewChild('searchInput') searchInput: ElementRef;
 
   /** Map from flat node to nested node. This helps us finding the nested node to be modified */
   flatNodeMap: Map<DocumentFlatNode, DocumentNode> = new Map<
@@ -552,21 +562,23 @@ export class SidenavComponent implements OnInit, AfterViewInit {
   constructor(
     private database: DocumentTree,
     private basicRestService: BasicRestService,
-    private router: Router
+    private router: Router,
+    private llmDialogService: LlmDialogService,
+    private configDialogService: ConfigDialogService,
   ) {
     this.treeFlattener = new MatTreeFlattener(
       this.transformer,
       this.getLevel,
       this.isExpandable,
-      this.getChildren
+      this.getChildren,
     );
     this.treeControl = new FlatTreeControl<DocumentFlatNode>(
       this.getLevel,
-      this.isExpandable
+      this.isExpandable,
     );
     this.dataSource = new MatTreeFlatDataSource(
       this.treeControl,
-      this.treeFlattener
+      this.treeFlattener,
     );
 
     database.dataChange.subscribe((data) => {
@@ -578,12 +590,27 @@ export class SidenavComponent implements OnInit, AfterViewInit {
 
     this.getScreenSize();
     this.setOperatingSystem();
+
+    if (localStorage.getItem('darkmode') !== null) {
+      this.darkmode = localStorage.getItem('darkmode') === 'true';
+      this.setTheme();
+    } else {
+      if (environment.production) {
+        Auth.currentAuthenticatedUser().then((user) => {
+          Auth.userAttributes(user).then((attributes) => {
+            this.darkmode = attributes['custom:darkmode'] === 1;
+            localStorage.setItem('darkmode', this.darkmode.toString());
+            this.setTheme();
+          });
+        });
+      }
+    }
   }
 
   setOperatingSystem() {
-    var userAgent = navigator.userAgent;
+    const userAgent = navigator.userAgent;
 
-    var operatingSystem = '';
+    let operatingSystem = '';
     if (/Windows/i.test(userAgent)) {
       operatingSystem = 'Windows';
     } else if (/Macintosh|Mac OS/i.test(userAgent)) {
@@ -607,15 +634,25 @@ export class SidenavComponent implements OnInit, AfterViewInit {
   }
 
   @HostListener('document:keydown.meta.k', ['$event'])
-  focusSearchInput() {
-    document.getElementById('search_documents').focus();
+  focusSearchInput(event) {
+    event.preventDefault();
+    this.searchInput.nativeElement.value = '';
+    this.openSearchDialog();
+  }
+
+  @HostListener('document:keydown.escape', ['$event'])
+  closeDialogs() {
+    document.getElementById('searchDialog').style.display = 'none';
+    this.searchInput.nativeElement.value = '';
+    this.llmDialogService.closeDialog();
+    this.configDialogService.closeDialog();
   }
 
   ngAfterViewInit(): void {
     this.autocomplete(
       document.getElementById('search_documents'),
       this.basicRestService,
-      this.router
+      this.router,
     );
   }
 
@@ -625,7 +662,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
     // check if opened on mobile browser, to prevent drag and drop
     this.isMobileDevice =
       /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(
-        navigator.userAgent
+        navigator.userAgent,
       );
   }
 
@@ -669,9 +706,9 @@ export class SidenavComponent implements OnInit, AfterViewInit {
    * Transformer to convert nested node to flat node. Record the nodes in maps for later use.
    */
   transformer = (node: DocumentNode, level: number) => {
-    let flatNode =
+    const flatNode =
       this.nestedNodeMap.has(node) &&
-        this.nestedNodeMap.get(node)!.name === node.name
+      this.nestedNodeMap.get(node)!.name === node.name
         ? this.nestedNodeMap.get(node)!
         : new DocumentFlatNode();
     flatNode.name = node.name;
@@ -686,16 +723,25 @@ export class SidenavComponent implements OnInit, AfterViewInit {
     return flatNode;
   };
 
-  openItem(id: string) {
-    this.basicRestService.get('document/' + id).subscribe((result) => {
-      var document = JSON.parse(JSON.stringify(result));
-      this.database.initContentChange.next({
-        id: document.id,
-        title: document.title,
-        content: document.content,
-        isPublic: document.isPublic,
+  openItem(el: HTMLElement, id: string) {
+    if (el.tagName === 'SPAN') el = el.parentElement;
+    if (el.tagName === 'MAT-TREE-NODE') {
+      const elems = document.querySelectorAll('.active');
+      [].forEach.call(elems, function (el: HTMLElement) {
+        el.classList.remove('active');
       });
-    });
+      el.classList.add('active');
+
+      this.basicRestService.get('document/' + id).subscribe((result) => {
+        const document = JSON.parse(JSON.stringify(result));
+        this.database.initContentChange.next({
+          id: document.id,
+          title: document.title,
+          content: document.content,
+          isPublic: document.isPublic,
+        });
+      });
+    }
   }
 
   addNewItem(node: DocumentFlatNode) {
@@ -703,14 +749,16 @@ export class SidenavComponent implements OnInit, AfterViewInit {
     if (!node) {
       node = this.nestedNodeMap.get(this.database.rootNode);
     }
-    var parentInRoot = this.database.insertItem(node, '');
+    const parentInRoot = this.database.insertItem(node, '');
     this.treeControl.expand(this.nestedNodeMap.get(parentInRoot));
     this.refreshTree();
+    document.getElementById('new_document').focus();
   }
 
   editItem(node: DocumentFlatNode) {
     node.editNode = true;
     this.refreshTree();
+    document.getElementById('edit_document_title').focus();
   }
 
   cancelEditItem(node: DocumentFlatNode) {
@@ -726,7 +774,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
   }
 
   moveToTrash(node: DocumentFlatNode) {
-    var nestedNode = this.flatNodeMap.get(node);
+    const nestedNode = this.flatNodeMap.get(node);
 
     // remove from parent in documents
     this.database.removeFromDocuments(nestedNode);
@@ -748,19 +796,19 @@ export class SidenavComponent implements OnInit, AfterViewInit {
     if (
       confirm('Are you sure you want to permanently delete ' + node.name + '?')
     ) {
-      var nestedNode = this.flatNodeMap.get(node);
+      const nestedNode = this.flatNodeMap.get(node);
 
       this.database.removeFromTrash(nestedNode);
 
       this.treeControl.collapse(
-        this.nestedNodeMap.get(this.database.trashNode)
+        this.nestedNodeMap.get(this.database.trashNode),
       );
       this.treeControl.expand(this.nestedNodeMap.get(this.database.trashNode));
 
       this.basicRestService
         .get('document/' + this.database.rootNode.children[0].id)
         .subscribe((result) => {
-          var document = JSON.parse(JSON.stringify(result));
+          const document = JSON.parse(JSON.stringify(result));
           this.database.initContentChange.next({
             id: document.id,
             title: document.title,
@@ -785,8 +833,8 @@ export class SidenavComponent implements OnInit, AfterViewInit {
     if (node.parent === ROOT_ID) {
       this.database.restoreItem(nodeToRestore, node.parent);
     } else {
-      var parentToInsert: DocumentNode = this.database.rootNodeMap.get(
-        node.parent
+      let parentToInsert: DocumentNode = this.database.rootNodeMap.get(
+        node.parent,
       );
       if (parentToInsert.deleted) {
         parentToInsert = this.getNearestParentThatIsNotDeleted(nodeToRestore);
@@ -796,7 +844,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
       this.database.restoreItem(
         nodeToRestore,
         parentToInsert.id,
-        parentToInsert.id === parentToRemoveId ? null : parentToRemoveId
+        parentToInsert.id === parentToRemoveId ? null : parentToRemoveId,
       );
     }
 
@@ -814,8 +862,8 @@ export class SidenavComponent implements OnInit, AfterViewInit {
   }
 
   getNearestParentThatIsNotDeleted(node: DocumentNode): DocumentNode {
-    var parentNode;
-    for (let element of this.flatNodeMap.values()) {
+    let parentNode;
+    for (const element of this.flatNodeMap.values()) {
       if (element.id === node.parent) {
         if (element.deleted) {
           parentNode = this.getNearestParentThatIsNotDeleted(element);
@@ -832,7 +880,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
   refreshTree() {
     if (
       this.treeControl.isExpanded(
-        this.nestedNodeMap.get(this.database.rootNode)
+        this.nestedNodeMap.get(this.database.rootNode),
       )
     ) {
       this.treeControl.collapse(this.nestedNodeMap.get(this.database.rootNode));
@@ -840,11 +888,11 @@ export class SidenavComponent implements OnInit, AfterViewInit {
     }
     if (
       this.treeControl.isExpanded(
-        this.nestedNodeMap.get(this.database.pinnedNode)
+        this.nestedNodeMap.get(this.database.pinnedNode),
       )
     ) {
       this.treeControl.collapse(
-        this.nestedNodeMap.get(this.database.pinnedNode)
+        this.nestedNodeMap.get(this.database.pinnedNode),
       );
       this.treeControl.expand(this.nestedNodeMap.get(this.database.pinnedNode));
     }
@@ -888,20 +936,20 @@ export class SidenavComponent implements OnInit, AfterViewInit {
 
     let visibleNodes = this.visibleNodes(
       event.item.data.parent === PINNED_ID,
-      event.item.data.deleted
+      event.item.data.deleted,
     );
 
     const currentIndexOfDraggedNode = visibleNodes.findIndex(
-      (v) => v.id === draggedNode.id
+      (v) => v.id === draggedNode.id,
     );
 
     let dropIndex = event.currentIndex;
 
-    let pinnedNodes = this.database.pinnedNode.children
+    const pinnedNodes = this.database.pinnedNode.children
       ? this.database.pinnedNode.children.length
       : 0;
-    let pinnedExpanded = this.treeControl.isExpanded(
-      this.nestedNodeMap.get(this.database.pinnedNode)
+    const pinnedExpanded = this.treeControl.isExpanded(
+      this.nestedNodeMap.get(this.database.pinnedNode),
     );
 
     if (
@@ -911,18 +959,18 @@ export class SidenavComponent implements OnInit, AfterViewInit {
     ) {
       dropIndex = dropIndex - pinnedNodes;
     } else if (draggedNode.deleted) {
-      let visibleRootNodes = visibleNodes.filter((x) => !x.deleted).length;
+      const visibleRootNodes = visibleNodes.filter((x) => !x.deleted).length;
       visibleNodes = visibleNodes.filter((x) => x.deleted);
       if (
         this.treeControl.isExpanded(
-          this.nestedNodeMap.get(this.database.pinnedNode)
+          this.nestedNodeMap.get(this.database.pinnedNode),
         )
       ) {
         dropIndex -= pinnedNodes;
       }
       if (
         this.treeControl.isExpanded(
-          this.nestedNodeMap.get(this.database.rootNode)
+          this.nestedNodeMap.get(this.database.rootNode),
         )
       ) {
         dropIndex -= visibleRootNodes;
@@ -935,7 +983,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
 
     // drop node at lower position, special handling
     if (currentIndexOfDraggedNode < dropIndex) {
-      let nodeAtDropIndex = visibleNodes[dropIndex];
+      const nodeAtDropIndex = visibleNodes[dropIndex];
       if (!nodeAtDropIndex) return;
       if (
         nodeAtDropIndex.children &&
@@ -1011,7 +1059,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
         this.treeControl.isExpanded(this.nestedNodeMap.get(node)),
         inPinned,
         deleted,
-        result
+        result,
       );
     });
     return result;
@@ -1022,7 +1070,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
     expanded: boolean,
     inPinned: boolean,
     deleted: boolean,
-    result: any
+    result: any,
   ) {
     if (node.id !== ROOT_ID && node.id !== PINNED_ID && node.id !== TRASH_ID) {
       if (inPinned && node.parent === PINNED_ID) {
@@ -1038,8 +1086,8 @@ export class SidenavComponent implements OnInit, AfterViewInit {
           this.treeControl.isExpanded(this.nestedNodeMap.get(child)),
           inPinned,
           deleted,
-          result
-        )
+          result,
+        ),
       );
     }
   }
@@ -1051,21 +1099,19 @@ export class SidenavComponent implements OnInit, AfterViewInit {
       .post('saveDocumentTree', {
         id: localStorage.getItem('currentUserId'),
         documents: JSON.parse(JSON.stringify(this.database.rootNode.children)),
-        TRASH_ID: JSON.parse(JSON.stringify(this.database.trashNode.children)),
-        PINNED_ID: JSON.parse(
-          JSON.stringify(this.database.pinnedNode.children)
-        ),
+        trash: JSON.parse(JSON.stringify(this.database.trashNode.children)),
+        pinned: JSON.parse(JSON.stringify(this.database.pinnedNode.children)),
       })
       .subscribe();
   }
 
-  autocomplete(inp: any, testService: BasicRestService, router: Router) {
+  autocomplete(input: any, testService: BasicRestService, router: Router) {
     /*the autocomplete function takes two arguments,
     the text field element and an array of possible autocompleted values:*/
-    var currentFocus;
+    let currentFocus;
     /*execute a function when someone writes in the text field:*/
-    inp.addEventListener('input', async function() {
-      var a,
+    input.addEventListener('input', async function () {
+      let a,
         b,
         i,
         val = this.value;
@@ -1085,9 +1131,9 @@ export class SidenavComponent implements OnInit, AfterViewInit {
         const result = await testService
           .get(
             'search-documents/' +
-            localStorage.getItem('currentUserId') +
-            '?searchString=' +
-            this.value
+              localStorage.getItem('currentUserId') +
+              '?searchString=' +
+              this.value,
           )
           .toPromise();
         const foundElements = JSON.parse(JSON.stringify(result));
@@ -1095,13 +1141,14 @@ export class SidenavComponent implements OnInit, AfterViewInit {
         for (i = 0; i < foundElements.length; i++) {
           /*create a DIV element for each matching element:*/
           b = document.createElement('DIV');
+          b.setAttribute('class', 'search-item');
           b.innerHTML +=
             "<strong style='font-size:18px;'>" +
             foundElements[i].title +
             '</strong></br>';
-          var suggestion = suggestionToDisplay(foundElements[i].content, val);
+          const suggestion = suggestionToDisplay(foundElements[i].content, val);
           /*make the matching letters bold:*/
-          var startIndex = suggestion
+          const startIndex = suggestion
             .toLocaleLowerCase()
             .indexOf(val.toLocaleLowerCase());
           if (startIndex > -1) {
@@ -1115,35 +1162,44 @@ export class SidenavComponent implements OnInit, AfterViewInit {
           b.innerHTML +=
             "<input type='hidden' value='" + foundElements[i].id + "'>";
           /*execute a function when someone clicks on the item value (DIV element):*/
-          b.addEventListener('click', function(e) {
+          b.addEventListener('click', function (e) {
             router.navigate(
               ['/' + this.getElementsByTagName('input')[0].value],
-              { relativeTo: this.route }
+              { relativeTo: this.route },
             );
+            document.getElementById('searchDialog').style.display = 'none';
+            input.value = '';
             closeAllLists(null);
           });
           a.appendChild(b);
         }
       }
-      // }
     });
     /*execute a function presses a key on the keyboard:*/
-    inp.addEventListener('keydown', function(e) {
-      var x = document.getElementById(this.id + 'autocomplete-list');
+    input.addEventListener('keydown', function (e) {
+      const x = document.getElementById(this.id + 'autocomplete-list');
       if (x) var suggestionList = x.getElementsByTagName('div');
       if (e.keyCode == 40) {
         /*If the arrow DOWN key is pressed,
         increase the currentFocus variable:*/
+        if (currentFocus == suggestionList.length - 1) return;
         currentFocus++;
         /*and and make the current item more visible:*/
         addActive(suggestionList);
+        if (!isElementVisible(x, suggestionList[currentFocus])) {
+          x.scrollTop += suggestionList[currentFocus].offsetHeight;
+        }
       } else if (e.keyCode == 38) {
         //up
         /*If the arrow UP key is pressed,
         decrease the currentFocus variable:*/
+        if (currentFocus == 0) return;
         currentFocus--;
         /*and and make the current item more visible:*/
         addActive(suggestionList);
+        if (!isElementVisible(x, suggestionList[currentFocus])) {
+          x.scrollTop -= suggestionList[currentFocus].offsetHeight;
+        }
       } else if (e.keyCode == 13) {
         /*If the ENTER key is pressed, prevent the form from being submitted,*/
         e.preventDefault();
@@ -1153,6 +1209,14 @@ export class SidenavComponent implements OnInit, AfterViewInit {
         }
       }
     });
+    function isElementVisible(container, element) {
+      const elementRect = element.getBoundingClientRect();
+      const containerRect = container.getBoundingClientRect();
+      return (
+        elementRect.top >= containerRect.top &&
+        elementRect.bottom <= containerRect.bottom
+      );
+    }
     function addActive(x: any) {
       /*a function to classify an item as "active":*/
       if (!x) return false;
@@ -1165,65 +1229,157 @@ export class SidenavComponent implements OnInit, AfterViewInit {
     }
     function removeActive(x: any) {
       /*a function to remove the "active" class from all autocomplete items:*/
-      for (var i = 0; i < x.length; i++) {
+      for (let i = 0; i < x.length; i++) {
         x[i].classList.remove('autocomplete-active');
       }
     }
     function closeAllLists(elmnt: any) {
       /*close all autocomplete lists in the document,
       except the one passed as an argument:*/
-      var x = document.getElementsByClassName('autocomplete-items');
-      for (var i = 0; i < x.length; i++) {
-        if (elmnt != x[i] && elmnt != inp) {
+      const x = document.getElementsByClassName('autocomplete-items');
+      for (let i = 0; i < x.length; i++) {
+        if (elmnt != x[i] && elmnt != input) {
           x[i].parentNode.removeChild(x[i]);
         }
       }
     }
     function suggestionToDisplay(
       content: string,
-      searchPattern: string
+      searchPattern: string,
     ): string {
       const offset = content.length - searchPattern.length;
       const startOffset = content
         .toLocaleLowerCase()
         .indexOf(searchPattern.toLocaleLowerCase());
       const endOffset = offset - startOffset;
-      if (offset >= 28 && startOffset >= 0) {
-        if (startOffset >= 14 && endOffset >= 14) {
+      const maxOffset = 48;
+      const midOffset = 24;
+      if (offset >= maxOffset && startOffset >= 0) {
+        if (startOffset >= midOffset && endOffset >= midOffset) {
           return (
             '...' +
             content.substring(
-              startOffset - 14,
-              startOffset + searchPattern.length + 14
+              startOffset - midOffset,
+              startOffset + searchPattern.length + midOffset,
             ) +
             '...'
           );
         }
-        if (startOffset < 14) {
-          return content.substring(0, searchPattern.length + 28) + '...';
+        if (startOffset < midOffset) {
+          return content.substring(0, searchPattern.length + maxOffset) + '...';
         }
-        if (endOffset < 14) {
+        if (endOffset < midOffset) {
           return (
             '...' +
-            content.substring(startOffset - 28 + endOffset, content.length)
+            content.substring(
+              startOffset - maxOffset + endOffset,
+              content.length,
+            )
           );
         }
-      } else if (startOffset === -1 && content.length > 28) {
-        return content.substring(0, 28) + '...';
+      } else if (startOffset === -1 && content.length > maxOffset) {
+        return content.substring(0, maxOffset) + '...';
       } else {
         return content;
       }
     }
     /*execute a function when someone clicks in the document:*/
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
       closeAllLists(e.target);
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        closeAllLists(null);
+      }
     });
   }
 
-  openOpenAiKeyDialog() {
-    const overlay = document.getElementById("overlay");
-    overlay.style.display = "flex";
-    const inputField = document.getElementById("inputField") as HTMLInputElement;
-    inputField.value = localStorage.getItem("openAiApiKey");
+  toggleDarkMode() {
+    this.darkmode = !this.darkmode;
+    localStorage.setItem('darkmode', this.darkmode.toString());
+    if (environment.production) {
+      Auth.currentAuthenticatedUser().then((user) => {
+        Auth.updateUserAttributes(user, {
+          'custom:darkmode': this.darkmode ? '1' : '0',
+        });
+      });
+    }
+    this.setTheme();
+  }
+
+  setTheme() {
+    document.documentElement.style.setProperty(
+      '--background-color',
+      this.darkmode
+        ? 'var(--dark-theme-background-color)'
+        : 'var(--light-theme-background-color)',
+    );
+    document.documentElement.style.setProperty(
+      '--font-color',
+      this.darkmode
+        ? 'var(--dark-theme-font-color)'
+        : 'var(--light-theme-font-color)',
+    );
+    document.documentElement.style.setProperty(
+      '--menu-color',
+      this.darkmode
+        ? 'var(--dark-theme-menu-color)'
+        : 'var(--light-theme-menu-color)',
+    );
+    document.documentElement.style.setProperty(
+      '--button-fade',
+      this.darkmode
+        ? 'var(--dark-theme-button-fade)'
+        : 'var(--light-theme-button-fade)',
+    );
+    document.documentElement.style.setProperty(
+      '--hyperlink-color',
+      this.darkmode
+        ? 'var(--dark-theme-hyperlink-color)'
+        : 'var(--light-theme-hyperlink-color)',
+    );
+  }
+
+  openSearchDialog() {
+    const overlay = document.getElementById('searchDialog');
+    overlay.style.display = 'flex';
+    if (overlay.getAttribute('outsideClickListener') !== 'true') {
+      overlay.addEventListener('click', (event) => {
+        overlay.setAttribute('outsideClickListener', 'true');
+        this.outsideClickHandler(event);
+      });
+    }
+    const searchField = document.getElementById('search_documents');
+    searchField.focus();
+  }
+
+  outsideClickHandler(event: MouseEvent) {
+    const overlay = document.getElementById('searchDialog');
+    if (event.target === overlay) {
+      overlay.style.display = 'none';
+      this.searchInput.nativeElement.value = '';
+    }
+  }
+
+  commandKey() {
+    return this.operatingSystem === 'Mac' ? '⌘' : 'Ctrl';
+  }
+
+  openLlmDialog() {
+    let config = localStorage.getItem('config');
+    if (config) {
+      config = JSON.parse(config);
+    }
+    if (!config || config['llm'] === '') {
+      window.alert(
+        'Please configure your LLM settings first. Click on the LLM config button in the user menu popup.',
+      );
+    } else {
+      this.llmDialogService.openDialog();
+    }
+  }
+
+  openConfigDialog() {
+    this.configDialogService.openDialog();
   }
 }

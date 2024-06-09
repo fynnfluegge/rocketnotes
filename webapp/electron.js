@@ -1,52 +1,55 @@
-const {app, dialog, Menu, BrowserWindow} = require('electron')
-const {autoUpdater} = require("electron-updater");
-const log = require('electron-log');
-const url = require("url")
-const path = require("path")
-const isMac = process.platform === 'darwin'
+const { app, dialog, Menu, BrowserWindow } = require("electron");
+const { autoUpdater } = require("electron-updater");
+const log = require("electron-log");
+const url = require("url");
+const path = require("path");
+
+const isMac = process.platform === "darwin";
 
 autoUpdater.logger = log;
-autoUpdater.logger.transports.file.level = 'info';
-log.info('App starting...');
+autoUpdater.logger.transports.file.level = "info";
+log.info("App starting...");
 
-let template = []
+let template = [];
 if (isMac) {
-    // OS X
-    const name = app.getName();
-    template.unshift({
-        label: name,
-        submenu: [
-          {
-              label: 'About ' + name,
-              role: 'about'
-          },
-          { type: 'separator' },
-          {
-            label: 'Check for updates', 
-            enabled: true, 
-            click() { autoUpdater.checkForUpdatesAndNotify() }
-          },
-          { type: 'separator' },
-          {
-              role: 'quit',
-              label: 'Quit',
-              accelerator: 'Command+Q'
-          },
-        ]
-    })
+  // OS X
+  const name = app.getName();
+  template.unshift({
+    label: name,
+    submenu: [
+      {
+        label: "About " + name,
+        role: "about",
+      },
+      { type: "separator" },
+      {
+        label: "Check for updates",
+        enabled: true,
+        click() {
+          autoUpdater.checkForUpdatesAndNotify();
+        },
+      },
+      { type: "separator" },
+      {
+        role: "quit",
+        label: "Quit",
+        accelerator: "Command+Q",
+      },
+    ],
+  });
 }
 
-let mainWindow
+let mainWindow;
 
-function createWindow () {
+function createWindow() {
   mainWindow = new BrowserWindow({
     // titleBarStyle: 'hidden',
     width: 1024,
     height: 800,
     webPreferences: {
-      nodeIntegration: true
-    }
-  })
+      nodeIntegration: true,
+    },
+  });
 
   // mainWindow.webContents.openDevTools();
 
@@ -54,20 +57,20 @@ function createWindow () {
     url.format({
       pathname: path.join(__dirname, `/build/index.html`),
       protocol: "file:",
-      slashes: true
-    })
+      slashes: true,
+    }),
   );
 
-  mainWindow.on('closed', function () {
-    mainWindow = null
-  })
+  mainWindow.on("closed", function() {
+    mainWindow = null;
+  });
 }
 
-app.on('ready', () => {
-  const menu = Menu.buildFromTemplate(template)
-  Menu.setApplicationMenu(menu)
-  createWindow()
-})
+app.on("ready", () => {
+  const menu = Menu.buildFromTemplate(template);
+  Menu.setApplicationMenu(menu);
+  createWindow();
+});
 
 // app.on('ready', () => {
 //   // autoUpdater.checkForUpdatesAndNotify()

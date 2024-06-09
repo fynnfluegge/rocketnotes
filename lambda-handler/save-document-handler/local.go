@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"log"
+	"os"
 	"strings"
 	"time"
 
@@ -15,8 +15,9 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 )
 
-type Item struct {
-	Document *Document `json:"detail"`
+type Body struct {
+	Document     *Document `json:"document"`
+	OpenAiApiKey string    `json:"openAiApiKey"`
 }
 
 type Document struct {
@@ -32,11 +33,11 @@ type Document struct {
 func init() {
 }
 
-func handleRequest(ctx context.Context, event events.SQSEvent) {
+func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 
-	item := Item{}
+	item := Body{}
 
-	json.Unmarshal([]byte(event.Records[0].Body), &item)
+	json.Unmarshal([]byte(request.Body), &item)
 
 	item.Document.Searchcontent = strings.ToLower(item.Document.Title + "\n" + item.Document.Content)
 
@@ -46,11 +47,19 @@ func handleRequest(ctx context.Context, event events.SQSEvent) {
 		SharedConfigState: session.SharedConfigEnable,
 	}))
 
-	svc := dynamodb.New(sess)
+	var svc *dynamodb.DynamoDB
+
+	if os.Getenv("USE_LOCAL_DYNAMODB") == "1" {
+		svc = dynamodb.New(sess, aws.NewConfig().WithEndpoint("http://dynamodb:8000"))
+	} else {
+		svc = dynamodb.New(sess)
+	}
 
 	av, err := dynamodbattribute.MarshalMap(item.Document)
 	if err != nil {
-		log.Fatalf("Got error marshalling new movie item: %s", err)
+		return events.APIGatewayProxyResponse{
+			StatusCode: 404,
+		}, nil
 	}
 
 	tableName := "tnn-Documents"
@@ -62,8 +71,17 @@ func handleRequest(ctx context.Context, event events.SQSEvent) {
 
 	_, err = svc.PutItem(input)
 	if err != nil {
-		log.Fatalf("Got error calling PutItem: %s", err)
+		return events.APIGatewayProxyResponse{
+			StatusCode: 404,
+		}, nil
 	}
+
+	return events.APIGatewayProxyResponse{
+		StatusCode: 200,
+		Headers: map[string]string{
+			"Access-Control-Allow-Origin": "*", // Required for CORS support to work locally
+		},
+	}, nil
 }
 
 func main() {
