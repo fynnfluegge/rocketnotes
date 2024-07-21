@@ -1,7 +1,99 @@
-<p>zettelkasten works!</p>
-
-<p>zettelkasten works!</p>
-<p>zettelkasten works!</p>
-<p>zettelkasten works!</p>
-<p>zettelkasten works!</p>
-<p>zettelkasten works!</p>
+<div
+  style="margin-top: 50px; height: calc(100% - 160px)"
+  (document:keydown.meta.shift.s)="submit()"
+  (document:keydown.esc)="cancelEdit()"
+>
+  <div style="max-width: 800px; margin: auto">
+    <p style="font-size: 24px; font-weight: bold; text-align: center">
+      Zettelkasten
+    </p>
+    <textarea
+      [(ngModel)]="textareaContent"
+      [style.width]="showPreview ? 'calc(50% - 4px)' : '100%'"
+      class="variable-textarea"
+      style="
+        resize: none;
+        margin-top: 4px;
+        display: inline-block;
+        height: 128px;
+        border-radius: 4px;
+      "
+    ></textarea>
+    <br />
+    <button (click)="addContent()" style="float: right">Save Note</button>
+    <br />
+    <div *ngFor="let item of contentMap | keyvalue">
+      <br />
+      <div
+        style="
+          display: flex;
+          flex-flow: wrap;
+          justify-content: space-between;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          border-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+          padding: 8px;
+        "
+      >
+        <markdown
+          *ngIf="!editMap[item.key]"
+          class="variable-binding"
+          [data]="item.value.content"
+          style="
+            height: 100%;
+            max-width: 1320px;
+            float: none;
+            margin: auto;
+            overflow-y: scroll;
+            margin-bottom: 4px;
+          "
+        ></markdown>
+        <textarea
+          *ngIf="editMap[item.key]"
+          [(ngModel)]="item.value.content"
+          class="variable-textarea"
+          style="
+            height: 100%;
+            max-width: 1320px;
+            float: none;
+            margin: auto;
+            overflow-y: scroll;
+            margin-bottom: 4px;
+          "
+        ></textarea>
+        <button (click)="edit(item.key)" *ngIf="!editMap[item.key]">
+          Edit
+        </button>
+        <button (click)="save(item.key)" *ngIf="editMap[item.key]">Save</button>
+        <button (click)="insert(item.key)">Insert</button>
+        <button (click)="delete(item.key)">Delete</button>
+        <div style="width: 100%">
+          <div *ngFor="let suggestion of suggestionMap[item.key]">
+            <div style="width: 100%; height: 36px; text-align: right">
+              <mat-icon style="margin-top: 4px"
+                >subdirectory_arrow_right
+              </mat-icon>
+              <span
+                class="tooltip-trigger"
+                style="height: 36px; font-size: 26px; margin-right: 8px"
+                >{{ suggestion.title }}
+                <div class="tooltip-content">
+                  <markdown
+                    class="tooltip-markdown"
+                    [data]="suggestion.content"
+                  ></markdown>
+                </div>
+              </span>
+              <button
+                (click)="archive(item.key, suggestion.id)"
+                style="float: right; height: 36px"
+              >
+                Archive
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

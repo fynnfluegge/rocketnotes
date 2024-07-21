@@ -175,3 +175,29 @@ code {
   color: black !important;
 }
 // ------------------------------- //
+
+// ------ markdown tooltip ------- //
+.tooltip-markdown {
+  font-size: 5px;
+}
+
+.tooltip-markdown > h5 {
+  font-size: 5px;
+}
+
+.tooltip-markdown > h4 {
+  font-size: 6px;
+}
+
+.tooltip-markdown > h3 {
+  font-size: 7px;
+}
+
+.tooltip-markdown > h2 {
+  font-size: 8px;
+}
+
+.tooltip-markdown > h1 {
+  font-size: 9px;
+}
+// ------------------------------- //

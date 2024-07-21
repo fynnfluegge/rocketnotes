@@ -1,11 +1,13 @@
+
 package main
 
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"os"
+	"strings"
+	"time"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -13,7 +15,19 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
+	"github.com/aws/aws-sdk-go/service/sqs"
 )
+
+type Body struct {
+	Zettel     *Zettel `json:"zettel"`
+}
+
+type Zettel struct {
+  ID       string `json:"id"`
+  UserId   string `json:"userId"`
+  Content  string `json:"content"`
+  Created  string `json:"created"`
+}
 
 type Document struct {
 	ID            string    `json:"id"`
@@ -27,31 +41,23 @@ type Document struct {
 	IsPublic      bool      `json:"isPublic"`
 }
 
-type RequestBody struct {
-	ID       string `json:"id"`
-	IsPublic bool   `json:"isPublic"`
-}
 
 func init() {
 }
 
 func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 
-	requestBody := RequestBody{}
+	documentId := request.PathParameters["documentId"]
 
-	json.Unmarshal([]byte(request.Body), &requestBody)
+	body := Body{}
+
+	json.Unmarshal([]byte(request.Body), &body)
 
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
 	}))
 
-	var svc *dynamodb.DynamoDB
-
-	if os.Getenv("USE_LOCAL_DYNAMODB") == "1" {
-		svc = dynamodb.New(sess, aws.NewConfig().WithEndpoint("http://dynamodb:8000"))
-	} else {
-		svc = dynamodb.New(sess)
-	}
+	svc := dynamodb.New(sess)
 
 	tableName := "tnn-Documents"
 
@@ -59,7 +65,7 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		TableName: aws.String(tableName),
 		Key: map[string]*dynamodb.AttributeValue{
 			"id": {
-				S: aws.String(requestBody.ID),
+				S: aws.String(documentId),
 			},
 		},
 	})
@@ -73,18 +79,20 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		}, nil
 	}
 
-	item := Document{}
+	document := Document{}
 
-	err = dynamodbattribute.UnmarshalMap(result.Item, &item)
+	err = dynamodbattribute.UnmarshalMap(result.Item, &document)
 	if err != nil {
 		panic(fmt.Sprintf("Failed to unmarshal Record, %v", err))
 	}
 
-	item.IsPublic = requestBody.IsPublic
+	document.Content += "\n" + body.Zettel.Content
+  document.Searchcontent = strings.ToLower(document.Title + "\n" + document.Content)
+	document.LastModified = time.Now()
 
-	av, err := dynamodbattribute.MarshalMap(item)
+	av, err := dynamodbattribute.MarshalMap(document))
 	if err != nil {
-		log.Fatalf("Got error marshalling new movie item: %s", err)
+		log.Fatalf("Got error marshalling new document item: %s", err)
 	}
 
 	input := &dynamodb.PutItemInput{
@@ -97,12 +105,21 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		log.Fatalf("Got error calling PutItem: %s", err)
 	}
 
-	return events.APIGatewayProxyResponse{
-		StatusCode: 200,
-		Headers: map[string]string{
-			"Access-Control-Allow-Origin": "*", // Required for CORS support to work locally
-		},
-	}, nil
+	if body.RecreateIndex == true {
+		qsvc := sqs.New(sess)
+
+		m := SqsMessage{document.ID, document.UserId, body.RecreateIndex}
+		b, err := json.Marshal(m)
+
+		_, err = qsvc.SendMessage(&sqs.SendMessageInput{
+			DelaySeconds: aws.Int64(0),
+			MessageBody:  aws.String(string(b)),
+			QueueUrl:     aws.String(os.Getenv("queueUrl")),
+		})
+		if err != nil {
+			log.Fatalf("Error sending sqs message: %s", err)
+		}
+	}
 }
 
 func main() {
