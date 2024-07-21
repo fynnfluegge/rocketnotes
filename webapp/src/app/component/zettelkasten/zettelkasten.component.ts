@@ -111,4 +111,6 @@ export class ZettelkastenComponent implements OnInit {
       this.contentMap[id],
     );
   }
+
+  cancelEdit() {}
 }

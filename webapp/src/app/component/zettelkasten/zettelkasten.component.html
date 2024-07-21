@@ -1,6 +1,5 @@
 <div
   style="margin-top: 50px; height: calc(100% - 160px)"
-  (document:keydown.meta.shift.s)="submit()"
   (document:keydown.esc)="cancelEdit()"
 >
   <div style="max-width: 800px; margin: auto">
@@ -9,7 +8,7 @@
     </p>
     <textarea
       [(ngModel)]="textareaContent"
-      [style.width]="showPreview ? 'calc(50% - 4px)' : '100%'"
+      [style.width]="'100%'"
       class="variable-textarea"
       style="
         resize: none;
@@ -85,7 +84,7 @@
                 </div>
               </span>
               <button
-                (click)="archive(item.key, suggestion.id)"
+                (click)="archive(item.key, suggestion)"
                 style="float: right; height: 36px"
               >
                 Archive
