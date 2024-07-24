@@ -29,22 +29,24 @@ export class ConfigDialogComponent implements OnDestroy, OnInit {
     this.subscription = this.configDialogService.isOpen$.subscribe((isOpen) => {
       this.isOpen = isOpen;
       if (isOpen) {
-        if (localStorage.getItem('config')) {
-          const config = JSON.parse(localStorage.getItem('config'));
-          if (config['embeddingModel']) {
-            this.currentEmbeddingModel = config['embeddingModel'];
-            this.selectedEmbeddingModel = config['embeddingModel'];
-          }
-          if (config['llm']) {
-            this.selectedLlm = config['llm'];
-          }
-          if (config['openAiApiKey']) {
-            this.openAiApiKey = config['openAiApiKey'];
-          }
-          if (config['anthropicApiKey']) {
-            this.anthropicApiKey = config['anthropicApiKey'];
-          }
-        }
+        this.restService
+          .get('userConfig/' + localStorage.getItem('currentUserId'))
+          .subscribe((res) => {
+            const config = JSON.parse(JSON.stringify(res));
+            if (config['embeddingModel']) {
+              this.currentEmbeddingModel = config['embeddingModel'];
+              this.selectedEmbeddingModel = config['embeddingModel'];
+            }
+            if (config['llm']) {
+              this.selectedLlm = config['llm'];
+            }
+            if (config['openAiApiKey']) {
+              this.openAiApiKey = config['openAiApiKey'];
+            }
+            if (config['anthropicApiKey']) {
+              this.anthropicApiKey = config['anthropicApiKey'];
+            }
+          });
         const overlay = document.getElementById('configDialog');
         if (overlay.getAttribute('outsideClickListener') !== 'true') {
           overlay.addEventListener('click', (event) => {

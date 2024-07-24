@@ -76,6 +76,15 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		},
 	})
 
+	lambdaS3DynamoDbRole := awsiam.NewRole(stack, aws.String("lambdaS3DynamoDbRole"), &awsiam.RoleProps{
+		AssumedBy: awsiam.NewServicePrincipal(aws.String("lambda.amazonaws.com"), &awsiam.ServicePrincipalOpts{}),
+		ManagedPolicies: &[]awsiam.IManagedPolicy{
+			lambdaBasicExecutionPolicy,
+			s3FullAccessPolicy,
+			dynamoDbFullAccessPolicy,
+		},
+	})
+
 	lambdaS3Role := awsiam.NewRole(stack, aws.String("lambdaS3Role"), &awsiam.RoleProps{
 		AssumedBy: awsiam.NewServicePrincipal(aws.String("lambda.amazonaws.com"), &awsiam.ServicePrincipalOpts{}),
 		ManagedPolicies: &[]awsiam.IManagedPolicy{
@@ -397,7 +406,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		Entry:        jsii.String("../lambda-handler/semantic-search-handler"),
 		Index:        aws.String("main.py"),
 		Environment: &map[string]*string{"BUCKET_NAME": bucket.BucketName()},
-		Role:        lambdaS3Role,
+		Role:        lambdaS3DynamoDbRole,
 		MemorySize:  jsii.Number(1024),
 		Timeout:     awscdk.Duration_Millis(jsii.Number(900000)),
 	})
@@ -417,7 +426,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		Entry:        jsii.String("../lambda-handler/chat-handler"),
 		Index:        aws.String("main.py"),
 		Environment: &map[string]*string{"BUCKET_NAME": bucket.BucketName()},
-		Role:        lambdaS3Role,
+		Role:        lambdaS3DynamoDbRole,
 		MemorySize:  jsii.Number(1024),
 		Timeout:     awscdk.Duration_Millis(jsii.Number(900000)),
 	})
