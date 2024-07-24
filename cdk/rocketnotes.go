@@ -85,14 +85,6 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		},
 	})
 
-	lambdaS3Role := awsiam.NewRole(stack, aws.String("lambdaS3Role"), &awsiam.RoleProps{
-		AssumedBy: awsiam.NewServicePrincipal(aws.String("lambda.amazonaws.com"), &awsiam.ServicePrincipalOpts{}),
-		ManagedPolicies: &[]awsiam.IManagedPolicy{
-			lambdaBasicExecutionPolicy,
-			s3FullAccessPolicy,
-		},
-	})
-
 	// Http Api with Authorization
 
 	httpApi := awscdkapigatewayv2alpha.NewHttpApi(stack, jsii.String("MyHttpApi"), &awscdkapigatewayv2alpha.HttpApiProps{
