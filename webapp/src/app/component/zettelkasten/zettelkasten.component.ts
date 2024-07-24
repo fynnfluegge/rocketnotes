@@ -47,16 +47,18 @@ export class ZettelkastenComponent implements OnInit {
 
   ngOnInit(): void {}
 
-  addContent() {
+  saveNote() {
+    const id = uuid.v4();
     if (this.textareaContent.trim()) {
-      this.contentMap[uuid.v4()] = new Zettel(
-        uuid.v4(),
+      this.contentMap[id] = new Zettel(
+        id,
         localStorage.getItem('currentUserId'),
         this.textareaContent,
         new Date(),
       );
       this.textareaContent = '';
     }
+    this.basicRestService.post('saveZettel', this.contentMap[id]);
   }
 
   edit(id: string) {
@@ -70,7 +72,7 @@ export class ZettelkastenComponent implements OnInit {
 
   delete(id: string) {
     delete this.contentMap[id];
-    this.basicRestService.delete('deleteZettelkasten/' + id);
+    this.basicRestService.delete('deleteZettel/' + id);
   }
 
   insert(id: string) {
