@@ -16,7 +16,7 @@ import (
 )
 
 type UserConfig struct {
-	Id    string `json:"userId"`
+	Id    string `json:"id"`
 	EmbeddingModel string `json:"embeddingModel"`
 	Llm string `json:"llm"`
 	OpenAiApiKey string `json:"openAiApiKey"`
