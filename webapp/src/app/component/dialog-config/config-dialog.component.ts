@@ -40,12 +40,8 @@ export class ConfigDialogComponent implements OnDestroy, OnInit {
             if (config['llm']) {
               this.selectedLlm = config['llm'];
             }
-            if (config['openAiApiKey']) {
-              this.openAiApiKey = config['openAiApiKey'];
-            }
-            if (config['anthropicApiKey']) {
-              this.anthropicApiKey = config['anthropicApiKey'];
-            }
+            this.openAiApiKey = config['openAiApiKey'] ?? '';
+            this.anthropicApiKey = config['anthropicApiKey'] ?? '';
           });
         const overlay = document.getElementById('configDialog');
         if (overlay.getAttribute('outsideClickListener') !== 'true') {
