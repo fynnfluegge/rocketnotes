@@ -5,7 +5,7 @@
 
 .tooltip-trigger .tooltip-content {
   visibility: hidden;
-  width: 200px;
+  width: 320px;
   background-color: #555;
   color: #fff;
   text-align: left;
@@ -17,7 +17,7 @@
   transform: translateY(-50%);
   z-index: 1;
   overflow: auto;
-  max-height: 150px;
+  max-height: 400px;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
   transition: opacity 0.3s;
 }

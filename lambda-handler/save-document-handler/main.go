@@ -32,7 +32,7 @@ type Document struct {
 	UserId       string `json:"userId"`
 	Title        string `json:"title"`
 	Content      string `json:"content"`
-	LastModified string `json:"lastModified"`
+	LastModified time.Time `json:"lastModified"`
 	Deleted      bool   `json:"deleted"`
 	IsPublic     bool   `json:"isPublic"`
 }

@@ -35,7 +35,7 @@
         "
       >
         <markdown
-          *ngIf="!editMap[item.key]"
+          *ngIf="!editMap.get(item.key)"
           class="variable-binding"
           [data]="item.value.content"
           style="
@@ -48,7 +48,7 @@
           "
         ></markdown>
         <textarea
-          *ngIf="editMap[item.key]"
+          *ngIf="editMap.get(item.key)"
           [(ngModel)]="item.value.content"
           class="variable-textarea"
           style="
@@ -60,10 +60,12 @@
             margin-bottom: 4px;
           "
         ></textarea>
-        <button (click)="edit(item.key)" *ngIf="!editMap[item.key]">
+        <button (click)="edit(item.key)" *ngIf="!editMap.get(item.key)">
           Edit
         </button>
-        <button (click)="save(item.key)" *ngIf="editMap[item.key]">Save</button>
+        <button (click)="save(item.key)" *ngIf="editMap.get(item.key)">
+          Save
+        </button>
         <button (click)="insert(item.key)">Insert</button>
         <button (click)="delete(item.key)">Delete</button>
         <div style="width: 100%">

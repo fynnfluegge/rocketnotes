@@ -8,6 +8,7 @@ import (
 	"os"
 	"strings"
 	"time"
+	"fmt"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -20,13 +21,14 @@ import (
 
 type Body struct {
 	Zettel     *Zettel `json:"zettel"`
+	RecreateIndex bool `json:"recreateIndex"`
 }
 
 type Zettel struct {
-  ID       string `json:"id"`
-  UserId   string `json:"userId"`
-  Content  string `json:"content"`
-  Created  string `json:"created"`
+  ID       string    `json:"id"`
+  UserId   string    `json:"userId"`
+  Content  string    `json:"content"`
+  Created  time.Time `json:"created"`
 }
 
 type Document struct {
@@ -39,6 +41,12 @@ type Document struct {
 	LastModified  time.Time `json:"lastModified"`
 	Deleted       bool      `json:"deleted"`
 	IsPublic      bool      `json:"isPublic"`
+}
+
+type SqsMessage struct {
+	DocumentId   string `json:"documentId"`
+	UserId       string `json:"userId"`
+	RecreateIndex bool `json:"recreateIndex"`
 }
 
 
@@ -90,7 +98,7 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
   document.Searchcontent = strings.ToLower(document.Title + "\n" + document.Content)
 	document.LastModified = time.Now()
 
-	av, err := dynamodbattribute.MarshalMap(document))
+	av, err := dynamodbattribute.MarshalMap(document)
 	if err != nil {
 		log.Fatalf("Got error marshalling new document item: %s", err)
 	}
@@ -120,6 +128,13 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 			log.Fatalf("Error sending sqs message: %s", err)
 		}
 	}
+
+	return events.APIGatewayProxyResponse{
+		StatusCode: 200,
+		Headers: map[string]string{
+			"Access-Control-Allow-Origin": "*", // Required for CORS support to work locally
+		},
+	}, nil
 }
 
 func main() {

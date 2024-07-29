@@ -2,24 +2,22 @@ package main
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
-	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 )
 
 type Zettel struct {
-  ID       string `json:"id"`
-  UserId   string `json:"userId"`
-  Content  string `json:"content"`
-  Created  string `json:"created"`
+  ID       string    `json:"id"`
+  UserId   string    `json:"userId"`
+  Content  string    `json:"content"`
+  Created  time.Time `json:"created"`
 }
 
 func init() {
@@ -43,7 +41,7 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 
 	tableName := "tnn-Zettelkasten"
 
-	result, err := svc.GetItem(&dynamodb.DeleteItemInput{
+	result, err := svc.DeleteItem(&dynamodb.DeleteItemInput{
 		TableName: aws.String(tableName),
 		Key: map[string]*dynamodb.AttributeValue{
 			"id": {
@@ -55,7 +53,7 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		log.Fatalf("Got error calling DeleteItem: %s", err)
 	}
 
-	if result.Item == nil {
+	if result == nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: 404,
 		}, nil

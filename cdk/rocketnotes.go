@@ -450,6 +450,24 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 
 	// Zettelkasten handler
 
+	// get zettel kasten
+	getZettelKastenHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("GET-ZettelKasten"), &awscdklambdagoalpha.GoFunctionProps{
+		FunctionName: jsii.String("GET-ZettelKasten"),
+		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
+		Entry:        jsii.String("../lambda-handler/get-zettelkasten-handler"),
+		Bundling: &awscdklambdagoalpha.BundlingOptions{
+			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
+		},
+		Role: lambdaDynamoDbRole,
+	})
+
+	httpApi.AddRoutes(&awscdkapigatewayv2alpha.AddRoutesOptions{
+		Path:        jsii.String("/zettelkasten/{userId}"),
+		Authorizer:  httpApiAuthorizer,
+		Methods:     &[]awscdkapigatewayv2alpha.HttpMethod{awscdkapigatewayv2alpha.HttpMethod_GET},
+		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("getZettelkastenLambdaIntegration"), getZettelKastenHandler, &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
+	})
+
 	// save zettel
 	saveZettelHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("POST-save-Zettel"), &awscdklambdagoalpha.GoFunctionProps{
 		FunctionName: jsii.String("POST-save-Zettel"),

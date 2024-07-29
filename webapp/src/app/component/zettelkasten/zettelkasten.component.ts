@@ -34,18 +34,33 @@ export class ZettelkastenComponent implements OnInit {
     },
   ];
   contentMap: Record<string, Zettel> = {};
-  editMap: Record<string, boolean> = {};
+  editMap: Map<string, boolean> = new Map();
   suggestionMap: Record<string, Document[]> = {};
 
   constructor(private basicRestService: BasicRestService) {
     this.contentMap = this.contentCollection.reduce((map, item) => {
-      this.editMap[item.id] = false;
+      this.editMap.set(item.id, false);
       map[item.id] = item;
       return map;
     }, {});
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.basicRestService
+      .get('zettelkasten/' + localStorage.getItem('currentUserId'))
+      .subscribe((result) => {
+        const jsonResult = JSON.parse(JSON.stringify(result));
+        jsonResult.forEach((element: any) => {
+          this.contentMap[element.id] = new Zettel(
+            element.id,
+            element.userId,
+            element.content,
+            element.created,
+          );
+          this.editMap.set(element.id, false);
+        });
+      });
+  }
 
   saveNote() {
     const id = uuid.v4();
@@ -58,34 +73,31 @@ export class ZettelkastenComponent implements OnInit {
       );
       this.textareaContent = '';
     }
-    this.basicRestService.post('saveZettel', this.contentMap[id]);
+    console.log(this.contentMap);
+    this.basicRestService
+      .post('saveZettel', {
+        zettel: this.contentMap[id],
+      })
+      .subscribe();
   }
 
   edit(id: string) {
-    this.editMap[id] = true;
+    this.editMap.set(id, true);
   }
 
   save(id: string) {
-    this.editMap[id] = false;
-    this.basicRestService.post('saveZettel', this.contentMap[id]);
+    this.editMap.set(id, false);
+    this.basicRestService
+      .post('saveZettel', { zettel: this.contentMap[id] })
+      .subscribe();
   }
 
   delete(id: string) {
     delete this.contentMap[id];
-    this.basicRestService.delete('deleteZettel/' + id);
+    this.basicRestService.delete('deleteZettel/' + id).subscribe();
   }
 
   insert(id: string) {
-    this.suggestionMap[id] = [
-      new Document(
-        '1',
-        '1',
-        'This is the title of the suggestion',
-        '## This is the content of the suggestion\n - This is a bullet point\n - This is another bullet point\n\nThis is a new paragraph',
-        new Date(),
-      ),
-    ];
-
     this.basicRestService
       .post('semanticSearch', {
         userId: localStorage.getItem('currentUserId'),
@@ -96,23 +108,30 @@ export class ZettelkastenComponent implements OnInit {
         this.suggestionMap[id] = [];
         const jsonResult = JSON.parse(JSON.stringify(result));
         jsonResult.forEach((element: any) => {
-          this.suggestionMap[id][element.documentId] = new Document(
-            element.documentId,
-            element.userId,
-            element.title,
-            element.content,
-            element.lastModified,
-          );
+          console.log(element.title);
+          this,
+            this.suggestionMap[id].push(
+              new Document(
+                element.documentId,
+                element.userId,
+                element.title,
+                element.content,
+                element.lastModified,
+              ),
+            );
         });
       });
   }
 
   archive(id: string, documentId: string) {
-    this.basicRestService.post(
-      'archiveZettel/' + documentId,
-      this.contentMap[id],
-    );
+    this.basicRestService
+      .post('archiveZettel/' + documentId, this.contentMap[id])
+      .subscribe();
   }
 
-  cancelEdit() {}
+  cancelEdit() {
+    for (let key of this.editMap.keys()) {
+      this.editMap.set(key, false);
+    }
+  }
 }

@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -20,10 +20,10 @@ type Body struct {
 }
 
 type Zettel struct {
-  ID       string `json:"id"`
-  UserId   string `json:"userId"`
-  Content  string `json:"content"`
-  Created  string `json:"created"`
+  ID       string    `json:"id"`
+  UserId   string    `json:"userId"`
+  Content  string    `json:"content"`
+  Created  time.Time `json:"created"`
 }
 
 func init() {
@@ -49,9 +49,7 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 
 	av, err := dynamodbattribute.MarshalMap(item.Zettel)
 	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 404,
-		}, nil
+		log.Fatalf("Got error marshalling new zettel item: %s", err)
 	}
 
 	tableName := "tnn-Zettelkasten"
@@ -64,7 +62,7 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 	_, err = svc.PutItem(input)
 	if err != nil {
 		return events.APIGatewayProxyResponse{
-			StatusCode: 404,
+			StatusCode: 500,
 		}, nil
 	}
 
