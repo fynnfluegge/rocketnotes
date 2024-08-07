@@ -124,7 +124,9 @@ export class ZettelkastenComponent implements OnInit {
   archive(id: string, documentId: string) {
     this.basicRestService
       .post('archiveZettel/' + documentId, this.contentMap[id])
-      .subscribe();
+      .subscribe(() => {
+        this.delete(id);
+      });
   }
 
   cancelEdit() {
