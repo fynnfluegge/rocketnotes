@@ -608,9 +608,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
       }
     }
 
-    console.log('init');
     if (this.router.url === '/zettelkasten') {
-      console.log('zettelkasten');
       this.showZettelkasten = true;
     } else {
       this.showZettelkasten = false;
@@ -734,7 +732,6 @@ export class SidenavComponent implements OnInit, AfterViewInit {
   };
 
   openItem(el: HTMLElement, id: string) {
-    console.log('open item');
     this.showZettelkasten = false;
     if (el.tagName === 'SPAN') el = el.parentElement;
     if (el.tagName === 'MAT-TREE-NODE') {
@@ -1396,7 +1393,6 @@ export class SidenavComponent implements OnInit, AfterViewInit {
   }
 
   openZettelkasten() {
-    console.log('open zettelkasten');
     this.showZettelkasten = true;
     this.router.navigate(['/zettelkasten']);
   }

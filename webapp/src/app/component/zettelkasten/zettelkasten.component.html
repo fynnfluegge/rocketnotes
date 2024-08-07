@@ -16,10 +16,17 @@
         display: inline-block;
         height: 128px;
         border-radius: 4px;
+        margin-bottom: 4px;
       "
     ></textarea>
     <br />
-    <button (click)="saveNote()" style="float: right">Save Note</button>
+    <button
+      (click)="saveNote()"
+      style="float: right"
+      class="btn btn-default btn-primary btn-fade"
+    >
+      Save Note
+    </button>
     <br />
     <div *ngFor="let item of contentMap | keyvalue">
       <br />
@@ -50,24 +57,56 @@
         <textarea
           *ngIf="editMap.get(item.key)"
           [(ngModel)]="item.value.content"
+          [style.width]="'100%'"
           class="variable-textarea"
           style="
-            height: 100%;
-            max-width: 1320px;
-            float: none;
-            margin: auto;
-            overflow-y: scroll;
+            resize: none;
+            margin-top: 4px;
+            display: inline-block;
+            height: 128px;
+            border-radius: 4px;
             margin-bottom: 4px;
           "
         ></textarea>
-        <button (click)="edit(item.key)" *ngIf="!editMap.get(item.key)">
+        <button
+          (click)="edit(item.key)"
+          *ngIf="!editMap.get(item.key)"
+          style="margin-left: auto; margin-right: 4px"
+          class="btn btn-default btn-primary btn-fade"
+        >
           Edit
         </button>
-        <button (click)="save(item.key)" *ngIf="editMap.get(item.key)">
+        <button
+          (click)="cancelEdit(0)"
+          *ngIf="editMap.get(item.key)"
+          style="margin-right: auto"
+          class="btn btn-default btn-primary btn-fade"
+        >
+          Cancel
+        </button>
+        <button
+          (click)="save(item.key)"
+          *ngIf="editMap.get(item.key)"
+          style="margin-left: auto; margin-right: 4px"
+          class="btn btn-default btn-primary btn-fade"
+        >
           Save
         </button>
-        <button (click)="insert(item.key)">Insert</button>
-        <button (click)="delete(item.key)">Delete</button>
+        <button
+          (click)="insert(item.key)"
+          data-title="Insert into documents by getting suggestions"
+          style="margin-right: 4px"
+          class="btn btn-default btn-primary btn-fade tooltip-bottom expand"
+        >
+          Insert
+        </button>
+        <button
+          (click)="delete(item.key)"
+          class="btn btn-default btn-primary btn-fade"
+        >
+          Delete
+        </button>
+
         <div style="width: 100%">
           <div *ngFor="let suggestion of suggestionMap[item.key]">
             <div style="width: 100%; height: 36px; text-align: right">
@@ -87,7 +126,9 @@
               </span>
               <button
                 (click)="archive(item.key, suggestion)"
+                data-title="Archive to suggested document"
                 style="float: right; height: 36px"
+                class="btn btn-default btn-primary btn-fade tooltip-bottom expand"
               >
                 Archive
               </button>

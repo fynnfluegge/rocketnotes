@@ -73,7 +73,6 @@ export class ZettelkastenComponent implements OnInit {
       );
       this.textareaContent = '';
     }
-    console.log(this.contentMap);
     this.basicRestService
       .post('saveZettel', {
         zettel: this.contentMap[id],
@@ -108,7 +107,6 @@ export class ZettelkastenComponent implements OnInit {
         this.suggestionMap[id] = [];
         const jsonResult = JSON.parse(JSON.stringify(result));
         jsonResult.forEach((element: any) => {
-          console.log(element.title);
           this,
             this.suggestionMap[id].push(
               new Document(

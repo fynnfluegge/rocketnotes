@@ -524,9 +524,7 @@ export class EditorComponent {
                 },
               ],
             })
-            .subscribe(() => {
-              console.log('Vector embeddings updated');
-            });
+            .subscribe(() => {});
         }
       });
   }
