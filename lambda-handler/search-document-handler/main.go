@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -23,7 +24,7 @@ type Document struct {
 	UserId       string `json:"userId"`
 	Title        string `json:"title"`
 	Content      string `json:"content"`
-	LastModified string `json:"lastModified"`
+	LastModified time.Time `json:"lastModified"`
 	Deleted      bool   `json:"deleted"`
 }
 

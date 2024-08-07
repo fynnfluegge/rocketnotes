@@ -536,6 +536,8 @@ export class SidenavComponent implements OnInit, AfterViewInit {
 
   operatingSystem: string;
 
+  showZettelkasten = false;
+
   @ViewChild('searchInput') searchInput: ElementRef;
 
   /** Map from flat node to nested node. This helps us finding the nested node to be modified */
@@ -604,6 +606,12 @@ export class SidenavComponent implements OnInit, AfterViewInit {
           });
         });
       }
+    }
+
+    if (this.router.url === '/zettelkasten') {
+      this.showZettelkasten = true;
+    } else {
+      this.showZettelkasten = false;
     }
   }
 
@@ -724,6 +732,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
   };
 
   openItem(el: HTMLElement, id: string) {
+    this.showZettelkasten = false;
     if (el.tagName === 'SPAN') el = el.parentElement;
     if (el.tagName === 'MAT-TREE-NODE') {
       const elems = document.querySelectorAll('.active');
@@ -1381,5 +1390,10 @@ export class SidenavComponent implements OnInit, AfterViewInit {
 
   openConfigDialog() {
     this.configDialogService.openDialog();
+  }
+
+  openZettelkasten() {
+    this.showZettelkasten = true;
+    this.router.navigate(['/zettelkasten']);
   }
 }

@@ -31,6 +31,27 @@ aws dynamodb create-table --endpoint-url http://localhost:8041 --table-name tnn-
 --provisioned-throughput ReadCapacityUnits=2,WriteCapacityUnits=2 \
 > /dev/null 2>&1
 
+aws dynamodb create-table --endpoint-url http://localhost:8041 --table-name tnn-Zettelkasten \
+--attribute-definitions AttributeName=id,AttributeType=S AttributeName=userId,AttributeType=S \
+--key-schema AttributeName=id,KeyType=HASH \
+--provisioned-throughput ReadCapacityUnits=2,WriteCapacityUnits=2 \
+--global-secondary-indexes "[
+    {
+        \"IndexName\": \"userId-index\",
+        \"KeySchema\": [
+            {\"AttributeName\": \"userId\", \"KeyType\": \"HASH\"}
+        ],
+        \"Projection\": {
+            \"ProjectionType\": \"ALL\"
+        },
+        \"ProvisionedThroughput\": {
+            \"ReadCapacityUnits\": 2,
+            \"WriteCapacityUnits\": 2
+        }
+    }
+]" \
+> /dev/null 2>&1
+
 # create document tree
 aws dynamodb put-item --endpoint-url http://localhost:8041 --table-name tnn-Tree \
 --item '{"id": {"S": "4afe1f16-add0-11ed-afa1-0242ac120002"},"documents": {"L": [{"M": {"id": {"S": "5b6ae09e-c32a-45ee-bb3b-1c65fc943a9c"},"children": {"NULL": true},"name": {"S": "Cheat Sheet"},"parent": {"S": "root"},"pinned": {"BOOL": false}}}]},"pinned": {"NULL": true},"trash": {"NULL": true}}' \

@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"os"
 	"time"
@@ -16,15 +15,15 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 )
 
-type Document struct {
-	ID           string `json:"id"`
-	ParentId     string `json:"parentId"`
-	UserId       string `json:"userId"`
-	Title        string `json:"title"`
-	Content      string `json:"content"`
-	LastModified time.Time `json:"lastModified"`
-	Deleted      bool   `json:"deleted"`
-	IsPublic     bool   `json:"isPublic"`
+type Body struct {
+	Zettel *Zettel `json:"zettel"`
+}
+
+type Zettel struct {
+  ID       string    `json:"id"`
+  UserId   string    `json:"userId"`
+  Content  string    `json:"content"`
+  Created  time.Time `json:"created"`
 }
 
 func init() {
@@ -32,7 +31,9 @@ func init() {
 
 func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 
-	id := request.PathParameters["documentId"]
+	item := Body{}
+
+	json.Unmarshal([]byte(request.Body), &item)
 
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
@@ -46,42 +47,23 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		svc = dynamodb.New(sess)
 	}
 
-	tableName := "tnn-Documents"
+	av, err := dynamodbattribute.MarshalMap(item.Zettel)
+	if err != nil {
+		log.Fatalf("Got error marshalling new zettel item: %s", err)
+	}
 
-	result, err := svc.GetItem(&dynamodb.GetItemInput{
+	tableName := "tnn-Zettelkasten"
+
+	input := &dynamodb.PutItemInput{
+		Item:      av,
 		TableName: aws.String(tableName),
-		Key: map[string]*dynamodb.AttributeValue{
-			"id": {
-				S: aws.String(id),
-			},
-		},
-	})
-	if err != nil {
-		log.Fatalf("Got error calling GetItem: %s", err)
 	}
 
-	if result.Item == nil {
+	_, err = svc.PutItem(input)
+	if err != nil {
 		return events.APIGatewayProxyResponse{
-			StatusCode: 404,
+			StatusCode: 500,
 		}, nil
-	}
-
-	item := Document{}
-
-	err = dynamodbattribute.UnmarshalMap(result.Item, &item)
-	if err != nil {
-		panic(fmt.Sprintf("Failed to unmarshal Record, %v", err))
-	}
-
-	if item.Deleted {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 404,
-		}, nil
-	}
-
-	b, err := json.Marshal(item)
-	if err != nil {
-		fmt.Println(err)
 	}
 
 	return events.APIGatewayProxyResponse{
@@ -89,7 +71,6 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		Headers: map[string]string{
 			"Access-Control-Allow-Origin": "*", // Required for CORS support to work locally
 		},
-		Body: string(b),
 	}, nil
 }
 

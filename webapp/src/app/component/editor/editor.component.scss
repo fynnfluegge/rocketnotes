@@ -30,24 +30,6 @@ textarea.md-input {
   height: 100%;
 }
 
-.variable-textarea {
-  border-radius: 5px;
-  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
-  padding: 12px;
-  border: none;
-}
-
-.variable-textarea:focus {
-  outline: none !important;
-  border: none;
-}
-
-.variable-textarea:hover {
-  box-shadow:
-    0 6px 12px 3px rgba(0, 0, 0, 0.09),
-    0 2px 3px 1px rgba(0, 0, 0, 0.06);
-}
-
 .variable-binding {
   display: block;
   float: right;
@@ -147,94 +129,7 @@ div.center {
   }
 }
 
-// ---- Tooltips ---- //
-
-.tooltip-bottom {
-  @extend .tooltip-base;
-}
-
-.tooltip-bottom::before,
-.tooltip-bottom::after {
-  margin-top: 17px;
-}
-
-.tooltip-bottom:after {
-  border-right: 6px solid transparent;
-  border-bottom: 6px solid rgba(0, 0, 0, 0.75);
-  border-left: 6px solid transparent;
-  top: 20px;
-}
-
-.tooltip-bottom.expand:after {
-  transform: translate3d(0, 6px, 0);
-}
-
-.tooltip-top {
-  @extend .tooltip-base;
-}
-
-.tooltip-top::before,
-.tooltip-top::after {
-  margin-top: -68px;
-}
-
-.tooltip-top:after {
-  border-right: 6px solid transparent;
-  border-top: 6px solid rgba(0, 0, 0, 0.75);
-  border-left: 6px solid transparent;
-  top: 58px;
-}
-
-.tooltip-top.expand:after {
-  transform: translate3d(0, -6px, 0);
-}
-
-/* setup tooltips base */
-.tooltip-base {
-  position: relative;
-}
-
-.tooltip-base:before,
-.tooltip-base:after {
-  transition: 0s;
-  display: block;
-  opacity: 0;
-  pointer-events: none;
-  position: absolute;
-}
-.tooltip-base:after {
-  content: "";
-  height: 0;
-  left: 20px;
-  width: 0;
-}
-.tooltip-base:before {
-  background: rgba(0, 0, 0, 0.75);
-  border-radius: 2px;
-  color: #fff;
-  content: attr(data-title);
-  font-size: 14px;
-  padding: 6px 10px;
-  top: 26px;
-  white-space: nowrap;
-}
-
-/* expand animation */
-.tooltip-base.expand:before {
-  transform: scale3d(0.2, 0.2, 1);
-  transition: all 0.2s ease-in-out;
-}
-.tooltip-base.expand:after {
-  transition: all 0.1s ease-in-out;
-}
-.tooltip-base.expand:hover:before,
-.tooltip-base.expand:hover:after {
-  opacity: 1;
-  transform: scale3d(1, 1, 1);
-}
-.tooltip-base.expand:hover:after {
-  transition: all 0.2s 0.1s ease-in-out;
-}
+// LLM text completion text
 .suggestion {
   position: absolute;
   z-index: 1000; /* Ensure it appears above other content */
