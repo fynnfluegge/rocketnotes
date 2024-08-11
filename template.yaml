@@ -6,7 +6,7 @@ Globals:
     Timeout: 20
   Api:
     Cors:
-      AllowMethods: "'GET,POST,OPTIONS'"
+      AllowMethods: "'GET,POST,DELETE,OPTIONS'"
       AllowHeaders: "'content-type'"
       AllowOrigin: "'*'"
       AllowCredentials: "'*'"
@@ -463,7 +463,7 @@ Resources:
       Timeout: 100
       Policies:
         - DynamoDBCrudPolicy:
-            TableName: tnn-Zettelkasten
+            TableName: tnn-documents
       Environment:
         Variables:
           USE_LOCAL_DYNAMODB: 1

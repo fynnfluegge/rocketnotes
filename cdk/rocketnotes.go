@@ -512,7 +512,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		Bundling: &awscdklambdagoalpha.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
-		Role: lambdaDynamoDbRole,
+		Role: lambdaSqsDynamoDbRole,
 	})
 
 	httpApi.AddRoutes(&awscdkapigatewayv2alpha.AddRoutesOptions{

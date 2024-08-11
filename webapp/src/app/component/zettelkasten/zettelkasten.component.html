@@ -120,12 +120,12 @@
                 <div class="tooltip-content">
                   <markdown
                     class="tooltip-markdown"
-                    [data]="suggestion.content"
+                    [data]="getTooltip(suggestion.id)"
                   ></markdown>
                 </div>
               </span>
               <button
-                (click)="archive(item.key, suggestion)"
+                (click)="archive(item.key, suggestion.id)"
                 data-title="Archive to suggested document"
                 style="float: right; height: 36px"
                 class="btn btn-default btn-primary btn-fade tooltip-bottom expand"

@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"os"
 	"strings"
 	"time"
 
@@ -22,11 +21,13 @@ type Body struct {
 
 type Document struct {
 	ID            string    `json:"id"`
+	ParentId      string    `json:"parentId"`
 	UserId        string    `json:"userId"`
 	Title         string    `json:"title"`
 	Content       string    `json:"content"`
 	Searchcontent string    `json:"searchContent"`
 	LastModified  time.Time `json:"lastModified"`
+	Deleted       bool      `json:"deleted"`
 	IsPublic      bool      `json:"isPublic"`
 }
 
@@ -49,11 +50,7 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 
 	var svc *dynamodb.DynamoDB
 
-	if os.Getenv("USE_LOCAL_DYNAMODB") == "1" {
-		svc = dynamodb.New(sess, aws.NewConfig().WithEndpoint("http://dynamodb:8000"))
-	} else {
-		svc = dynamodb.New(sess)
-	}
+	svc = dynamodb.New(sess, aws.NewConfig().WithEndpoint("http://dynamodb:8000"))
 
 	av, err := dynamodbattribute.MarshalMap(item.Document)
 	if err != nil {

@@ -65,7 +65,13 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		SharedConfigState: session.SharedConfigEnable,
 	}))
 
-	svc := dynamodb.New(sess)
+	var svc *dynamodb.DynamoDB
+
+	if os.Getenv("USE_LOCAL_DYNAMODB") == "1" {
+		svc = dynamodb.New(sess, aws.NewConfig().WithEndpoint("http://dynamodb:8000"))
+	} else {
+		svc = dynamodb.New(sess)
+	}
 
 	tableName := "tnn-Documents"
 

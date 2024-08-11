@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { Document } from 'src/app/model/document.model';
 import { Zettel } from 'src/app/model/zettel.model';
 import { BasicRestService } from 'src/app/service/basic-rest.service';
+import { environment } from 'src/environments/environment';
 import * as uuid from 'uuid';
 
 @Component({
@@ -13,29 +14,11 @@ export class ZettelkastenComponent implements OnInit {
   @Input() showSidebar: boolean;
 
   textareaContent: string = '';
-  contentCollection: Zettel[] = [
-    {
-      id: '1',
-      userId: '1',
-      content: 'This is the content of Zettel 1',
-      created: new Date(),
-    },
-    {
-      id: '2',
-      userId: '1',
-      content: 'This is the content of Zettel 2',
-      created: new Date(),
-    },
-    {
-      id: '3',
-      userId: '1',
-      content: 'This is the content of Zettel 3',
-      created: new Date(),
-    },
-  ];
+  contentCollection: Zettel[] = [];
   contentMap: Record<string, Zettel> = {};
   editMap: Map<string, boolean> = new Map();
   suggestionMap: Record<string, Document[]> = {};
+  tooltips: Map<string, string> = new Map();
 
   constructor(private basicRestService: BasicRestService) {
     this.contentMap = this.contentCollection.reduce((map, item) => {
@@ -92,8 +75,9 @@ export class ZettelkastenComponent implements OnInit {
   }
 
   delete(id: string) {
-    delete this.contentMap[id];
-    this.basicRestService.delete('deleteZettel/' + id).subscribe();
+    this.basicRestService.delete('deleteZettel/' + id).subscribe(() => {
+      delete this.contentMap[id];
+    });
   }
 
   insert(id: string) {
@@ -106,8 +90,13 @@ export class ZettelkastenComponent implements OnInit {
         // this.isLoading = false;
         this.suggestionMap[id] = [];
         const jsonResult = JSON.parse(JSON.stringify(result));
+        var dedupList = new Set();
         jsonResult.forEach((element: any) => {
-          this,
+          if (dedupList.has(element.documentId)) {
+            return;
+          } else {
+            dedupList.add(element.documentId);
+            // TODO dedup
             this.suggestionMap[id].push(
               new Document(
                 element.documentId,
@@ -117,21 +106,61 @@ export class ZettelkastenComponent implements OnInit {
                 element.lastModified,
               ),
             );
+          }
         });
       });
   }
 
   archive(id: string, documentId: string) {
     this.basicRestService
-      .post('archiveZettel/' + documentId, this.contentMap[id])
+      .post('archiveZettel/' + documentId, {
+        zettel: this.contentMap[id],
+        recreateIndex: environment.production,
+      })
       .subscribe(() => {
+        // TODO recreate index for local
         this.delete(id);
+
+        if (
+          !environment.production &&
+          localStorage.getItem('config') !== null
+        ) {
+          this.basicRestService
+            .post('vector-embeddings', {
+              Records: [
+                {
+                  body: {
+                    userId: localStorage.getItem('currentUserId'),
+                    documentId: documentId,
+                    recreateIndex: true,
+                  },
+                },
+              ],
+            })
+            .subscribe(() => {});
+        }
       });
   }
 
   cancelEdit() {
     for (let key of this.editMap.keys()) {
       this.editMap.set(key, false);
+    }
+  }
+
+  getTooltip(id: string) {
+    if (this.tooltips.has(id)) {
+      return this.tooltips.get(id);
+    } else {
+      this.basicRestService.get('document/' + id).subscribe((result) => {
+        this.tooltips.set(
+          id,
+          JSON.parse(JSON.stringify(result)).title +
+            '\n' +
+            JSON.parse(JSON.stringify(result)).content,
+        );
+        return this.tooltips.get(id);
+      });
     }
   }
 }
