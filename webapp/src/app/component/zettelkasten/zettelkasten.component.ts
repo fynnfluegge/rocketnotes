@@ -80,7 +80,7 @@ export class ZettelkastenComponent implements OnInit {
     });
   }
 
-  insert(id: string) {
+  archive(id: string) {
     this.basicRestService
       .post('semanticSearch', {
         userId: localStorage.getItem('currentUserId'),
@@ -111,7 +111,7 @@ export class ZettelkastenComponent implements OnInit {
       });
   }
 
-  archive(id: string, documentId: string) {
+  insert(id: string, documentId: string) {
     this.basicRestService
       .post('archiveZettel/' + documentId, {
         zettel: this.contentMap[id],

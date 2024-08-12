@@ -179,27 +179,27 @@ code {
 
 // ------ markdown tooltip ------- //
 .tooltip-markdown {
-  font-size: 5px;
-}
-
-.tooltip-markdown > h5 {
-  font-size: 5px;
-}
-
-.tooltip-markdown > h4 {
   font-size: 6px;
 }
 
-.tooltip-markdown > h3 {
+.tooltip-markdown > h5 {
+  font-size: 6px;
+}
+
+.tooltip-markdown > h4 {
   font-size: 7px;
 }
 
-.tooltip-markdown > h2 {
+.tooltip-markdown > h3 {
   font-size: 8px;
 }
 
-.tooltip-markdown > h1 {
+.tooltip-markdown > h2 {
   font-size: 9px;
+}
+
+.tooltip-markdown > h1 {
+  font-size: 10px;
 }
 // ------------------------------- //
 
@@ -293,6 +293,7 @@ code {
   padding: 6px 10px;
   top: 26px;
   white-space: nowrap;
+  z-index: 2;
 }
 
 /* expand animation */

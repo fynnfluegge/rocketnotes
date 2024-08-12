@@ -71,7 +71,7 @@
         <button
           (click)="edit(item.key)"
           *ngIf="!editMap.get(item.key)"
-          style="margin-left: auto; margin-right: 4px"
+          style="margin-left: auto; margin-right: 4px; height: 36px"
           class="btn btn-default btn-primary btn-fade"
         >
           Edit
@@ -93,15 +93,16 @@
           Save
         </button>
         <button
-          (click)="insert(item.key)"
-          data-title="Insert into documents by getting suggestions"
-          style="margin-right: 4px"
+          (click)="archive(item.key)"
+          data-title="Archive zettel into suggested documents"
+          style="margin-right: 4px; height: 36px"
           class="btn btn-default btn-primary btn-fade tooltip-bottom expand"
         >
-          Insert
+          Archive
         </button>
         <button
           (click)="delete(item.key)"
+          style="height: 36px"
           class="btn btn-default btn-primary btn-fade"
         >
           Delete
@@ -110,12 +111,13 @@
         <div style="width: 100%">
           <div *ngFor="let suggestion of suggestionMap[item.key]">
             <div style="width: 100%; height: 36px; text-align: right">
-              <mat-icon style="margin-top: 4px"
-                >subdirectory_arrow_right
+              <mat-icon
+                style="margin-top: 4px; margin-right: 6px; font-size: 28px"
+                >archive
               </mat-icon>
               <span
                 class="tooltip-trigger"
-                style="height: 36px; font-size: 26px; margin-right: 8px"
+                style="height: 36px; font-size: 24px; margin-right: 8px"
                 >{{ suggestion.title }}
                 <div class="tooltip-content">
                   <markdown
@@ -125,12 +127,12 @@
                 </div>
               </span>
               <button
-                (click)="archive(item.key, suggestion.id)"
-                data-title="Archive to suggested document"
+                (click)="insert(item.key, suggestion.id)"
+                data-title="Insert zettel into document"
                 style="float: right; height: 36px"
                 class="btn btn-default btn-primary btn-fade tooltip-bottom expand"
               >
-                Archive
+                Insert
               </button>
             </div>
           </div>
