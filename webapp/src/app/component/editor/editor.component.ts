@@ -7,7 +7,7 @@ import { Title } from '@angular/platform-browser';
 import { environment } from 'src/environments/environment';
 import { Location } from '@angular/common';
 import { HostListener } from '@angular/core';
-import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 
 import OpenAI from 'openai';
 
@@ -43,13 +43,13 @@ export class EditorComponent {
 
   initialContent: string;
 
-  keyPressCounter: number = 0;
-
   private openai: OpenAI;
   private abortController: AbortController;
   private completionTimeout: NodeJS.Timeout | undefined;
   private suggestionLinebreak: boolean = false;
   public aiCompletionEnabled: boolean = false;
+
+  private timer: any;
 
   constructor(
     private database: DocumentTree,
@@ -138,6 +138,19 @@ export class EditorComponent {
       localStorage.getItem('aiCompletionEnabled') === 'true';
   }
 
+  private startOrResetTimer(): void {
+    // Clear the existing timer
+    if (this.timer) {
+      clearTimeout(this.timer);
+    }
+
+    // Set a new timer
+    this.timer = setTimeout(() => {
+      this.submit();
+      this.timer = null; // Clear the timer after submit
+    }, 3000);
+  }
+
   toggleAiCompletion() {
     if (!this.aiCompletionEnabled && !localStorage.getItem('config')) {
       window.alert(
@@ -189,7 +202,6 @@ export class EditorComponent {
           );
         }
       }, 100);
-      this.keyPressCounter = 0;
       this.initialContent = (' ' + this.content).slice(1);
     }
   }
@@ -222,14 +234,13 @@ export class EditorComponent {
     if (this.editorMode) {
       this.editorMode = false;
       this.suggestion = '';
-      this.submit();
+      this.submit(true);
     }
   }
 
   undoChanges() {
     if (confirm('Are you sure to undo all Changes to ' + this.title + '?')) {
       if (this.initialContent !== this.content) {
-        this.keyPressCounter = 0;
         this.content = this.initialContent;
         this.submit();
       }
@@ -266,11 +277,7 @@ export class EditorComponent {
         markdownTextarea.scrollTop += markdownTextarea.clientHeight;
       }
     } else if (event.code !== 'Escape') {
-      this.keyPressCounter++;
-      if (this.keyPressCounter === 100) {
-        this.keyPressCounter = 0;
-        this.submit();
-      }
+      this.startOrResetTimer();
 
       if (this.aiCompletionEnabled) {
         this.abortController.abort();
@@ -488,7 +495,7 @@ export class EditorComponent {
     }
   }
 
-  submit(): void {
+  submit(recreateVectors: boolean = false): void {
     this.basicRestService
       .post('saveDocument', {
         document: {
@@ -497,20 +504,24 @@ export class EditorComponent {
           title: this.title,
           content: this.content,
           isPublic: this.isPublic,
-          recreateIndex: localStorage.getItem('config') !== null,
+          recreateIndex:
+            localStorage.getItem('config') !== null && recreateVectors,
         },
       })
       .subscribe(() => {
-        this.showSnackbar = true;
-        setTimeout(() => {
-          this.showSnackbar = false;
-        }, 1000);
+        // Snackbar disabled, since too many snackbar messages are displayed
+        // this.showSnackbar = true;
+        // setTimeout(() => {
+        //   this.showSnackbar = false;
+        // }, 1000);
+
         // Explicitly update the vector embeddings after the document has been saved
         // only in local mode. In deployed production mode, the vector embeddings are updated
         // via sqs event after the document has been saved
         if (
           !environment.production &&
-          localStorage.getItem('config') !== null
+          localStorage.getItem('config') !== null &&
+          recreateVectors
         ) {
           this.basicRestService
             .post('vector-embeddings', {
