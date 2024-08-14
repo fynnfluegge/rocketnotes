@@ -100,6 +100,20 @@
   [style.left.px]="showSidebar ? '0' : '-200'"
   (document:keydown.meta.control.n)="addNewItem(null)"
 >
+  <!-- <button -->
+  <!--   (click)="openZettelkasten()" -->
+  <!--   style=" -->
+  <!--     display: flex; -->
+  <!--     height: 24px; -->
+  <!--     width: 100%; -->
+  <!--     text-align: center; -->
+  <!--     font-weight: 280; -->
+  <!--     color: lightgrey; -->
+  <!--   " -->
+  <!-- > -->
+  <!--   <mat-icon style="margin-left: -4px; font-size: 22px">drafts</mat-icon> -->
+  <!--   Zettelkasten -->
+  <!-- </button> -->
   <div [ngClass]="{ hide: !showSidebar }">
     <mat-tree
       [dataSource]="dataSource"
@@ -393,5 +407,12 @@
   [style.margin-left.px]="showSidebar ? '260' : '60'"
   [style.width]="showSidebar ? 'calc(100% - 280px)' : 'calc(100% - 80px)'"
 >
-  <app-editor [showSidebar]="showSidebar"></app-editor>
+  <app-editor
+    *ngIf="!showZettelkasten"
+    [showSidebar]="showSidebar"
+  ></app-editor>
+  <app-zettelkasten
+    *ngIf="showZettelkasten"
+    [showSidebar]="showSidebar"
+  ></app-zettelkasten>
 </div>

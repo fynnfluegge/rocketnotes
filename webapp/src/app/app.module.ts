@@ -21,6 +21,7 @@ import { SidenavComponent } from './component/navigation/sidenav.component';
 import { PublicDocumentViewerComponent } from './component/public-document-viewer/public-document-viewer.component';
 import { LlmDialogComponent } from './component/dialog-llm/llm-dialog.component';
 import { ConfigDialogComponent } from './component/dialog-config/config-dialog.component';
+import { ZettelkastenComponent } from './component/zettelkasten/zettelkasten.component';
 
 @NgModule({
   declarations: [
@@ -30,6 +31,7 @@ import { ConfigDialogComponent } from './component/dialog-config/config-dialog.c
     PublicDocumentViewerComponent,
     LlmDialogComponent,
     ConfigDialogComponent,
+    ZettelkastenComponent,
   ],
   imports: [
     BrowserModule,

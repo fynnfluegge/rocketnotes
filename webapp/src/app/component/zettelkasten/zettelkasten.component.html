@@ -1,0 +1,143 @@
+<div
+  style="margin-top: 50px; height: calc(100% - 160px)"
+  (document:keydown.esc)="cancelEdit()"
+>
+  <div style="max-width: 800px; margin: auto">
+    <p style="font-size: 24px; font-weight: bold; text-align: center">
+      Zettelkasten
+    </p>
+    <textarea
+      [(ngModel)]="textareaContent"
+      [style.width]="'100%'"
+      class="variable-textarea"
+      style="
+        resize: none;
+        margin-top: 4px;
+        display: inline-block;
+        height: 128px;
+        border-radius: 4px;
+        margin-bottom: 4px;
+      "
+    ></textarea>
+    <br />
+    <button
+      (click)="saveNote()"
+      style="float: right"
+      class="btn btn-default btn-primary btn-fade"
+    >
+      Save Note
+    </button>
+    <br />
+    <div *ngFor="let item of contentMap | keyvalue">
+      <br />
+      <div
+        style="
+          display: flex;
+          flex-flow: wrap;
+          justify-content: space-between;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          border-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+          padding: 8px;
+        "
+      >
+        <markdown
+          *ngIf="!editMap.get(item.key)"
+          class="variable-binding"
+          [data]="item.value.content"
+          style="
+            height: 100%;
+            max-width: 1320px;
+            float: none;
+            margin: auto;
+            overflow-y: scroll;
+            margin-bottom: 4px;
+          "
+        ></markdown>
+        <textarea
+          *ngIf="editMap.get(item.key)"
+          [(ngModel)]="item.value.content"
+          [style.width]="'100%'"
+          class="variable-textarea"
+          style="
+            resize: none;
+            margin-top: 4px;
+            display: inline-block;
+            height: 128px;
+            border-radius: 4px;
+            margin-bottom: 4px;
+          "
+        ></textarea>
+        <button
+          (click)="edit(item.key)"
+          *ngIf="!editMap.get(item.key)"
+          style="margin-left: auto; margin-right: 4px; height: 36px"
+          class="btn btn-default btn-primary btn-fade"
+        >
+          Edit
+        </button>
+        <button
+          (click)="cancelEdit(0)"
+          *ngIf="editMap.get(item.key)"
+          style="margin-right: auto"
+          class="btn btn-default btn-primary btn-fade"
+        >
+          Cancel
+        </button>
+        <button
+          (click)="save(item.key)"
+          *ngIf="editMap.get(item.key)"
+          style="margin-left: auto; margin-right: 4px"
+          class="btn btn-default btn-primary btn-fade"
+        >
+          Save
+        </button>
+        <button
+          (click)="archive(item.key)"
+          data-title="Archive zettel into suggested documents"
+          style="margin-right: 4px; height: 36px"
+          class="btn btn-default btn-primary btn-fade tooltip-bottom expand"
+        >
+          Archive
+        </button>
+        <button
+          (click)="delete(item.key)"
+          style="height: 36px"
+          class="btn btn-default btn-primary btn-fade"
+        >
+          Delete
+        </button>
+
+        <div style="width: 100%">
+          <div *ngFor="let suggestion of suggestionMap[item.key]">
+            <div style="width: 100%; height: 36px; text-align: right">
+              <mat-icon
+                style="margin-top: 4px; margin-right: 6px; font-size: 28px"
+                >archive
+              </mat-icon>
+              <span
+                class="tooltip-trigger"
+                style="height: 36px; font-size: 24px; margin-right: 8px"
+                >{{ suggestion.title }}
+                <div class="tooltip-content">
+                  <markdown
+                    class="tooltip-markdown"
+                    [data]="getTooltip(suggestion.id)"
+                  ></markdown>
+                </div>
+              </span>
+              <button
+                (click)="insert(item.key, suggestion.id)"
+                data-title="Insert zettel into document"
+                style="float: right; height: 36px"
+                class="btn btn-default btn-primary btn-fade tooltip-bottom expand"
+              >
+                Insert
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

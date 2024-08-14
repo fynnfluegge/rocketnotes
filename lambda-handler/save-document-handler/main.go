@@ -27,13 +27,15 @@ type Body struct {
 }
 
 type Document struct {
-	ID            string    `json:"id"`
-	UserId        string    `json:"userId"`
-	Title         string    `json:"title"`
-	Content       string    `json:"content"`
-	Searchcontent string    `json:"searchContent"`
-	LastModified  time.Time `json:"lastModified"`
-	IsPublic      bool      `json:"isPublic"`
+	ID           string 	 `json:"id"`
+	ParentId     string 	 `json:"parentId"`
+	UserId       string 	 `json:"userId"`
+	Title        string 	 `json:"title"`
+	Content      string 	 `json:"content"`
+	Searchcontent string   `json:"searchContent"`
+	LastModified time.Time `json:"lastModified"`
+	Deleted      bool   	 `json:"deleted"`
+	IsPublic     bool   	 `json:"isPublic"`
 }
 
 type SqsMessage struct {
@@ -52,7 +54,6 @@ func handleRequest(ctx context.Context, event events.SQSEvent) {
 	json.Unmarshal([]byte(event.Records[0].Body), &item)
 
 	item.Body.Document.Searchcontent = strings.ToLower(item.Body.Document.Title + "\n" + item.Body.Document.Content)
-
 	item.Body.Document.LastModified = time.Now()
 
 	sess := session.Must(session.NewSessionWithOptions(session.Options{

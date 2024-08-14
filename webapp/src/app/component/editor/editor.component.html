@@ -126,7 +126,7 @@
     <i
       [ngClass]="editorMode ? 'fa-solid fa-xmark' : 'fa-solid fa-pen-to-square'"
     ></i>
-    {{ editorMode ? "Cancel Edit" : "Edit" }}
+    {{ editorMode ? "Cancel" : "Edit" }}
   </button>
   &nbsp;&nbsp;
   <button
@@ -135,6 +135,15 @@
     (click)="undoChanges()"
   >
     <i class="fa-solid fa-undo"></i> Undo
+  </button>
+  &nbsp;&nbsp;
+  <button
+    class="btn btn-default btn-primary btn-fade"
+    (click)="cancelEdit()"
+    *ngIf="editorMode"
+  >
+    <i [ngClass]="'fa-solid fa-save'"></i>
+    Save
   </button>
   &nbsp;&nbsp;
 </div>

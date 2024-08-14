@@ -6,7 +6,7 @@ Globals:
     Timeout: 20
   Api:
     Cors:
-      AllowMethods: "'GET,POST,OPTIONS'"
+      AllowMethods: "'GET,POST,DELETE,OPTIONS'"
       AllowHeaders: "'content-type'"
       AllowOrigin: "'*'"
       AllowCredentials: "'*'"
@@ -374,3 +374,102 @@ Resources:
             Path: /text-completion
             Method: POST
 
+  getZettelkastenFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: go1.x
+    Properties:
+      CodeUri: lambda-handler/get-zettelkasten-handler
+      Handler: main.go
+      Runtime: provided.al2
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: tnn-Zettelkasten
+      Environment:
+        Variables:
+          USE_LOCAL_DYNAMODB: 1
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /zettelkasten/{userId}
+            Method: GET 
+
+  saveZettelFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: go1.x
+    Properties:
+      CodeUri: lambda-handler/save-zettel-handler
+      Handler: main.go
+      Runtime: provided.al2
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: tnn-Zettelkasten
+      Environment:
+        Variables:
+          USE_LOCAL_DYNAMODB: 1
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /saveZettel
+            Method: POST
+
+  deleteZettelFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: go1.x
+    Properties:
+      CodeUri: lambda-handler/delete-zettel-handler
+      Handler: main.go
+      Runtime: provided.al2
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: tnn-Zettelkasten
+      Environment:
+        Variables:
+          USE_LOCAL_DYNAMODB: 1
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /deleteZettel/{id}
+            Method: DELETE
+
+  archiveZettelFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: go1.x
+    Properties:
+      CodeUri: lambda-handler/archive-zettel-handler
+      Handler: main.go
+      Runtime: provided.al2
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: tnn-documents
+      Environment:
+        Variables:
+          USE_LOCAL_DYNAMODB: 1
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /archiveZettel/{documentId}
+            Method: POST

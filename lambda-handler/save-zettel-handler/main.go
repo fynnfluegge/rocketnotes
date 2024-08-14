@@ -3,7 +3,8 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"strings"
+	"log"
+	"os"
 	"time"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -15,20 +16,14 @@ import (
 )
 
 type Body struct {
-	Document     *Document `json:"document"`
-	OpenAiApiKey string    `json:"openAiApiKey"`
+	Zettel *Zettel `json:"zettel"`
 }
 
-type Document struct {
-	ID            string    `json:"id"`
-	ParentId      string    `json:"parentId"`
-	UserId        string    `json:"userId"`
-	Title         string    `json:"title"`
-	Content       string    `json:"content"`
-	Searchcontent string    `json:"searchContent"`
-	LastModified  time.Time `json:"lastModified"`
-	Deleted       bool      `json:"deleted"`
-	IsPublic      bool      `json:"isPublic"`
+type Zettel struct {
+  ID       string    `json:"id"`
+  UserId   string    `json:"userId"`
+  Content  string    `json:"content"`
+  Created  time.Time `json:"created"`
 }
 
 func init() {
@@ -40,26 +35,24 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 
 	json.Unmarshal([]byte(request.Body), &item)
 
-	item.Document.Searchcontent = strings.ToLower(item.Document.Title + "\n" + item.Document.Content)
-
-	item.Document.LastModified = time.Now()
-
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
 	}))
 
 	var svc *dynamodb.DynamoDB
 
-	svc = dynamodb.New(sess, aws.NewConfig().WithEndpoint("http://dynamodb:8000"))
-
-	av, err := dynamodbattribute.MarshalMap(item.Document)
-	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 404,
-		}, nil
+	if os.Getenv("USE_LOCAL_DYNAMODB") == "1" {
+		svc = dynamodb.New(sess, aws.NewConfig().WithEndpoint("http://dynamodb:8000"))
+	} else {
+		svc = dynamodb.New(sess)
 	}
 
-	tableName := "tnn-Documents"
+	av, err := dynamodbattribute.MarshalMap(item.Zettel)
+	if err != nil {
+		log.Fatalf("Got error marshalling new zettel item: %s", err)
+	}
+
+	tableName := "tnn-Zettelkasten"
 
 	input := &dynamodb.PutItemInput{
 		Item:      av,
@@ -69,7 +62,7 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 	_, err = svc.PutItem(input)
 	if err != nil {
 		return events.APIGatewayProxyResponse{
-			StatusCode: 404,
+			StatusCode: 500,
 		}, nil
 	}
 
