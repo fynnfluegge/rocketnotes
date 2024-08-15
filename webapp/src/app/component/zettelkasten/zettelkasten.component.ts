@@ -17,7 +17,7 @@ export class ZettelkastenComponent implements OnInit {
   contentCollection: Zettel[] = [];
   contentMap: Record<string, Zettel> = {};
   editMap: Map<string, boolean> = new Map();
-  suggestionMap: Record<string, Document[]> = {};
+  suggestionMap: Map<string, Document[]> = new Map();
   tooltips: Map<string, string> = new Map();
 
   constructor(private basicRestService: BasicRestService) {
@@ -80,7 +80,7 @@ export class ZettelkastenComponent implements OnInit {
     });
   }
 
-  archive(id: string) {
+  async archive(id: string) {
     this.basicRestService
       .post('semanticSearch', {
         userId: localStorage.getItem('currentUserId'),
@@ -108,7 +108,21 @@ export class ZettelkastenComponent implements OnInit {
             );
           }
         });
+        this.addTooltips(id);
       });
+  }
+
+  async addTooltips(id: string) {
+    this.suggestionMap[id].forEach((value: Document) => {
+      this.basicRestService.get('document/' + value.id).subscribe((result) => {
+        this.tooltips.set(
+          value.id,
+          JSON.parse(JSON.stringify(result)).title +
+            '\n' +
+            JSON.parse(JSON.stringify(result)).content,
+        );
+      });
+    });
   }
 
   insert(id: string, documentId: string) {
@@ -151,16 +165,6 @@ export class ZettelkastenComponent implements OnInit {
   getTooltip(id: string) {
     if (this.tooltips.has(id)) {
       return this.tooltips.get(id);
-    } else {
-      this.basicRestService.get('document/' + id).subscribe((result) => {
-        this.tooltips.set(
-          id,
-          JSON.parse(JSON.stringify(result)).title +
-            '\n' +
-            JSON.parse(JSON.stringify(result)).content,
-        );
-        return this.tooltips.get(id);
-      });
     }
   }
 }
