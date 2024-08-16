@@ -57,6 +57,13 @@ button {
   opacity: 1;
 }
 
+.btn:focus {
+  border-color: inherit !important;
+  -webkit-box-shadow: none !important;
+  box-shadow: none !important;
+  putline: none !important;
+}
+
 a {
   text-decoration: none !important;
   color: var(--hyperlink-color) !important;
@@ -311,4 +318,42 @@ code {
 }
 .tooltip-base.expand:hover:after {
   transition: all 0.2s 0.1s ease-in-out;
+}
+
+.loading-animation {
+  margin: 12px;
+  text-align: left;
+  transform: translateY(-50%);
+  font-size: 32px;
+  animation: pulse 1s infinite; /* Example animation */
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.2;
+  }
+}
+
+.circle-loading-animation {
+  border: 6px solid var(--font-color);
+  border-top: 6px solid var(--menu-color);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }

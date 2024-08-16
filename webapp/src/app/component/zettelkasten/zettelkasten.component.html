@@ -23,7 +23,7 @@
     <button
       (click)="saveNote()"
       style="float: right"
-      class="btn btn-default btn-primary btn-fade"
+      class="btn btn-default btn-primary"
     >
       Save Note
     </button>
@@ -72,7 +72,7 @@
           (click)="edit(item.key)"
           *ngIf="!editMap.get(item.key)"
           style="margin-left: auto; margin-right: 4px; height: 36px"
-          class="btn btn-default btn-primary btn-fade"
+          class="btn btn-default btn-primary"
         >
           Edit
         </button>
@@ -80,7 +80,7 @@
           (click)="cancelEdit(0)"
           *ngIf="editMap.get(item.key)"
           style="margin-right: auto"
-          class="btn btn-default btn-primary btn-fade"
+          class="btn btn-default btn-primary"
         >
           Cancel
         </button>
@@ -88,29 +88,50 @@
           (click)="save(item.key)"
           *ngIf="editMap.get(item.key)"
           style="margin-left: auto; margin-right: 4px"
-          class="btn btn-default btn-primary btn-fade"
+          class="btn btn-default btn-primary"
         >
           Save
         </button>
-        <button
-          (click)="archive(item.key)"
-          data-title="Archive zettel into suggested documents"
-          style="margin-right: 4px; height: 36px"
-          class="btn btn-default btn-primary btn-fade tooltip-bottom expand"
+        <div
+          class="tooltip-bottom expand"
+          [attr.data-title]="
+            llmEnabled
+              ? 'Archive zettel into suggested documents'
+              : 'Configure LLM to enable this feature'
+          "
         >
-          Archive
-        </button>
+          <button
+            [disabled]="!llmEnabled"
+            (click)="archive(item.key)"
+            style="margin-right: 4px; height: 36px"
+            class="btn btn-default btn-primary tooltip-bottom expand"
+          >
+            Archive
+          </button>
+        </div>
         <button
           (click)="delete(item.key)"
           style="height: 36px"
-          class="btn btn-default btn-primary btn-fade"
+          class="btn btn-default btn-primary"
         >
           Delete
         </button>
 
         <div style="width: 100%">
+          <div
+            *ngIf="isLoading(item.key)"
+            class="circle-loading-animation"
+            style="margin: auto"
+          ></div>
           <div *ngFor="let suggestion of suggestionMap[item.key]">
-            <div style="width: 100%; height: 36px; text-align: right">
+            <div
+              style="
+                width: 100%;
+                height: 36px;
+                margin-bottom: 4px;
+                text-align: right;
+              "
+            >
               <mat-icon
                 style="margin-top: 4px; margin-right: 6px; font-size: 28px"
                 >archive
@@ -130,7 +151,7 @@
                 (click)="insert(item.key, suggestion.id)"
                 data-title="Insert zettel into document"
                 style="float: right; height: 36px"
-                class="btn btn-default btn-primary btn-fade tooltip-bottom expand"
+                class="btn btn-default btn-primary tooltip-bottom expand"
               >
                 Insert
               </button>

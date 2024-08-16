@@ -103,26 +103,6 @@
   background-color: var(--menu-color);
 }
 
-.loading-animation {
-  margin: 12px;
-  text-align: left;
-  transform: translateY(-50%);
-  font-size: 32px;
-  animation: pulse 1s infinite; /* Example animation */
-}
-
-@keyframes pulse {
-  0% {
-    opacity: 0.2;
-  }
-  50% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0.2;
-  }
-}
-
 .chat-message {
   border-radius: 8px;
   border: 1px solid #545454;

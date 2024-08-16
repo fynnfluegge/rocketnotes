@@ -14,18 +14,15 @@ export class ZettelkastenComponent implements OnInit {
   @Input() showSidebar: boolean;
 
   textareaContent: string = '';
-  contentCollection: Zettel[] = [];
   contentMap: Record<string, Zettel> = {};
   editMap: Map<string, boolean> = new Map();
   suggestionMap: Map<string, Document[]> = new Map();
+  isLoadingMap: Map<string, boolean> = new Map();
   tooltips: Map<string, string> = new Map();
+  llmEnabled: boolean = false;
 
   constructor(private basicRestService: BasicRestService) {
-    this.contentMap = this.contentCollection.reduce((map, item) => {
-      this.editMap.set(item.id, false);
-      map[item.id] = item;
-      return map;
-    }, {});
+    this.llmEnabled = localStorage.getItem('config') !== null;
   }
 
   ngOnInit(): void {
@@ -41,6 +38,7 @@ export class ZettelkastenComponent implements OnInit {
             element.created,
           );
           this.editMap.set(element.id, false);
+          this.isLoadingMap.set(element.id, false);
         });
       });
   }
@@ -67,7 +65,7 @@ export class ZettelkastenComponent implements OnInit {
     this.editMap.set(id, true);
   }
 
-  save(id: string) {
+  async save(id: string) {
     this.editMap.set(id, false);
     this.basicRestService
       .post('saveZettel', { zettel: this.contentMap[id] })
@@ -81,13 +79,14 @@ export class ZettelkastenComponent implements OnInit {
   }
 
   async archive(id: string) {
+    this.isLoadingMap.set(id, true);
     this.basicRestService
       .post('semanticSearch', {
         userId: localStorage.getItem('currentUserId'),
         searchString: this.contentMap[id].content,
       })
       .subscribe((result) => {
-        // this.isLoading = false;
+        this.isLoadingMap.set(id, false);
         this.suggestionMap[id] = [];
         const jsonResult = JSON.parse(JSON.stringify(result));
         var dedupList = new Set();
@@ -96,7 +95,6 @@ export class ZettelkastenComponent implements OnInit {
             return;
           } else {
             dedupList.add(element.documentId);
-            // TODO dedup
             this.suggestionMap[id].push(
               new Document(
                 element.documentId,
@@ -132,7 +130,6 @@ export class ZettelkastenComponent implements OnInit {
         recreateIndex: environment.production,
       })
       .subscribe(() => {
-        // TODO recreate index for local
         this.delete(id);
 
         if (
@@ -166,5 +163,9 @@ export class ZettelkastenComponent implements OnInit {
     if (this.tooltips.has(id)) {
       return this.tooltips.get(id);
     }
+  }
+
+  isLoading(id: string) {
+    return this.isLoadingMap.get(id);
   }
 }
