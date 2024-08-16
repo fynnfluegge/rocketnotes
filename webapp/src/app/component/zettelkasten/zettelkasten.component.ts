@@ -19,8 +19,11 @@ export class ZettelkastenComponent implements OnInit {
   suggestionMap: Map<string, Document[]> = new Map();
   isLoadingMap: Map<string, boolean> = new Map();
   tooltips: Map<string, string> = new Map();
+  llmEnabled: boolean = false;
 
-  constructor(private basicRestService: BasicRestService) {}
+  constructor(private basicRestService: BasicRestService) {
+    this.llmEnabled = localStorage.getItem('config') !== null;
+  }
 
   ngOnInit(): void {
     this.basicRestService

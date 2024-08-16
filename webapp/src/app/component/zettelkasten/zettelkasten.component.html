@@ -92,14 +92,23 @@
         >
           Save
         </button>
-        <button
-          (click)="archive(item.key)"
-          data-title="Archive zettel into suggested documents"
-          style="margin-right: 4px; height: 36px"
-          class="btn btn-default btn-primary tooltip-bottom expand"
+        <div
+          class="tooltip-bottom expand"
+          [attr.data-title]="
+            llmEnabled
+              ? 'Archive zettel into suggested documents'
+              : 'Configure LLM to enable this feature'
+          "
         >
-          Archive
-        </button>
+          <button
+            [disabled]="!llmEnabled"
+            (click)="archive(item.key)"
+            style="margin-right: 4px; height: 36px"
+            class="btn btn-default btn-primary tooltip-bottom expand"
+          >
+            Archive
+          </button>
+        </div>
         <button
           (click)="delete(item.key)"
           style="height: 36px"
