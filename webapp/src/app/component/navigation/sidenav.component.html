@@ -111,9 +111,7 @@
       color: lightgrey;
     "
   >
-    <mat-icon style="margin-left: -4px; margin-top: 2px; font-size: 20px"
-      >drafts</mat-icon
-    >
+    <mat-icon style="margin-top: 2px; font-size: 20px">drafts</mat-icon>
     Zettelkasten
   </button>
   <div [ngClass]="{ hide: !showSidebar }">
@@ -122,6 +120,7 @@
       [treeControl]="treeControl"
       cdkDropList
       (cdkDropListDropped)="drop($event)"
+      style="margin-left: 4px"
     >
       <mat-tree-node
         *matTreeNodeDef="let node; when: isPinned"
