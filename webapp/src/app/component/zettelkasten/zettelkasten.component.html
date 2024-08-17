@@ -33,8 +33,7 @@
       <div
         style="
           display: flex;
-          flex-flow: wrap;
-          justify-content: space-between;
+          flex-wrap: wrap;
           border: 1px solid #ccc;
           border-radius: 4px;
           border-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -68,55 +67,58 @@
             margin-bottom: 4px;
           "
         ></textarea>
-        <button
-          (click)="edit(item.key)"
-          *ngIf="!editMap.get(item.key)"
-          style="margin-left: auto; margin-right: 4px; height: 36px"
-          class="btn btn-default btn-primary"
-        >
-          Edit
-        </button>
-        <button
-          (click)="cancelEdit(0)"
-          *ngIf="editMap.get(item.key)"
-          style="margin-right: auto"
-          class="btn btn-default btn-primary"
-        >
-          Cancel
-        </button>
-        <button
-          (click)="save(item.key)"
-          *ngIf="editMap.get(item.key)"
-          style="margin-left: auto; margin-right: 4px"
-          class="btn btn-default btn-primary"
-        >
-          Save
-        </button>
-        <div
-          class="tooltip-bottom expand"
-          [attr.data-title]="
-            llmEnabled
-              ? 'Archive zettel into suggested documents'
-              : 'Configure LLM to enable this feature'
-          "
-        >
+        <div style="display: flex; gap: 4px; margin-left: auto">
           <button
-            [disabled]="!llmEnabled"
-            (click)="archive(item.key)"
-            style="margin-right: 4px; height: 36px"
-            class="btn btn-default btn-primary tooltip-bottom expand"
+            (click)="edit(item.key)"
+            *ngIf="!editMap.get(item.key)"
+            style="margin-left: auto; height: 36px"
+            class="btn btn-default btn-primary"
           >
-            Archive
+            Edit
+          </button>
+          <button
+            (click)="cancelEdit(0)"
+            *ngIf="editMap.get(item.key)"
+            style="margin-right: auto"
+            class="btn btn-default btn-primary"
+          >
+            Cancel
+          </button>
+          <button
+            (click)="save(item.key)"
+            *ngIf="editMap.get(item.key)"
+            style="margin-left: auto"
+            class="btn btn-default btn-primary"
+          >
+            Save
+          </button>
+          <div
+            *ngIf="!editMap.get(item.key)"
+            class="tooltip-bottom expand"
+            [attr.data-title]="
+              llmEnabled
+                ? 'Archive zettel into suggested documents'
+                : 'Configure LLM to enable this feature'
+            "
+          >
+            <button
+              [disabled]="!llmEnabled"
+              (click)="archive(item.key)"
+              style="height: 36px"
+              class="btn btn-default btn-primary tooltip-bottom expand"
+            >
+              Archive
+            </button>
+          </div>
+          <button
+            *ngIf="!editMap.get(item.key)"
+            (click)="delete(item.key)"
+            style="height: 36px"
+            class="btn btn-default btn-primary"
+          >
+            Delete
           </button>
         </div>
-        <button
-          (click)="delete(item.key)"
-          style="height: 36px"
-          class="btn btn-default btn-primary"
-        >
-          Delete
-        </button>
-
         <div style="width: 100%">
           <div
             *ngIf="isLoading(item.key)"
@@ -128,7 +130,7 @@
               style="
                 width: 100%;
                 height: 36px;
-                margin-bottom: 4px;
+                margin-top: 4px;
                 text-align: right;
               "
             >

@@ -341,8 +341,8 @@ code {
 }
 
 .circle-loading-animation {
-  border: 6px solid var(--font-color);
-  border-top: 6px solid var(--menu-color);
+  border: 6px solid var(--menu-color);
+  border-top: 6px solid var(--focus-color-low-alpha);
   border-radius: 50%;
   width: 36px;
   height: 36px;
