@@ -596,15 +596,17 @@ export class SidenavComponent implements OnInit, AfterViewInit {
     if (environment.production) {
       Auth.currentAuthenticatedUser().then((user) => {
         Auth.userAttributes(user).then((attributes) => {
+          console.log(attributes['custom:darkmode']);
           this.darkmode = attributes['custom:darkmode'] === 1;
           localStorage.setItem('darkmode', this.darkmode.toString());
+          this.setTheme();
         });
       });
-    }
-
-    if (localStorage.getItem('darkmode') !== null) {
-      this.darkmode = localStorage.getItem('darkmode') === 'true';
-      this.setTheme();
+    } else {
+      if (localStorage.getItem('darkmode') !== null) {
+        this.darkmode = localStorage.getItem('darkmode') === 'true';
+        this.setTheme();
+      }
     }
 
     if (this.router.url === '/zettelkasten') {
