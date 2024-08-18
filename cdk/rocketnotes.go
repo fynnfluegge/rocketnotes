@@ -488,8 +488,8 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 	})
 
 	// delete zettel
-	deleteZettelHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("DELETE-delete-Zettel"), &awscdklambdagoalpha.GoFunctionProps{
-		FunctionName: jsii.String("DELETE-delete-Zettel"),
+	deleteZettelHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("DELETE-Zettel"), &awscdklambdagoalpha.GoFunctionProps{
+		FunctionName: jsii.String("DELETE-Zettel"),
 		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
 		Entry:        jsii.String("../lambda-handler/delete-zettel-handler"),
 		Bundling: &awscdklambdagoalpha.BundlingOptions{
