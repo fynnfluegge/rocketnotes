@@ -96,13 +96,7 @@ export class ZettelkastenComponent implements OnInit {
           } else {
             dedupList.add(element.documentId);
             this.suggestionMap[id].push(
-              new Document(
-                element.documentId,
-                element.userId,
-                element.title,
-                element.content,
-                element.lastModified,
-              ),
+              new Document(element.documentId, element.title, element.content),
             );
           }
         });
@@ -111,15 +105,22 @@ export class ZettelkastenComponent implements OnInit {
   }
 
   async addTooltips(id: string) {
+    const deletedItems = [];
     this.suggestionMap[id].forEach((value: Document) => {
       this.basicRestService.get('document/' + value.id).subscribe((result) => {
-        this.tooltips.set(
-          value.id,
-          JSON.parse(JSON.stringify(result)).title +
-            '\n' +
-            JSON.parse(JSON.stringify(result)).content,
-        );
+        const _document: Document = JSON.parse(JSON.stringify(result));
+        if (_document.deleted) {
+          deletedItems.push(id);
+        } else {
+          this.tooltips.set(
+            value.id,
+            _document.title + '\n' + _document.content,
+          );
+        }
       });
+    });
+    deletedItems.forEach((v) => {
+      this.suggestionMap.delete(v);
     });
   }
 

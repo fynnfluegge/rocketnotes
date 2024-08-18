@@ -96,6 +96,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 				awscdkapigatewayv2alpha.CorsHttpMethod_OPTIONS,
 				awscdkapigatewayv2alpha.CorsHttpMethod_GET,
 				awscdkapigatewayv2alpha.CorsHttpMethod_POST,
+				awscdkapigatewayv2alpha.CorsHttpMethod_DELETE,
 			},
 		},
 	})
@@ -487,7 +488,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 	})
 
 	// delete zettel
-	deleteZettelHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("POST-delete-Zettel"), &awscdklambdagoalpha.GoFunctionProps{
+	deleteZettelHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("DELETE-delete-Zettel"), &awscdklambdagoalpha.GoFunctionProps{
 		FunctionName: jsii.String("DELETE-delete-Zettel"),
 		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
 		Entry:        jsii.String("../lambda-handler/delete-zettel-handler"),
@@ -501,7 +502,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		Path:        jsii.String("/deleteZettel/{id}"),
 		Authorizer:  httpApiAuthorizer,
 		Methods:     &[]awscdkapigatewayv2alpha.HttpMethod{awscdkapigatewayv2alpha.HttpMethod_DELETE},
-		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("saveZettelLambdaIntegration"), deleteZettelHandler, &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
+		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("deleteZettelLambdaIntegration"), deleteZettelHandler, &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
 	})
 
 	// archive zettel

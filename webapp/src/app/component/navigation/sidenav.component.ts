@@ -593,19 +593,18 @@ export class SidenavComponent implements OnInit, AfterViewInit {
     this.getScreenSize();
     this.setOperatingSystem();
 
+    if (environment.production) {
+      Auth.currentAuthenticatedUser().then((user) => {
+        Auth.userAttributes(user).then((attributes) => {
+          this.darkmode = attributes['custom:darkmode'] === 'true';
+          localStorage.setItem('darkmode', this.darkmode.toString());
+        });
+      });
+    }
+
     if (localStorage.getItem('darkmode') !== null) {
       this.darkmode = localStorage.getItem('darkmode') === 'true';
       this.setTheme();
-    } else {
-      if (environment.production) {
-        Auth.currentAuthenticatedUser().then((user) => {
-          Auth.userAttributes(user).then((attributes) => {
-            this.darkmode = attributes['custom:darkmode'] === 1;
-            localStorage.setItem('darkmode', this.darkmode.toString());
-            this.setTheme();
-          });
-        });
-      }
     }
 
     if (this.router.url === '/zettelkasten') {
@@ -1309,7 +1308,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
     if (environment.production) {
       Auth.currentAuthenticatedUser().then((user) => {
         Auth.updateUserAttributes(user, {
-          'custom:darkmode': this.darkmode ? '1' : '0',
+          'custom:darkmode': this.darkmode ? 'true' : 'false',
         });
       });
     }

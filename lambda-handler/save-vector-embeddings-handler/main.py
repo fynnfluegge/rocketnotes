@@ -140,8 +140,11 @@ def handler(event, context):
         else:
             # Faiss index does not exist, create the index from scratch
             # ---------------------------------------------------------
-            filter_expression = "userId = :value"
-            expression_attribute_values = {":value": {"S": userId}}
+            filter_expression = "userId = :user_value AND deleted = :deleted_value"
+            expression_attribute_values = {
+                ":user_value": {"S": userId},
+                ":deleted_value": {"BOOL": False},
+            }
 
             # Execute the query
             result = dynamodb.query(
