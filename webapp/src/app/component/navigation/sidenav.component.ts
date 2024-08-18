@@ -596,7 +596,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
     if (environment.production) {
       Auth.currentAuthenticatedUser().then((user) => {
         Auth.userAttributes(user).then((attributes) => {
-          this.darkmode = attributes['custom:darkmode'] === 'true';
+          this.darkmode = attributes['custom:darkmode'] === '1';
           localStorage.setItem('darkmode', this.darkmode.toString());
         });
       });
@@ -1308,7 +1308,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
     if (environment.production) {
       Auth.currentAuthenticatedUser().then((user) => {
         Auth.updateUserAttributes(user, {
-          'custom:darkmode': this.darkmode ? 'true' : 'false',
+          'custom:darkmode': this.darkmode ? '1' : '0',
         });
       });
     }

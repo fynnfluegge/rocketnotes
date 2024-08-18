@@ -513,6 +513,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		Bundling: &awscdklambdagoalpha.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
+		Environment: &map[string]*string{"queueUrl": vectorQueue.QueueUrl()},
 		Role: lambdaSqsDynamoDbRole,
 	})
 
