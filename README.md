@@ -33,6 +33,8 @@ Checkout how the serverless RAG pipeline works here [Serverless RAG on AWS](http
   - Servlerless RAG with faiss, OpenAI and/or Anthropic
 - 📦 Local mode with Docker
   - use Ollama and/or Sentence Transformers for 100% local RAG
+- 📥 Zettelkasten with semantic archiving
+  - Use vector index to insert notes into highest semantic-ranked documents
 
 &nbsp;
 
@@ -56,7 +58,18 @@ Checkout how the serverless RAG pipeline works here [Serverless RAG on AWS](http
   <img src="https://github.com/fynnfluegge/rocketnotes/assets/16321871/648ae135-0406-4854-a68f-fb6b3d3f0702" width="800">
 </div>
 
-## Create code snipptes with syntax highlighting
+## Zettelkasten with semantic archiving
+
+- ✍️ Save your daily note snippets into zettelkasten.
+- 📥 Use vector index to insert notes into highest semantic-ranked documents with ease.
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/9fe9d1b3-8e7e-4d45-90c2-b7bd4f03b23f" width="800">
+</div>
+
+&nbsp;
+
+
+## Create code snippets with syntax highlighting
 
 - 📝 Use the power and simplicity of Markdown for your personal notes.
 - 💻 Create useful code snippets in your favourite programming language with syntax highlighting.
