@@ -103,7 +103,7 @@ This deployment will only deploy the webapp build to the S3 bucket and will be m
 ```
 git clone https://github.com/fynnfluegge/rocketnotes.git
 cd rocketnotes
-docker-compuse up -d
+docker-compose up -d
 ```
 
 Docker-compose will create and start four containers with a docker network:
