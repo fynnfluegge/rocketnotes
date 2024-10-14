@@ -111,6 +111,14 @@ span:hover {
 .icon-button-chevron {
   opacity: 0.5;
   width: 24px;
+  height: 24px;
+  background-color: transparent;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center; // Optional: for vertical centering
+  overflow: visible; // Ensure the icon is not clipped
+  padding: 0;
+  margin: 0;
 }
 
 .icon-button-star {
