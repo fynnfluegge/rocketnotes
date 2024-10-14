@@ -47,6 +47,11 @@ export class EditorComponent {
   private abortController: AbortController;
   private completionTimeout: NodeJS.Timeout | undefined;
   private suggestionLinebreak: boolean = false;
+
+  // This is used when Enter is hit at the bottom of the textarea
+  // Sync scroll is disabled for a short time to prevent the textarea from scrolling up
+  private disableSynchronizeScroll: boolean = false;
+
   public aiCompletionEnabled: boolean = false;
 
   private timer: any;
@@ -58,7 +63,7 @@ export class EditorComponent {
     private titleService: Title,
     private location: Location,
     private http: HttpClient,
-  ) {}
+  ) { }
 
   ngOnInit() {
     if (environment.production) {
@@ -217,7 +222,7 @@ export class EditorComponent {
 
   synchronizeScroll(event: any) {
     // Synchronize only in editor preview mode
-    if (this.showPreview) {
+    if (this.showPreview && !this.disableSynchronizeScroll) {
       const scrollTop = event.target.scrollTop;
       const previewPanel = document.getElementById('markdownPreview');
       const markdownTextarea = document.getElementById('markdownTextarea');
@@ -274,7 +279,11 @@ export class EditorComponent {
         markdownTextarea.scrollHeight - 32
       ) {
         // Scroll the markdownTextarea down by one line (adjust the value as needed)
+        this.disableSynchronizeScroll = true;
         markdownTextarea.scrollTop += markdownTextarea.clientHeight;
+        setTimeout(() => {
+          this.disableSynchronizeScroll = false;
+        }, 1000);
       }
     } else if (event.code !== 'Escape') {
       this.startOrResetTimer();
@@ -535,7 +544,7 @@ export class EditorComponent {
                 },
               ],
             })
-            .subscribe(() => {});
+            .subscribe(() => { });
         }
       });
   }
