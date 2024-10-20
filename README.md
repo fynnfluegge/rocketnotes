@@ -11,8 +11,8 @@
 
 </div>
 
-Rocketnotes is a web-based Markdown note taking app with LLM-powered text completion, chat and semantic search. It utilizes a 100% serverless RAG pipeline build with [langchain](https://github.com/langchain-ai/langchain), [sentence-transformers](https://github.com/UKPLab/sentence-transformers),
-[faiss](https://github.com/facebookresearch/faiss), [Ollama](https://github.com/jmorganca/ollama) and OpenAI or Anthropic API.  
+Rocketnotes is a web-based Markdown note taking app with LLM-powered text completion, chat and semantic search. It utilizes a 100% serverless RAG pipeline built with [langchain](https://github.com/langchain-ai/langchain), [sentence-transformers](https://github.com/UKPLab/sentence-transformers),
+[faiss](https://github.com/facebookresearch/faiss), [Ollama](https://github.com/jmorganca/ollama) and OpenAI or Anthropic.  
 Checkout how the serverless RAG pipeline works here [Serverless RAG on AWS](https://medium.com/@fynnfluegge/serverless-rag-on-aws-bf8029f8bffd).
 
 ## How to run
@@ -67,7 +67,6 @@ Checkout how the serverless RAG pipeline works here [Serverless RAG on AWS](http
 </div>
 
 &nbsp;
-
 
 ## Create code snippets with syntax highlighting
 

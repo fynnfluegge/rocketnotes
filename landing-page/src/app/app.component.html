@@ -61,7 +61,7 @@
         <!--Grid column-->
         <div class="col-md-6 mb-4">
           <img
-            src="assets/img1.png"
+            src="assets/280548515-6f5cf350-4560-4262-896e-44bd059b2f93.png"
             class="img-fluid z-depth-1-half box-shadow"
           />
         </div>
@@ -70,38 +70,50 @@
         <!--Grid column-->
         <div class="col-md-6 mb-4">
           <!-- Main heading -->
-          <h3 class="h3 mb-3">Welcome to Rocketnotes 📝</h3>
+          <h3 class="h3 mb-3">
+            <i class="fa-solid fa-pen-to-square"></i> Welcome to Rocketnotes
+          </h3>
           <p>
-            Save your notes in the cloud and access it everywhere from any
-            device.
+            Rocketnotes is a web-based Markdown note taking app with LLM-powered
+            text completion, chat and semantic search.
+            <br />
+            It utilizes a
+            <a
+              class="colored-link"
+              href="https://medium.com/@fynnfluegge/serverless-rag-on-aws-bf8029f8bffd"
+              >100% serverless RAG pipeline
+            </a>
+            built with
+            <br />
+            <a
+              class="colored-link"
+              href="https://github.com/langchain-ai/langchain"
+              >langchain</a
+            >,
+            <br />
+            <a
+              class="colored-link"
+              href="https://github.com/UKPLab/sentence-transformers"
+              >sentence-transformers</a
+            >,
+            <br />
+            <a
+              class="colored-link"
+              href="https://github.com/facebookresearch/faiss"
+              >faiss</a
+            >,
+            <br />
+            <a class="colored-link" href="https://github.com/ollama/ollama"
+              >Ollama</a
+            >
+            <br />
+            and OpenAI or Anthropic.
           </p>
           <p>
-            Read details below to learn more about the powerful and practical
-            markdown editor.
+            Read details below to learn more about all feature of the powerful
+            and practical markdown editor.
           </p>
           <!-- Main heading -->
-
-          <hr />
-
-          <p>
-            <strong>Available</strong> as a web app and as an Electron app for
-            MacOS (Windows coming soon).
-          </p>
-          <p>
-            Advanced <strong>Markdown Editor</strong> with responsive preview
-            and code syntax highlighting for many popular programming languages.
-          </p>
-          <p>
-            <strong>Document Tree</strong> for structuring your note documents.
-          </p>
-          <p>
-            <strong>Document Search</strong> for fast access by searching all
-            your document contents.
-          </p>
-          <p>
-            <strong>Document Sharing</strong> to allow external users viewing
-            some of your documents.
-          </p>
         </div>
         <!--Grid column-->
       </div>
@@ -113,10 +125,154 @@
 
     <!--Section: Main features & Quick Start-->
     <section>
+      <h3 class="h3 text-center mb-5">Chat and Semantic Search</h3>
+
+      <!--Grid row-->
+      <div class="row wow fadeIn">
+        <!--Grid column-->
+        <div class="col-lg-6 col-md-12 px-4">
+          <div class="row">
+            <div class="col-1 mr-3">
+              <i class="fas fa-microchip fa-2x blue-text"></i>
+            </div>
+            <div class="col-10">
+              <h5 class="feature-title">Chat with your documents</h5>
+              <p class="grey-text">
+                Use the power of LLMs together with a RAG pipeline to retrieve
+                contexts from all your documents.
+              </p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-1 mr-3">
+              <i class="fas fa-magnifying-glass fa-2x blue-text"></i>
+            </div>
+            <div class="col-10">
+              <h5 class="feature-title">Search your documents semantically</h5>
+              <p class="grey-text">
+                Access documents based on semantic reasoning from your search
+                phrase.
+              </p>
+            </div>
+          </div>
+        </div>
+        <!--/Grid column-->
+
+        <!--Grid column-->
+        <div class="col-md-6 mb-4">
+          <img
+            src="assets/309480723-6bb831ff-e7f2-41ab-824b-609fbb62853b.gif"
+            class="img-fluid z-depth-1-half box-shadow"
+          />
+        </div>
+        <!--/Grid column-->
+      </div>
+      <!--/Grid row-->
+    </section>
+    <!--Section: Main features & Quick Start-->
+
+    <hr class="my-5" />
+
+    <section>
+      <h3 class="h3 text-center mb-5">LLM-Powered Text Completion</h3>
+
+      <!--Grid row-->
+      <div class="row wow fadeIn">
+        <!--Grid column-->
+        <div class="col-md-6 mb-4">
+          <img
+            src="assets/264334730-648ae135-0406-4854-a68f-fb6b3d3f0702.gif"
+            class="img-fluid z-depth-1-half box-shadow"
+          />
+        </div>
+        <!--/Grid column-->
+
+        <!--Grid column-->
+        <div class="col-lg-6 col-md-12 px-4">
+          <!--First row-->
+          <div class="row">
+            <div class="col-1 mr-3">
+              <i class="fas fa-rocket fa-2x indigo-text"></i>
+            </div>
+            <div class="col-10">
+              <h5 class="feature-title">
+                Get Copilot-like text completion autosuggestions
+              </h5>
+            </div>
+          </div>
+          <!--/First row-->
+
+          <div style="height: 30px"></div>
+        </div>
+      </div>
+      <!--/Grid row-->
+    </section>
+
+    <hr class="my-5" />
+
+    <!--Section: Main features & Quick Start-->
+    <section>
+      <h3 class="h3 text-center mb-5">Zettelkasten with Semantic Archiving</h3>
+
+      <!--Grid row-->
+      <div class="row wow fadeIn">
+        <!--Grid column-->
+        <div class="col-lg-6 col-md-12 px-4">
+          <div class="row">
+            <div class="col-1 mr-3">
+              <i class="fas fa-file-lines fa-2x blue-text"></i>
+            </div>
+            <div class="col-10">
+              <h5 class="feature-title">Zettelkasten</h5>
+              <p class="grey-text">
+                Save note snippets in a Zettelkasten-like structure.
+              </p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-1 mr-3">
+              <i class="fas fa-folder-open fa-2x blue-text"></i>
+            </div>
+            <div class="col-10">
+              <h5 class="feature-title">Archive your snippets semantically</h5>
+              <p class="grey-text">
+                Get suggestions of the top-most semantic reasoned documents and
+                decide where to archive your snippet.
+              </p>
+            </div>
+          </div>
+        </div>
+        <!--/Grid column-->
+
+        <!--Grid column-->
+        <div class="col-md-6 mb-4">
+          <img
+            src="assets/361131980-9fe9d1b3-8e7e-4d45-90c2-b7bd4f03b23f.gif"
+            class="img-fluid z-depth-1-half box-shadow"
+          />
+        </div>
+        <!--/Grid column-->
+      </div>
+      <!--/Grid row-->
+    </section>
+    <!--Section: Main features & Quick Start-->
+
+    <hr class="my-5" />
+
+    <!--Section: Main features & Quick Start-->
+    <section>
       <h3 class="h3 text-center mb-5">Extensive Markdown Editor</h3>
 
       <!--Grid row-->
       <div class="row wow fadeIn">
+        <!--Grid column-->
+        <div class="col-md-6 mb-4">
+          <img
+            src="assets/code_editor.gif"
+            class="img-fluid z-depth-1-half box-shadow"
+          />
+        </div>
+        <!--/Grid column-->
         <!--Grid column-->
         <div class="col-lg-6 col-md-12 px-4">
           <div class="row">
@@ -175,15 +331,6 @@
           </div>
         </div>
         <!--/Grid column-->
-
-        <!--Grid column-->
-        <div class="col-md-6 mb-4">
-          <img
-            src="assets/code_editor.gif"
-            class="img-fluid z-depth-1-half box-shadow"
-          />
-        </div>
-        <!--/Grid column-->
       </div>
       <!--/Grid row-->
     </section>
@@ -196,15 +343,6 @@
 
       <!--Grid row-->
       <div class="row wow fadeIn">
-        <!--Grid column-->
-        <div class="col-md-6 mb-4">
-          <img
-            src="assets/tree.gif"
-            class="img-fluid z-depth-1-half box-shadow"
-          />
-        </div>
-        <!--/Grid column-->
-
         <!--Grid column-->
         <div class="col-lg-6 col-md-12 px-4">
           <!--First row-->
@@ -255,6 +393,14 @@
           </div>
           <!--/Third row-->
         </div>
+        <!--Grid column-->
+        <div class="col-md-6 mb-4">
+          <img
+            src="assets/tree.gif"
+            class="img-fluid z-depth-1-half box-shadow"
+          />
+        </div>
+        <!--/Grid column-->
       </div>
       <!--/Grid row-->
     </section>
@@ -266,6 +412,13 @@
 
       <!--Grid row-->
       <div class="row wow fadeIn">
+        <!--Grid column-->
+        <div class="col-md-6 mb-4">
+          <img
+            src="assets/309545584-0d1582fa-120f-4cc5-89c2-a490cc1a750a.gif"
+            class="img-fluid z-depth-1-half box-shadow"
+          />
+        </div>
         <!--Grid column-->
         <div class="col-lg-6 col-md-12 px-4">
           <!--Second row-->
@@ -284,15 +437,6 @@
             </div>
           </div>
           <!--/Second row-->
-        </div>
-        <!--/Grid column-->
-
-        <!--Grid column-->
-        <div class="col-md-6 mb-4">
-          <img
-            src="assets/searchbar.gif"
-            class="img-fluid z-depth-1-half box-shadow"
-          />
         </div>
         <!--/Grid column-->
       </div>

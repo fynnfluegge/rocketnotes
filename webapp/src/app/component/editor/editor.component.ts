@@ -63,7 +63,7 @@ export class EditorComponent {
     private titleService: Title,
     private location: Location,
     private http: HttpClient,
-  ) { }
+  ) {}
 
   ngOnInit() {
     if (environment.production) {
@@ -544,7 +544,7 @@ export class EditorComponent {
                 },
               ],
             })
-            .subscribe(() => { });
+            .subscribe(() => {});
         }
       });
   }
