@@ -83,6 +83,8 @@
   ></textarea>
   <div class="suggestion">{{ suggestion }}</div>
   <markdown
+    katex
+    mermaid
     id="markdownPreview"
     *ngIf="showPreview && editorMode"
     class="variable-binding"
@@ -90,6 +92,8 @@
     style="height: 100%; overflow-y: scroll; margin-top: 4px"
   ></markdown>
   <markdown
+    katex
+    mermaid
     *ngIf="!editorMode"
     class="variable-binding"
     [data]="content"

@@ -41,7 +41,8 @@
               "src/styles.scss",
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
               "node_modules/font-awesome/css/font-awesome.min.css",
-              "node_modules/prismjs/themes/prism-okaidia.css"
+              "node_modules/prismjs/themes/prism-okaidia.css",
+              "node_modules/katex/dist/katex.min.css"
             ],
             "scripts": [
               "node_modules/marked/marked.min.js",
@@ -52,7 +53,10 @@
               "node_modules/prismjs/components/prism-kotlin.min.js",
               "node_modules/prismjs/components/prism-go.min.js",
               "node_modules/prismjs/components/prism-python.min.js",
-              "node_modules/prismjs/components/prism-sql.min.js"
+              "node_modules/prismjs/components/prism-sql.min.js",
+              "node_modules/katex/dist/katex.min.js",
+              "node_modules/katex/dist/contrib/auto-render.min.js",
+              "node_modules/mermaid/dist/mermaid.min.js"
             ]
           },
           "configurations": {
@@ -120,13 +124,8 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.spec.json",
             "karmaConfig": "karma.conf.js",
-            "assets": [
-              "src/favicon.ico",
-              "src/assets"
-            ],
-            "styles": [
-              "src/styles.scss"
-            ],
+            "assets": ["src/favicon.ico", "src/assets"],
+            "styles": ["src/styles.scss"],
             "scripts": []
           }
         },
@@ -138,9 +137,7 @@
               "tsconfig.spec.json",
               "e2e/tsconfig.json"
             ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
+            "exclude": ["**/node_modules/**"]
           }
         },
         "e2e": {
