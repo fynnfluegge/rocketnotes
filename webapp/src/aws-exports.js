@@ -17,8 +17,14 @@ const awsmobile = {
         "redirectSignIn": environment.redirectSignIn,
         "redirectSignOut": environment.redirectSignOut,
         "responseType": "code"
+    },
+    "identityProviders": {
+        "GitHub": {
+            "client_id": "YOUR_GITHUB_CLIENT_ID",
+            "client_secret": "YOUR_GITHUB_CLIENT_SECRET",
+            "authorize_scopes": "read:user,user:email"
+        }
     }
 };
-
 
 export default awsmobile;

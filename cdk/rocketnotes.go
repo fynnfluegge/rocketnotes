@@ -21,8 +21,8 @@ import (
 	"github.com/aws/aws-cdk-go/awscdk/v2/awssqs"
 	"github.com/aws/aws-cdk-go/awscdkapigatewayv2alpha/v2"
 	"github.com/aws/aws-cdk-go/awscdkapigatewayv2integrationsalpha/v2"
-	"github.com/aws/aws-cdk-go/awscdklambdagoalpha/v2"
-	"github.com/aws/aws-cdk-go/awscdklambdapythonalpha/v2"
+	"github.com/aws/aws-cdklambdagoalpha/v2"
+	"github.com/aws/aws-cdklambdapythonalpha/v2"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/constructs-go/constructs/v10"
 	"github.com/aws/jsii-runtime-go"
@@ -535,6 +535,45 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
 		Role: lambdaSqsDynamoDbRole,
+	})
+
+	// Add Github OAuth 2.0 App lambda function
+	githubOAuthHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("GithubOAuthHandler"), &awscdklambdagoalpha.GoFunctionProps{
+		FunctionName: jsii.String("GithubOAuthHandler"),
+		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
+		Entry:        jsii.String("../lambda-handler/github-oauth-handler"),
+		Bundling: &awscdklambdagoalpha.BundlingOptions{
+			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
+		},
+		Role: lambdaDynamoDbRole,
+	})
+
+	httpApi.AddRoutes(&awscdkapigatewayv2alpha.AddRoutesOptions{
+		Path:        jsii.String("/github-oauth"),
+		Methods:     &[]awscdkapigatewayv2alpha.HttpMethod{awscdkapigatewayv2alpha.HttpMethod_POST},
+		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("githubOAuthLambdaIntegration"), githubOAuthHandler, &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
+	})
+
+	// Add OpenID Identity Provider to Cognito UserPoolClient
+	cognitoUserPoolClient := awscdk.NewCfnResource(stack, jsii.String("CognitoUserPoolClient"), &awscdk.CfnResourceProps{
+		Type: jsii.String("AWS::Cognito::UserPoolClient"),
+		Properties: &map[string]interface{}{
+			"ClientName":        jsii.String("GithubOAuthClient"),
+			"UserPoolId":        jsii.String(props.CognitoUserPoolId),
+			"AllowedOAuthFlows": jsii.Strings("code"),
+			"AllowedOAuthScopes": jsii.Strings(
+				"openid",
+				"profile",
+				"email",
+			),
+			"CallbackURLs": jsii.Strings(
+				"https://your-callback-url.com/callback",
+			),
+			"LogoutURLs": jsii.Strings(
+				"https://your-callback-url.com/logout",
+			),
+			"SupportedIdentityProviders": jsii.Strings("COGNITO", "OIDC"),
+		},
 	})
 
 	// hosted zone & certificate

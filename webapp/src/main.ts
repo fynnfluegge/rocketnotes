@@ -14,7 +14,7 @@ const oauth = {
     '.amazoncognito.com',
 
   // Authorized scopes
-  scope: ['email', 'openid'],
+  scope: ['email', 'openid', 'profile', 'aws.cognito.signin.user.admin'],
 
   // Callback URL
   redirectSignIn: environment.redirectSignIn,
@@ -40,6 +40,18 @@ if (environment.production) {
 
   Auth.configure({
     oauth: oauth,
+    identityPoolId: 'YOUR_IDENTITY_POOL_ID',
+    region: environment.awsRegion,
+    userPoolId: environment.cognitoUserPoolId,
+    userPoolWebClientId: environment.cognitoAppClientId,
+    authenticationFlowType: 'USER_SRP_AUTH',
+    identityProviders: {
+      'GitHub': {
+        'client_id': 'YOUR_GITHUB_CLIENT_ID',
+        'client_secret': 'YOUR_GITHUB_CLIENT_SECRET',
+        'authorize_scopes': 'read:user,user:email'
+      }
+    }
   });
 }
 
