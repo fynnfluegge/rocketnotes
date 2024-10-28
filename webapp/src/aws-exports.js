@@ -19,12 +19,16 @@ const awsmobile = {
         "responseType": "code"
     },
     "identityProviders": {
+        "Google": {
+            "client_id": environment.googleClientId,
+            "client_secret": environment.googleClientSecret
+        },
         "GitHub": {
-            "client_id": "YOUR_GITHUB_CLIENT_ID",
-            "client_secret": "YOUR_GITHUB_CLIENT_SECRET",
-            "authorize_scopes": "read:user,user:email"
+            "client_id": environment.githubClientId,
+            "client_secret": environment.githubClientSecret
         }
-    }
+    },
+    "federationTarget": "COGNITO_USER_POOLS"
 };
 
 export default awsmobile;

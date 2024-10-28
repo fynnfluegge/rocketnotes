@@ -12,4 +12,8 @@ export const environment = {
   redirectSignOut: 'undefined',
   authGuardRedirect: 'undefined',
   apiUrl: 'http://localhost:3002',
+  googleClientId: 'undefined',
+  googleClientSecret: 'undefined',
+  githubClientId: 'undefined',
+  githubClientSecret: 'undefined',
 };

@@ -72,3 +72,7 @@ jobs:
           DOMAIN: ${{ vars.DOMAIN }}
           SUBDOMAIN: ${{ vars.SUBDOMAIN }}
           DEPLOY_LANDING_PAGE: ${{ vars.DEPLOY_LANDING_PAGE }}
+          GOOGLE_CLIENT_ID: ${{ vars.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GITHUB_CLIENT_ID: ${{ vars.GITHUB_CLIENT_ID }}
+          GITHUB_CLIENT_SECRET: ${{ secrets.GITHUB_CLIENT_SECRET }}
