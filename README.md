@@ -35,7 +35,7 @@ Checkout how the serverless RAG pipeline works here [Serverless RAG on AWS](http
 - 🔦 Semantic search
 - ✍️ Copilot-like text completion
 - 🤖 Chat with your documents
-  - Servlerless RAG with faiss, OpenAI and/or Anthropic
+  - Serverless RAG with faiss, OpenAI and/or Anthropic
 - 📦 Local mode with Docker
   - use Ollama and/or Sentence Transformers for 100% local RAG
 - 📥 Zettelkasten with semantic archiving
