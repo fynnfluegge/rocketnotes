@@ -35,6 +35,7 @@ type RocketnotesStackProps struct {
 	Domain             string
 	Subdomain          string
 	DeployLandingPage  string
+	// TODO add Google client id and secret
 }
 
 func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesStackProps) awscdk.Stack {
@@ -84,6 +85,11 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 			dynamoDbFullAccessPolicy,
 		},
 	})
+
+	// TODO add Google Identity provider construct
+	// get user pool from props.CognitoUserPoolId
+	// add Google Identity provider to user pool
+	
 
 	// Http Api with Authorization
 

@@ -14,6 +14,7 @@ const oauth = {
     '.amazoncognito.com',
 
   // Authorized scopes
+  // TODO add profile
   scope: ['email', 'openid'],
 
   // Callback URL
