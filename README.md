@@ -19,6 +19,13 @@ It utilizes a 100% serverless RAG pipeline built with
 [Ollama](https://github.com/jmorganca/ollama) and OpenAI or Anthropic.  
 Checkout how the serverless RAG pipeline works here [Serverless RAG on AWS](https://medium.com/@fynnfluegge/serverless-rag-on-aws-bf8029f8bffd).
 
+# Table of Contents
+
+1. [Example](#example)
+2. [Example2](#example2)
+3. [Third Example](#third-example)
+4. [Fourth Example](#fourth-examplehttpwwwfourthexamplecom)
+
 ## How to run
 
 - You can [Sign Up](https://takeniftynotes.auth.eu-central-1.amazoncognito.com/login?response_type=code&client_id=tt3v27pnqqh7elqdvq9tgmr9v&redirect_uri=https://app.takeniftynotes.net) for free
@@ -40,8 +47,7 @@ Checkout how the serverless RAG pipeline works here [Serverless RAG on AWS](http
   - use Ollama and/or Sentence Transformers for 100% local RAG
 - 📥 Zettelkasten with semantic archiving
   - Use vector index to insert notes into highest semantic-ranked documents
-
-&nbsp;
+    &nbsp;
 
 <div align="center">
   
@@ -104,6 +110,8 @@ Checkout how the serverless RAG pipeline works here [Serverless RAG on AWS](http
 </div>
 
 &nbsp;
+
+## Roadmap
 
 ## 🌟 Contributing
 
