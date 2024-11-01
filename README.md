@@ -11,26 +11,18 @@
 
 </div>
 
-Rocketnotes is a web-based Markdown note taking app with LLM-powered text completion, chat and semantic search.
-It utilizes a 100% serverless RAG pipeline built with
+Rocketnotes is a web-based Markdown note taking app with LLM-powered text completion, chat and semantic search.  
+It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/serverless-rag-on-aws-bf8029f8bffd) built with
 [langchain](https://github.com/langchain-ai/langchain),
 [sentence-transformers](https://github.com/UKPLab/sentence-transformers),
 [faiss](https://github.com/facebookresearch/faiss),
 [Ollama](https://github.com/jmorganca/ollama) and OpenAI or Anthropic.  
-Checkout how the serverless RAG pipeline works here [Serverless RAG on AWS](https://medium.com/@fynnfluegge/serverless-rag-on-aws-bf8029f8bffd).
 
-# Table of Contents
+## How to use
 
-1. [Example](#example)
-2. [Example2](#example2)
-3. [Third Example](#third-example)
-4. [Fourth Example](#fourth-examplehttpwwwfourthexamplecom)
-
-## How to run
-
-- You can [Sign Up](https://takeniftynotes.auth.eu-central-1.amazoncognito.com/login?response_type=code&client_id=tt3v27pnqqh7elqdvq9tgmr9v&redirect_uri=https://app.takeniftynotes.net) for free
-- Run it 100% [locally with Docker](INSTALLATION.md#run-on-your-local-machine-with-docker)
-- Deploy to [AWS](INSTALLATION.md#aws-hosting)
+- [Sign Up](https://takeniftynotes.auth.eu-central-1.amazoncognito.com/login?response_type=code&client_id=tt3v27pnqqh7elqdvq9tgmr9v&redirect_uri=https://app.takeniftynotes.net) for free
+- Run it 100% [locally with Docker](#run-with-docker)
+- Host in your personal [AWS](#aws-hosting) account
 
 ## ✨ Features
 
@@ -111,11 +103,7 @@ Checkout how the serverless RAG pipeline works here [Serverless RAG on AWS](http
 
 &nbsp;
 
-## Roadmap
-
-## Installation
-
-### Run on your local machine with Docker
+## Run with Docker
 
 ```
 git clone https://github.com/fynnfluegge/rocketnotes.git
@@ -134,11 +122,11 @@ On initial startup it may take a moment.
 Once it's done execute `sh ./dynamodb-init.sh` as a last step to initialize the dynamodb.
 Now you can open `http://localhost:3001` in the browser and you should see the initially created Cheat Sheet document 🚀
 
-### AWS hosting
+## AWS hosting
 
 > Hosting on your own AWS account will cost you less than **$1 per month** under normal usage.
 
-#### Prerequisites
+### Prerequisites
 
 The following tools need to be installed on your system prior to build and deploy to AWS:
 
@@ -154,7 +142,7 @@ npm install
 
 </br>
 
-#### Initial Setup
+### Initial Setup
 
 In order to deploy Rocketnotes at AWS you need an AWS Account and configure the AWS CLI locally with `aws configure` as usual.
 The deployment itself is very straight forward.
@@ -167,7 +155,7 @@ If you want to create the cognito resources via the aws console, there are plent
 Second, you need an existing hosted zone in the target region of your AWS account. This requires a domain you are in charge of.
 How to create a hosted zone and configure Route 53 as a DNS service with your domain you will find [here](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/CreatingHostedZone.html).
 
-#### Deploy all AWS resources
+### Deploy all AWS resources
 
 The following environment variables are required for the deployment:
 
@@ -190,11 +178,11 @@ cd cdk
 cdk deploy
 ```
 
-The first deployment will take some minutes, since all the resources and lambda functions need to be initially created. If the deployment was successfull the api url should be logged in the console as `HTTP API endpoint URL`.
+The first deployment will take some minutes, since all the resources and lambda functions need to be initially created. If the deployment was successful the api url should be logged in the console as `HTTP API endpoint URL`.
 
-#### Build webapp
+### Build webapp
 
-The Angular webapp need to be bundled in production mode.
+The Angular webapp needs to be bundled in production mode.
 The following environment variables are required for the production build:
 
 ```bash
@@ -204,7 +192,7 @@ export AUTH_GUARD_REDIRECT="<AUTH_GUARD_REDIRECT_URL>" # <- "https://<YOUR_DOMAI
 export API_URL="<YOUR_API_URL>" # <- HTTP API endpoint URL from deployment console log
 ```
 
-Once your environment variables are specified run:
+Once your environment variables are set run:
 
 ```
 cd webapp
@@ -212,16 +200,14 @@ npm install
 npm run build
 ```
 
-#### Deploy webapp
+### Deploy webapp
 
-Finally, the Angular app can be deployed to S3 with again:
+Finally, the Angular app can be deployed to S3 by again running:
 
 ```
 cd cdk
 cdk deploy
 ```
-
-This deployment will only deploy the webapp build to the S3 bucket and will be much faster than the previous one.
 
 </br>
 
@@ -279,7 +265,6 @@ Open http://localhost:4200 in your browser and you should see the Rocketnotes we
 
 </br>
 
-You find also the contribution guidelines there.
 Don't hesitate to open an issue for getting some feedback about a potential bug or if you desire a missing feature.
-We also appreciate to check over current [issues](https://github.com/fynnfluegge/rocketnotes/issues) and provide feedback to existing ones or even raise a PR which solves an issue.
+It is appreciated to check over current [issues](https://github.com/fynnfluegge/rocketnotes/issues) and provide feedback to existing ones or even raise a PR which solves an issue.
 Any contribution is welcome!
