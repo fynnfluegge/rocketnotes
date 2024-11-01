@@ -22,7 +22,8 @@ It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/ser
 
 - [Sign Up](https://takeniftynotes.auth.eu-central-1.amazoncognito.com/login?response_type=code&client_id=tt3v27pnqqh7elqdvq9tgmr9v&redirect_uri=https://app.takeniftynotes.net) for free
 - Run it 100% [locally with Docker](#run-with-docker)
-- Host in your personal [AWS](#aws-hosting) account
+- Host at [AWS](#aws-hosting)
+- Check [contributing guide](#contributing) how to setup a local development environment
 
 ## ✨ Features
 
@@ -39,7 +40,9 @@ It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/ser
   - use Ollama and/or Sentence Transformers for 100% local RAG
 - 📥 Zettelkasten with semantic archiving
   - Use vector index to insert notes into highest semantic-ranked documents
-    &nbsp;
+- WIP: Neovim plugin [rocketnotes.nvim](https://github.com/fynnfluegge/rocketnotes.nvim)
+  
+&nbsp;
 
 <div align="center">
   
@@ -211,7 +214,7 @@ cdk deploy
 
 </br>
 
-## 🌟 Contributing
+## Contributing
 
 The most comfortable way to get started is to open the project in a ready-to-code Gitpod workspace with all packages & tools preinstalled and a running database with sample data.
 
@@ -227,7 +230,7 @@ If you prefer to setup the project on your local machine continue to the next se
 
 First, the following tools and frameworks need to be installed on your system prior to start:
 - [Docker](https://docs.docker.com/get-docker/)
-- [Node.js >= 14.x](https://nodejs.org/download/release/latest-v14.x/)
+- [Node.js >= 18.x](https://nodejs.org/download/release/latest-v18.x/)
 - [Go 1.x](https://go.dev/doc/install)
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 - [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html)
