@@ -104,7 +104,6 @@ It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/ser
   <img src="landing-page/src/assets/tree.gif">
 </div>
 
-&nbsp;
 
 ## Contributing
 
@@ -116,7 +115,9 @@ The most comfortable way to get started is to open the project in a ready-to-cod
   </a>
 </div>
 
-If you prefer to setup the project on your local machine see [contributing guide](#contributing) and learn all required steps to run the project locally in development mode.
+&nbsp;
+
+If you prefer to setup the project on your local machine see [contributing guide](CONTRIBUTING.md#contributing-guide) and learn all required steps to run it locally in development mode.
 
 Don't hesitate to open an issue for getting some feedback about a potential bug or if you desire a missing feature.
 It is appreciated to check over current [issues](https://github.com/fynnfluegge/rocketnotes/issues) and provide feedback to existing ones or even raise a PR which solves an issue.
