@@ -11,19 +11,19 @@
 
 </div>
 
-Rocketnotes is a web-based Markdown note taking app with LLM-powered text completion, chat and semantic search.
-It utilizes a 100% serverless RAG pipeline built with
+Rocketnotes is a web-based Markdown note taking app with LLM-powered text completion, chat and semantic search.  
+It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/serverless-rag-on-aws-bf8029f8bffd) built with
 [langchain](https://github.com/langchain-ai/langchain),
 [sentence-transformers](https://github.com/UKPLab/sentence-transformers),
 [faiss](https://github.com/facebookresearch/faiss),
 [Ollama](https://github.com/jmorganca/ollama) and OpenAI or Anthropic.  
-Checkout how the serverless RAG pipeline works here [Serverless RAG on AWS](https://medium.com/@fynnfluegge/serverless-rag-on-aws-bf8029f8bffd).
 
-## How to run
+## How to use
 
-- You can [Sign Up](https://takeniftynotes.auth.eu-central-1.amazoncognito.com/login?response_type=code&client_id=tt3v27pnqqh7elqdvq9tgmr9v&redirect_uri=https://app.takeniftynotes.net) for free
-- Run it 100% [locally with Docker](INSTALLATION.md#run-on-your-local-machine-with-docker)
-- Deploy to [AWS](INSTALLATION.md#aws-hosting)
+- [Sign Up](https://takeniftynotes.auth.eu-central-1.amazoncognito.com/login?response_type=code&client_id=tt3v27pnqqh7elqdvq9tgmr9v&redirect_uri=https://app.takeniftynotes.net) for free
+- Run it 100% [locally with Docker](INSTALLATION.md#run-with-docker)
+- Host at [AWS](INSTALLATION.md#aws-hosting)
+- Check [contributing guide](CONTRIBUTING.md#contributing-guide) how to setup a local development environment
 
 ## ✨ Features
 
@@ -40,7 +40,8 @@ Checkout how the serverless RAG pipeline works here [Serverless RAG on AWS](http
   - use Ollama and/or Sentence Transformers for 100% local RAG
 - 📥 Zettelkasten with semantic archiving
   - Use vector index to insert notes into highest semantic-ranked documents
-
+- WIP: Neovim plugin [rocketnotes.nvim](https://github.com/fynnfluegge/rocketnotes.nvim)
+  
 &nbsp;
 
 <div align="center">
@@ -103,9 +104,8 @@ Checkout how the serverless RAG pipeline works here [Serverless RAG on AWS](http
   <img src="landing-page/src/assets/tree.gif">
 </div>
 
-&nbsp;
 
-## 🌟 Contributing
+## Contributing
 
 The most comfortable way to get started is to open the project in a ready-to-code Gitpod workspace with all packages & tools preinstalled and a running database with sample data.
 
@@ -115,9 +115,10 @@ The most comfortable way to get started is to open the project in a ready-to-cod
   </a>
 </div>
 
-If you prefer to setup the project on your local machine visit the [get started guide](CONTRIBUTING.md#getting-started) with all required steps to run the project locally in development mode.
+&nbsp;
 
-You find also the contribution guidelines there.
+If you prefer to setup the project on your local machine see [contributing guide](CONTRIBUTING.md#contributing-guide) and learn all required steps to run it locally in development mode.
+
 Don't hesitate to open an issue for getting some feedback about a potential bug or if you desire a missing feature.
-We also appreciate to check over current [issues](https://github.com/fynnfluegge/rocketnotes/issues) and provide feedback to existing ones or even raise a PR which solves an issue.
+It is appreciated to check over current [issues](https://github.com/fynnfluegge/rocketnotes/issues) and provide feedback to existing ones or even raise a PR which solves an issue.
 Any contribution is welcome!
