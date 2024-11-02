@@ -1,35 +1,44 @@
 # Installation
 
-This document describes how to deploy your personal Rocketnotes installation in the cloud at AWS or run it locally with Docker.
-
 ### Prerequisites
 
-The following tools need to be installed on your system prior to build and deploy to AWS or to your own infrastructure:
-
-- [Node.js >= 18.x](https://nodejs.org/download/release/latest-v14.x/)
-- [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
+Clone the project:
 
 ```
-git clone https://github.com/fynnfluegge/rocketnotes.git
+git clone https://github.com/{your-account}/rocketnotes.git
 cd rocketnotes
-npm install
 ```
 
-</br>
+## Run on your local machine with Docker
+
+```
+docker-compose up -d
+```
+
+Docker-compose will create and start four containers with a docker network:
+
+- the DynamoDB with a volume listening on port 8041
+- the S3 mock listening on port 9091
+- the Angular app listening on port 3001
+- all the lambda functions in a single container listening on port 3002
+
+On initial startup it may take a moment.
+Once it's done execute `sh ./dynamodb-init.sh` as a last step to initialize the dynamodb.
+Now you can open `http://localhost:3001` in the browser and you should see the initially created Cheat Sheet document 🚀
 
 ## AWS hosting
 
 > Hosting on your own AWS account will cost you less than **$1 per month** under normal usage.
 
-### Prerequisites
-
 The following tools need to be installed on your system prior to build and deploy to AWS:
 
+- [Node.js >= 18.x](https://nodejs.org/download/release/latest-v14.x/)
+- [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 - [AWS CDK](https://github.com/aws/aws-cdk)
 
 ### Initial Setup
 
-In order to deploy Rocketnotes at AWS you need an AWS Account and configure the AWS CLI locally with `aws configure` as usual.
+In order to deploy Rocketnotes to AWS you need an AWS Account and configure the AWS CLI locally with `aws configure` as usual.
 The deployment itself is very straight forward.
 
 But First, there need to be an existing Cognito user pool and a Hosted Zone associated with your AWS account in the region where you are going to deploy against.
@@ -87,32 +96,9 @@ npm run build
 
 ### Deploy webapp
 
-Finally, the Angular app can be deployed to S3 with again:
+Finally, the Angular app can be deployed to S3 by again running:
 
 ```
 cd cdk
 cdk deploy
 ```
-
-This deployment will only deploy the webapp build to the S3 bucket and will be much faster than the previous one.
-
-</br>
-
-## Run on your local machine with Docker
-
-```
-git clone https://github.com/fynnfluegge/rocketnotes.git
-cd rocketnotes
-docker-compose up -d
-```
-
-Docker-compose will create and start four containers with a docker network:
-
-- the DynamoDB with a volume listening on port 8041
-- the S3 mock listening on port 9091
-- the Angular app listening on port 3001
-- all the lambda functions in a single container listening on port 3002
-
-On initial startup it may take a moment.
-Once it's done execute `sh ./dynamodb-init.sh` as a last step to initialize the dynamodb.
-Now you can open `http://localhost:3001` in the browser and you should see the initially created Cheat Sheet document 🚀
