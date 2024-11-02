@@ -21,9 +21,9 @@ It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/ser
 ## How to use
 
 - [Sign Up](https://takeniftynotes.auth.eu-central-1.amazoncognito.com/login?response_type=code&client_id=tt3v27pnqqh7elqdvq9tgmr9v&redirect_uri=https://app.takeniftynotes.net) for free
-- Run it 100% [locally with Docker](INSTALLATION#run-with-docker)
-- Host at [AWS](INSTALLATION#aws-hosting)
-- Check [contributing guide](CONTRIBUTING#contributing-guide) how to setup a local development environment
+- Run it 100% [locally with Docker](INSTALLATION.md#run-with-docker)
+- Host at [AWS](INSTALLATION.md#aws-hosting)
+- Check [contributing guide](CONTRIBUTING.md#contributing-guide) how to setup a local development environment
 
 ## ✨ Features
 
