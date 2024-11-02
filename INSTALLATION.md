@@ -9,7 +9,7 @@ git clone https://github.com/{your-account}/rocketnotes.git
 cd rocketnotes
 ```
 
-## Run on your local machine with Docker
+## Run with Docker
 
 ```
 docker-compose up -d
