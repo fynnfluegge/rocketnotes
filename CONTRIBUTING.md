@@ -1,4 +1,4 @@
-# Contributing to Rocketnotes 🚀
+# Contributing Guide
 
 ### Setup development environment
 
