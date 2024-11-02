@@ -115,6 +115,8 @@ The most comfortable way to get started is to open the project in a ready-to-cod
   </a>
 </div>
 
+&nbsp;
+
 If you prefer to setup the project on your local machine see [contributing guide](CONTRIBUTING.md#contributing-guide) and learn all required steps to run it locally in development mode.
 
 Don't hesitate to open an issue for getting some feedback about a potential bug or if you desire a missing feature.
