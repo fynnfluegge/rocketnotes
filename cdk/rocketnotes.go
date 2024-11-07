@@ -90,14 +90,24 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 	httpApi := awscdkapigatewayv2alpha.NewHttpApi(stack, jsii.String("MyHttpApi"), &awscdkapigatewayv2alpha.HttpApiProps{
 		ApiName: jsii.String("MyHttpApi"),
 		CorsPreflight: &awscdkapigatewayv2alpha.CorsPreflightOptions{
-			AllowOrigins: jsii.Strings("*"),
-			AllowHeaders: jsii.Strings("*"),
+			AllowOrigins: jsii.Strings(
+				"https://" + props.Subdomain + "." + props.Domain,
+				"http://localhost:4200",
+			),
+			AllowHeaders: jsii.Strings(
+				"Authorization",
+				"Content-Type",
+				"X-Amz-Date",
+				"X-Api-Key",
+				"X-Amz-Security-Token",
+			),
 			AllowMethods: &[]awscdkapigatewayv2alpha.CorsHttpMethod{
 				awscdkapigatewayv2alpha.CorsHttpMethod_OPTIONS,
 				awscdkapigatewayv2alpha.CorsHttpMethod_GET,
 				awscdkapigatewayv2alpha.CorsHttpMethod_POST,
 				awscdkapigatewayv2alpha.CorsHttpMethod_DELETE,
 			},
+			MaxAge: awscdk.Duration_Days(jsii.Number(1)),
 		},
 	})
 
@@ -117,11 +127,11 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 
 	// GET Document Api
 
-	getDocumentHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("GET-Document"), &awscdklambdagoalpha.GoFunctionProps{
+	getDocumentHandler := awscdklambdago.NewGoFunction(stack, jsii.String("GET-Document"), &awscdklambdago.GoFunctionProps{
 		FunctionName: jsii.String("GET-Document"),
 		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
 		Entry:        jsii.String("../lambda-handler/get-document-handler"),
-		Bundling: &awscdklambdagoalpha.BundlingOptions{
+		Bundling: &awscdklambdago.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
 		Role: lambdaDynamoDbRole,
@@ -135,11 +145,11 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 	})
 
 	// GET User Config Api
-	getUserConfigHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("GET-UserConfig"), &awscdklambdagoalpha.GoFunctionProps{
+	getUserConfigHandler := awscdklambdago.NewGoFunction(stack, jsii.String("GET-UserConfig"), &awscdklambdago.GoFunctionProps{
 		FunctionName: jsii.String("GET-UserConfig"),
 		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
 		Entry:        jsii.String("../lambda-handler/get-user-config-handler"),
-		Bundling: &awscdklambdagoalpha.BundlingOptions{
+		Bundling: &awscdklambdago.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
 		Role: lambdaDynamoDbRole,
@@ -154,11 +164,11 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 
 	// GET Shared Document Api
 
-	getSharedDocumentHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("GET-Shared-Document"), &awscdklambdagoalpha.GoFunctionProps{
+	getSharedDocumentHandler := awscdklambdago.NewGoFunction(stack, jsii.String("GET-Shared-Document"), &awscdklambdago.GoFunctionProps{
 		FunctionName: jsii.String("GET-Shared-Document"),
 		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
 		Entry:        jsii.String("../lambda-handler/get-shared-document-handler"),
-		Bundling: &awscdklambdagoalpha.BundlingOptions{
+		Bundling: &awscdklambdago.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
 		Role: lambdaDynamoDbRole,
@@ -172,11 +182,11 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 
 	// GET Document Tree Api
 
-	getDocumentTreeHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("GET-DocumentTree"), &awscdklambdagoalpha.GoFunctionProps{
+	getDocumentTreeHandler := awscdklambdago.NewGoFunction(stack, jsii.String("GET-DocumentTree"), &awscdklambdago.GoFunctionProps{
 		FunctionName: jsii.String("GET-DocumentTree"),
 		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
 		Entry:        jsii.String("../lambda-handler/get-document-tree-handler"),
-		Bundling: &awscdklambdagoalpha.BundlingOptions{
+		Bundling: &awscdklambdago.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
 		Role: lambdaDynamoDbRole,
@@ -191,11 +201,11 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 
 	// GET search Documents API
 
-	searchDocumentHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("GET-search-Documents"), &awscdklambdagoalpha.GoFunctionProps{
+	searchDocumentHandler := awscdklambdago.NewGoFunction(stack, jsii.String("GET-search-Documents"), &awscdklambdago.GoFunctionProps{
 		FunctionName: jsii.String("GET-search-Documents"),
 		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
 		Entry:        jsii.String("../lambda-handler/search-document-handler"),
-		Bundling: &awscdklambdagoalpha.BundlingOptions{
+		Bundling: &awscdklambdago.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
 		Role: lambdaDynamoDbRole,
@@ -275,7 +285,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		AuthorizationType: jsii.String("JWT"),
 	})
 
-	awscdklambdagoalpha.NewGoFunction(stack, jsii.String("POST-Document"), &awscdklambdagoalpha.GoFunctionProps{
+	awscdklambdago.NewGoFunction(stack, jsii.String("POST-Document"), &awscdklambdago.GoFunctionProps{
 		FunctionName: jsii.String("POST-Document"),
 		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
 		Entry:        jsii.String("../lambda-handler/save-document-handler/main.go"),
@@ -284,7 +294,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 				BatchSize: jsii.Number(1),
 			}),
 		},
-		Bundling: &awscdklambdagoalpha.BundlingOptions{
+		Bundling: &awscdklambdago.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
 		Environment: &map[string]*string{"queueUrl": vectorQueue.QueueUrl()},
@@ -292,11 +302,11 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 	})
 
 	// POST Save User Config Api
-	postUserConfigHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("POST-UserConfig"), &awscdklambdagoalpha.GoFunctionProps{
+	postUserConfigHandler := awscdklambdago.NewGoFunction(stack, jsii.String("POST-UserConfig"), &awscdklambdago.GoFunctionProps{
 		FunctionName: jsii.String("POST-UserConfig"),
 		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
 		Entry:        jsii.String("../lambda-handler/save-user-config-handler"),
-		Bundling: &awscdklambdagoalpha.BundlingOptions{
+		Bundling: &awscdklambdago.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
 		Environment: &map[string]*string{"queueUrl": vectorQueue.QueueUrl()},
@@ -312,11 +322,11 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 
 	// POST DocumentTree Api
 
-	postDocumentTreeHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("POST-DocumentTree"), &awscdklambdagoalpha.GoFunctionProps{
+	postDocumentTreeHandler := awscdklambdago.NewGoFunction(stack, jsii.String("POST-DocumentTree"), &awscdklambdago.GoFunctionProps{
 		FunctionName: jsii.String("POST-DocumentTree"),
 		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
 		Entry:        jsii.String("../lambda-handler/save-document-tree-handler"),
-		Bundling: &awscdklambdagoalpha.BundlingOptions{
+		Bundling: &awscdklambdago.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
 		Role: lambdaDynamoDbRole,
@@ -331,11 +341,11 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 
 	// POST Set Document Title Api
 
-	postDocumentTitleHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("POST-DocumentTitle"), &awscdklambdagoalpha.GoFunctionProps{
+	postDocumentTitleHandler := awscdklambdago.NewGoFunction(stack, jsii.String("POST-DocumentTitle"), &awscdklambdago.GoFunctionProps{
 		FunctionName: jsii.String("POST-DocumentTitle"),
 		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
 		Entry:        jsii.String("../lambda-handler/save-document-title-handler"),
-		Bundling: &awscdklambdagoalpha.BundlingOptions{
+		Bundling: &awscdklambdago.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
 		Role: lambdaDynamoDbRole,
@@ -350,11 +360,11 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 
 	// POST Share Document Api
 
-	postShareDocumentHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("POST-share-Document"), &awscdklambdagoalpha.GoFunctionProps{
+	postShareDocumentHandler := awscdklambdago.NewGoFunction(stack, jsii.String("POST-share-Document"), &awscdklambdago.GoFunctionProps{
 		FunctionName: jsii.String("POST-share-Document"),
 		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
 		Entry:        jsii.String("../lambda-handler/save-document-public-handler"),
-		Bundling: &awscdklambdagoalpha.BundlingOptions{
+		Bundling: &awscdklambdago.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
 		Role: lambdaDynamoDbRole,
@@ -375,7 +385,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		AccessControl:    awss3.BucketAccessControl_BUCKET_OWNER_FULL_CONTROL,
 	})
 
-	awscdklambdapythonalpha.NewPythonFunction(stack, jsii.String("VectorEmbeddingsHandler"), &awscdklambdapythonalpha.PythonFunctionProps{
+	awscdklambdapython.NewPythonFunction(stack, jsii.String("VectorEmbeddingsHandler"), &awscdklambdapython.PythonFunctionProps{
 		FunctionName: jsii.String("VectorEmbeddings"),
 		Runtime:      awslambda.Runtime_PYTHON_3_9(),
 		Entry:        jsii.String("../lambda-handler/save-vector-embeddings-handler"),
@@ -393,7 +403,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 
 	// Semantic search handler
 
-	semanticSearcHandler := awscdklambdapythonalpha.NewPythonFunction(stack, jsii.String("SemanticSearchHandler"), &awscdklambdapythonalpha.PythonFunctionProps{
+	semanticSearcHandler := awscdklambdapython.NewPythonFunction(stack, jsii.String("SemanticSearchHandler"), &awscdklambdapython.PythonFunctionProps{
 		FunctionName: jsii.String("SemanticSearch"),
 		Runtime:      awslambda.Runtime_PYTHON_3_9(),
 		Entry:        jsii.String("../lambda-handler/semantic-search-handler"),
@@ -413,7 +423,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 
 	// Chat handler
 
-	chatHandler := awscdklambdapythonalpha.NewPythonFunction(stack, jsii.String("ChatHandler"), &awscdklambdapythonalpha.PythonFunctionProps{
+	chatHandler := awscdklambdapython.NewPythonFunction(stack, jsii.String("ChatHandler"), &awscdklambdapython.PythonFunctionProps{
 		FunctionName: jsii.String("Chat"),
 		Runtime:      awslambda.Runtime_PYTHON_3_9(),
 		Entry:        jsii.String("../lambda-handler/chat-handler"),
@@ -433,7 +443,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 
 	// Completion handler
 
-	textCompletionHandler := awscdklambdapythonalpha.NewPythonFunction(stack, jsii.String("TextCompletionHandler"), &awscdklambdapythonalpha.PythonFunctionProps{
+	textCompletionHandler := awscdklambdapython.NewPythonFunction(stack, jsii.String("TextCompletionHandler"), &awscdklambdapython.PythonFunctionProps{
 		FunctionName: jsii.String("TextCompletion"),
 		Runtime:      awslambda.Runtime_PYTHON_3_9(),
 		Entry:        jsii.String("../lambda-handler/text-completion-handler"),
@@ -452,11 +462,11 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 	// Zettelkasten handler
 
 	// get zettel kasten
-	getZettelKastenHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("GET-ZettelKasten"), &awscdklambdagoalpha.GoFunctionProps{
+	getZettelKastenHandler := awscdklambdago.NewGoFunction(stack, jsii.String("GET-ZettelKasten"), &awscdklambdago.GoFunctionProps{
 		FunctionName: jsii.String("GET-ZettelKasten"),
 		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
 		Entry:        jsii.String("../lambda-handler/get-zettelkasten-handler"),
-		Bundling: &awscdklambdagoalpha.BundlingOptions{
+		Bundling: &awscdklambdago.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
 		Role: lambdaDynamoDbRole,
@@ -470,11 +480,11 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 	})
 
 	// save zettel
-	saveZettelHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("POST-save-Zettel"), &awscdklambdagoalpha.GoFunctionProps{
+	saveZettelHandler := awscdklambdago.NewGoFunction(stack, jsii.String("POST-save-Zettel"), &awscdklambdago.GoFunctionProps{
 		FunctionName: jsii.String("POST-save-Zettel"),
 		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
 		Entry:        jsii.String("../lambda-handler/save-zettel-handler"),
-		Bundling: &awscdklambdagoalpha.BundlingOptions{
+		Bundling: &awscdklambdago.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
 		Role: lambdaDynamoDbRole,
@@ -488,11 +498,11 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 	})
 
 	// delete zettel
-	deleteZettelHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("DELETE-Zettel"), &awscdklambdagoalpha.GoFunctionProps{
+	deleteZettelHandler := awscdklambdago.NewGoFunction(stack, jsii.String("DELETE-Zettel"), &awscdklambdago.GoFunctionProps{
 		FunctionName: jsii.String("DELETE-Zettel"),
 		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
 		Entry:        jsii.String("../lambda-handler/delete-zettel-handler"),
-		Bundling: &awscdklambdagoalpha.BundlingOptions{
+		Bundling: &awscdklambdago.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
 		Role: lambdaDynamoDbRole,
@@ -506,11 +516,11 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 	})
 
 	// archive zettel
-	archiveZettelHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("POST-archive-Zettel"), &awscdklambdagoalpha.GoFunctionProps{
+	archiveZettelHandler := awscdklambdago.NewGoFunction(stack, jsii.String("POST-archive-Zettel"), &awscdklambdago.GoFunctionProps{
 		FunctionName: jsii.String("POST-archive-Zettel"),
 		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
 		Entry:        jsii.String("../lambda-handler/archive-zettel-handler"),
-		Bundling: &awscdklambdagoalpha.BundlingOptions{
+		Bundling: &awscdklambdago.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
 		Environment: &map[string]*string{"queueUrl": vectorQueue.QueueUrl()},
@@ -527,15 +537,65 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 
 	// sign-up confirmation lambda handler
 
-	awscdklambdagoalpha.NewGoFunction(stack, jsii.String("Sign-up-confirmation-handler"), &awscdklambdagoalpha.GoFunctionProps{
+	awscdklambdago.NewGoFunction(stack, jsii.String("Sign-up-confirmation-handler"), &awscdklambdago.GoFunctionProps{
 		FunctionName: jsii.String("Sign-up-confirmation-handler"),
 		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
 		Entry:        jsii.String("../lambda-handler/sign-up-confirmation-handler"),
-		Bundling: &awscdklambdagoalpha.BundlingOptions{
+		Bundling: &awscdklambdago.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
 		Role: lambdaSqsDynamoDbRole,
 	})
+
+	// Add Github OAuth 2.0 App lambda function
+	githubOAuthHandler := awscdklambdago.NewGoFunction(stack, jsii.String("GithubOAuthHandler"), &awscdklambdago.GoFunctionProps{
+		FunctionName: jsii.String("GithubOAuthHandler"),
+		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
+		Entry:        jsii.String("../lambda-handler/github-oauth-handler"),
+		Bundling: &awscdklambdago.BundlingOptions{
+			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
+		},
+		Role: lambdaDynamoDbRole,
+	})
+
+	httpApi.AddRoutes(&awscdkapigatewayv2alpha.AddRoutesOptions{
+		Path:        jsii.String("/github-oauth"),
+		Methods:     &[]awscdkapigatewayv2alpha.HttpMethod{awscdkapigatewayv2alpha.HttpMethod_POST},
+		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("githubOAuthLambdaIntegration"), githubOAuthHandler, &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
+	})
+
+	// Add OpenID Identity Provider to Cognito UserPoolClient
+	cognitoUserPoolClient := awscdk.NewCfnResource(stack, jsii.String("CognitoUserPoolClient"), &awscdk.CfnResourceProps{
+		Type: jsii.String("AWS::Cognito::UserPoolClient"),
+		Properties: &map[string]interface{}{
+			"ClientName":        jsii.String("OAuthClient"),
+			"UserPoolId":        jsii.String(props.CognitoUserPoolId),
+			"AllowedOAuthFlows": jsii.Strings("code"),
+			"AllowedOAuthScopes": jsii.Strings(
+				"openid",
+				"profile",
+				"email",
+			),
+			"CallbackURLs": jsii.Strings(
+				"https://" + props.Subdomain + "." + props.Domain + "/callback",
+				"http://localhost:4200/callback", // For local development
+			),
+			"LogoutURLs": jsii.Strings(
+				"https://" + props.Subdomain + "." + props.Domain + "/logout",
+				"http://localhost:4200/logout", // For local development
+			),
+			"SupportedIdentityProviders": jsii.Strings(
+				"COGNITO",
+				"Google",
+				"GitHub",  // Added comma here
+			),
+			"PreventUserExistenceErrors": jsii.String("ENABLED"),
+			"EnableTokenRevocation": jsii.Bool(true),
+		},
+	})
+
+	// Add this after creating cognitoUserPoolClient
+	awscdk.Tags_Of(cognitoUserPoolClient).Add(jsii.String("Name"), jsii.String("RocketnotesUserPoolClient"), nil)
 
 	// hosted zone & certificate
 
@@ -660,31 +720,31 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		}))
 
 		landingPageCloudFrontDistribution := awscloudfront.NewCloudFrontWebDistribution(stack, jsii.String("MyCloudFrontDistribution"), &awscloudfront.CloudFrontWebDistributionProps{
-			ViewerCertificate: landingPageViewerCertificate,
-			ErrorConfigurations: &[]*awscloudfront.CfnDistribution_CustomErrorResponseProperty{
-				{
-					ErrorCode:          jsii.Number(403),
-					ResponseCode:       jsii.Number(200),
-					ErrorCachingMinTtl: jsii.Number(300),
-					ResponsePagePath:   jsii.String("/index.html"),
-				},
-			},
-			OriginConfigs: &[]*awscloudfront.SourceConfiguration{
-				{
-					S3OriginSource: &awscloudfront.S3OriginConfig{
-						S3BucketSource:       landingPageBucket,
-						OriginAccessIdentity: cloudfrontOAI,
+				ViewerCertificate: landingPageViewerCertificate,
+				ErrorConfigurations: &[]*awscloudfront.CfnDistribution_CustomErrorResponseProperty{
+					{
+						ErrorCode:          jsii.Number(403),
+						ResponseCode:       jsii.Number(200),
+						ErrorCachingMinTtl: jsii.Number(300),
+						ResponsePagePath:   jsii.String("/index.html"),
 					},
-					Behaviors: &[]*awscloudfront.Behavior{
-						{
-							IsDefaultBehavior: jsii.Bool(true),
-							Compress:          jsii.Bool(true),
-							AllowedMethods:    awscloudfront.CloudFrontAllowedMethods_GET_HEAD_OPTIONS,
+				},
+				OriginConfigs: &[]*awscloudfront.SourceConfiguration{
+					{
+						S3OriginSource: &awscloudfront.S3OriginConfig{
+							S3BucketSource:       landingPageBucket,
+							OriginAccessIdentity: cloudfrontOAI,
+						},
+						Behaviors: &[]*awscloudfront.Behavior{
+							{
+								IsDefaultBehavior: jsii.Bool(true),
+								Compress:          jsii.Bool(true),
+								AllowedMethods:    awscloudfront.CloudFrontAllowedMethods_GET_HEAD_OPTIONS,
+							},
 						},
 					},
 				},
-			},
-		})
+			})
 
 		awsroute53.NewARecord(stack, jsii.String("LaningPageSiteAliasRecord"), &awsroute53.ARecordProps{
 			RecordName: jsii.String("www." + props.Domain),
@@ -710,6 +770,28 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 			AccessControl:     awss3.BucketAccessControl_BUCKET_OWNER_FULL_CONTROL,
 		})
 	}
+
+	// Add Google OAuth handler
+	googleOAuthHandler := awscdklambdago.NewGoFunction(stack, jsii.String("GoogleOAuthHandler"), &awscdklambdago.GoFunctionProps{
+		FunctionName: jsii.String("GoogleOAuthHandler"),
+		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
+		Entry:        jsii.String("../lambda-handler/google-oauth-handler"),
+		Bundling: &awscdklambdago.BundlingOptions{
+			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
+		},
+		Environment: &map[string]*string{
+			"GOOGLE_CLIENT_ID":     jsii.String(os.Getenv("GOOGLE_CLIENT_ID")),
+			"GOOGLE_CLIENT_SECRET": jsii.String(os.Getenv("GOOGLE_CLIENT_SECRET")),
+			"GOOGLE_REDIRECT_URI":  jsii.String("https://" + props.Subdomain + "." + props.Domain + "/callback"),
+		},
+		Role: lambdaDynamoDbRole,
+	})
+
+	httpApi.AddRoutes(&awscdkapigatewayv2alpha.AddRoutesOptions{
+		Path:        jsii.String("/google-oauth"),
+		Methods:     &[]awscdkapigatewayv2alpha.HttpMethod{awscdkapigatewayv2alpha.HttpMethod_POST},
+		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("googleOAuthLambdaIntegration"), googleOAuthHandler, &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
+	})
 
 	awscdk.NewCfnOutput(stack, jsii.String("apiUrl"), &awscdk.CfnOutputProps{
 		Value:       httpApi.Url(),
@@ -742,3 +824,4 @@ func env() *awscdk.Environment {
 		Region:  jsii.String(os.Getenv("AWS_REGION")),
 	}
 }
+

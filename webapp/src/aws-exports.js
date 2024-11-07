@@ -17,8 +17,18 @@ const awsmobile = {
         "redirectSignIn": environment.redirectSignIn,
         "redirectSignOut": environment.redirectSignOut,
         "responseType": "code"
-    }
+    },
+    "identityProviders": {
+        "Google": {
+            "client_id": environment.googleClientId,
+            "client_secret": environment.googleClientSecret
+        },
+        "GitHub": {
+            "client_id": environment.githubClientId,
+            "client_secret": environment.githubClientSecret
+        }
+    },
+    "federationTarget": "COGNITO_USER_POOLS"
 };
-
 
 export default awsmobile;

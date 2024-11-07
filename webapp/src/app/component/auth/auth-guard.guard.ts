@@ -29,7 +29,11 @@ export class AuthGuard implements CanActivate {
           return true;
         })
         .catch(() => {
-          window.location.assign(environment.authGuardRedirect);
+          // Redirect to Cognito hosted UI with all providers
+          const cognito_domain = `https://${environment.domainName}.auth.${environment.awsRegion}.amazoncognito.com`;
+          const redirect_uri = encodeURIComponent(environment.redirectSignIn);
+          const hosted_ui_url = `${cognito_domain}/login?response_type=code&client_id=${environment.cognitoAppClientId}&redirect_uri=${redirect_uri}`;
+          window.location.assign(hosted_ui_url);
           return false;
         })
       : true;
