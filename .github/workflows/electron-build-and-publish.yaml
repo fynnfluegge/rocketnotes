@@ -1,11 +1,9 @@
 name: Electron Build and Publish
 
 on:
-  pull_request:
-    branches: [main]
-  # workflow_run:
-  #   workflows: ["Release Build"]
-  #   types: [completed]
+  workflow_run:
+    workflows: ["Release Build"]
+    types: [completed]
 
 jobs:
   build:

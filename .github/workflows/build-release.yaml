@@ -1,15 +1,9 @@
 name: Release Build
 
 on:
-  # push:
-  #   tags:
-  #     - "*.*.*"
-  pull_request:
-    branches: [main]
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  push:
+    tags:
+      - "*.*.*"
 
 jobs:
   build:
