@@ -32,6 +32,10 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
       - uses: aws-actions/setup-sam@v2
         with:
           use-installer: true
