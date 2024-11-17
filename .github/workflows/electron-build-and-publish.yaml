@@ -1,11 +1,11 @@
 name: Electron Build and Publish
 
 on:
-  pull_request:
-    branches: [main]
-  # workflow_run:
-  #   workflows: ["Release Build"]
-  #   types: [completed]
+  # pull_request:
+  #   branches: [main]
+  workflow_run:
+    workflows: ["Release Build"]
+    types: [completed]
 
 jobs:
   build:
@@ -60,7 +60,7 @@ jobs:
       - name: Bundle and Publish electron
         run: |
           cd webapp
-          npm run bundle-electron --publish always
+          npm run bundle-electron
         env:
           AWS_ACCOUNT: ${{ secrets.AWS_ACCOUNT }}
           AWS_REGION: ${{ vars.AWS_REGION }}

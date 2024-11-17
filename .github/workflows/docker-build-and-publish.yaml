@@ -1,11 +1,11 @@
 name: Docker Build and Push
 
 on:
-  pull_request:
-    branches: [main]
-  # workflow_run:
-  #   workflows: ["Release Build"]
-  #   types: [completed]
+  # pull_request:
+  #   branches: [main]
+  workflow_run:
+    workflows: ["Release Build"]
+    types: [completed]
 
 env:
   REGISTRY_IMAGE_API: fynnfluegge/rocketnotes-api
