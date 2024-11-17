@@ -4,7 +4,7 @@ WORKDIR /root/
 
 COPY ./build ./build
 COPY package*.json ./
-RUN npm install
+RUN npm install --omit=dev
 COPY server.js ./
 
 EXPOSE 3001

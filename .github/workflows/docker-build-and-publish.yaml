@@ -36,9 +36,6 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Install PhantomJS globally
-        run: npm install -g phantomjs-prebuilt
-
       - name: Cache node modules
         id: cache-npm
         uses: actions/cache@v3
