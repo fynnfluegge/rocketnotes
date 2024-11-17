@@ -1,9 +1,9 @@
 name: Release Build and Push
 
 on:
-  push:
-    tags:
-      - "*.*.*"
+  workflow_run:
+    workflows: [Release Build]
+    types: [completed]
 
 env:
   REGISTRY_IMAGE_API: fynnfluegge/rocketnotes-api
@@ -47,7 +47,6 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
-            ${{ env.REGISTRY_IMAGE_API }}:${{ env.RELEASE_TAG }}
             ${{ env.REGISTRY_IMAGE_API }}:latest
 
       - name: Build and push Docker image webapp
@@ -57,5 +56,4 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
-            ${{ env.REGISTRY_IMAGE_WEBAPP }}:${{ env.RELEASE_TAG }}
             ${{ env.REGISTRY_IMAGE_WEBAPP }}:latest

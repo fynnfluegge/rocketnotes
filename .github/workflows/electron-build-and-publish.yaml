@@ -1,0 +1,49 @@
+name: Electron Build and Publish
+
+on:
+  workflow_run:
+    workflows: [Release Build]
+    types: [completed]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Cache node modules
+        id: cache-npm
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Build electron app
+        run: |
+          cd webapp
+          npm ci
+          npm run build-electron
+        env:
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          DOMAIN_NAME: ${{ vars.DOMAIN_NAME }}
+          API_URL: ${{ vars.API_URL }}
+          COGNITO_USER_POOL_ID: ${{ vars.COGNITO_USER_POOL_ID }}
+          COGNITO_APP_CLIENT_ID: ${{ vars.COGNITO_APP_CLIENT_ID }}
+          REDIRECT_SIGN_IN: ${{ vars.REDIRECT_SIGN_IN }}
+          REDIRECT_SIGN_OUT: ${{ vars.REDIRECT_SIGN_OUT }}
+          AUTH_GUARD_REDIRECT: ${{ vars.AUTH_GUARD_REDIRECT }}
