@@ -36,29 +36,14 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Cache node modules
-        id: cache-npm
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
+      - name: Install PhantomJS globally
+        run: npm install -g phantomjs-prebuilt
 
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+      - uses: dawidd6/action-download-artifact@v2
         with:
-          node-version: ${{ matrix.node-version }}
-
-      - name: Build webapp
-        run: |
-          cd webapp
-          npm ci
-          npm run build
+          name: webapp-build
+          path: webapp/build
+          run_id: ${{ github.event.workflow_run.id }}
 
       - uses: actions/setup-python@v5
         with:
