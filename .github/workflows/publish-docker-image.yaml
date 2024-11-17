@@ -2,7 +2,7 @@ name: Docker Build and Push
 
 on:
   workflow_run:
-    workflows: ["Release Build"]
+    workflows: [Build]
     types: [completed]
 
 env:
