@@ -45,7 +45,8 @@ jobs:
       - name: Build and push Docker image api
         uses: docker/build-push-action@v5
         with:
-          context: ./Dockerfile.sam
+          context: .
+          file: ./Dockerfile.sam
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
