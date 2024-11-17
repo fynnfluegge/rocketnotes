@@ -1,11 +1,11 @@
 name: Docker Build and Push
 
 on:
-  # pull_request:
-  #   branches: [main]
-  workflow_run:
-    workflows: ["Release Build"]
-    types: [completed]
+  pull_request:
+    branches: [main]
+  # workflow_run:
+  #   workflows: ["Release Build"]
+  #   types: [completed]
 
 env:
   REGISTRY_IMAGE_API: fynnfluegge/rocketnotes-api
@@ -39,11 +39,43 @@ jobs:
       - name: Install PhantomJS globally
         run: npm install -g phantomjs-prebuilt
 
-      - uses: dawidd6/action-download-artifact@v2
+      - name: Cache node modules
+        id: cache-npm
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
         with:
-          name: webapp-build
-          path: webapp/build
-          run_id: ${{ github.event.workflow_run.id }}
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Build webapp
+        run: |
+          cd webapp
+          npm ci
+          npm run build
+        env:
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          DOMAIN_NAME: ${{ vars.DOMAIN_NAME }}
+          API_URL: ${{ vars.API_URL }}
+          COGNITO_USER_POOL_ID: ${{ vars.COGNITO_USER_POOL_ID }}
+          COGNITO_APP_CLIENT_ID: ${{ vars.COGNITO_APP_CLIENT_ID }}
+          REDIRECT_SIGN_IN: ${{ vars.REDIRECT_SIGN_IN }}
+          REDIRECT_SIGN_OUT: ${{ vars.REDIRECT_SIGN_OUT }}
+          AUTH_GUARD_REDIRECT: ${{ vars.AUTH_GUARD_REDIRECT }}
+      # - uses: dawidd6/action-download-artifact@v2
+      #   with:
+      #     name: webapp-build
+      #     path: webapp/build
+      #     run_id: ${{ github.event.workflow_run.id }}
 
       - uses: actions/setup-python@v5
         with:
