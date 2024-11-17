@@ -16,7 +16,7 @@ It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/ser
 [langchain](https://github.com/langchain-ai/langchain),
 [sentence-transformers](https://github.com/UKPLab/sentence-transformers),
 [faiss](https://github.com/facebookresearch/faiss),
-[Ollama](https://github.com/jmorganca/ollama) and OpenAI or Anthropic.  
+[Ollama](https://github.com/jmorganca/ollama) and OpenAI or Anthropic.
 
 ## How to use
 
@@ -24,6 +24,7 @@ It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/ser
 - Run it 100% [locally with Docker](INSTALLATION.md#run-with-docker)
 - Host at [AWS](INSTALLATION.md#aws-hosting)
 - Check [contributing guide](CONTRIBUTING.md#contributing-guide) how to setup a local development environment
+  - If you are interested in contributing, go to (README.md#Contributing) section.
 
 ## ✨ Features
 
@@ -41,7 +42,7 @@ It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/ser
 - 📥 Zettelkasten with semantic archiving
   - Use vector index to insert notes into highest semantic-ranked documents
 - WIP: Neovim plugin [rocketnotes.nvim](https://github.com/fynnfluegge/rocketnotes.nvim)
-  
+
 &nbsp;
 
 <div align="center">
@@ -103,7 +104,6 @@ It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/ser
 <div align="center">
   <img src="landing-page/src/assets/tree.gif">
 </div>
-
 
 ## Contributing
 
