@@ -16,14 +16,15 @@ It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/ser
 [langchain](https://github.com/langchain-ai/langchain),
 [sentence-transformers](https://github.com/UKPLab/sentence-transformers),
 [faiss](https://github.com/facebookresearch/faiss),
-[Ollama](https://github.com/jmorganca/ollama) and OpenAI or Anthropic.  
+[Ollama](https://github.com/jmorganca/ollama) and OpenAI or Anthropic.
 
 ## How to use
 
 - [Sign Up](https://takeniftynotes.auth.eu-central-1.amazoncognito.com/login?response_type=code&client_id=tt3v27pnqqh7elqdvq9tgmr9v&redirect_uri=https://app.takeniftynotes.net) for free
 - Run it 100% [locally with Docker](INSTALLATION.md#run-with-docker)
 - Host at [AWS](INSTALLATION.md#aws-hosting)
-- Check [contributing guide](CONTRIBUTING.md#contributing-guide) how to setup a local development environment
+- Check [Contribution Guide](CONTRIBUTING.md#contributing-guide) how to setup a local development environment
+  - If you are interested in contributing, visit [Contributing](README.md#Contributing) section for more details.
 
 ## ✨ Features
 
@@ -41,7 +42,7 @@ It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/ser
 - 📥 Zettelkasten with semantic archiving
   - Use vector index to insert notes into highest semantic-ranked documents
 - WIP: Neovim plugin [rocketnotes.nvim](https://github.com/fynnfluegge/rocketnotes.nvim)
-  
+
 &nbsp;
 
 <div align="center">
@@ -104,8 +105,9 @@ It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/ser
   <img src="landing-page/src/assets/tree.gif">
 </div>
 
-
 ## Contributing
+
+A good way to do the first contribution are the *good first issue* labelled issues [here](https://github.com/fynnfluegge/rocketnotes/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22). On some of the issues are already linked PRs with comments in the code what has to be done. These PRs can be picked up if not assigned to someone yet.
 
 The most comfortable way to get started is to open the project in a ready-to-code Gitpod workspace with all packages & tools preinstalled and a running database with sample data.
 
@@ -117,7 +119,7 @@ The most comfortable way to get started is to open the project in a ready-to-cod
 
 &nbsp;
 
-If you prefer to setup the project on your local machine see [contributing guide](CONTRIBUTING.md#contributing-guide) and learn all required steps to run it locally in development mode.
+If you prefer to setup the project on your local machine see [Contributing Guide](CONTRIBUTING.md#contributing-guide) and learn all required steps to run it locally in development mode.
 
 Don't hesitate to open an issue for getting some feedback about a potential bug or if you desire a missing feature.
 It is appreciated to check over current [issues](https://github.com/fynnfluegge/rocketnotes/issues) and provide feedback to existing ones or even raise a PR which solves an issue.

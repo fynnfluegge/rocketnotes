@@ -1,10 +1,12 @@
-name: Reusable Build Workflow
+name: Electron Build and Publish
 
 on:
-  workflow_call:
+  workflow_run:
+    workflows: ["Release Build"]
+    types: [completed]
 
 jobs:
-  reusable_workflow_job:
+  build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -31,11 +33,11 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Build webapp
+      - name: Build electron app
         run: |
           cd webapp
           npm ci
-          npm run build
+          npm run build-electron
         env:
           AWS_REGION: ${{ vars.AWS_REGION }}
           DOMAIN_NAME: ${{ vars.DOMAIN_NAME }}
@@ -46,18 +48,17 @@ jobs:
           REDIRECT_SIGN_OUT: ${{ vars.REDIRECT_SIGN_OUT }}
           AUTH_GUARD_REDIRECT: ${{ vars.AUTH_GUARD_REDIRECT }}
 
-      - uses: actions/upload-artifact@master
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@master
         with:
-          name: webapp-build
-          path: webapp/build
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
 
-      - name: Build landing-page
+      - name: Bundle and Publish electron
         run: |
-          cd landing-page
-          npm ci
-          npm run build
-
-      - uses: actions/upload-artifact@master
-        with:
-          name: landing-page-build
-          path: landing-page/build
+          cd webapp
+          npm run bundle-electron
+        env:
+          AWS_ACCOUNT: ${{ secrets.AWS_ACCOUNT }}
+          AWS_REGION: ${{ vars.AWS_REGION }}

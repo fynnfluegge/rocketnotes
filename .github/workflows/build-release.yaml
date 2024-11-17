@@ -1,0 +1,10 @@
+name: Release Build
+
+on:
+  push:
+    tags:
+      - "*.*.*"
+
+jobs:
+  build:
+    uses: ./.github/workflows/workflow-build.yaml
