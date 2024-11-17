@@ -1,9 +1,8 @@
-name: Release Build and Push
+name: Docker Build and Push
 
 on:
   workflow_run:
-    workflows: [Release Build]
-    branches: ["*"]
+    workflows: ["Release Build"]
     types: [completed]
 
 env:
