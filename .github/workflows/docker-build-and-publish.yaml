@@ -58,7 +58,7 @@ jobs:
 
       - name: Extract release tag
         id: get_tag
-        run: echo "RELEASE_TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+        run: echo "RELEASE_TAG=$GITHUB_REF_NAME" >> $GITHUB_ENV
 
       - name: Build and push Docker image api
         uses: docker/build-push-action@v5
