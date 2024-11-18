@@ -5,8 +5,10 @@
   
   # Rocketnotes
   
-  [![Build](https://github.com/fynnfluegge/rocketnotes/actions/workflows/build.yml/badge.svg)](https://github.com/fynnfluegge/rocketnotes/actions/workflows/build.yml)
-  [![Deploy](https://github.com/fynnfluegge/rocketnotes/actions/workflows/deploy.yml/badge.svg)](https://github.com/fynnfluegge/rocketnotes/actions/workflows/deploy.yml)
+  [![Build](https://github.com/fynnfluegge/rocketnotes/actions/workflows/build-main.yaml/badge.svg)](https://github.com/fynnfluegge/rocketnotes/actions/workflows/build-main.yaml)
+  [![Deploy](https://github.com/fynnfluegge/rocketnotes/actions/workflows/deploy.yaml/badge.svg)](https://github.com/fynnfluegge/rocketnotes/actions/workflows/deploy.yaml)
+  [![Docker](https://github.com/fynnfluegge/rocketnotes/actions/workflows/docker-build-and-publish.yaml/badge.svg)](https://github.com/fynnfluegge/rocketnotes/actions/workflows/docker-build-and-publish.yaml)
+  [![Electron](https://github.com/fynnfluegge/rocketnotes/actions/workflows/electron-build-and-publish.yaml/badge.svg)](https://github.com/fynnfluegge/rocketnotes/actions/workflows/electron-build-and-publish.yaml)
   [![License](https://img.shields.io/badge/License-MIT%20-green.svg)](https://opensource.org/licenses/MIT)
 
 </div>

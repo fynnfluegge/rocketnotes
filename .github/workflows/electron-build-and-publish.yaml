@@ -33,6 +33,9 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
+      - name: Install Snapcraft
+        uses: samuelmeuli/action-snapcraft@v3
+
       - name: Build electron app
         run: |
           cd webapp
