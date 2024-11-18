@@ -31,7 +31,6 @@
     "aws-amplify-angular": "^6.0.26",
     "bootstrap": "^5.1.3",
     "clipboard": "^2.0.11",
-    "dmg-license": "^1.0.11",
     "dotenv": "^5.0.0",
     "electron-log": "^4.4.7",
     "electron-updater": "^5.0.1",
