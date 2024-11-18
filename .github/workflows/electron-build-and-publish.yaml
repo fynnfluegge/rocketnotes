@@ -7,6 +7,9 @@ on:
   #   workflows: ["Release Build"]
   #   types: [completed]
 
+env:
+  PUBLISH_FOR_PULL_REQUEST: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
