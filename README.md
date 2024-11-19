@@ -22,11 +22,12 @@ It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/ser
 
 ## How to use
 
-- [Sign Up](https://takeniftynotes.auth.eu-central-1.amazoncognito.com/login?response_type=code&client_id=tt3v27pnqqh7elqdvq9tgmr9v&redirect_uri=https://app.takeniftynotes.net) for free
+- [Sign Up](https://takeniftynotes.auth.eu-central-1.amazoncognito.com/login?response_type=code&client_id=tt3v27pnqqh7elqdvq9tgmr9v&redirect_uri=https://app.takeniftynotes.net) for free and use it in the Browser or as an Electron app.
 - Run it 100% [locally with Docker](INSTALLATION.md#run-with-docker)
 - Host at [AWS](INSTALLATION.md#aws-hosting)
 - Check [Contribution Guide](CONTRIBUTING.md#contributing-guide) how to setup a local development environment
-  - If you are interested in contributing, visit [Contributing](README.md#contributing) section for more details.
+  - If you are interested in contributing, visit [Contributing](#contributing) section for more details
+  - [Good first issues](https://github.com/fynnfluegge/rocketnotes/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22) provide a good starting point to become a contributor
 
 ## ✨ Features
 
@@ -109,7 +110,8 @@ It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/ser
 
 ## Contributing
 
-A good way to do the first contribution are the _good first issue_ labelled issues [here](https://github.com/fynnfluegge/rocketnotes/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22). On some of the issues are already linked PRs with comments in the code what has to be done. These PRs can be picked up if not assigned to someone yet.
+A good way to do the first contribution are the [good first issues](https://github.com/fynnfluegge/rocketnotes/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22).
+On some of the issues are already linked PRs with comments in the code what has to be done. These PRs can be picked up if not assigned to someone yet.
 
 The most comfortable way to get started is to open the project in a ready-to-code Gitpod workspace with all packages & tools preinstalled and a running database with sample data.
 
