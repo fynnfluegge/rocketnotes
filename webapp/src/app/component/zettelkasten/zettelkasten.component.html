@@ -21,6 +21,27 @@
     ></textarea>
     <br />
     <button
+      (click)="recordNote()"
+      style="float: right"
+      class="btn btn-default btn-primary"
+    >
+      Record Note
+    </button>
+    <button
+      (click)="stopRecord()"
+      style="float: right"
+      class="btn btn-default btn-primary"
+    >
+      Stop Recording
+    </button>
+    <!-- <div *ngIf="isRecording && !blobUrl"> {{recordedTime}} </div> -->
+    <!-- <div> -->
+    <!--  <audio *ngIf="!isRecording && blobUrl" controls> -->
+    <!--   <source [src]="blobUrl" type="audio/webm"> -->
+    <!--  </audio> -->
+    <!-- </div> -->
+    <!-- </div> -->
+    <button
       (click)="saveNote()"
       style="float: right"
       class="btn btn-default btn-primary"

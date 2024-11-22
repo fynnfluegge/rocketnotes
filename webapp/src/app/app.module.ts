@@ -22,6 +22,7 @@ import { PublicDocumentViewerComponent } from './component/public-document-viewe
 import { LlmDialogComponent } from './component/dialog-llm/llm-dialog.component';
 import { ConfigDialogComponent } from './component/dialog-config/config-dialog.component';
 import { ZettelkastenComponent } from './component/zettelkasten/zettelkasten.component';
+import { AudioRecordingService } from './service/audio-recording.service';
 
 @NgModule({
   declarations: [
@@ -51,6 +52,7 @@ import { ZettelkastenComponent } from './component/zettelkasten/zettelkasten.com
   providers: [
     AuthGuard,
     BasicRestService,
+    AudioRecordingService,
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
   ],
   bootstrap: [AppComponent],
