@@ -7,7 +7,6 @@ import { environment } from 'src/environments/environment';
 import * as uuid from 'uuid';
 import { DomSanitizer } from '@angular/platform-browser';
 import OpenAI from 'openai';
-import * as fs from 'fs';
 
 @Component({
   selector: 'app-zettelkasten',
@@ -48,11 +47,22 @@ export class ZettelkastenComponent implements OnInit {
     this.audioRecordingService
       .getRecordedTime()
       .subscribe((time) => (this.recordedTime = time));
-    this.audioRecordingService.getRecordedBlob().subscribe((data) => {
+    this.audioRecordingService.getRecordedBlob().subscribe(async (data) => {
+      console.log(data.title);
       this.teste = data;
       this.blobUrl = this.sanitizer.bypassSecurityTrustUrl(
         URL.createObjectURL(data.blob),
       );
+      let metadata = {
+        type: 'audio/mp3',
+      };
+      let file = new File([data.blob], 'test.mp3', metadata);
+      const transcription = await this.openai.audio.transcriptions.create({
+        file: file,
+        model: 'whisper-1',
+      });
+
+      console.log(transcription);
     });
   }
 
@@ -92,15 +102,8 @@ export class ZettelkastenComponent implements OnInit {
       .subscribe();
   }
 
-  async recordNote() {
+  recordNote() {
     this.startRecording();
-
-    // const transcription = await this.openai.audio.transcriptions.create({
-    //   file: fs.createReadStream('german.m4a'),
-    //   model: 'whisper-1',
-    // });
-
-    // console.log(transcription);
   }
 
   async stopRecord() {
@@ -232,6 +235,7 @@ export class ZettelkastenComponent implements OnInit {
 
   stopRecording() {
     if (this.isRecording) {
+      console.log('stop recording');
       this.audioRecordingService.stopRecording();
       this.isRecording = false;
     }

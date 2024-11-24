@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import * as moment from 'moment';
-import { RecordRTC } from 'recordrtc';
+import * as RecordRTC from 'recordrtc';
 import { Observable, Subject } from 'rxjs';
 
 interface RecordedAudioOutput {
@@ -76,6 +76,7 @@ export class AudioRecordingService {
 
   stopRecording() {
     if (this.recorder) {
+      console.log('stop recording + ' + this.recorder);
       this.recorder.stop(
         (blob) => {
           if (this.startTime) {
