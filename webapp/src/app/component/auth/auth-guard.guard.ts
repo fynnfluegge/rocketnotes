@@ -6,32 +6,32 @@ import {
   UrlTree,
 } from '@angular/router';
 import { Observable } from 'rxjs';
-import Auth from '@aws-amplify/auth';
+import { getCurrentUser } from 'aws-amplify/auth';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthGuard implements CanActivate {
-  constructor() { }
+  constructor() {}
 
   canActivate(
     route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot
+    state: RouterStateSnapshot,
   ):
     | Observable<boolean | UrlTree>
     | Promise<boolean | UrlTree>
     | boolean
     | UrlTree {
     return environment.production
-      ? Auth.currentAuthenticatedUser()
-        .then(() => {
-          return true;
-        })
-        .catch(() => {
-          window.location.assign(environment.authGuardRedirect);
-          return false;
-        })
+      ? getCurrentUser()
+          .then(() => {
+            return true;
+          })
+          .catch(() => {
+            window.location.assign(environment.authGuardRedirect);
+            return false;
+          })
       : true;
   }
 }

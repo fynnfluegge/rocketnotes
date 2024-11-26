@@ -2,45 +2,36 @@ import { enableProdMode } from '@angular/core';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { AppModule } from './app/app.module';
 import { environment } from './environments/environment';
-import Amplify, { Auth } from 'aws-amplify';
-import awsconfig from './aws-exports';
+import { Amplify } from 'aws-amplify';
 
-const oauth = {
-  // Domain name
-  domain:
-    environment.domainName +
-    '.auth.' +
-    environment.awsRegion +
-    '.amazoncognito.com',
-
-  // Authorized scopes
-  scope: ['email', 'openid'],
-
-  // Callback URL
-  redirectSignIn: environment.redirectSignIn,
-
-  // Sign out URL
-  redirectSignOut: environment.redirectSignOut,
-
-  // 'code' for Authorization code grant,
-  // 'token' for Implicit grant
-  responseType: 'code',
-
-  // optional, for Cognito hosted ui specified options
-  options: {
-    // Indicates if the data collection is enabled to support Cognito advanced security features. By default, this flag is set to true.
-    AdvancedSecurityDataCollectionFlag: false,
+const amplifyConfig = {
+  aws_project_region: environment.awsRegion,
+  aws_cognito_region: environment.awsRegion,
+  aws_user_pools_id: environment.cognitoUserPoolId,
+  aws_user_pools_web_client_id: environment.cognitoAppClientId,
+  oauth: {
+    domain:
+      environment.domainName +
+      '.auth.' +
+      environment.awsRegion +
+      '.amazoncognito.com',
+    scope: [
+      'phone',
+      'email',
+      'openid',
+      'profile',
+      'aws.cognito.signin.user.admin',
+    ],
+    redirectSignIn: environment.redirectSignIn,
+    redirectSignOut: environment.redirectSignOut,
+    responseType: 'code',
   },
 };
 
 if (environment.production) {
   enableProdMode();
 
-  Amplify.configure(awsconfig);
-
-  Auth.configure({
-    oauth: oauth,
-  });
+  Amplify.configure(amplifyConfig);
 }
 
 platformBrowserDynamic()
