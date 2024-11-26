@@ -1,5 +1,4 @@
 import { Component, Input, VERSION } from '@angular/core';
-import { Auth } from 'aws-amplify';
 import { BasicRestService } from 'src/app/service/basic-rest.service';
 import { ActivatedRoute } from '@angular/router';
 import { DocumentTree } from '../navigation/sidenav.component';
@@ -8,6 +7,7 @@ import { environment } from 'src/environments/environment';
 import { Location } from '@angular/common';
 import { HostListener } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { getCurrentUser, fetchUserAttributes } from 'aws-amplify/auth';
 
 import OpenAI from 'openai';
 
@@ -67,9 +67,11 @@ export class EditorComponent {
 
   ngOnInit() {
     if (environment.production) {
-      Auth.currentAuthenticatedUser().then((user) => {
+      getCurrentUser().then((user) => {
         localStorage.setItem('currentUserId', user.username);
-        localStorage.setItem('username', user.attributes.email);
+        fetchUserAttributes().then((data) => {
+          localStorage.setItem('username', data.email);
+        });
       });
     } else {
       localStorage.setItem(
@@ -107,29 +109,28 @@ export class EditorComponent {
 
     let hasConfig = true;
     if (environment.production) {
-      Auth.currentAuthenticatedUser().then((user) => {
-        Auth.userAttributes(user).then((attributes) => {
-          hasConfig = attributes['custom:config'] === 1;
-        });
-      });
-    }
-
-    if (hasConfig) {
-      this.basicRestService
-        .get('userConfig/' + localStorage.getItem('currentUserId'))
-        .subscribe((config) => {
-          localStorage.setItem('config', JSON.stringify(config));
-          if (config['llm']) {
-            if (config['llm'].startsWith('gpt')) {
-              this.openai = new OpenAI({
-                apiKey: config['openAiApiKey'],
-                dangerouslyAllowBrowser: true,
+      getCurrentUser().then((user) => {
+        fetchUserAttributes().then((data) => {
+          hasConfig = data['custom:config'] === '1';
+          if (hasConfig) {
+            this.basicRestService
+              .get('userConfig/' + localStorage.getItem('currentUserId'))
+              .subscribe((config) => {
+                localStorage.setItem('config', JSON.stringify(config));
+                if (config['llm']) {
+                  if (config['llm'].startsWith('gpt')) {
+                    this.openai = new OpenAI({
+                      apiKey: config['openAiApiKey'],
+                      dangerouslyAllowBrowser: true,
+                    });
+                  } else if (config['llm'] === 'claude') {
+                    // use lambda proxy
+                  }
+                }
               });
-            } else if (config['llm'] === 'claude') {
-              // use lambda proxy
-            }
           }
         });
+      });
     }
 
     this.abortController = new AbortController();
