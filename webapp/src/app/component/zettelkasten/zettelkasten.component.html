@@ -21,15 +21,17 @@
     ></textarea>
     <br />
     <button
+      *ngIf="!isRecording && speechToTextEnabled"
       (click)="recordNote()"
-      style="float: right"
+      style="float: left"
       class="btn btn-default btn-primary"
     >
       Record Note
     </button>
     <button
+      *ngIf="isRecording && speechToTextEnabled"
       (click)="stopRecord()"
-      style="float: right"
+      style="float: left"
       class="btn btn-default btn-primary"
     >
       Stop Recording

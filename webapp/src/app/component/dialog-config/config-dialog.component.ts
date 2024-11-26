@@ -15,6 +15,7 @@ export class ConfigDialogComponent implements OnDestroy, OnInit {
   isOpen: boolean = false;
   currentEmbeddingModel: string;
   selectedEmbeddingModel: string = 'text-embedding-ada-002';
+  selectedSpeechToTextModel: string = 'none';
   selectedLlm: string = 'gpt-3.5-turbo';
   openAiApiKey: string;
   anthropicApiKey: string;
@@ -63,7 +64,8 @@ export class ConfigDialogComponent implements OnDestroy, OnInit {
   submit() {
     if (
       (this.selectedEmbeddingModel === 'text-embeddings-ada-002' ||
-        this.selectedLlm.startsWith('gpt')) &&
+        this.selectedLlm.startsWith('gpt') ||
+        this.selectedSpeechToTextModel === 'Whisper') &&
       !this.openAiApiKey
     ) {
       const openAiApiKeyRequiredWarning = document.getElementById(
@@ -89,6 +91,7 @@ export class ConfigDialogComponent implements OnDestroy, OnInit {
           id: localStorage.getItem('currentUserId'),
           embeddingModel: this.selectedEmbeddingModel,
           llm: this.selectedLlm,
+          speechToTextModel: this.selectedSpeechToTextModel,
           openAiApiKey: this.openAiApiKey,
           anthropicApiKey: this.anthropicApiKey,
           recreateIndex:
@@ -107,6 +110,7 @@ export class ConfigDialogComponent implements OnDestroy, OnInit {
             JSON.stringify({
               embeddingModel: this.selectedEmbeddingModel,
               llm: this.selectedLlm,
+              speechToTextModel: this.selectedSpeechToTextModel,
               openAiApiKey: this.openAiApiKey,
               anthropicApiKey: this.anthropicApiKey,
             }),

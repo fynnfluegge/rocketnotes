@@ -19,6 +19,7 @@ type UserConfig struct {
 	Id    string `json:"id"`
 	EmbeddingModel string `json:"embeddingModel"`
 	Llm string `json:"llm"`
+	SpeechToTextModel string `json:"speechToTextModel"`
 	OpenAiApiKey string `json:"openAiApiKey"`
 	AnthropicApiKey string `json:"anthropicApiKey"`
 }

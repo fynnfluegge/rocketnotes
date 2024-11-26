@@ -76,7 +76,6 @@ export class AudioRecordingService {
 
   stopRecording() {
     if (this.recorder) {
-      console.log('stop recording + ' + this.recorder);
       this.recorder.stop(
         (blob) => {
           if (this.startTime) {

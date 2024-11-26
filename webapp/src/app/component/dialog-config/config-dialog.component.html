@@ -119,6 +119,24 @@
         />Ollama-orca-mini
       </label>
       <hr />
+      <h5>Speech-to-Text Model</h5>
+      <label class="radio-inline">
+        <input
+          type="radio"
+          name="speechToText"
+          [(ngModel)]="selectedSpeechToTextModel"
+          value="Whisper"
+        />Whisper
+      </label>
+      <label class="radio-inline">
+        <input
+          type="radio"
+          name="speechToText"
+          [(ngModel)]="selectedSpeechToTextModel"
+          value="none"
+        />None
+      </label>
+      <hr />
       <h5>OpenAI API Key</h5>
       <textarea
         type="text"
