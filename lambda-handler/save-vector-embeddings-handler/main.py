@@ -8,7 +8,11 @@ from langchain.text_splitter import (
     MarkdownHeaderTextSplitter,
     RecursiveCharacterTextSplitter,
 )
-from langchain_community.embeddings import HuggingFaceEmbeddings, OllamaEmbeddings
+from langchain_community.embeddings import (
+    HuggingFaceEmbeddings,
+    OllamaEmbeddings,
+    VoyageEmbeddings,
+)
 from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
 
@@ -72,6 +76,13 @@ def handler(event, context):
         embeddings = OllamaEmbeddings(
             base_url="http://ollama:11434", model=embeddingsModel.split("Ollama-")[1]
         )
+    elif embeddingsModel == "voyage-2":
+        if anthropicApiKey is None:
+            return {
+                "statusCode": 400,
+                "body": json.dumps("Anthropic API key not found"),
+            }
+        embeddings = VoyageEmbeddings(model=embeddingsModel)
     else:
         return {
             "statusCode": 400,

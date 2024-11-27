@@ -10,6 +10,14 @@
           value="text-embedding-ada-002"
         />Text-Embedding-Ada-002
       </label>
+      <label class="radio-inline">
+        <input
+          type="radio"
+          name="embeddingModel"
+          [(ngModel)]="selectedEmbeddingModel"
+          value="voyage-2"
+        />Text-Embedding-Ada-002
+      </label>
       <label class="radio-inline" *ngIf="isLocal">
         <input
           type="radio"

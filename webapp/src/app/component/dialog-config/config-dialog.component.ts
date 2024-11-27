@@ -70,7 +70,11 @@ export class ConfigDialogComponent implements OnDestroy, OnInit {
         'openAiApiKeyRequired',
       );
       openAiApiKeyRequiredWarning.style.display = 'block';
-    } else if (this.selectedLlm.startsWith('claude') && !this.anthropicApiKey) {
+    } else if (
+      (this.selectedLlm.startsWith('claude') ||
+        this.selectedEmbeddingModel === 'voyage-2') &&
+      !this.anthropicApiKey
+    ) {
       const anthropicApiKeyRequiredWarning = document.getElementById(
         'anthropicApiKeyRequired',
       );
