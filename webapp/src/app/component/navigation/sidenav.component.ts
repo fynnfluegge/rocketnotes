@@ -15,13 +15,18 @@ import {
 import { of as ofObservable, Observable, BehaviorSubject, Subject } from 'rxjs';
 import * as uuid from 'uuid';
 import { BasicRestService } from 'src/app/service/basic-rest.service';
-import { Auth } from 'aws-amplify';
 import { environment } from 'src/environments/environment';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { HostListener } from '@angular/core';
 import { LlmDialogService } from 'src/app/service/llm-dialog.service';
 import { ConfigDialogService } from 'src/app/service/config-dialog-service';
+import {
+  getCurrentUser,
+  updateUserAttribute,
+  fetchUserAttributes,
+  signOut,
+} from 'aws-amplify/auth';
 
 const ROOT_ID: string = 'root';
 const PINNED_ID: string = 'pinned';
@@ -84,7 +89,7 @@ export class DocumentTree {
   initialize() {
     // since localStorage.getItem("currentUserId") may not yet be initialized Auth.currentAuthenticatedUser() is used
     if (environment.production) {
-      Auth.currentAuthenticatedUser().then((user) => {
+      getCurrentUser().then((user) => {
         this.http
           .get(this.backend_url + '/documentTree/' + user.username)
           .subscribe({
@@ -594,12 +599,9 @@ export class SidenavComponent implements OnInit, AfterViewInit {
     this.setOperatingSystem();
 
     if (environment.production) {
-      Auth.currentAuthenticatedUser().then((user) => {
-        Auth.userAttributes(user).then((attributes) => {
-          const darkmodeAttribute = attributes.find(
-            (attribute) => attribute.Name === `custom:darkmode`,
-          );
-          this.darkmode = darkmodeAttribute.Value === '1';
+      getCurrentUser().then(() => {
+        fetchUserAttributes().then((attributes) => {
+          this.darkmode = attributes[`custom:darkmode`] === '1';
           localStorage.setItem('darkmode', this.darkmode.toString());
           this.setTheme();
         });
@@ -915,7 +917,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
   }
 
   onLogout(): void {
-    Auth.signOut();
+    signOut();
   }
 
   // Drag & Drop
@@ -1310,9 +1312,12 @@ export class SidenavComponent implements OnInit, AfterViewInit {
     this.darkmode = !this.darkmode;
     localStorage.setItem('darkmode', this.darkmode.toString());
     if (environment.production) {
-      Auth.currentAuthenticatedUser().then((user) => {
-        Auth.updateUserAttributes(user, {
-          'custom:darkmode': this.darkmode ? '1' : '0',
+      getCurrentUser().then(() => {
+        updateUserAttribute({
+          userAttribute: {
+            attributeKey: 'custom:darkmode',
+            value: this.darkmode ? '1' : '0',
+          },
         });
       });
     }

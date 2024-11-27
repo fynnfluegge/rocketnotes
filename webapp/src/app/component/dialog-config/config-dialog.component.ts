@@ -3,7 +3,7 @@ import { Subscription } from 'rxjs';
 import { BasicRestService } from 'src/app/service/basic-rest.service';
 import { ConfigDialogService } from 'src/app/service/config-dialog-service';
 import { environment } from 'src/environments/environment';
-import { Auth } from 'aws-amplify';
+import { getCurrentUser, updateUserAttribute } from 'aws-amplify/auth';
 
 @Component({
   selector: 'app-config-dialog',
@@ -96,9 +96,12 @@ export class ConfigDialogComponent implements OnDestroy, OnInit {
         })
         .subscribe(() => {
           if (environment.production) {
-            Auth.currentAuthenticatedUser().then((user) => {
-              Auth.updateUserAttributes(user, {
-                'custom:config': '1',
+            getCurrentUser().then(() => {
+              updateUserAttribute({
+                userAttribute: {
+                  attributeKey: 'custom:config',
+                  value: '1',
+                },
               });
             });
           }
