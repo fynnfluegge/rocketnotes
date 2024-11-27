@@ -41,6 +41,9 @@ export class ConfigDialogComponent implements OnDestroy, OnInit {
             if (config['llm']) {
               this.selectedLlm = config['llm'];
             }
+            if (config['speechToTextModel']) {
+              this.selectedSpeechToTextModel = config['speechToTextModel'];
+            }
             this.openAiApiKey = config['openAiApiKey'] ?? '';
             this.anthropicApiKey = config['anthropicApiKey'] ?? '';
           });
