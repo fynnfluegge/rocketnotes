@@ -61,7 +61,7 @@ def handler(event, context):
     if openAiApiKey is not None:
         os.environ["OPENAI_API_KEY"] = openAiApiKey
     if anthropicApiKey is not None:
-        os.environ["ANTHROPIC_API_KEY"] = anthropicApiKey
+        os.environ["VOYAGE_API_KEY"] = anthropicApiKey
 
     if embeddingsModel == "text-embedding-ada-002":
         if openAiApiKey is None:
@@ -70,12 +70,6 @@ def handler(event, context):
                 "body": json.dumps("OpenAI API key not found"),
             }
         embeddings = OpenAIEmbeddings(client=None, model=embeddingsModel)
-    elif embeddingsModel == "Sentence-Transformers":
-        embeddings = HuggingFaceEmbeddings(model_kwargs={"device": "cpu"})
-    elif embeddingsModel == "Ollama-nomic-embed-text":
-        embeddings = OllamaEmbeddings(
-            base_url="http://ollama:11434", model=embeddingsModel.split("Ollama-")[1]
-        )
     elif embeddingsModel == "voyage-2":
         if anthropicApiKey is None:
             return {
@@ -83,6 +77,12 @@ def handler(event, context):
                 "body": json.dumps("Anthropic API key not found"),
             }
         embeddings = VoyageEmbeddings(model=embeddingsModel)
+    elif embeddingsModel == "Sentence-Transformers":
+        embeddings = HuggingFaceEmbeddings(model_kwargs={"device": "cpu"})
+    elif embeddingsModel == "Ollama-nomic-embed-text":
+        embeddings = OllamaEmbeddings(
+            base_url="http://ollama:11434", model=embeddingsModel.split("Ollama-")[1]
+        )
     else:
         return {
             "statusCode": 400,

@@ -3,7 +3,11 @@ import os
 from pathlib import Path
 
 import boto3
-from langchain_community.embeddings import HuggingFaceEmbeddings, OllamaEmbeddings
+from langchain_community.embeddings import (
+    HuggingFaceEmbeddings,
+    OllamaEmbeddings,
+    VoyageEmbeddings,
+)
 from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
 
@@ -64,7 +68,13 @@ def handler(event, context):
             os.environ["OPENAI_API_KEY"] = userConfig.get("openAiApiKey").get("S")
         else:
             return {"statusCode": 400, "body": "OpenAI API key is missing"}
-        embeddings = OpenAIEmbeddings(client=None, model="text-embedding-ada-002")
+        embeddings = OpenAIEmbeddings(client=None, model=embeddings_model)
+    elif embeddings_model == "voyage-2":
+        if "anthropicApiKey" in userConfig:
+            os.environ["VOYAGE_API_KEY"] = userConfig.get("anthropicApiKey").get("S")
+        else:
+            return {"statusCode": 400, "body": "OpenAI API key is missing"}
+        embeddings = VoyageEmbeddings(model=embeddings_model)
     elif embeddings_model == "Sentence-Transformers":
         embeddings = HuggingFaceEmbeddings(model_kwargs={"device": "cpu"})
     elif embeddings_model == "Ollama-nomic-embed-text":
