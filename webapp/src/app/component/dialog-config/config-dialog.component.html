@@ -166,6 +166,25 @@
           key
         </span>
       </div>
+      <h5>Voyage API Key</h5>
+      <textarea
+        type="text"
+        id="voyageApiKey"
+        rows="2"
+        [placeholder]="'Enter your Voyage API key...'"
+        style="width: 94%"
+        [(ngModel)]="voyageApiKey"
+        #message="ngModel"
+        name="voyageApiKey"
+      ></textarea>
+      <div>
+        <span
+          id="voyageApiKeyRequired"
+          style="text-align: center; color: var(--warning-color); display: none"
+        >
+          For the selected configuration, you need to provide an Voyage API key
+        </span>
+      </div>
       <br />
       <div>
         <span style="text-align: right"

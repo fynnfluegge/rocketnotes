@@ -77,8 +77,8 @@ def handler(event, context):
             return {"statusCode": 400, "body": "OpenAI API key is missing"}
 
     if embeddings_model == "voyage-2":
-        if "anthropicApiKey" in userConfig:
-            os.environ["ANTHROPIC_API_KEY"] = userConfig.get("anthropicApiKey").get("S")
+        if "voyageApiKey" in userConfig:
+            os.environ["VOYAGE_API_KEY"] = userConfig.get("voyageApiKey").get("S")
         else:
             return {"statusCode": 400, "body": "OpenAI API key is missing"}
 
@@ -100,7 +100,6 @@ def handler(event, context):
     ):
         if "anthropicApiKey" in userConfig:
             os.environ["ANTHROPIC_API_KEY"] = userConfig.get("anthropicApiKey").get("S")
-            os.environ["VOYAGE_API_KEY"] = userConfig.get("anthropicApiKey").get("S")
         else:
             return {"statusCode": 400, "body": "Anthropic API key is missing"}
         chat_model = ChatAnthropic(temperature=0.9, max_tokens=2048, model=llm_model)

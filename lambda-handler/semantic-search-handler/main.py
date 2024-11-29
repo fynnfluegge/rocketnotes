@@ -70,8 +70,8 @@ def handler(event, context):
             return {"statusCode": 400, "body": "OpenAI API key is missing"}
         embeddings = OpenAIEmbeddings(client=None, model=embeddings_model)
     elif embeddings_model == "voyage-2":
-        if "anthropicApiKey" in userConfig:
-            os.environ["VOYAGE_API_KEY"] = userConfig.get("anthropicApiKey").get("S")
+        if "voyageApiKey" in userConfig:
+            os.environ["VOYAGE_API_KEY"] = userConfig.get("voyageApiKey").get("S")
         else:
             return {"statusCode": 400, "body": "OpenAI API key is missing"}
         embeddings = VoyageEmbeddings(model=embeddings_model)

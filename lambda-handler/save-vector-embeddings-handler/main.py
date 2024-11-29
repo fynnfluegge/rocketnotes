@@ -57,11 +57,11 @@ def handler(event, context):
     userConfig = userConfig["Item"]
     embeddingsModel = userConfig.get("embeddingModel", {}).get("S", None)
     openAiApiKey = userConfig.get("openAiApiKey", {}).get("S", None)
-    anthropicApiKey = userConfig.get("anthropicApiKey", {}).get("S", None)
+    voyageApiKey = userConfig.get("voyageApiKey", {}).get("S", None)
     if openAiApiKey is not None:
         os.environ["OPENAI_API_KEY"] = openAiApiKey
-    if anthropicApiKey is not None:
-        os.environ["VOYAGE_API_KEY"] = anthropicApiKey
+    if voyageApiKey is not None:
+        os.environ["VOYAGE_API_KEY"] = voyageApiKey
 
     if embeddingsModel == "text-embedding-ada-002":
         if openAiApiKey is None:
@@ -71,10 +71,10 @@ def handler(event, context):
             }
         embeddings = OpenAIEmbeddings(client=None, model=embeddingsModel)
     elif embeddingsModel == "voyage-2":
-        if anthropicApiKey is None:
+        if voyageApiKey is None:
             return {
                 "statusCode": 400,
-                "body": json.dumps("Anthropic API key not found"),
+                "body": json.dumps("Voyage API key not found"),
             }
         embeddings = VoyageEmbeddings(model=embeddingsModel)
     elif embeddingsModel == "Sentence-Transformers":
@@ -151,10 +151,10 @@ def handler(event, context):
         else:
             # Faiss index does not exist, create the index from scratch
             # ---------------------------------------------------------
-            filter_expression = "userId = :user_value AND deleted = :deleted_value"
+            filter_expression = "userId = :user_value"
             expression_attribute_values = {
                 ":user_value": {"S": userId},
-                ":deleted_value": {"BOOL": False},
+                # ":deleted_value": {"BOOL": False},
             }
 
             # Execute the query
@@ -170,6 +170,8 @@ def handler(event, context):
             if documents:
                 split_documents = []
                 for document in documents:
+                    if document["deleted"]["BOOL"]:
+                        continue
                     try:
                         content = document["content"]["S"]
                         documentId = document["id"]["S"]
