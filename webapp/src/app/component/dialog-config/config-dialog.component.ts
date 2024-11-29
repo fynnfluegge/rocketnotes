@@ -92,9 +92,11 @@ export class ConfigDialogComponent implements OnDestroy, OnInit {
           'voyageApiKeyRequired',
         );
         voyageApiKeyRequiredWarning.style.display = 'block';
+        return;
       } else {
-        const voyageApiKeyRequiredWarning =
-          document.getElementById('voyageApiKey');
+        const voyageApiKeyRequiredWarning = document.getElementById(
+          'voyageApiKeyRequired',
+        );
         voyageApiKeyRequiredWarning.style.display = 'none';
       }
 
