@@ -105,19 +105,10 @@ export class EditorComponent {
       }
     });
 
-    let hasConfig = true;
-    if (environment.production) {
-      Auth.currentAuthenticatedUser().then((user) => {
-        Auth.userAttributes(user).then((attributes) => {
-          hasConfig = attributes['custom:config'] === 1;
-        });
-      });
-    }
-
-    if (hasConfig) {
-      this.basicRestService
-        .get('userConfig/' + localStorage.getItem('currentUserId'))
-        .subscribe((config) => {
+    this.basicRestService
+      .get('userConfig/' + localStorage.getItem('currentUserId'))
+      .subscribe(
+        (config) => {
           localStorage.setItem('config', JSON.stringify(config));
           if (config['llm']) {
             if (config['llm'].startsWith('gpt')) {
@@ -129,8 +120,15 @@ export class EditorComponent {
               // use lambda proxy
             }
           }
-        });
-    }
+        },
+        (error) => {
+          if (error.status === 404) {
+            console.error('User config not found (404)');
+          } else {
+            console.error('An error occurred', error);
+          }
+        },
+      );
 
     this.abortController = new AbortController();
 

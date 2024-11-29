@@ -32,19 +32,28 @@ export class ConfigDialogComponent implements OnDestroy, OnInit {
       if (isOpen) {
         this.restService
           .get('userConfig/' + localStorage.getItem('currentUserId'))
-          .subscribe((res) => {
-            const config = JSON.parse(JSON.stringify(res));
-            if (config['embeddingModel']) {
-              this.currentEmbeddingModel = config['embeddingModel'];
-              this.selectedEmbeddingModel = config['embeddingModel'];
-            }
-            if (config['llm']) {
-              this.selectedLlm = config['llm'];
-            }
-            this.openAiApiKey = config['openAiApiKey'] ?? '';
-            this.anthropicApiKey = config['anthropicApiKey'] ?? '';
-            this.voyageApiKey = config['voyageApiKey'] ?? '';
-          });
+          .subscribe(
+            (res) => {
+              const config = JSON.parse(JSON.stringify(res));
+              if (config['embeddingModel']) {
+                this.currentEmbeddingModel = config['embeddingModel'];
+                this.selectedEmbeddingModel = config['embeddingModel'];
+              }
+              if (config['llm']) {
+                this.selectedLlm = config['llm'];
+              }
+              this.openAiApiKey = config['openAiApiKey'] ?? '';
+              this.anthropicApiKey = config['anthropicApiKey'] ?? '';
+              this.voyageApiKey = config['voyageApiKey'] ?? '';
+            },
+            (error) => {
+              if (error.status === 404) {
+                console.error('User config not found (404)');
+              } else {
+                console.error('An error occurred', error);
+              }
+            },
+          );
         const overlay = document.getElementById('configDialog');
         if (overlay.getAttribute('outsideClickListener') !== 'true') {
           overlay.addEventListener('click', (event) => {
@@ -112,13 +121,6 @@ export class ConfigDialogComponent implements OnDestroy, OnInit {
             this.currentEmbeddingModel !== this.selectedEmbeddingModel,
         })
         .subscribe(() => {
-          if (environment.production) {
-            Auth.currentAuthenticatedUser().then((user) => {
-              Auth.updateUserAttributes(user, {
-                'custom:config': '1',
-              });
-            });
-          }
           localStorage.setItem(
             'config',
             JSON.stringify({
