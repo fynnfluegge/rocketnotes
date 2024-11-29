@@ -21,6 +21,7 @@ type UserConfig struct {
 	Llm string `json:"llm"`
 	OpenAiApiKey string `json:"openAiApiKey"`
 	AnthropicApiKey string `json:"anthropicApiKey"`
+	VoyageApiKey string `json:"voyageApiKey"`
 }
 
 func init() {

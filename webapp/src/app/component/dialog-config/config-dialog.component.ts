@@ -18,6 +18,7 @@ export class ConfigDialogComponent implements OnDestroy, OnInit {
   selectedLlm: string = 'gpt-3.5-turbo';
   openAiApiKey: string;
   anthropicApiKey: string;
+  voyageApiKey: string;
   isLocal: boolean = !environment.production;
 
   constructor(
@@ -42,6 +43,7 @@ export class ConfigDialogComponent implements OnDestroy, OnInit {
             }
             this.openAiApiKey = config['openAiApiKey'] ?? '';
             this.anthropicApiKey = config['anthropicApiKey'] ?? '';
+            this.voyageApiKey = config['voyageApiKey'] ?? '';
           });
         const overlay = document.getElementById('configDialog');
         if (overlay.getAttribute('outsideClickListener') !== 'true') {
@@ -84,6 +86,20 @@ export class ConfigDialogComponent implements OnDestroy, OnInit {
         'anthropicApiKeyRequired',
       );
       anthropicApiKeyRequiredWarning.style.display = 'none';
+
+      if (this.selectedEmbeddingModel === 'voyage-2' && !this.voyageApiKey) {
+        const voyageApiKeyRequiredWarning = document.getElementById(
+          'voyageApiKeyRequired',
+        );
+        voyageApiKeyRequiredWarning.style.display = 'block';
+        return;
+      } else {
+        const voyageApiKeyRequiredWarning = document.getElementById(
+          'voyageApiKeyRequired',
+        );
+        voyageApiKeyRequiredWarning.style.display = 'none';
+      }
+
       this.restService
         .post('userConfig', {
           id: localStorage.getItem('currentUserId'),
@@ -91,6 +107,7 @@ export class ConfigDialogComponent implements OnDestroy, OnInit {
           llm: this.selectedLlm,
           openAiApiKey: this.openAiApiKey,
           anthropicApiKey: this.anthropicApiKey,
+          voyageApiKey: this.voyageApiKey,
           recreateIndex:
             this.currentEmbeddingModel !== this.selectedEmbeddingModel,
         })
@@ -109,6 +126,7 @@ export class ConfigDialogComponent implements OnDestroy, OnInit {
               llm: this.selectedLlm,
               openAiApiKey: this.openAiApiKey,
               anthropicApiKey: this.anthropicApiKey,
+              voyageApiKey: this.voyageApiKey,
             }),
           );
           if (

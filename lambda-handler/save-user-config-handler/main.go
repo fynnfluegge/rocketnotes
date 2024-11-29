@@ -21,6 +21,7 @@ type RequestBody struct {
 	Llm string `json:"llm"`
 	OpenAiApiKey string `json:"openAiApiKey"`
 	AnthropicApiKey string `json:"anthropicApiKey"`
+	VoyageApiKey string `json:"voyageApiKey`
 	RecreateIndex bool `json:"recreateIndex"`
 }
 
@@ -30,12 +31,14 @@ type UserConfig struct {
 	Llm string `json:"llm"`
 	OpenAiApiKey string `json:"openAiApiKey"`
 	AnthropicApiKey string `json:"anthropicApiKey"`
+	VoyageApiKey string `json:"voyageApiKey"`
 }
 
 type SqsMessage struct {
   UserId string `json:"userId"`
   OpenAiApiKey string `json:"openAiApiKey"`
   AnthropicApiKey string `json:"anthropicApiKey"`
+	VoyageApiKey string `json:"voyageApiKey`
   RecreateIndex bool `json:"recreateIndex"`
 }
 
@@ -63,7 +66,7 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 
 	tableName := "tnn-UserConfig"
 
-	av, err := dynamodbattribute.MarshalMap(UserConfig{item.Id, item.EmbeddingModel, item.Llm, item.OpenAiApiKey, item.AnthropicApiKey})
+	av, err := dynamodbattribute.MarshalMap(UserConfig{item.Id, item.EmbeddingModel, item.Llm, item.OpenAiApiKey, item.AnthropicApiKey, item.VoyageApiKey})
 
 	if err != nil {
 		log.Fatalf("Got error marshalling new document item: %s", err)
@@ -83,7 +86,7 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 	if os.Getenv("USE_LOCAL_DYNAMODB") != "1" && item.RecreateIndex {
 		qsvc := sqs.New(sess)
 
-		m := SqsMessage{item.Id, item.OpenAiApiKey, item.AnthropicApiKey, item.RecreateIndex}
+		m := SqsMessage{item.Id, item.OpenAiApiKey, item.AnthropicApiKey, item.VoyageApiKey, item.RecreateIndex}
 		b, err := json.Marshal(m)
 
 		_, err = qsvc.SendMessage(&sqs.SendMessageInput{

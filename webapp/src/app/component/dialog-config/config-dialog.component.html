@@ -10,6 +10,14 @@
           value="text-embedding-ada-002"
         />Text-Embedding-Ada-002
       </label>
+      <label class="radio-inline">
+        <input
+          type="radio"
+          name="embeddingModel"
+          [(ngModel)]="selectedEmbeddingModel"
+          value="voyage-2"
+        />Voyage-2
+      </label>
       <label class="radio-inline" *ngIf="isLocal">
         <input
           type="radio"
@@ -156,6 +164,25 @@
         >
           For the selected configuration, you need to provide an Anthropic API
           key
+        </span>
+      </div>
+      <h5>Voyage API Key</h5>
+      <textarea
+        type="text"
+        id="voyageApiKey"
+        rows="2"
+        [placeholder]="'Enter your Voyage API key...'"
+        style="width: 94%"
+        [(ngModel)]="voyageApiKey"
+        #message="ngModel"
+        name="voyageApiKey"
+      ></textarea>
+      <div>
+        <span
+          id="voyageApiKeyRequired"
+          style="text-align: center; color: var(--warning-color); display: none"
+        >
+          For the selected configuration, you need to provide a Voyage API key
         </span>
       </div>
       <br />
