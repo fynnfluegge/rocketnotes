@@ -104,7 +104,6 @@ def handler(event, context):
                 folder_path=file_path,
                 embeddings=embeddings,
             )
-            # If recreateIndex is set to True, recreate the index
             # Update any document vectors that have changed since last index creation
             # if recreateIndex:
             #     metadata = head_object_from_s3(f"{embeddingsModel}_{userId}.faiss")
@@ -190,6 +189,10 @@ def handler(event, context):
                 )
                 for documentId, vectors in document_vectors.items():
                     add_vectors_to_dynamodb(documentId, vectors)
+        else:
+            # TODO in this case a document has been deleted
+            # delete vectors for documentId
+            pass
 
     except Exception as e:
         return {
