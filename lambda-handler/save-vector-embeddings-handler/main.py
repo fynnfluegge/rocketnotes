@@ -87,7 +87,7 @@ def handler(event, context):
 
     try:
         file_path = f"/tmp/{userId}"
-        file_name = "faiss_index.bin"
+        file_name = "faiss_index"
         Path(file_path).mkdir(parents=True, exist_ok=True)
         faiss_index_exists = load_from_s3(
             f"{userId}.faiss",
@@ -98,48 +98,54 @@ def handler(event, context):
         # Update only document vectors
         # --------------------------------------------
         if faiss_index_exists and documentId and not recreateIndex:
-            print("Updating document vectors for documentId: ", documentId)
-            db = FAISS.load_local(
-                index_name=userId,
-                folder_path=file_path,
-                embeddings=embeddings,
-            )
-            # Update any document vectors that have changed since last index creation
-            # if recreateIndex:
-            #     metadata = head_object_from_s3(f"{embeddingsModel}_{userId}.faiss")
-            #     if metadata:
-            #         last_modified = metadata["LastModified"]
-            #         documents = dynamodb.scan(
-            #             TableName="tnn-Documents",
-            #             FilterExpression="userId = :userId",
-            #             ExpressionAttributeValues={":userId": {"S": userId}},
-            #         )
-            #         for document in documents["Items"]:
-            #             if document["lastModified"]["S"] > last_modified:
-            #                 documentId = document["id"]["S"]
-            #                 delete_document_vectors_from_faiss_index(documentId, db)
-            #                 save_document_vectors_to_faiss_index(document, db)
-            # else:
-            # Get item from DynamoDB table
-            document = dynamodb.get_item(
-                TableName="tnn-Documents",
-                Key={"id": {"S": documentId}},
-            )
-            # Check if item exists in the table
-            if "Item" not in document:
-                return {
-                    "statusCode": 404,
-                    "body": json.dumps("Item not found in DynamoDB table"),
-                }
+            try:
+                load_from_s3(
+                    f"{userId}.pkl",
+                    f"{file_path}/{file_name}.pkl",
+                )
+                print("Updating document vectors for documentId: ", documentId)
+                db = FAISS.load_local(
+                    index_name="faiss_index",
+                    folder_path=file_path,
+                    embeddings=embeddings,
+                )
+                # Update any document vectors that have changed since last index creation
+                # if recreateIndex:
+                #     metadata = head_object_from_s3(f"{embeddingsModel}_{userId}.faiss")
+                #     if metadata:
+                #         last_modified = metadata["LastModified"]
+                #         documents = dynamodb.scan(
+                #             TableName="tnn-Documents",
+                #             FilterExpression="userId = :userId",
+                #             ExpressionAttributeValues={":userId": {"S": userId}},
+                #         )
+                #         for document in documents["Items"]:
+                #             if document["lastModified"]["S"] > last_modified:
+                #                 documentId = document["id"]["S"]
+                #                 delete_document_vectors_from_faiss_index(documentId, db)
+                #                 save_document_vectors_to_faiss_index(document, db)
+                # else:
+                # Get item from DynamoDB table
+                document = dynamodb.get_item(
+                    TableName="tnn-Documents",
+                    Key={"id": {"S": documentId}},
+                )
+                # Check if item exists in the table
+                if "Item" not in document:
+                    return {
+                        "statusCode": 404,
+                        "body": json.dumps("Item not found in DynamoDB table"),
+                    }
 
-            document = document["Item"]
-            delete_document_vectors_from_faiss_index(documentId, db)
-            save_document_vectors_to_faiss_index(document, db)
-
-            file_name = "faiss_index.bin"
-            db.save_local(index_name=file_name, folder_path=file_path)
-            save_to_s3(userId + ".faiss", file_path + "/" + file_name + ".faiss")
-            save_to_s3(userId + ".pkl", file_path + "/" + file_name + ".pkl")
+                document = document["Item"]
+                delete_document_vectors_from_faiss_index(documentId, db)
+                save_document_vectors_to_faiss_index(document, db)
+                db.save_local(index_name=file_name, folder_path=file_path)
+                save_to_s3(userId + ".faiss", file_path + "/" + file_name + ".faiss")
+                save_to_s3(userId + ".pkl", file_path + "/" + file_name + ".pkl")
+                # TODO update vectors to dynamodb
+            except Exception as e:
+                print(f"Error updating document vectors: {e}")
 
         # Faiss index does not exist or should be recreated
         # Recreate all vectors for all documents
