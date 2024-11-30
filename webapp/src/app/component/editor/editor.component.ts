@@ -149,9 +149,10 @@ export class EditorComponent {
 
     // Set a new timer
     this.timer = setTimeout(() => {
-      this.submit();
+      // TODO only submit if content has changed
+      // this.submit();
       this.timer = null; // Clear the timer after submit
-    }, 3000);
+    }, 10000);
   }
 
   toggleAiCompletion() {
@@ -237,7 +238,7 @@ export class EditorComponent {
     if (this.editorMode) {
       this.editorMode = false;
       this.suggestion = '';
-      this.submit(true);
+      this.submit();
     }
   }
 
@@ -502,7 +503,7 @@ export class EditorComponent {
     }
   }
 
-  submit(recreateVectors: boolean = false): void {
+  submit(): void {
     this.basicRestService
       .post('saveDocument', {
         document: {
@@ -512,10 +513,11 @@ export class EditorComponent {
           content: this.content,
           isPublic: this.isPublic,
         },
-        recreateIndex:
-          localStorage.getItem('config') !== null && recreateVectors,
       })
       .subscribe(() => {
+        if (this.timer) {
+          clearTimeout(this.timer);
+        }
         // Snackbar disabled, since too many snackbar messages are displayed
         // this.showSnackbar = true;
         // setTimeout(() => {
@@ -527,8 +529,7 @@ export class EditorComponent {
         // via sqs event after the document has been saved
         if (
           !environment.production &&
-          localStorage.getItem('config') !== null &&
-          recreateVectors
+          localStorage.getItem('config') !== null
         ) {
           this.basicRestService
             .post('vector-embeddings', {
@@ -537,7 +538,7 @@ export class EditorComponent {
                   body: {
                     userId: localStorage.getItem('currentUserId'),
                     documentId: this.id,
-                    recreateIndex: true,
+                    recreateIndex: false,
                   },
                 },
               ],

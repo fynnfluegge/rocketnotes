@@ -23,7 +23,6 @@ type Item struct {
 
 type Body struct {
 	Document *Document `json:"document"`
-	RecreateIndex bool `json:"recreateIndex"`
 }
 
 type Document struct {
@@ -39,9 +38,8 @@ type Document struct {
 }
 
 type SqsMessage struct {
-	DocumentId   string `json:"documentId"`
 	UserId       string `json:"userId"`
-	RecreateIndex bool `json:"recreateIndex"`
+	DocumentId   string `json:"documentId"`
 }
 
 func init() {
@@ -79,11 +77,23 @@ func handleRequest(ctx context.Context, event events.SQSEvent) {
 		log.Fatalf("Got error calling PutItem: %s", err)
 	}
 
-	if item.Body.RecreateIndex == true {
+	result, err := svc.GetItem(&dynamodb.GetItemInput{
+		TableName: aws.String("tnn-UserConfig"),
+		Key: map[string]*dynamodb.AttributeValue{
+			"id": {
+				S: aws.String(item.Body.Document.UserId),
+			},
+		},
+	})
+	if err != nil {
+		log.Fatalf("Got error calling GetItem: %s", err)
+	}
+
+	if result.Item != nil {
 		log.Printf("Recreating index for document %s", item.Body.Document.ID)
 		qsvc := sqs.New(sess)
 
-		m := SqsMessage{item.Body.Document.ID, item.Body.Document.UserId, item.Body.RecreateIndex}
+		m := SqsMessage{item.Body.Document.UserId, item.Body.Document.ID}
 		b, err := json.Marshal(m)
 
 		_, err = qsvc.SendMessage(&sqs.SendMessageInput{
