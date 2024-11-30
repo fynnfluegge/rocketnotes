@@ -118,7 +118,7 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		log.Fatalf("Got error calling PutItem: %s", err)
 	}
 
-	result, err := svc.GetItem(&dynamodb.GetItemInput{
+	user_config, err := svc.GetItem(&dynamodb.GetItemInput{
 		TableName: aws.String("tnn-UserConfig"),
 		Key: map[string]*dynamodb.AttributeValue{
 			"id": {
@@ -126,11 +126,12 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 			},
 		},
 	})
+
 	if err != nil {
 		log.Fatalf("Got error calling GetItem: %s", err)
 	}
 
-	if result.Item != nil {
+	if user_config.Item != nil {
 		qsvc := sqs.New(sess)
 
 		m := SqsMessage{document.UserId, document.ID}

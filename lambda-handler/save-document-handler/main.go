@@ -77,7 +77,7 @@ func handleRequest(ctx context.Context, event events.SQSEvent) {
 		log.Fatalf("Got error calling PutItem: %s", err)
 	}
 
-	result, err := svc.GetItem(&dynamodb.GetItemInput{
+	user_config, err := svc.GetItem(&dynamodb.GetItemInput{
 		TableName: aws.String("tnn-UserConfig"),
 		Key: map[string]*dynamodb.AttributeValue{
 			"id": {
@@ -85,11 +85,12 @@ func handleRequest(ctx context.Context, event events.SQSEvent) {
 			},
 		},
 	})
+
 	if err != nil {
 		log.Fatalf("Got error calling GetItem: %s", err)
 	}
 
-	if result.Item != nil {
+	if user_config.Item != nil {
 		log.Printf("Recreating index for document %s", item.Body.Document.ID)
 		qsvc := sqs.New(sess)
 
