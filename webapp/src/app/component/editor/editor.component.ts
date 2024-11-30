@@ -105,19 +105,10 @@ export class EditorComponent {
       }
     });
 
-    let hasConfig = true;
-    if (environment.production) {
-      Auth.currentAuthenticatedUser().then((user) => {
-        Auth.userAttributes(user).then((attributes) => {
-          hasConfig = attributes['custom:config'] === 1;
-        });
-      });
-    }
-
-    if (hasConfig) {
-      this.basicRestService
-        .get('userConfig/' + localStorage.getItem('currentUserId'))
-        .subscribe((config) => {
+    this.basicRestService
+      .get('userConfig/' + localStorage.getItem('currentUserId'))
+      .subscribe(
+        (config) => {
           localStorage.setItem('config', JSON.stringify(config));
           if (config['llm']) {
             if (config['llm'].startsWith('gpt')) {
@@ -129,8 +120,15 @@ export class EditorComponent {
               // use lambda proxy
             }
           }
-        });
-    }
+        },
+        (error) => {
+          if (error.status === 404) {
+            console.error('User config not found (404)');
+          } else {
+            console.error('An error occurred', error);
+          }
+        },
+      );
 
     this.abortController = new AbortController();
 
@@ -151,9 +149,10 @@ export class EditorComponent {
 
     // Set a new timer
     this.timer = setTimeout(() => {
-      this.submit();
+      // TODO only submit if content has changed
+      // this.submit();
       this.timer = null; // Clear the timer after submit
-    }, 3000);
+    }, 10000);
   }
 
   toggleAiCompletion() {
@@ -239,7 +238,7 @@ export class EditorComponent {
     if (this.editorMode) {
       this.editorMode = false;
       this.suggestion = '';
-      this.submit(true);
+      this.submit();
     }
   }
 
@@ -504,7 +503,7 @@ export class EditorComponent {
     }
   }
 
-  submit(recreateVectors: boolean = false): void {
+  submit(): void {
     this.basicRestService
       .post('saveDocument', {
         document: {
@@ -513,11 +512,12 @@ export class EditorComponent {
           title: this.title,
           content: this.content,
           isPublic: this.isPublic,
-          recreateIndex:
-            localStorage.getItem('config') !== null && recreateVectors,
         },
       })
       .subscribe(() => {
+        if (this.timer) {
+          clearTimeout(this.timer);
+        }
         // Snackbar disabled, since too many snackbar messages are displayed
         // this.showSnackbar = true;
         // setTimeout(() => {
@@ -529,8 +529,7 @@ export class EditorComponent {
         // via sqs event after the document has been saved
         if (
           !environment.production &&
-          localStorage.getItem('config') !== null &&
-          recreateVectors
+          localStorage.getItem('config') !== null
         ) {
           this.basicRestService
             .post('vector-embeddings', {
@@ -539,7 +538,7 @@ export class EditorComponent {
                   body: {
                     userId: localStorage.getItem('currentUserId'),
                     documentId: this.id,
-                    recreateIndex: true,
+                    recreateIndex: false,
                   },
                 },
               ],

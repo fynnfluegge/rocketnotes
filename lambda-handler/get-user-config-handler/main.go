@@ -22,6 +22,7 @@ type UserConfig struct {
 	SpeechToTextModel string `json:"speechToTextModel"`
 	OpenAiApiKey string `json:"openAiApiKey"`
 	AnthropicApiKey string `json:"anthropicApiKey"`
+	VoyageApiKey string `json:"voyageApiKey"`
 }
 
 func init() {

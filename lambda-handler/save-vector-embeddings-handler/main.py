@@ -4,11 +4,10 @@ from pathlib import Path
 
 import boto3
 from langchain.schema import Document
-from langchain.text_splitter import (
-    MarkdownHeaderTextSplitter,
-    RecursiveCharacterTextSplitter,
-)
-from langchain_community.embeddings import HuggingFaceEmbeddings, OllamaEmbeddings
+from langchain.text_splitter import (MarkdownHeaderTextSplitter,
+                                     RecursiveCharacterTextSplitter)
+from langchain_community.embeddings import (HuggingFaceEmbeddings,
+                                            OllamaEmbeddings, VoyageEmbeddings)
 from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
 
@@ -38,6 +37,7 @@ def handler(event, context):
     userId = message["userId"]
     documentId = message.get("documentId", None)
     recreateIndex = message.get("recreateIndex", False)
+    deleteVectors = message.get("deleteVectors", False)
 
     userConfig = dynamodb.get_item(
         TableName=userConfig_table_name,
@@ -53,11 +53,11 @@ def handler(event, context):
     userConfig = userConfig["Item"]
     embeddingsModel = userConfig.get("embeddingModel", {}).get("S", None)
     openAiApiKey = userConfig.get("openAiApiKey", {}).get("S", None)
-    anthropicApiKey = userConfig.get("anthropicApiKey", {}).get("S", None)
+    voyageApiKey = userConfig.get("voyageApiKey", {}).get("S", None)
     if openAiApiKey is not None:
         os.environ["OPENAI_API_KEY"] = openAiApiKey
-    if anthropicApiKey is not None:
-        os.environ["ANTHROPIC_API_KEY"] = anthropicApiKey
+    if voyageApiKey is not None:
+        os.environ["VOYAGE_API_KEY"] = voyageApiKey
 
     if embeddingsModel == "text-embedding-ada-002":
         if openAiApiKey is None:
@@ -66,6 +66,13 @@ def handler(event, context):
                 "body": json.dumps("OpenAI API key not found"),
             }
         embeddings = OpenAIEmbeddings(client=None, model=embeddingsModel)
+    elif embeddingsModel == "voyage-2" or embeddingsModel == "voyage-3":
+        if voyageApiKey is None:
+            return {
+                "statusCode": 400,
+                "body": json.dumps("Voyage API key not found"),
+            }
+        embeddings = VoyageEmbeddings(model=embeddingsModel)
     elif embeddingsModel == "Sentence-Transformers":
         embeddings = HuggingFaceEmbeddings(model_kwargs={"device": "cpu"})
     elif embeddingsModel == "Ollama-nomic-embed-text":
@@ -79,43 +86,45 @@ def handler(event, context):
         }
 
     try:
-        file_path = f"/tmp/{userId}/{embeddingsModel}"
+        file_path = f"/tmp/{userId}"
+        file_name = "faiss_index"
         Path(file_path).mkdir(parents=True, exist_ok=True)
         faiss_index_exists = load_from_s3(
-            f"{embeddingsModel}_{userId}.faiss",
-            f"{file_path}/{embeddingsModel}_{userId}.faiss",
+            f"{userId}.faiss",
+            f"{file_path}/{file_name}.faiss",
         )
 
-        # Vectors already exists, update the index
+        # Vectors already exists and documentId present
+        # Update only document vectors
         # --------------------------------------------
-        if faiss_index_exists:
-            load_from_s3(
-                f"{embeddingsModel}_{userId}.pkl",
-                f"{file_path}/{embeddingsModel}_{userId}.pkl",
-            )
-
-            db = FAISS.load_local(
-                index_name=userId,
-                folder_path=file_path,
-                embeddings=embeddings,
-            )
-            # If recreateIndex is set to True, recreate the index
-            # Update any document vectors that have changed since last index creation
-            if recreateIndex:
-                metadata = head_object_from_s3(f"{embeddingsModel}_{userId}.faiss")
-                if metadata:
-                    last_modified = metadata["LastModified"]
-                    documents = dynamodb.scan(
-                        TableName="tnn-Documents",
-                        FilterExpression="userId = :userId",
-                        ExpressionAttributeValues={":userId": {"S": userId}},
-                    )
-                    for document in documents["Items"]:
-                        if document["lastModified"]["S"] > last_modified:
-                            documentId = document["id"]["S"]
-                            delete_document_vectors_from_faiss_index(documentId, db)
-                            save_document_vectors_to_faiss_index(document, db)
-            else:
+        if faiss_index_exists and documentId and not recreateIndex:
+            try:
+                load_from_s3(
+                    f"{userId}.pkl",
+                    f"{file_path}/{file_name}.pkl",
+                )
+                print("Updating document vectors for documentId: ", documentId)
+                db = FAISS.load_local(
+                    index_name="faiss_index",
+                    folder_path=file_path,
+                    embeddings=embeddings,
+                )
+                # Update any document vectors that have changed since last index creation
+                # if recreateIndex:
+                #     metadata = head_object_from_s3(f"{embeddingsModel}_{userId}.faiss")
+                #     if metadata:
+                #         last_modified = metadata["LastModified"]
+                #         documents = dynamodb.scan(
+                #             TableName="tnn-Documents",
+                #             FilterExpression="userId = :userId",
+                #             ExpressionAttributeValues={":userId": {"S": userId}},
+                #         )
+                #         for document in documents["Items"]:
+                #             if document["lastModified"]["S"] > last_modified:
+                #                 documentId = document["id"]["S"]
+                #                 delete_document_vectors_from_faiss_index(documentId, db)
+                #                 save_document_vectors_to_faiss_index(document, db)
+                # else:
                 # Get item from DynamoDB table
                 document = dynamodb.get_item(
                     TableName="tnn-Documents",
@@ -131,19 +140,21 @@ def handler(event, context):
                 document = document["Item"]
                 delete_document_vectors_from_faiss_index(documentId, db)
                 save_document_vectors_to_faiss_index(document, db)
+                db.save_local(index_name=file_name, folder_path=file_path)
+                save_to_s3(userId + ".faiss", file_path + "/" + file_name + ".faiss")
+                save_to_s3(userId + ".pkl", file_path + "/" + file_name + ".pkl")
+                # TODO update vectors to dynamodb
+            except Exception as e:
+                print(f"Error updating document vectors: {e}")
 
-            file_name = "faiss_index.bin"
-            db.save_local(index_name=file_name, folder_path=file_path)
-            save_to_s3(userId + ".faiss", file_path + "/" + file_name + ".faiss")
-            save_to_s3(userId + ".pkl", file_path + "/" + file_name + ".pkl")
-
-        else:
-            # Faiss index does not exist, create the index from scratch
-            # ---------------------------------------------------------
-            filter_expression = "userId = :user_value AND deleted = :deleted_value"
+        # Faiss index does not exist or should be recreated
+        # Recreate all vectors for all documents
+        # ---------------------------------------------------------
+        elif not faiss_index_exists or recreateIndex:
+            print("Recreating index for userId: ", userId)
+            filter_expression = "userId = :user_value"
             expression_attribute_values = {
                 ":user_value": {"S": userId},
-                ":deleted_value": {"BOOL": False},
             }
 
             # Execute the query
@@ -160,15 +171,20 @@ def handler(event, context):
                 split_documents = []
                 for document in documents:
                     try:
-                        content = document["content"]["S"]
-                        documentId = document["id"]["S"]
-                        title = document["title"]["S"]
-                    except Exception:
-                        continue
-                    split_documents.extend(split_document(content, documentId, title))
+                        if document.get("deleted", {}).get("BOOL", False):
+                            continue
+                        else:
+                            content = document["content"]["S"]
+                            documentId = document["id"]["S"]
+                            title = document["title"]["S"]
+                            split_documents.extend(
+                                split_document(content, documentId, title)
+                            )
+                    except Exception as e:
+                        print(
+                            f"Error processing document {document['id']['S']}: ", str(e)
+                        )
                 db = FAISS.from_documents(split_documents, embeddings)
-                file_path = f"/tmp/{userId}"
-                file_name = "faiss_index.bin"
                 Path(file_path).mkdir(parents=True, exist_ok=True)
                 db.save_local(index_name=file_name, folder_path=file_path)
                 save_to_s3(userId + ".faiss", file_path + "/" + file_name + ".faiss")
@@ -179,6 +195,10 @@ def handler(event, context):
                 )
                 for documentId, vectors in document_vectors.items():
                     add_vectors_to_dynamodb(documentId, vectors)
+        else:
+            # TODO in this case a document has been deleted
+            # delete vectors for documentId
+            pass
 
     except Exception as e:
         return {

@@ -13,12 +13,12 @@
 
 </div>
 
-Rocketnotes is a web-based Markdown note taking app with LLM-powered text completion, chat and semantic search.  
+Rocketnotes is a web-based Markdown note taking app with LLM-powered text completion, chat and semantic search.
 It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/serverless-rag-on-aws-bf8029f8bffd) built with
 [langchain](https://github.com/langchain-ai/langchain),
 [sentence-transformers](https://github.com/UKPLab/sentence-transformers),
 [faiss](https://github.com/facebookresearch/faiss),
-[Ollama](https://github.com/jmorganca/ollama) and OpenAI or Anthropic.
+[Ollama](https://github.com/jmorganca/ollama), OpenAI, Anthropic and Voyage.
 
 ## How to use
 
@@ -39,7 +39,7 @@ It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/ser
 - 🔦 Semantic search
 - ✍️ Copilot-like text completion
 - 🤖 Chat with your documents
-  - Serverless RAG with faiss, OpenAI and/or Anthropic
+  - Serverless RAG with faiss, OpenAI, Anthropic, Voyage
 - 📦 Local mode with Docker
   - use Ollama and/or Sentence Transformers for 100% local RAG
 - 📥 Zettelkasten with semantic archiving
