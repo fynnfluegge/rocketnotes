@@ -4,15 +4,10 @@ from pathlib import Path
 
 import boto3
 from langchain.schema import Document
-from langchain.text_splitter import (
-    MarkdownHeaderTextSplitter,
-    RecursiveCharacterTextSplitter,
-)
-from langchain_community.embeddings import (
-    HuggingFaceEmbeddings,
-    OllamaEmbeddings,
-    VoyageEmbeddings,
-)
+from langchain.text_splitter import (MarkdownHeaderTextSplitter,
+                                     RecursiveCharacterTextSplitter)
+from langchain_community.embeddings import (HuggingFaceEmbeddings,
+                                            OllamaEmbeddings, VoyageEmbeddings)
 from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
 
@@ -70,7 +65,7 @@ def handler(event, context):
                 "body": json.dumps("OpenAI API key not found"),
             }
         embeddings = OpenAIEmbeddings(client=None, model=embeddingsModel)
-    elif embeddingsModel == "voyage-2":
+    elif embeddingsModel == "voyage-2" or embeddingsModel == "voyage-3":
         if voyageApiKey is None:
             return {
                 "statusCode": 400,
@@ -100,11 +95,6 @@ def handler(event, context):
         # Vectors already exists, update the index
         # --------------------------------------------
         if faiss_index_exists:
-            load_from_s3(
-                f"{embeddingsModel}_{userId}.pkl",
-                f"{file_path}/{embeddingsModel}_{userId}.pkl",
-            )
-
             db = FAISS.load_local(
                 index_name=userId,
                 folder_path=file_path,
@@ -154,7 +144,6 @@ def handler(event, context):
             filter_expression = "userId = :user_value"
             expression_attribute_values = {
                 ":user_value": {"S": userId},
-                # ":deleted_value": {"BOOL": False},
             }
 
             # Execute the query
@@ -170,15 +159,20 @@ def handler(event, context):
             if documents:
                 split_documents = []
                 for document in documents:
-                    if document["deleted"]["BOOL"]:
-                        continue
                     try:
-                        content = document["content"]["S"]
-                        documentId = document["id"]["S"]
-                        title = document["title"]["S"]
-                    except Exception:
-                        continue
-                    split_documents.extend(split_document(content, documentId, title))
+                        if document.get("deleted", {}).get("BOOL", False):
+                            continue
+                        else:
+                            content = document["content"]["S"]
+                            documentId = document["id"]["S"]
+                            title = document["title"]["S"]
+                            split_documents.extend(
+                                split_document(content, documentId, title)
+                            )
+                    except Exception as e:
+                        print(
+                            f"Error processing document {document['id']['S']}: ", str(e)
+                        )
                 db = FAISS.from_documents(split_documents, embeddings)
                 file_path = f"/tmp/{userId}"
                 file_name = "faiss_index.bin"

@@ -80,6 +80,7 @@ func handleRequest(ctx context.Context, event events.SQSEvent) {
 	}
 
 	if item.Body.RecreateIndex == true {
+		log.Printf("Recreating index for document %s", item.Body.Document.ID)
 		qsvc := sqs.New(sess)
 
 		m := SqsMessage{item.Body.Document.ID, item.Body.Document.UserId, item.Body.RecreateIndex}

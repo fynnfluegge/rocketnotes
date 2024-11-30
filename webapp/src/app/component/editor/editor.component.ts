@@ -511,9 +511,9 @@ export class EditorComponent {
           title: this.title,
           content: this.content,
           isPublic: this.isPublic,
-          recreateIndex:
-            localStorage.getItem('config') !== null && recreateVectors,
         },
+        recreateIndex:
+          localStorage.getItem('config') !== null && recreateVectors,
       })
       .subscribe(() => {
         // Snackbar disabled, since too many snackbar messages are displayed

@@ -36,9 +36,6 @@ type UserConfig struct {
 
 type SqsMessage struct {
   UserId string `json:"userId"`
-  OpenAiApiKey string `json:"openAiApiKey"`
-  AnthropicApiKey string `json:"anthropicApiKey"`
-	VoyageApiKey string `json:"voyageApiKey`
   RecreateIndex bool `json:"recreateIndex"`
 }
 
@@ -86,7 +83,7 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 	if os.Getenv("USE_LOCAL_DYNAMODB") != "1" && item.RecreateIndex {
 		qsvc := sqs.New(sess)
 
-		m := SqsMessage{item.Id, item.OpenAiApiKey, item.AnthropicApiKey, item.VoyageApiKey, item.RecreateIndex}
+		m := SqsMessage{item.Id, item.RecreateIndex}
 		b, err := json.Marshal(m)
 
 		_, err = qsvc.SendMessage(&sqs.SendMessageInput{
