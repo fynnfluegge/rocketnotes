@@ -90,7 +90,7 @@ def handler(event, context):
         file_name = "faiss_index.bin"
         Path(file_path).mkdir(parents=True, exist_ok=True)
         faiss_index_exists = load_from_s3(
-            f"{embeddingsModel}_{userId}.faiss",
+            f"{userId}.faiss",
             f"{file_path}/{file_name}.faiss",
         )
 
