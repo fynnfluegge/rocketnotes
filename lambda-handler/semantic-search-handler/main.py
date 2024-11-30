@@ -3,11 +3,8 @@ import os
 from pathlib import Path
 
 import boto3
-from langchain_community.embeddings import (
-    HuggingFaceEmbeddings,
-    OllamaEmbeddings,
-    VoyageEmbeddings,
-)
+from langchain_community.embeddings import (HuggingFaceEmbeddings,
+                                            OllamaEmbeddings, VoyageEmbeddings)
 from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
 
@@ -69,7 +66,7 @@ def handler(event, context):
         else:
             return {"statusCode": 400, "body": "OpenAI API key is missing"}
         embeddings = OpenAIEmbeddings(client=None, model=embeddings_model)
-    elif embeddings_model == "voyage-2":
+    elif embeddings_model == "voyage-2" or embeddings_model == "voyage-3":
         if "voyageApiKey" in userConfig:
             os.environ["VOYAGE_API_KEY"] = userConfig.get("voyageApiKey").get("S")
         else:

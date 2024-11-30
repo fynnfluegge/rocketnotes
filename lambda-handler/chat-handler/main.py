@@ -6,11 +6,8 @@ import boto3
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationSummaryMemory
 from langchain_anthropic import ChatAnthropic
-from langchain_community.embeddings import (
-    HuggingFaceEmbeddings,
-    OllamaEmbeddings,
-    VoyageEmbeddings,
-)
+from langchain_community.embeddings import (HuggingFaceEmbeddings,
+                                            OllamaEmbeddings, VoyageEmbeddings)
 from langchain_community.llms import Ollama
 from langchain_community.vectorstores import FAISS
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
@@ -76,7 +73,7 @@ def handler(event, context):
         else:
             return {"statusCode": 400, "body": "OpenAI API key is missing"}
 
-    if embeddings_model == "voyage-2":
+    if embeddings_model == "voyage-2" or embeddings_model == "voyage-3":
         if "voyageApiKey" in userConfig:
             os.environ["VOYAGE_API_KEY"] = userConfig.get("voyageApiKey").get("S")
         else:

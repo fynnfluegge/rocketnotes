@@ -44,9 +44,8 @@ type Document struct {
 }
 
 type SqsMessage struct {
-	DocumentId   string `json:"documentId"`
 	UserId       string `json:"userId"`
-	RecreateIndex bool `json:"recreateIndex"`
+	DocumentId   string `json:"documentId"`
 }
 
 
@@ -119,10 +118,23 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		log.Fatalf("Got error calling PutItem: %s", err)
 	}
 
-	if body.RecreateIndex == true {
+	user_config, err := svc.GetItem(&dynamodb.GetItemInput{
+		TableName: aws.String("tnn-UserConfig"),
+		Key: map[string]*dynamodb.AttributeValue{
+			"id": {
+				S: aws.String(body.Zettel.UserId),
+			},
+		},
+	})
+
+	if err != nil {
+		log.Fatalf("Got error calling GetItem: %s", err)
+	}
+
+	if user_config.Item != nil {
 		qsvc := sqs.New(sess)
 
-		m := SqsMessage{document.ID, document.UserId, body.RecreateIndex}
+		m := SqsMessage{document.UserId, document.ID}
 		b, err := json.Marshal(m)
 
 		_, err = qsvc.SendMessage(&sqs.SendMessageInput{
