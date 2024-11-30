@@ -3,7 +3,6 @@ import { Subscription } from 'rxjs';
 import { BasicRestService } from 'src/app/service/basic-rest.service';
 import { ConfigDialogService } from 'src/app/service/config-dialog-service';
 import { environment } from 'src/environments/environment';
-import { Auth } from 'aws-amplify';
 
 @Component({
   selector: 'app-config-dialog',
@@ -33,21 +32,6 @@ export class ConfigDialogComponent implements OnDestroy, OnInit {
       if (isOpen) {
         this.restService
           .get('userConfig/' + localStorage.getItem('currentUserId'))
-          .subscribe((res) => {
-            const config = JSON.parse(JSON.stringify(res));
-            if (config['embeddingModel']) {
-              this.currentEmbeddingModel = config['embeddingModel'];
-              this.selectedEmbeddingModel = config['embeddingModel'];
-            }
-            if (config['llm']) {
-              this.selectedLlm = config['llm'];
-            }
-            if (config['speechToTextModel']) {
-              this.selectedSpeechToTextModel = config['speechToTextModel'];
-            }
-            this.openAiApiKey = config['openAiApiKey'] ?? '';
-            this.anthropicApiKey = config['anthropicApiKey'] ?? '';
-          });
           .subscribe(
             (res) => {
               const config = JSON.parse(JSON.stringify(res));
@@ -57,6 +41,9 @@ export class ConfigDialogComponent implements OnDestroy, OnInit {
               }
               if (config['llm']) {
                 this.selectedLlm = config['llm'];
+              }
+              if (config['speechToTextModel']) {
+                this.selectedSpeechToTextModel = config['speechToTextModel'];
               }
               this.openAiApiKey = config['openAiApiKey'] ?? '';
               this.anthropicApiKey = config['anthropicApiKey'] ?? '';

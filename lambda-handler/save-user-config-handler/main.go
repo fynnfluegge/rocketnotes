@@ -65,8 +65,7 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 
 	tableName := "tnn-UserConfig"
 
-	av, err := dynamodbattribute.MarshalMap(UserConfig{item.Id, item.EmbeddingModel, item.Llm, item.SpeechToTextModel, item.OpenAiApiKey, item.AnthropicApiKey})
-	av, err := dynamodbattribute.MarshalMap(UserConfig{item.Id, item.EmbeddingModel, item.Llm, item.OpenAiApiKey, item.AnthropicApiKey, item.VoyageApiKey})
+	av, err := dynamodbattribute.MarshalMap(UserConfig{item.Id, item.EmbeddingModel, item.Llm, item.SpeechToTextModel, item.OpenAiApiKey, item.AnthropicApiKey,item.VoyageApiKey})
 
 	if err != nil {
 		log.Fatalf("Got error marshalling new document item: %s", err)
