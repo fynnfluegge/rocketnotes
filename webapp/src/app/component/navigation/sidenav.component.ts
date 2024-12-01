@@ -611,7 +611,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
       }
     }
 
-    if (this.router.url === '/zettelkasten') {
+    if (this.router.url === '/notebox') {
       this.showZettelkasten = true;
     } else {
       this.showZettelkasten = false;
@@ -1397,6 +1397,6 @@ export class SidenavComponent implements OnInit, AfterViewInit {
 
   openZettelkasten() {
     this.showZettelkasten = true;
-    this.router.navigate(['/zettelkasten']);
+    this.router.navigate(['/notebox']);
   }
 }

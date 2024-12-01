@@ -1,9 +1,11 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Document } from 'src/app/model/document.model';
 import { Zettel } from 'src/app/model/zettel.model';
+import { AudioRecordingService } from 'src/app/service/audio-recording.service';
 import { BasicRestService } from 'src/app/service/basic-rest.service';
 import { environment } from 'src/environments/environment';
-import * as uuid from 'uuid';
+import { v4 } from 'uuid';
+import OpenAI from 'openai';
 
 @Component({
   selector: 'app-zettelkasten',
@@ -13,6 +15,8 @@ import * as uuid from 'uuid';
 export class ZettelkastenComponent implements OnInit {
   @Input() showSidebar: boolean;
 
+  private openai: OpenAI;
+
   textareaContent: string = '';
   contentMap: Record<string, Zettel> = {};
   editMap: Map<string, boolean> = new Map();
@@ -20,9 +24,35 @@ export class ZettelkastenComponent implements OnInit {
   isLoadingMap: Map<string, boolean> = new Map();
   tooltips: Map<string, string> = new Map();
   llmEnabled: boolean = false;
+  speechToTextEnabled: boolean = false;
 
-  constructor(private basicRestService: BasicRestService) {
+  isRecording = false;
+
+  constructor(
+    private basicRestService: BasicRestService,
+    private audioRecordingService: AudioRecordingService,
+  ) {
     this.llmEnabled = localStorage.getItem('config') !== null;
+    const config = JSON.parse(localStorage.getItem('config'));
+    if (config.openAiApiKey && config.speechToTextModel === 'Whisper') {
+      this.speechToTextEnabled = true;
+      this.openai = new OpenAI({
+        apiKey: config['openAiApiKey'],
+        dangerouslyAllowBrowser: true,
+      });
+    }
+    this.audioRecordingService.getRecordedBlob().subscribe(async (data) => {
+      let metadata = {
+        type: 'audio/mp3',
+      };
+      let file = new File([data.blob], 'test.mp3', metadata);
+      const transcription = await this.openai.audio.transcriptions.create({
+        file: file,
+        model: 'whisper-1',
+      });
+
+      this.textareaContent += transcription.text + '\n';
+    });
   }
 
   ngOnInit(): void {
@@ -44,7 +74,7 @@ export class ZettelkastenComponent implements OnInit {
   }
 
   saveNote() {
-    const id = uuid.v4();
+    const id = v4();
     if (this.textareaContent.trim()) {
       this.contentMap[id] = new Zettel(
         id,
@@ -59,6 +89,14 @@ export class ZettelkastenComponent implements OnInit {
         zettel: this.contentMap[id],
       })
       .subscribe();
+  }
+
+  recordNote() {
+    this.startRecording();
+  }
+
+  async stopRecord() {
+    this.stopRecording();
   }
 
   edit(id: string) {
@@ -168,5 +206,30 @@ export class ZettelkastenComponent implements OnInit {
 
   isLoading(id: string) {
     return this.isLoadingMap.get(id);
+  }
+
+  startRecording() {
+    if (!this.isRecording) {
+      this.isRecording = true;
+      this.audioRecordingService.startRecording();
+    }
+  }
+
+  abortRecording() {
+    if (this.isRecording) {
+      this.isRecording = false;
+      this.audioRecordingService.abortRecording();
+    }
+  }
+
+  stopRecording() {
+    if (this.isRecording) {
+      this.audioRecordingService.stopRecording();
+      this.isRecording = false;
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.abortRecording();
   }
 }

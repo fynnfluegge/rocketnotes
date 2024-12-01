@@ -4,7 +4,7 @@
 >
   <div style="max-width: 800px; margin: auto">
     <p style="font-size: 24px; font-weight: bold; text-align: center">
-      Zettelkasten
+      Notebox
     </p>
     <textarea
       [(ngModel)]="textareaContent"
@@ -20,6 +20,22 @@
       "
     ></textarea>
     <br />
+    <button
+      *ngIf="!isRecording && speechToTextEnabled"
+      (click)="recordNote()"
+      style="float: left"
+      class="btn btn-default btn-primary"
+    >
+      Record Note
+    </button>
+    <button
+      *ngIf="isRecording && speechToTextEnabled"
+      (click)="stopRecord()"
+      style="float: left"
+      class="btn btn-default btn-primary"
+    >
+      Stop Recording
+    </button>
     <button
       (click)="saveNote()"
       style="float: right"

@@ -44,6 +44,7 @@ It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/ser
   - use Ollama and/or Sentence Transformers for 100% local RAG
 - 📥 Zettelkasten with semantic archiving
   - Use vector index to insert notes into highest semantic-ranked documents
+- 🗣️ Speech-to-text note taking
 - WIP: Neovim plugin [rocketnotes.nvim](https://github.com/fynnfluegge/rocketnotes.nvim)
 
 &nbsp;

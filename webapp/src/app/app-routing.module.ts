@@ -6,7 +6,7 @@ import { PublicDocumentViewerComponent } from './component/public-document-viewe
 
 const routes: Routes = [
   {
-    path: 'zettelkasten',
+    path: 'notebox',
     component: SidenavComponent,
     canActivate: [AuthGuard],
   },
