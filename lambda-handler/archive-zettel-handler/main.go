@@ -1,14 +1,13 @@
-
 package main
 
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 	"strings"
 	"time"
-	"fmt"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -20,15 +19,15 @@ import (
 )
 
 type Body struct {
-	Zettel     *Zettel `json:"zettel"`
-	RecreateIndex bool `json:"recreateIndex"`
+	Zettel        *Zettel `json:"zettel"`
+	RecreateIndex bool    `json:"recreateIndex"`
 }
 
 type Zettel struct {
-  ID       string    `json:"id"`
-  UserId   string    `json:"userId"`
-  Content  string    `json:"content"`
-  Created  time.Time `json:"created"`
+	ID      string    `json:"id"`
+	UserId  string    `json:"userId"`
+	Content string    `json:"content"`
+	Created time.Time `json:"created"`
 }
 
 type Document struct {
@@ -44,16 +43,14 @@ type Document struct {
 }
 
 type SqsMessage struct {
-	UserId       string `json:"userId"`
-	DocumentId   string `json:"documentId"`
+	UserId     string `json:"userId"`
+	DocumentId string `json:"documentId"`
 }
-
 
 func init() {
 }
 
 func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-
 	documentId := request.PathParameters["documentId"]
 
 	body := Body{}
@@ -100,7 +97,7 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 	}
 
 	document.Content += "\n" + body.Zettel.Content
-  document.Searchcontent = strings.ToLower(document.Title + "\n" + document.Content)
+	document.Searchcontent = strings.ToLower(document.Title + "\n" + document.Content)
 	document.LastModified = time.Now()
 
 	av, err := dynamodbattribute.MarshalMap(document)
@@ -126,12 +123,11 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 			},
 		},
 	})
-
 	if err != nil {
 		log.Fatalf("Got error calling GetItem: %s", err)
 	}
 
-	if user_config.Item != nil {
+	if user_config.Item != nil && os.Getenv("USE_LOCAL_DYNAMODB") != "1" {
 		qsvc := sqs.New(sess)
 
 		m := SqsMessage{document.UserId, document.ID}
