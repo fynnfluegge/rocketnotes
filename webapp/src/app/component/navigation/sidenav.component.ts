@@ -13,7 +13,7 @@ import {
   MatTreeFlattener,
 } from '@angular/material/tree';
 import { of as ofObservable, Observable, BehaviorSubject, Subject } from 'rxjs';
-import * as uuid from 'uuid';
+import { v4 } from 'uuid';
 import { BasicRestService } from 'src/app/service/basic-rest.service';
 import { Auth } from 'aws-amplify';
 import { environment } from 'src/environments/environment';
@@ -304,7 +304,7 @@ export class DocumentTree {
 
   insertItem(parent: DocumentFlatNode, vName: string): DocumentNode {
     const child = <DocumentNode>{
-      id: uuid.v4(),
+      id: v4(),
       name: vName,
       parent: parent.id,
       pinned: false,
