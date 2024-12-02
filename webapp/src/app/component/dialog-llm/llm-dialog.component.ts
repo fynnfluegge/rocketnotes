@@ -9,6 +9,7 @@ import { Subscription } from 'rxjs';
 import { LlmDialogService } from 'src/app/service/llm-dialog.service';
 import { BasicRestService } from 'src/app/service/basic-rest.service';
 import { DocumentTree } from '../navigation/sidenav.component';
+import { Title } from '@angular/platform-browser';
 
 type ChatMessage = {
   text: string;
@@ -43,6 +44,8 @@ export class LlmDialogComponent implements OnDestroy, OnInit {
     private llmDialogService: LlmDialogService,
     private restService: BasicRestService,
     private database: DocumentTree,
+    private basicRestService: BasicRestService,
+    private titleService: Title,
   ) {}
 
   ngOnInit() {
@@ -168,12 +171,19 @@ export class LlmDialogComponent implements OnDestroy, OnInit {
   }
 
   openDocument(searchResult: SearchResult) {
-    this.database.initContentChange.next({
-      id: searchResult.documentId,
-      title: searchResult.title,
-      content: searchResult.text,
-      isPublic: false,
-    });
+    this.basicRestService
+      .get('document/' + searchResult.documentId)
+      .subscribe((message) => {
+        const document = JSON.parse(JSON.stringify(message));
+        this.database.initContentChange.next({
+          id: searchResult.documentId,
+          title: document.title,
+          content: document.content,
+          isPublic: document.isPublic,
+        });
+        this.titleService.setTitle(document.title);
+        this.llmDialogService.closeDialog();
+      });
   }
 
   resizeTextarea(event: any) {
@@ -184,11 +194,6 @@ export class LlmDialogComponent implements OnDestroy, OnInit {
   onKeydown(event: any) {
     if (event.code === 'Enter' && !event.shiftKey) {
       event.preventDefault();
-      // if (this.activeTab === 'tab1') {
-      //   this.sendChatMessage();
-      // } else {
-      //   this.sendSearchMessage();
-      // }
     }
   }
 }
