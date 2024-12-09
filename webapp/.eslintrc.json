@@ -1,29 +1,21 @@
 {
   "root": true,
-  "extends": [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended"
-  ],
+  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "project": [
-      "./tsconfig.json"
-    ]
+    "project": ["./tsconfig.json"]
   },
-  "plugins": [
-    "@typescript-eslint"
-  ],
+  "plugins": ["@typescript-eslint"],
   "rules": {
     "@typescript-eslint/strict-boolean-expressions": [
-      2,
+      1,
       {
-        "allowString": false,
-        "allowNumber": false
+        "allowString": true,
+        "allowNumber": true
       }
-    ]
+    ],
+    "@typescript-eslint/no-explicit-any": 0,
+    "no-console": 1
   },
-  "ignorePatterns": [
-    "src/**/*.test.ts",
-    "src/frontend/generated/*"
-  ]
+  "ignorePatterns": ["src/**/*.test.ts", "src/frontend/generated/*"]
 }

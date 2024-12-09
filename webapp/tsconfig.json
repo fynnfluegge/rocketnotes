@@ -1,6 +1,7 @@
 /* To learn more about this file see: https://angular.io/config/tsconfig. */
 {
   "compileOnSave": false,
+  "strictNullChecks": true,
   "ts-node": {
     // these options are overrides used only by ts-node
     // same as the --compilerOptions flag and the TS_NODE_COMPILER_OPTIONS environment variable
@@ -19,9 +20,6 @@
     "importHelpers": true,
     "target": "es2022",
     "module": "es2022",
-    "lib": [
-      "es2022",
-      "dom"
-    ]
+    "lib": ["es2022", "dom"]
   }
 }

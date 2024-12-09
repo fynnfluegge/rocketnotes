@@ -64,6 +64,13 @@
         </label>
       </div>
       <button
+        (click)="vimConfig()"
+        style="padding: 8px; margin-top: 4px; border-radius: 4px"
+        class="btn-primary"
+      >
+        Vim Config Token <i class="fas fa-copy"></i>
+      </button>
+      <button
         (click)="onLogout()"
         style="padding: 8px; margin-top: 4px; border-radius: 4px"
         class="btn-primary"

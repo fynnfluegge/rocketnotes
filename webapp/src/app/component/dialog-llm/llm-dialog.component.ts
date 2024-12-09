@@ -148,7 +148,7 @@ export class LlmDialogComponent implements OnDestroy, OnInit {
 
   openTab(evt: any, tabId: string) {
     this.activeTab = tabId;
-    var i: number, tabcontent: any, tablinks: any;
+    let i: number, tabcontent: any, tablinks: any;
     tabcontent = document.getElementsByClassName('tabcontent');
     for (i = 0; i < tabcontent.length; i++) {
       tabcontent[i].style.display = 'none';

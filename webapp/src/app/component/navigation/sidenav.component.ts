@@ -19,6 +19,7 @@ import { Auth } from 'aws-amplify';
 import { environment } from 'src/environments/environment';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
+import { Clipboard } from '@angular/cdk/clipboard';
 import { HostListener } from '@angular/core';
 import { LlmDialogService } from 'src/app/service/llm-dialog.service';
 import { ConfigDialogService } from 'src/app/service/config-dialog-service';
@@ -567,6 +568,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
     private router: Router,
     private llmDialogService: LlmDialogService,
     private configDialogService: ConfigDialogService,
+    private clipboard: Clipboard,
   ) {
     this.treeFlattener = new MatTreeFlattener(
       this.transformer,
@@ -1398,5 +1400,18 @@ export class SidenavComponent implements OnInit, AfterViewInit {
   openZettelkasten() {
     this.showZettelkasten = true;
     this.router.navigate(['/notebox']);
+  }
+
+  vimConfig() {
+    const jsonObject = {
+      apiUrl: environment.apiUrl,
+      region: environment.awsRegion,
+      domain: environment.domainName,
+      clientId: environment.cognitoAppClientId,
+    };
+    const jsonString = JSON.stringify(jsonObject);
+    const base64String = btoa(jsonString);
+
+    this.clipboard.copy(base64String);
   }
 }
