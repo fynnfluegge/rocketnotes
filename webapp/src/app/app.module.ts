@@ -23,6 +23,7 @@ import { LlmDialogComponent } from './component/dialog-llm/llm-dialog.component'
 import { ConfigDialogComponent } from './component/dialog-config/config-dialog.component';
 import { ZettelkastenComponent } from './component/zettelkasten/zettelkasten.component';
 import { AudioRecordingService } from './service/audio-recording.service';
+import { DocumentTree } from './service/document-tree-service';
 
 @NgModule({
   declarations: [
@@ -53,6 +54,7 @@ import { AudioRecordingService } from './service/audio-recording.service';
     AuthGuard,
     BasicRestService,
     AudioRecordingService,
+    DocumentTree,
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
   ],
   bootstrap: [AppComponent],

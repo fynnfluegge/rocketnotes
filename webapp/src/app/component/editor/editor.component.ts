@@ -1,19 +1,17 @@
 import { Component, Input, VERSION } from '@angular/core';
 import { Auth } from 'aws-amplify';
 import { BasicRestService } from 'src/app/service/basic-rest.service';
+import { ConfigDialogService } from 'src/app/service/config-dialog-service';
+import { DocumentTree } from 'src/app/service/document-tree-service';
 import { ActivatedRoute } from '@angular/router';
-import { DocumentTree } from '../navigation/sidenav.component';
 import { Title } from '@angular/platform-browser';
 import { environment } from 'src/environments/environment';
 import { Location } from '@angular/common';
 import { HostListener } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-
-import OpenAI from 'openai';
-
-import '../../../assets/prism-custom.js';
-import { ConfigDialogService } from 'src/app/service/config-dialog-service';
 import { lastValueFrom, retry } from 'rxjs';
+import OpenAI from 'openai';
+import '../../../assets/prism-custom.js';
 
 @Component({
   selector: 'app-editor',

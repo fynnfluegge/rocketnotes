@@ -8,7 +8,9 @@ interface RecordedAudioOutput {
   title: string;
 }
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class AudioRecordingService {
   private stream: MediaStream;
   private recorder: {

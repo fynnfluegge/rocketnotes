@@ -8,8 +8,8 @@ import {
 import { Subscription } from 'rxjs';
 import { LlmDialogService } from 'src/app/service/llm-dialog.service';
 import { BasicRestService } from 'src/app/service/basic-rest.service';
-import { DocumentTree } from '../navigation/sidenav.component';
 import { Title } from '@angular/platform-browser';
+import { DocumentTree } from 'src/app/service/document-tree-service';
 
 type ChatMessage = {
   text: string;
