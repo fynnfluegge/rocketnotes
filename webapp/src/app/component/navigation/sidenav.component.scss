@@ -18,6 +18,15 @@ button {
   width: 24px;
 }
 
+.nav-item-button {
+  font-size: 20px;
+  color: lightgray;
+  background-color: transparent;
+  width: 16px;
+  padding-left: 0;
+  margin-left: 4px;
+}
+
 .mat-tree-node {
   height: 32px;
   border-bottom: 1px solid grey;
