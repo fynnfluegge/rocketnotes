@@ -5,11 +5,6 @@ import {
   ViewChild,
   ElementRef,
 } from '@angular/core';
-import { FlatTreeControl } from '@angular/cdk/tree';
-import {
-  MatTreeFlatDataSource,
-  MatTreeFlattener,
-} from '@angular/material/tree';
 import { of as ofObservable, Observable } from 'rxjs';
 import { BasicRestService } from 'src/app/service/basic-rest.service';
 import { Auth } from 'aws-amplify';
@@ -56,27 +51,6 @@ export class SidenavComponent implements OnInit, AfterViewInit {
 
   @ViewChild('searchInput') searchInput: ElementRef;
 
-  /** Map from flat node to nested node. This helps us finding the nested node to be modified */
-  flatNodeMap: Map<DocumentFlatNode, DocumentNode> = new Map<
-    DocumentFlatNode,
-    DocumentNode
-  >();
-
-  /** Map from nested node to flattened node. This helps us to keep the same object for selection */
-  nestedNodeMap: Map<DocumentNode, DocumentFlatNode> = new Map<
-    DocumentNode,
-    DocumentFlatNode
-  >();
-
-  /** A selected parent node to be inserted */
-  selectedParent: DocumentFlatNode | null = null;
-
-  treeControl: FlatTreeControl<DocumentFlatNode>;
-
-  treeFlattener: MatTreeFlattener<DocumentNode, DocumentFlatNode>;
-
-  dataSource: MatTreeFlatDataSource<DocumentNode, DocumentFlatNode>;
-
   constructor(
     private documentTree: DocumentTree,
     private basicRestService: BasicRestService,
@@ -85,32 +59,6 @@ export class SidenavComponent implements OnInit, AfterViewInit {
     private configDialogService: ConfigDialogService,
     private clipboard: Clipboard,
   ) {
-    this.treeFlattener = new MatTreeFlattener(
-      this.transformer,
-      this.getLevel,
-      this.isExpandable,
-      this.getChildren,
-    );
-    this.treeControl = new FlatTreeControl<DocumentFlatNode>(
-      this.getLevel,
-      this.isExpandable,
-    );
-    this.dataSource = new MatTreeFlatDataSource(
-      this.treeControl,
-      this.treeFlattener,
-    );
-
-    documentTree.dataChange.subscribe((data) => {
-      this.dataSource.data = data;
-
-      this.treeControl.collapse(
-        this.nestedNodeMap.get(this.documentTree.rootNode),
-      );
-      this.treeControl.expand(
-        this.nestedNodeMap.get(this.documentTree.rootNode),
-      );
-    });
-
     this.getScreenSize();
     this.setOperatingSystem();
 
@@ -198,18 +146,6 @@ export class SidenavComponent implements OnInit, AfterViewInit {
       );
   }
 
-  getLevel = (node: DocumentFlatNode) => {
-    return node.level;
-  };
-
-  isExpandable = (node: DocumentFlatNode) => {
-    return node.expandable;
-  };
-
-  getChildren = (node: DocumentNode): Observable<DocumentNode[]> => {
-    return ofObservable(node.children);
-  };
-
   isRoot = (_: number, _nodeData: DocumentFlatNode) => {
     return _nodeData.id === ROOT_ID;
   };
@@ -232,27 +168,6 @@ export class SidenavComponent implements OnInit, AfterViewInit {
 
   hasNoContent = (_: number, _nodeData: DocumentFlatNode) => {
     return _nodeData.name === '';
-  };
-
-  /**
-   * Transformer to convert nested node to flat node. Record the nodes in maps for later use.
-   */
-  transformer = (node: DocumentNode, level: number) => {
-    const flatNode =
-      this.nestedNodeMap.has(node) &&
-      this.nestedNodeMap.get(node)!.name === node.name
-        ? this.nestedNodeMap.get(node)!
-        : new DocumentFlatNode();
-    flatNode.name = node.name;
-    flatNode.id = node.id;
-    flatNode.parent = node.parent;
-    flatNode.level = level;
-    flatNode.deleted = node.deleted;
-    flatNode.pinned = node.pinned;
-    flatNode.expandable = !!node.children;
-    this.flatNodeMap.set(flatNode, node);
-    this.nestedNodeMap.set(node, flatNode);
-    return flatNode;
   };
 
   openItem(el: HTMLElement, id: string) {

@@ -2,7 +2,12 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Auth } from 'aws-amplify';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, of as ofObservable } from 'rxjs';
+import { FlatTreeControl } from '@angular/cdk/tree';
+import {
+  MatTreeFlatDataSource,
+  MatTreeFlattener,
+} from '@angular/material/tree';
 import { environment } from 'src/environments/environment';
 import * as uuid from 'uuid';
 import { BasicRestService } from './basic-rest.service';
@@ -55,6 +60,27 @@ export class DocumentTree {
 
   initContentChange: Subject<any> = new Subject<any>();
 
+  /** Map from flat node to nested node. This helps us finding the nested node to be modified */
+  flatNodeMap: Map<DocumentFlatNode, DocumentNode> = new Map<
+    DocumentFlatNode,
+    DocumentNode
+  >();
+
+  /** Map from nested node to flattened node. This helps us to keep the same object for selection */
+  nestedNodeMap: Map<DocumentNode, DocumentFlatNode> = new Map<
+    DocumentNode,
+    DocumentFlatNode
+  >();
+
+  /** A selected parent node to be inserted */
+  selectedParent: DocumentFlatNode | null = null;
+
+  treeControl: FlatTreeControl<DocumentFlatNode>;
+
+  treeFlattener: MatTreeFlattener<DocumentNode, DocumentFlatNode>;
+
+  dataSource: MatTreeFlatDataSource<DocumentNode, DocumentFlatNode>;
+
   get data(): DocumentNode[] {
     return this.dataChange.value;
   }
@@ -64,6 +90,31 @@ export class DocumentTree {
     private basicRestService: BasicRestService,
     private route: ActivatedRoute,
   ) {
+    this.treeFlattener = new MatTreeFlattener(
+      this.transformer,
+      this.getLevel,
+      this.isExpandable,
+      this.getChildren,
+    );
+    this.treeControl = new FlatTreeControl<DocumentFlatNode>(
+      this.getLevel,
+      this.isExpandable,
+    );
+    this.dataSource = new MatTreeFlatDataSource(
+      this.treeControl,
+      this.treeFlattener,
+    );
+
+    this.dataChange.subscribe((data) => {
+      this.dataSource.data = data;
+
+      this.treeControl.collapse(
+        this.nestedNodeMap.get(this.documentTree.rootNode),
+      );
+      this.treeControl.expand(
+        this.nestedNodeMap.get(this.documentTree.rootNode),
+      );
+    });
     this.initialize();
   }
 
@@ -497,4 +548,48 @@ export class DocumentTree {
       })
       .subscribe();
   }
+
+  refreshTree() {
+    if (this.treeControl.isExpanded(this.nestedNodeMap.get(this.rootNode))) {
+      this.treeControl.collapse(this.nestedNodeMap.get(this.rootNode));
+      this.treeControl.expand(this.nestedNodeMap.get(this.rootNode));
+    }
+    if (this.treeControl.isExpanded(this.nestedNodeMap.get(this.pinnedNode))) {
+      this.treeControl.collapse(this.nestedNodeMap.get(this.pinnedNode));
+      this.treeControl.expand(this.nestedNodeMap.get(this.pinnedNode));
+    }
+  }
+
+  /**
+   * Transformer to convert nested node to flat node. Record the nodes in maps for later use.
+   */
+  transformer = (node: DocumentNode, level: number) => {
+    const flatNode =
+      this.nestedNodeMap.has(node) &&
+      this.nestedNodeMap.get(node)!.name === node.name
+        ? this.nestedNodeMap.get(node)!
+        : new DocumentFlatNode();
+    flatNode.name = node.name;
+    flatNode.id = node.id;
+    flatNode.parent = node.parent;
+    flatNode.level = level;
+    flatNode.deleted = node.deleted;
+    flatNode.pinned = node.pinned;
+    flatNode.expandable = !!node.children;
+    this.flatNodeMap.set(flatNode, node);
+    this.nestedNodeMap.set(node, flatNode);
+    return flatNode;
+  };
+
+  getLevel = (node: DocumentFlatNode) => {
+    return node.level;
+  };
+
+  isExpandable = (node: DocumentFlatNode) => {
+    return node.expandable;
+  };
+
+  getChildren = (node: DocumentNode): Observable<DocumentNode[]> => {
+    return ofObservable(node.children);
+  };
 }
