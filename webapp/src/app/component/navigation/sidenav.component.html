@@ -295,11 +295,14 @@
             style="width: 140px; height: 24px; font-size: 14px; padding: 4px"
           />
         </mat-form-field>
-        <button mat-icon-button (click)="saveItem(node, itemValue.value, true)">
-          <mat-icon>save</mat-icon>
+        <button
+          class="nav-item-button"
+          (click)="saveItem(node, itemValue.value, true)"
+        >
+          <i class="fas fa-save"></i>
         </button>
-        <button mat-icon-button (click)="deleteEmptyItem(node)">
-          <mat-icon>delete</mat-icon>
+        <button class="nav-item-button" (click)="deleteEmptyItem(node)">
+          <i class="fa fa-times-circle"></i>
         </button>
       </mat-tree-node>
 
@@ -321,13 +324,16 @@
           />
         </mat-form-field>
         <button
-          mat-icon-button
+          class="nav-item-button"
           (click)="saveItem(node, itemValue.value, false)"
         >
-          <mat-icon>save</mat-icon>
+          <i class="fas fa-save"></i>
         </button>
-        <button mat-icon-button (click)="cancelEditItem(node, itemValue.value)">
-          <mat-icon>cancel</mat-icon>
+        <button
+          class="nav-item-button"
+          (click)="cancelEditItem(node, itemValue.value)"
+        >
+          <i class="fa fa-times-circle"></i>
         </button>
       </mat-tree-node>
 
