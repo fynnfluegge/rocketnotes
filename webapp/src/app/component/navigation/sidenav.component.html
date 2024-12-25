@@ -127,8 +127,8 @@
   </button>
   <div [ngClass]="{ hide: !showSidebar }">
     <mat-tree
-      [dataSource]="dataSource"
-      [treeControl]="treeControl"
+      [dataSource]="documentTree.dataSource"
+      [treeControl]="documentTree.treeControl"
       cdkDropList
       (cdkDropListDropped)="drop($event)"
       style="margin-left: 4px"
@@ -146,7 +146,11 @@
           class="icon-button-chevron"
         >
           <mat-icon>
-            {{ treeControl.isExpanded(node) ? "expand_more" : "chevron_right" }}
+            {{
+              documentTree.treeControl.isExpanded(node)
+                ? "expand_more"
+                : "chevron_right"
+            }}
           </mat-icon>
         </button>
         Pinned
@@ -165,7 +169,11 @@
           class="icon-button-chevron"
         >
           <mat-icon>
-            {{ treeControl.isExpanded(node) ? "expand_more" : "chevron_right" }}
+            {{
+              documentTree.treeControl.isExpanded(node)
+                ? "expand_more"
+                : "chevron_right"
+            }}
           </mat-icon>
         </button>
         <span>Documents</span>
@@ -184,7 +192,11 @@
           class="icon-button-chevron"
         >
           <mat-icon>
-            {{ treeControl.isExpanded(node) ? "expand_more" : "chevron_right" }}
+            {{
+              documentTree.treeControl.isExpanded(node)
+                ? "expand_more"
+                : "chevron_right"
+            }}
           </mat-icon>
         </button>
         Trash
@@ -352,7 +364,11 @@
       >
         <button mat-icon-button matTreeNodeToggle class="icon-button-chevron">
           <mat-icon>
-            {{ treeControl.isExpanded(node) ? "expand_more" : "chevron_right" }}
+            {{
+              documentTree.treeControl.isExpanded(node)
+                ? "expand_more"
+                : "chevron_right"
+            }}
           </mat-icon>
         </button>
         <span style="overflow: hidden; text-overflow: ellipsis">{{
