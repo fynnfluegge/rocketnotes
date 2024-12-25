@@ -5,7 +5,6 @@ import {
   ViewChild,
   ElementRef,
 } from '@angular/core';
-import { of as ofObservable, Observable } from 'rxjs';
 import { BasicRestService } from 'src/app/service/basic-rest.service';
 import { Auth } from 'aws-amplify';
 import { environment } from 'src/environments/environment';
@@ -285,89 +284,11 @@ export class SidenavComponent implements OnInit, AfterViewInit {
   }
 
   restoreItem(node: DocumentFlatNode) {
-    const nodeToRestore = this.flatNodeMap.get(node);
-    const parentToRemoveId = `${nodeToRestore.parent}`;
-
-    if (node.parent === ROOT_ID) {
-      this.documentTree.restoreItem(nodeToRestore, node.parent);
-    } else {
-      let parentToInsert: DocumentNode = this.documentTree.rootNodeMap.get(
-        node.parent,
-      );
-      if (parentToInsert.deleted) {
-        parentToInsert = this.getNearestParentThatIsNotDeleted(nodeToRestore);
-        if (parentToInsert) nodeToRestore.parent = parentToInsert.id;
-        else nodeToRestore.parent = ROOT_ID;
-      }
-      this.documentTree.restoreItem(
-        nodeToRestore,
-        parentToInsert.id,
-        parentToInsert.id === parentToRemoveId ? null : parentToRemoveId,
-      );
-    }
-
-    this.refreshTree();
-
-    this.treeControl.collapse(
-      this.nestedNodeMap.get(this.documentTree.trashNode),
-    );
-    this.treeControl.expand(
-      this.nestedNodeMap.get(this.documentTree.trashNode),
-    );
+    this.documentTree.restoreItem(node);
   }
 
   pinItem(node: DocumentFlatNode) {
-    const nestedNode = this.flatNodeMap.get(node);
-    this.documentTree.pinItem(nestedNode);
-    this.treeControl.collapse(
-      this.nestedNodeMap.get(this.documentTree.pinnedNode),
-    );
-    this.treeControl.expand(
-      this.nestedNodeMap.get(this.documentTree.pinnedNode),
-    );
-  }
-
-  getNearestParentThatIsNotDeleted(node: DocumentNode): DocumentNode {
-    let parentNode;
-    for (const element of this.flatNodeMap.values()) {
-      if (element.id === node.parent) {
-        if (element.deleted) {
-          parentNode = this.getNearestParentThatIsNotDeleted(element);
-          break;
-        } else {
-          parentNode = element;
-          break;
-        }
-      }
-    }
-    return parentNode;
-  }
-
-  refreshTree() {
-    if (
-      this.treeControl.isExpanded(
-        this.nestedNodeMap.get(this.documentTree.rootNode),
-      )
-    ) {
-      this.treeControl.collapse(
-        this.nestedNodeMap.get(this.documentTree.rootNode),
-      );
-      this.treeControl.expand(
-        this.nestedNodeMap.get(this.documentTree.rootNode),
-      );
-    }
-    if (
-      this.treeControl.isExpanded(
-        this.nestedNodeMap.get(this.documentTree.pinnedNode),
-      )
-    ) {
-      this.treeControl.collapse(
-        this.nestedNodeMap.get(this.documentTree.pinnedNode),
-      );
-      this.treeControl.expand(
-        this.nestedNodeMap.get(this.documentTree.pinnedNode),
-      );
-    }
+    this.documentTree.pinItem(node);
   }
 
   onMenuToggle(): void {

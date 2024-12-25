@@ -108,12 +108,8 @@ export class DocumentTree {
     this.dataChange.subscribe((data) => {
       this.dataSource.data = data;
 
-      this.treeControl.collapse(
-        this.nestedNodeMap.get(this.documentTree.rootNode),
-      );
-      this.treeControl.expand(
-        this.nestedNodeMap.get(this.documentTree.rootNode),
-      );
+      this.treeControl.collapse(this.nestedNodeMap.get(this.rootNode));
+      this.treeControl.expand(this.nestedNodeMap.get(this.rootNode));
     });
     this.initialize();
   }
@@ -466,7 +462,48 @@ export class DocumentTree {
       });
   }
 
-  restoreItem(
+  restoreItem(node: DocumentFlatNode) {
+    const nodeToRestore = this.flatNodeMap.get(node);
+    const parentToRemoveId = `${nodeToRestore.parent}`;
+
+    if (node.parent === ROOT_ID) {
+      this.restoreNode(nodeToRestore, node.parent);
+    } else {
+      let parentToInsert: DocumentNode = this.rootNodeMap.get(node.parent);
+      if (parentToInsert.deleted) {
+        parentToInsert = this.getNearestParentThatIsNotDeleted(nodeToRestore);
+        if (parentToInsert) nodeToRestore.parent = parentToInsert.id;
+        else nodeToRestore.parent = ROOT_ID;
+      }
+      this.restoreNode(
+        nodeToRestore,
+        parentToInsert.id,
+        parentToInsert.id === parentToRemoveId ? null : parentToRemoveId,
+      );
+    }
+
+    this.refreshTree();
+    this.treeControl.collapse(this.nestedNodeMap.get(this.trashNode));
+    this.treeControl.expand(this.nestedNodeMap.get(this.trashNode));
+  }
+
+  getNearestParentThatIsNotDeleted(node: DocumentNode): DocumentNode {
+    let parentNode;
+    for (const element of this.flatNodeMap.values()) {
+      if (element.id === node.parent) {
+        if (element.deleted) {
+          parentNode = this.getNearestParentThatIsNotDeleted(element);
+          break;
+        } else {
+          parentNode = element;
+          break;
+        }
+      }
+    }
+    return parentNode;
+  }
+
+  restoreNode(
     node: DocumentNode,
     parentToInsertId: string,
     parentToRemoveId: string = null,
@@ -503,7 +540,14 @@ export class DocumentTree {
       .subscribe();
   }
 
-  pinItem(node: DocumentNode) {
+  pinItem(node: DocumentFlatNode) {
+    const nestedNode = this.flatNodeMap.get(node);
+    this.pinNode(nestedNode);
+    this.treeControl.collapse(this.nestedNodeMap.get(this.pinnedNode));
+    this.treeControl.expand(this.nestedNodeMap.get(this.pinnedNode));
+  }
+
+  pinNode(node: DocumentNode) {
     node.pinned = !node.pinned;
     // pin node
     if (node.pinned) {
