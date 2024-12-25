@@ -339,34 +339,36 @@ export class SidenavComponent implements OnInit, AfterViewInit {
     /*execute a function presses a key on the keyboard:*/
     input.addEventListener('keydown', function (e) {
       const x = document.getElementById(this.id + 'autocomplete-list');
-      if (x) const suggestionList = x.getElementsByTagName('div');
-      if (e.keyCode == 40) {
-        /*If the arrow DOWN key is pressed,
+      if (x) {
+        const suggestionList = x.getElementsByTagName('div');
+        if (e.keyCode == 40) {
+          /*If the arrow DOWN key is pressed,
         increase the currentFocus variable:*/
-        if (currentFocus == suggestionList.length - 1) return;
-        currentFocus++;
-        /*and and make the current item more visible:*/
-        addActive(suggestionList);
-        if (!isElementVisible(x, suggestionList[currentFocus])) {
-          x.scrollTop += suggestionList[currentFocus].offsetHeight;
-        }
-      } else if (e.keyCode == 38) {
-        //up
-        /*If the arrow UP key is pressed,
+          if (currentFocus == suggestionList.length - 1) return;
+          currentFocus++;
+          /*and and make the current item more visible:*/
+          addActive(suggestionList);
+          if (!isElementVisible(x, suggestionList[currentFocus])) {
+            x.scrollTop += suggestionList[currentFocus].offsetHeight;
+          }
+        } else if (e.keyCode == 38) {
+          //up
+          /*If the arrow UP key is pressed,
         decrease the currentFocus variable:*/
-        if (currentFocus == 0) return;
-        currentFocus--;
-        /*and and make the current item more visible:*/
-        addActive(suggestionList);
-        if (!isElementVisible(x, suggestionList[currentFocus])) {
-          x.scrollTop -= suggestionList[currentFocus].offsetHeight;
-        }
-      } else if (e.keyCode == 13) {
-        /*If the ENTER key is pressed, prevent the form from being submitted,*/
-        e.preventDefault();
-        if (currentFocus > -1) {
-          /*and simulate a click on the "active" item:*/
-          if (suggestionList) suggestionList[currentFocus].click();
+          if (currentFocus == 0) return;
+          currentFocus--;
+          /*and and make the current item more visible:*/
+          addActive(suggestionList);
+          if (!isElementVisible(x, suggestionList[currentFocus])) {
+            x.scrollTop -= suggestionList[currentFocus].offsetHeight;
+          }
+        } else if (e.keyCode == 13) {
+          /*If the ENTER key is pressed, prevent the form from being submitted,*/
+          e.preventDefault();
+          if (currentFocus > -1) {
+            /*and simulate a click on the "active" item:*/
+            if (suggestionList) suggestionList[currentFocus].click();
+          }
         }
       }
     });
