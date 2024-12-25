@@ -335,6 +335,15 @@ export class DocumentTree {
     }
   }
 
+  addNewItem(node: DocumentFlatNode) {
+    if (!node) {
+      node = this.nestedNodeMap.get(this.rootNode);
+    }
+    const parentInRoot = this.insertItem(node, '');
+    this.treeControl.expand(this.nestedNodeMap.get(parentInRoot));
+    this.refreshTree();
+  }
+
   insertItem(parent: DocumentFlatNode, vName: string): DocumentNode {
     const child = <DocumentNode>{
       id: uuid.v4(),
@@ -370,6 +379,9 @@ export class DocumentTree {
         pinned: JSON.parse(JSON.stringify(this.pinnedNode.children)),
       })
       .subscribe();
+
+    this.treeControl.collapse(this.nestedNodeMap.get(this.rootNode));
+    this.treeControl.expand(this.nestedNodeMap.get(this.rootNode));
   }
 
   removeFromDocuments(node: DocumentNode) {
@@ -382,9 +394,19 @@ export class DocumentTree {
     this.dataChange.next(this.data);
   }
 
-  moveToTrash(node: DocumentNode) {
+  moveToTrash(node: DocumentFlatNode) {
+    const nestedNode = this.flatNodeMap.get(node);
     if (!this.trashNode.children) this.trashNode.children = [];
-    this.trashNode.children.push(node);
+
+    // remove from parent in documents
+    this.removeFromDocuments(nestedNode);
+
+    // set node and children as deleted
+    // unpin node and children
+    this.setDeletedandUnpin(nestedNode);
+
+    // move node to trash
+    this.trashNode.children.push(nestedNode);
 
     this.dataChange.next(this.data);
     this.basicRestService
@@ -395,9 +417,14 @@ export class DocumentTree {
         pinned: JSON.parse(JSON.stringify(this.pinnedNode.children)),
       })
       .subscribe();
+
+    this.refreshTree();
+
+    this.treeControl.collapse(this.nestedNodeMap.get(this.trashNode));
+    this.treeControl.expand(this.nestedNodeMap.get(this.trashNode));
   }
 
-  removeFromTrash(node: DocumentNode) {
+  removeFromTrash(node: DocumentFlatNode) {
     this.removeFromParent(this.trashNode, node.id);
 
     this.dataChange.next(this.data);
@@ -411,9 +438,30 @@ export class DocumentTree {
       .subscribe(() => {
         // TODO here delete post
       });
+    this.treeControl.collapse(this.nestedNodeMap.get(this.trashNode));
+    this.treeControl.expand(this.nestedNodeMap.get(this.trashNode));
+
+    this.basicRestService
+      .get('document/' + this.rootNode.children[0].id)
+      .subscribe((result) => {
+        const document = JSON.parse(JSON.stringify(result));
+        this.initContentChange.next({
+          id: document.id,
+          title: document.title,
+          content: document.content,
+          isPublic: document.isPublic,
+        });
+      });
   }
 
-  saveItem(node: DocumentNode, newName: string, newItem: boolean) {
+  saveItem(node: DocumentFlatNode, itemValue: string, newItem: boolean) {
+    const nestedNode = this.flatNodeMap.get(node);
+    this.saveNode(nestedNode!, itemValue, newItem);
+    this.treeControl.collapse(this.nestedNodeMap.get(this.rootNode));
+    this.treeControl.expand(this.nestedNodeMap.get(this.rootNode));
+  }
+
+  saveNode(node: DocumentNode, newName: string, newItem: boolean) {
     const node_ = this.rootNodeMap.get(node.id);
     node_.name = newName;
 

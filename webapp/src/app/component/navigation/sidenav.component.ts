@@ -193,94 +193,39 @@ export class SidenavComponent implements OnInit, AfterViewInit {
 
   addNewItem(node: DocumentFlatNode) {
     this.showSidebar = true;
-    if (!node) {
-      node = this.nestedNodeMap.get(this.documentTree.rootNode);
-    }
-    const parentInRoot = this.documentTree.insertItem(node, '');
-    this.treeControl.expand(this.nestedNodeMap.get(parentInRoot));
-    this.refreshTree();
+    this.documentTree.addNewItem(node);
     document.getElementById('new_document').focus();
   }
 
   editItem(node: DocumentFlatNode) {
     node.editNode = true;
-    this.refreshTree();
+    this.documentTree.refreshTree();
     document.getElementById('edit_document_title').focus();
   }
 
   cancelEditItem(node: DocumentFlatNode) {
     node.editNode = false;
-    this.refreshTree();
+    this.documentTree.refreshTree();
   }
 
   deleteEmptyItem(node: DocumentFlatNode) {
     this.documentTree.deleteEmptyItem(node);
-
-    this.treeControl.collapse(
-      this.nestedNodeMap.get(this.documentTree.rootNode),
-    );
-    this.treeControl.expand(this.nestedNodeMap.get(this.documentTree.rootNode));
   }
 
   moveToTrash(node: DocumentFlatNode) {
-    const nestedNode = this.flatNodeMap.get(node);
-
-    // remove from parent in documents
-    this.documentTree.removeFromDocuments(nestedNode);
-
-    // set node and children as deleted
-    // unpin node and children
-    this.documentTree.setDeletedandUnpin(nestedNode);
-
-    // move node to trash
-    this.documentTree.moveToTrash(nestedNode);
-
-    this.refreshTree();
-
-    this.treeControl.collapse(
-      this.nestedNodeMap.get(this.documentTree.trashNode),
-    );
-    this.treeControl.expand(
-      this.nestedNodeMap.get(this.documentTree.trashNode),
-    );
+    this.documentTree.moveToTrash(node);
   }
 
   removeFromTrash(node: DocumentFlatNode) {
     if (
       confirm('Are you sure you want to permanently delete ' + node.name + '?')
     ) {
-      const nestedNode = this.flatNodeMap.get(node);
-
-      this.documentTree.removeFromTrash(nestedNode);
-
-      this.treeControl.collapse(
-        this.nestedNodeMap.get(this.documentTree.trashNode),
-      );
-      this.treeControl.expand(
-        this.nestedNodeMap.get(this.documentTree.trashNode),
-      );
-
-      this.basicRestService
-        .get('document/' + this.documentTree.rootNode.children[0].id)
-        .subscribe((result) => {
-          const document = JSON.parse(JSON.stringify(result));
-          this.documentTree.initContentChange.next({
-            id: document.id,
-            title: document.title,
-            content: document.content,
-            isPublic: document.isPublic,
-          });
-        });
+      this.documentTree.removeFromTrash(node);
     }
   }
 
-  saveNode(node: DocumentFlatNode, itemValue: string, newItem: boolean) {
-    const nestedNode = this.flatNodeMap.get(node);
-    this.documentTree.saveItem(nestedNode!, itemValue, newItem);
-    this.treeControl.collapse(
-      this.nestedNodeMap.get(this.documentTree.rootNode),
-    );
-    this.treeControl.expand(this.nestedNodeMap.get(this.documentTree.rootNode));
+  saveItem(node: DocumentFlatNode, itemValue: string, newItem: boolean) {
+    this.documentTree.saveItem(node!, itemValue, newItem);
   }
 
   restoreItem(node: DocumentFlatNode) {

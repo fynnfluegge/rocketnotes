@@ -288,14 +288,14 @@
             id="new_document"
             matInput
             #itemValue
-            (keyup.enter)="saveNode(node, itemValue.value, true)"
+            (keyup.enter)="saveItem(node, itemValue.value, true)"
             (keyup.escape)="cancelEditItem(node, itemValue.value)"
             placeholder="New document..."
             class="input-field"
             style="width: 140px; height: 24px; font-size: 14px; padding: 4px"
           />
         </mat-form-field>
-        <button mat-icon-button (click)="saveNode(node, itemValue.value, true)">
+        <button mat-icon-button (click)="saveItem(node, itemValue.value, true)">
           <mat-icon>save</mat-icon>
         </button>
         <button mat-icon-button (click)="deleteEmptyItem(node)">
@@ -313,7 +313,7 @@
             id="edit_document_title"
             matInput
             #itemValue
-            (keyup.enter)="saveNode(node, itemValue.value, false)"
+            (keyup.enter)="saveItem(node, itemValue.value, false)"
             (keyup.escape)="cancelEditItem(node, itemValue.value)"
             value="{{ node.name }}"
             class="input-field"
@@ -322,7 +322,7 @@
         </mat-form-field>
         <button
           mat-icon-button
-          (click)="saveNode(node, itemValue.value, false)"
+          (click)="saveItem(node, itemValue.value, false)"
         >
           <mat-icon>save</mat-icon>
         </button>
