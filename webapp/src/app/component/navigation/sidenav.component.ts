@@ -16,7 +16,6 @@ import { LlmDialogService } from 'src/app/service/llm-dialog.service';
 import { ConfigDialogService } from 'src/app/service/config-dialog-service';
 import {
   DocumentFlatNode,
-  DocumentNode,
   DocumentTree,
   PINNED_ID,
   ROOT_ID,
@@ -255,7 +254,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
     if (this.dragging) {
       clearTimeout(this.expandTimeout);
       this.expandTimeout = setTimeout(() => {
-        this.treeControl.expand(node);
+        this.documentTree.expandNode(node);
       }, this.expandDelay);
     }
   }
@@ -266,185 +265,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
   }
 
   drop(event: CdkDragDrop<string[]>) {
-    if (!event.isPointerOverContainer) return;
-
-    const draggedNode: DocumentFlatNode = event.item.data;
-
-    this.treeControl.collapse(draggedNode);
-
-    let visibleNodes = this.visibleNodes(
-      event.item.data.parent === PINNED_ID,
-      event.item.data.deleted,
-    );
-
-    const currentIndexOfDraggedNode = visibleNodes.findIndex(
-      (v) => v.id === draggedNode.id,
-    );
-
-    let dropIndex = event.currentIndex;
-
-    const pinnedNodes = this.documentTree.pinnedNode.children
-      ? this.documentTree.pinnedNode.children.length
-      : 0;
-    const pinnedExpanded = this.treeControl.isExpanded(
-      this.nestedNodeMap.get(this.documentTree.pinnedNode),
-    );
-
-    if (
-      !draggedNode.deleted &&
-      pinnedExpanded &&
-      event.item.data.parent !== PINNED_ID
-    ) {
-      dropIndex = dropIndex - pinnedNodes;
-    } else if (draggedNode.deleted) {
-      const visibleRootNodes = visibleNodes.filter((x) => !x.deleted).length;
-      visibleNodes = visibleNodes.filter((x) => x.deleted);
-      if (
-        this.treeControl.isExpanded(
-          this.nestedNodeMap.get(this.documentTree.pinnedNode),
-        )
-      ) {
-        dropIndex -= pinnedNodes;
-      }
-      if (
-        this.treeControl.isExpanded(
-          this.nestedNodeMap.get(this.documentTree.rootNode),
-        )
-      ) {
-        dropIndex -= visibleRootNodes;
-      }
-    }
-
-    if (currentIndexOfDraggedNode == dropIndex) return;
-
-    let dropIndexIncremented = false;
-
-    // drop node at lower position, special handling
-    if (currentIndexOfDraggedNode < dropIndex) {
-      const nodeAtDropIndex = visibleNodes[dropIndex];
-      if (!nodeAtDropIndex) return;
-      if (
-        nodeAtDropIndex.children &&
-        this.treeControl.isExpanded(this.nestedNodeMap.get(nodeAtDropIndex))
-      ) {
-        dropIndex++;
-        dropIndexIncremented = true;
-      }
-    }
-
-    function findNodeSiblings(arr: Array<any>, id: string): Array<any> {
-      let result, subResult;
-      arr.forEach((item, i) => {
-        if (item.id === id) {
-          result = arr;
-        } else if (item.children) {
-          subResult = findNodeSiblings(item.children, id);
-          if (subResult) result = subResult;
-        }
-      });
-      return result;
-    }
-
-    // determine where to insert the node
-    const nodeAtDest = visibleNodes[dropIndex];
-
-    if (nodeAtDest.id == draggedNode.id) return;
-
-    let searchTree;
-    const changedData = this.dataSource.data;
-    if (draggedNode.deleted) {
-      searchTree = changedData.find((n) => n.id === TRASH_ID);
-    } else if (event.item.data.parent === PINNED_ID) {
-      searchTree = changedData.find((n) => n.id === PINNED_ID);
-    } else {
-      searchTree = changedData.find((n) => n.id === ROOT_ID);
-    }
-
-    const newSiblings = findNodeSiblings(searchTree.children, nodeAtDest.id);
-
-    if (!newSiblings) return;
-    let insertIndex = newSiblings.findIndex((s) => s.id === nodeAtDest.id);
-
-    if (!dropIndexIncremented && currentIndexOfDraggedNode < dropIndex) {
-      if (this.nestedNodeMap.get(nodeAtDest).level != draggedNode.level) {
-        insertIndex++;
-      }
-    }
-
-    // remove the node from its old place
-    const oldSiblings = findNodeSiblings(searchTree.children, draggedNode.id);
-
-    const siblingIndex = oldSiblings.findIndex((n) => n.id === draggedNode.id);
-
-    const nodeToInsert: DocumentNode = oldSiblings.splice(siblingIndex, 1)[0];
-
-    nodeToInsert.parent = nodeAtDest.parent.slice();
-
-    // insert node
-    newSiblings.splice(insertIndex, 0, nodeToInsert);
-
-    this.rebuildTreeForData(changedData);
-  }
-
-  /*
-    find all visible nodes regardless of the level, except the dragged node, and return it as a flat list
-  */
-  visibleNodes(inPinned: boolean, deleted: boolean): DocumentNode[] {
-    const result = [];
-    this.dataSource.data.forEach((node) => {
-      this.addExpandedChildren(
-        node,
-        this.treeControl.isExpanded(this.nestedNodeMap.get(node)),
-        inPinned,
-        deleted,
-        result,
-      );
-    });
-    return result;
-  }
-
-  addExpandedChildren(
-    node: DocumentNode,
-    expanded: boolean,
-    inPinned: boolean,
-    deleted: boolean,
-    result: any,
-  ) {
-    if (node.id !== ROOT_ID && node.id !== PINNED_ID && node.id !== TRASH_ID) {
-      if (inPinned && node.parent === PINNED_ID) {
-        result.push(node);
-      } else if (!inPinned && node.parent !== PINNED_ID) {
-        result.push(node);
-      }
-    }
-    if (expanded && node.children) {
-      node.children.map((child) =>
-        this.addExpandedChildren(
-          child,
-          this.treeControl.isExpanded(this.nestedNodeMap.get(child)),
-          inPinned,
-          deleted,
-          result,
-        ),
-      );
-    }
-  }
-
-  rebuildTreeForData(data: any) {
-    this.dataSource.data = data;
-    this.refreshTree();
-    this.basicRestService
-      .post('saveDocumentTree', {
-        id: localStorage.getItem('currentUserId'),
-        documents: JSON.parse(
-          JSON.stringify(this.documentTree.rootNode.children),
-        ),
-        trash: JSON.parse(JSON.stringify(this.documentTree.trashNode.children)),
-        pinned: JSON.parse(
-          JSON.stringify(this.documentTree.pinnedNode.children),
-        ),
-      })
-      .subscribe();
+    this.documentTree.dropNode(event);
   }
 
   autocomplete(input: any, testService: BasicRestService, router: Router) {
@@ -453,10 +274,8 @@ export class SidenavComponent implements OnInit, AfterViewInit {
     let currentFocus;
     /*execute a function when someone writes in the text field:*/
     input.addEventListener('input', async function () {
-      let a,
-        b,
-        i,
-        val = this.value;
+      let a, b, i;
+      const val = this.value;
       /*close any already open lists of autocompleted values*/
       closeAllLists(null);
       if (!val) {
@@ -504,7 +323,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
           b.innerHTML +=
             "<input type='hidden' value='" + foundElements[i].id + "'>";
           /*execute a function when someone clicks on the item value (DIV element):*/
-          b.addEventListener('click', function (e) {
+          b.addEventListener('click', function () {
             router.navigate(
               ['/' + this.getElementsByTagName('input')[0].value],
               { relativeTo: this.route },
@@ -520,7 +339,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
     /*execute a function presses a key on the keyboard:*/
     input.addEventListener('keydown', function (e) {
       const x = document.getElementById(this.id + 'autocomplete-list');
-      if (x) var suggestionList = x.getElementsByTagName('div');
+      if (x) const suggestionList = x.getElementsByTagName('div');
       if (e.keyCode == 40) {
         /*If the arrow DOWN key is pressed,
         increase the currentFocus variable:*/
