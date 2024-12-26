@@ -39,7 +39,7 @@ jobs:
       - name: test webapp
         run: |
           cd webapp
-          npm test
+          npm test -- --watch=false --browsers=ChromeHeadless
 
       - name: build webapp
         run: |
