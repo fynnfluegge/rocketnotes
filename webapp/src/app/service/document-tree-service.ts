@@ -753,7 +753,7 @@ export class DocumentTree {
 
     function findNodeSiblings(arr: Array<any>, id: string): Array<any> {
       let result, subResult;
-      arr.forEach((item, i) => {
+      arr.forEach((item) => {
         if (item.id === id) {
           result = arr;
         } else if (item.children) {
