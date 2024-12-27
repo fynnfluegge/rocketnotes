@@ -127,8 +127,8 @@
   </button>
   <div [ngClass]="{ hide: !showSidebar }">
     <mat-tree
-      [dataSource]="dataSource"
-      [treeControl]="treeControl"
+      [dataSource]="documentTree.dataSource"
+      [treeControl]="documentTree.treeControl"
       cdkDropList
       (cdkDropListDropped)="drop($event)"
       style="margin-left: 4px"
@@ -146,7 +146,11 @@
           class="icon-button-chevron"
         >
           <mat-icon>
-            {{ treeControl.isExpanded(node) ? "expand_more" : "chevron_right" }}
+            {{
+              documentTree.treeControl.isExpanded(node)
+                ? "expand_more"
+                : "chevron_right"
+            }}
           </mat-icon>
         </button>
         Pinned
@@ -165,7 +169,11 @@
           class="icon-button-chevron"
         >
           <mat-icon>
-            {{ treeControl.isExpanded(node) ? "expand_more" : "chevron_right" }}
+            {{
+              documentTree.treeControl.isExpanded(node)
+                ? "expand_more"
+                : "chevron_right"
+            }}
           </mat-icon>
         </button>
         <span>Documents</span>
@@ -184,7 +192,11 @@
           class="icon-button-chevron"
         >
           <mat-icon>
-            {{ treeControl.isExpanded(node) ? "expand_more" : "chevron_right" }}
+            {{
+              documentTree.treeControl.isExpanded(node)
+                ? "expand_more"
+                : "chevron_right"
+            }}
           </mat-icon>
         </button>
         Trash
@@ -210,6 +222,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            cursor: pointer;
           "
           >{{ node.name }}</span
         >
@@ -288,7 +301,7 @@
             id="new_document"
             matInput
             #itemValue
-            (keyup.enter)="saveNode(node, itemValue.value, true)"
+            (keyup.enter)="saveItem(node, itemValue.value, true)"
             (keyup.escape)="cancelEditItem(node, itemValue.value)"
             placeholder="New document..."
             class="input-field"
@@ -297,7 +310,7 @@
         </mat-form-field>
         <button
           class="nav-item-button"
-          (click)="saveNode(node, itemValue.value, true)"
+          (click)="saveItem(node, itemValue.value, true)"
         >
           <i class="fas fa-save"></i>
         </button>
@@ -316,7 +329,7 @@
             id="edit_document_title"
             matInput
             #itemValue
-            (keyup.enter)="saveNode(node, itemValue.value, false)"
+            (keyup.enter)="saveItem(node, itemValue.value, false)"
             (keyup.escape)="cancelEditItem(node, itemValue.value)"
             value="{{ node.name }}"
             class="input-field"
@@ -325,7 +338,7 @@
         </mat-form-field>
         <button
           class="nav-item-button"
-          (click)="saveNode(node, itemValue.value, false)"
+          (click)="saveItem(node, itemValue.value, false)"
         >
           <i class="fas fa-save"></i>
         </button>
@@ -352,12 +365,17 @@
       >
         <button mat-icon-button matTreeNodeToggle class="icon-button-chevron">
           <mat-icon>
-            {{ treeControl.isExpanded(node) ? "expand_more" : "chevron_right" }}
+            {{
+              documentTree.treeControl.isExpanded(node)
+                ? "expand_more"
+                : "chevron_right"
+            }}
           </mat-icon>
         </button>
-        <span style="overflow: hidden; text-overflow: ellipsis">{{
-          node.name
-        }}</span>
+        <span
+          style="overflow: hidden; text-overflow: ellipsis; cursor: pointer"
+          >{{ node.name }}</span
+        >
         <div
           class="dropdown hide"
           style="margin-left: auto; position: relative; top: 3px"

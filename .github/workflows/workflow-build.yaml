@@ -31,10 +31,19 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Build webapp
+      - name: npm install webapp
         run: |
           cd webapp
           npm ci
+
+      - name: test webapp
+        run: |
+          cd webapp
+          npm test -- --watch=false --browsers=ChromeHeadless
+
+      - name: build webapp
+        run: |
+          cd webapp
           npm run build
         env:
           AWS_REGION: ${{ vars.AWS_REGION }}
@@ -51,7 +60,7 @@ jobs:
           name: webapp-build
           path: webapp/build
 
-      - name: Build landing-page
+      - name: build landing-page
         run: |
           cd landing-page
           npm ci
