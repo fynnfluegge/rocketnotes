@@ -55,7 +55,7 @@ export class EditorComponent {
   private timer: any;
 
   constructor(
-    private database: DocumentTree,
+    private documentTree: DocumentTree,
     private basicRestService: BasicRestService,
     private route: ActivatedRoute,
     private titleService: Title,
@@ -77,7 +77,7 @@ export class EditorComponent {
       localStorage.setItem('username', 'localuser@test.com');
     }
 
-    this.database.initContentChange.subscribe((value) => {
+    this.documentTree.initContentChange.subscribe((value) => {
       this.id = value.id;
       this.title = value.title;
       this.content = value.content;

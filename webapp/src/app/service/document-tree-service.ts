@@ -9,7 +9,7 @@ import {
   MatTreeFlattener,
 } from '@angular/material/tree';
 import { environment } from 'src/environments/environment';
-import * as uuid from 'uuid';
+import { v4 } from 'uuid';
 import { BasicRestService } from './basic-rest.service';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 
@@ -347,7 +347,7 @@ export class DocumentTree {
 
   insertItem(parent: DocumentFlatNode, vName: string): DocumentNode {
     const child = <DocumentNode>{
-      id: uuid.v4(),
+      id: v4(),
       name: vName,
       parent: parent.id,
       pinned: false,

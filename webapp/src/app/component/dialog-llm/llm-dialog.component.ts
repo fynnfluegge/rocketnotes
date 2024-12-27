@@ -42,8 +42,7 @@ export class LlmDialogComponent implements OnDestroy, OnInit {
 
   constructor(
     private llmDialogService: LlmDialogService,
-    private restService: BasicRestService,
-    private database: DocumentTree,
+    private documentTree: DocumentTree,
     private basicRestService: BasicRestService,
     private titleService: Title,
   ) {}
@@ -93,7 +92,7 @@ export class LlmDialogComponent implements OnDestroy, OnInit {
     const userMessage = this.chatInput.trim();
     this.chatInput = '';
 
-    this.restService
+    this.basicRestService
       .post('chat', {
         userId: localStorage.getItem('currentUserId'),
         prompt: userMessage,
@@ -121,7 +120,7 @@ export class LlmDialogComponent implements OnDestroy, OnInit {
     this.isLoading = true;
     this.searchInput = '';
 
-    this.restService
+    this.basicRestService
       .post('semanticSearch', {
         userId: localStorage.getItem('currentUserId'),
         searchString: searchInput,
@@ -175,7 +174,7 @@ export class LlmDialogComponent implements OnDestroy, OnInit {
       .get('document/' + searchResult.documentId)
       .subscribe((message) => {
         const document = JSON.parse(JSON.stringify(message));
-        this.database.initContentChange.next({
+        this.documentTree.initContentChange.next({
           id: searchResult.documentId,
           title: document.title,
           content: document.content,

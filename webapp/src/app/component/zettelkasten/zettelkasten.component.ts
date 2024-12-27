@@ -34,10 +34,14 @@ export class ZettelkastenComponent implements OnInit {
   ) {
     this.llmEnabled = localStorage.getItem('config') !== null;
     const config = JSON.parse(localStorage.getItem('config'));
-    if (config.openAiApiKey && config.speechToTextModel === 'Whisper') {
+    if (
+      config &&
+      config.openAiApiKey &&
+      config.speechToTextModel === 'Whisper'
+    ) {
       this.speechToTextEnabled = true;
       this.openai = new OpenAI({
-        apiKey: config['openAiApiKey'],
+        apiKey: config.openAiApiKey,
         dangerouslyAllowBrowser: true,
       });
     }

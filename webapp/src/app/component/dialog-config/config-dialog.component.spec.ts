@@ -12,12 +12,6 @@ describe('ConfigDialogComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [ConfigDialogComponent],
-    }).compileComponents();
-  });
-
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [ConfigDialogComponent],
       imports: [HttpClientModule, FormsModule],
       providers: [BasicRestService],
     }).compileComponents();
