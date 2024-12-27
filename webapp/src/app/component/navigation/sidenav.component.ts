@@ -50,7 +50,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
   @ViewChild('searchInput') searchInput: ElementRef;
 
   constructor(
-    private documentTree: DocumentTree,
+    public documentTree: DocumentTree,
     private basicRestService: BasicRestService,
     private router: Router,
     private llmDialogService: LlmDialogService,
