@@ -222,6 +222,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            cursor: pointer;
           "
           >{{ node.name }}</span
         >
@@ -371,9 +372,10 @@
             }}
           </mat-icon>
         </button>
-        <span style="overflow: hidden; text-overflow: ellipsis">{{
-          node.name
-        }}</span>
+        <span
+          style="overflow: hidden; text-overflow: ellipsis; cursor: pointer"
+          >{{ node.name }}</span
+        >
         <div
           class="dropdown hide"
           style="margin-left: auto; position: relative; top: 3px"
