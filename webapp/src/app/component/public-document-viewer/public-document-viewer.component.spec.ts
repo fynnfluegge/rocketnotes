@@ -27,9 +27,6 @@ describe('PublicDocumentViewerComponent', () => {
         },
       ],
     }).compileComponents();
-  });
-
-  beforeEach(() => {
     fixture = TestBed.createComponent(PublicDocumentViewerComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
