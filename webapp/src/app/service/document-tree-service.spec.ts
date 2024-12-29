@@ -159,14 +159,40 @@ describe('DocumentTree', () => {
   //   });
   // });
 
-  it('should add a new item', () => {
+  it('should add a new item to root node', async () => {
+    environment.production = true;
+    spyOn(Auth, 'currentAuthenticatedUser').and.returnValue(
+      Promise.resolve({ username: 'testuser' }),
+    );
+
+    await service.initialize();
+
+    const req = httpMock.expectOne(
+      `${service.backend_url}/documentTree/testuser`,
+    );
+    expect(req.request.method).toBe('GET');
+    req.flush(mockDocumentTreeResponse);
+
+    expect(service.rootNode!.children!.length).toBe(1);
+    expect(service.rootNode!.children![0].name).toBe('Document 1');
+
     const parentNode = new DocumentFlatNode();
     parentNode.id = ROOT_ID;
 
     service.addNewItem(parentNode);
 
-    expect(service.rootNode!.children!.length).toBe(1);
+    expect(service.rootNode!.children!.length).toBe(2);
     expect(service.rootNode!.children![0].name).toBe('');
+    expect(service.rootNode!.children![1].name).toBe('Document 1');
+
+    const nodeToDelete = new DocumentFlatNode();
+    nodeToDelete.id = service.rootNode!.children![0].id;
+    nodeToDelete.parent = ROOT_ID;
+
+    service.deleteEmptyItem(nodeToDelete);
+
+    expect(service.rootNode!.children!.length).toBe(1);
+    expect(service.rootNode!.children![0].name).toBe('Document 1');
   });
 
   // it('should delete an empty item', () => {
