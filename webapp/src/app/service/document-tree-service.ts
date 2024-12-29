@@ -24,9 +24,10 @@ export class DocumentNode {
   id: string;
   name: string;
   parent: string;
-  children?: DocumentNode[];
   deleted: boolean;
   pinned: boolean;
+  lastModified: Date;
+  children?: DocumentNode[];
 }
 
 /**
@@ -38,6 +39,7 @@ export class DocumentFlatNode {
   parent: string;
   deleted: boolean;
   pinned: boolean;
+  lastModified: Date;
   editNode: boolean;
   level: number;
   expandable: boolean;
@@ -187,6 +189,7 @@ export class DocumentTree {
                           title: document.title,
                           content: document.content,
                           isPublic: document.isPublic,
+                          deleted: document.deleted,
                         });
                       });
                   } else if (this.rootNode.children) {
@@ -199,6 +202,7 @@ export class DocumentTree {
                           title: document.title,
                           content: document.content,
                           isPublic: document.isPublic,
+                          deleted: document.deleted,
                         });
                       });
                   }
@@ -276,6 +280,7 @@ export class DocumentTree {
                         title: document.title,
                         content: document.content,
                         isPublic: document.isPublic,
+                        deleted: document.deleted,
                       });
                     });
                 } else if (this.rootNode.children) {
@@ -288,6 +293,7 @@ export class DocumentTree {
                         title: document.title,
                         content: document.content,
                         isPublic: document.isPublic,
+                        deleted: document.deleted,
                       });
                     });
                 }
@@ -451,6 +457,7 @@ export class DocumentTree {
           title: document.title,
           content: document.content,
           isPublic: document.isPublic,
+          deleted: document.deleted,
         });
       });
   }
@@ -465,10 +472,12 @@ export class DocumentTree {
   saveNode(node: DocumentNode, newName: string, newItem: boolean) {
     const node_ = this.rootNodeMap.get(node.id);
     node_.name = newName;
+    node_.lastModified = new Date();
 
     if (node.pinned) {
       const pinnedNode = this.pinnedNodeMap.get(node.id);
       pinnedNode.name = newName;
+      pinnedNode.lastModified = node_.lastModified;
     }
 
     if (newItem) this.rootNodeMap.set(node.id, node);
@@ -491,6 +500,7 @@ export class DocumentTree {
                 userId: localStorage.getItem('currentUserId'),
                 title: newName,
                 content: 'new document',
+                lastModified: node_.lastModified,
               },
             })
             .subscribe(() => {

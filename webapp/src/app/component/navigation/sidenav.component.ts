@@ -185,6 +185,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
           title: document.title,
           content: document.content,
           isPublic: document.isPublic,
+          deleted: document.deleted,
         });
       });
     }

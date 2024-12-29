@@ -2,6 +2,7 @@ import { Component, Input, VERSION } from '@angular/core';
 import { Auth } from 'aws-amplify';
 import { BasicRestService } from 'src/app/service/basic-rest.service';
 import { ConfigDialogService } from 'src/app/service/config-dialog-service';
+import { Document } from 'src/app/model/document.model';
 import { DocumentTree } from 'src/app/service/document-tree-service';
 import { ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
@@ -37,6 +38,7 @@ export class EditorComponent {
   public title: string;
   public content: string;
   public isPublic: boolean;
+  public isDeleted: boolean;
   public publicLink: string;
 
   initialContent: string;
@@ -83,6 +85,7 @@ export class EditorComponent {
       this.content = value.content;
       this.titleService.setTitle(value.title);
       this.isPublic = value.isPublic;
+      this.isDeleted = value.deleted;
       this.publicLink = environment.redirectSignIn + '/shared/' + this.id;
       this.location.replaceState('/' + this.id);
     });
@@ -98,6 +101,7 @@ export class EditorComponent {
             this.title = document.title;
             this.titleService.setTitle(document.title);
             this.isPublic = document.isPublic;
+            this.isDeleted = document.deleted;
             this.publicLink = environment.redirectSignIn + '/shared/' + this.id;
           });
       }
@@ -502,14 +506,28 @@ export class EditorComponent {
   }
 
   submit(): void {
+    // TODO update node by id in document Tree
     this.basicRestService
       .post('saveDocument', {
-        document: {
+        document: <Document>{
           id: this.id,
           userId: localStorage.getItem('currentUserId'),
           title: this.title,
           content: this.content,
-          isPublic: this.isPublic,
+          deleted: this.isDeleted,
+          lastModified: new Date(),
+        },
+        documentTree: {
+          id: localStorage.getItem('currentUserId'),
+          documents: JSON.parse(
+            JSON.stringify(this.documentTree.rootNode.children),
+          ),
+          trash: JSON.parse(
+            JSON.stringify(this.documentTree.trashNode.children),
+          ),
+          pinned: JSON.parse(
+            JSON.stringify(this.documentTree.pinnedNode.children),
+          ),
         },
       })
       .subscribe(() => {
@@ -522,9 +540,8 @@ export class EditorComponent {
         //   this.showSnackbar = false;
         // }, 1000);
 
-        // Explicitly update the vector embeddings after the document has been saved
-        // only in local mode. In deployed production mode, the vector embeddings are updated
-        // via sqs event after the document has been saved
+        // Explicitly update the vector embeddings after the document has been saved only in local mode.
+        // In deployed production mode, the vector embeddings are updated via sqs event after the document has been saved
         if (
           !environment.production &&
           localStorage.getItem('config') !== null

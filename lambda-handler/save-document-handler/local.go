@@ -35,14 +35,11 @@ func init() {
 }
 
 func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-
 	item := Body{}
 
 	json.Unmarshal([]byte(request.Body), &item)
 
 	item.Document.Searchcontent = strings.ToLower(item.Document.Title + "\n" + item.Document.Content)
-
-	item.Document.LastModified = time.Now()
 
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,

@@ -179,6 +179,7 @@ export class LlmDialogComponent implements OnDestroy, OnInit {
           title: document.title,
           content: document.content,
           isPublic: document.isPublic,
+          deleted: document.deleted,
         });
         this.titleService.setTitle(document.title);
         this.llmDialogService.closeDialog();

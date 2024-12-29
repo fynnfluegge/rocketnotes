@@ -26,33 +26,31 @@ type Body struct {
 }
 
 type Document struct {
-	ID           string 	 `json:"id"`
-	ParentId     string 	 `json:"parentId"`
-	UserId       string 	 `json:"userId"`
-	Title        string 	 `json:"title"`
-	Content      string 	 `json:"content"`
-	Searchcontent string   `json:"searchContent"`
-	LastModified time.Time `json:"lastModified"`
-	Deleted      bool   	 `json:"deleted"`
-	IsPublic     bool   	 `json:"isPublic"`
+	ID            string    `json:"id"`
+	ParentId      string    `json:"parentId"`
+	UserId        string    `json:"userId"`
+	Title         string    `json:"title"`
+	Content       string    `json:"content"`
+	Searchcontent string    `json:"searchContent"`
+	LastModified  time.Time `json:"lastModified"`
+	Deleted       bool      `json:"deleted"`
+	IsPublic      bool      `json:"isPublic"`
 }
 
 type SqsMessage struct {
-	UserId       string `json:"userId"`
-	DocumentId   string `json:"documentId"`
+	UserId     string `json:"userId"`
+	DocumentId string `json:"documentId"`
 }
 
 func init() {
 }
 
 func handleRequest(ctx context.Context, event events.SQSEvent) {
-
 	item := Item{}
 
 	json.Unmarshal([]byte(event.Records[0].Body), &item)
 
 	item.Body.Document.Searchcontent = strings.ToLower(item.Body.Document.Title + "\n" + item.Body.Document.Content)
-	item.Body.Document.LastModified = time.Now()
 
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
@@ -85,7 +83,6 @@ func handleRequest(ctx context.Context, event events.SQSEvent) {
 			},
 		},
 	})
-
 	if err != nil {
 		log.Fatalf("Got error calling GetItem: %s", err)
 	}

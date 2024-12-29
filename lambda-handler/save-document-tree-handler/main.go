@@ -15,11 +15,12 @@ import (
 )
 
 type Document struct {
-	ID       string      `json:"id"`
-	Name     string      `json:"name"`
-	Parent   string      `json:"parent"`
-	Pinned   bool        `json:"pinned"`
-	Children []*Document `json:"children"`
+	ID           string      `json:"id"`
+	Name         string      `json:"name"`
+	Parent       string      `json:"parent"`
+	Pinned       bool        `json:"pinned"`
+	LastModified time.Time   `json:"lastModified"`
+	Children     []*Document `json:"children"`
 }
 
 type Item struct {
@@ -33,7 +34,6 @@ func init() {
 }
 
 func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-
 	item := Item{}
 
 	json.Unmarshal([]byte(request.Body), &item)
