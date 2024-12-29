@@ -113,7 +113,7 @@ describe('DocumentTree', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should initialize document tree in production environment', async () => {
+  it('should initialize document tree in production environment', () => {
     expect(service.rootNode).toEqual(<DocumentNode>{
       id: ROOT_ID,
       name: ROOT_ID,
@@ -131,35 +131,7 @@ describe('DocumentTree', () => {
     });
   });
 
-  // it('should initialize document tree in non-production environment', async () => {
-  //   environment.production = false;
-  //
-  //   await service.initialize();
-  //
-  //   const req = httpMock.expectOne(
-  //     `${service.backend_url}/documentTree/4afe1f16-add0-11ed-afa1-0242ac120002`,
-  //   );
-  //   expect(req.request.method).toBe('GET');
-  //   req.flush(mockDocumentTreeResponse);
-  //
-  //   expect(service.rootNode).toEqual(<DocumentNode>{
-  //     id: ROOT_ID,
-  //     name: ROOT_ID,
-  //     children: mockDocumentTreeResponse.documents,
-  //   });
-  //   expect(service.pinnedNode).toEqual(<DocumentNode>{
-  //     id: PINNED_ID,
-  //     name: PINNED_ID,
-  //     children: mockDocumentTreeResponse.pinned,
-  //   });
-  //   expect(service.trashNode).toEqual(<DocumentNode>{
-  //     id: TRASH_ID,
-  //     name: TRASH_ID,
-  //     children: mockDocumentTreeResponse.trash,
-  //   });
-  // });
-
-  it('should add a new item to root node and delete the newly created item', async () => {
+  it('should add a new item to root node and delete the newly created item', () => {
     expect(service.rootNode!.children!.length).toBe(1);
     expect(service.rootNode!.children![0].name).toBe('Document 1');
 
@@ -182,69 +154,33 @@ describe('DocumentTree', () => {
     expect(service.rootNode!.children![0].name).toBe('Document 1');
   });
 
-  // it('should delete an empty item', () => {
-  //   const node = new DocumentFlatNode();
-  //   node.id = 'doc1';
-  //   node.parent = ROOT_ID;
-  //
-  //   service.addNewItem(node);
-  //
-  //   expect(service.rootNode!.children!.length).toBe(1);
-  //
-  //   service.deleteEmptyItem(node);
-  //
-  //   expect(service.rootNode.children).toEqual(null);
-  // });
+  it('should move a node to trash', () => {
+    let nodeToMoveToTrash: DocumentFlatNode | undefined;
+    service.flatNodeMap.forEach((value, key) => {
+      console.log(key, value);
+      if (value.id === 'doc1') {
+        nodeToMoveToTrash = key;
+      }
+    });
 
-  // it('should move a node to trash', () => {
-  //   const node = new DocumentFlatNode();
-  //   node.id = 'doc1';
-  //   node.parent = ROOT_ID;
-  //
-  //   service.rootNode = {
-  //     id: ROOT_ID,
-  //     name: ROOT_ID,
-  //     children: [
-  //       {
-  //         id: 'doc1',
-  //         name: 'Document 1',
-  //         parent: ROOT_ID,
-  //         children: [],
-  //         deleted: false,
-  //         pinned: false,
-  //       },
-  //     ],
-  //   };
-  //
-  //   service.moveToTrash(node);
-  //
-  //   expect(service.trashNode.children.length).toBe(1);
-  //   expect(service.trashNode.children[0].id).toBe('doc1');
-  // });
+    service.moveToTrash(nodeToMoveToTrash);
+    expect(service.trashNode.children.length).toBe(2);
+    expect(service.trashNode.children[1].id).toBe('doc1');
+    expect(service.trashNode.children[0].id).toBe('trash1');
+  });
 
-  // it('should pin a node', () => {
-  //   const node = new DocumentFlatNode();
-  //   node.id = 'doc1';
-  //   node.parent = ROOT_ID;
-  //
-  //   service.rootNode = {
-  //     id: ROOT_ID,
-  //     name: ROOT_ID,
-  //     children: [
-  //       {
-  //         id: 'doc1',
-  //         name: 'Document 1',
-  //         parent: ROOT_ID,
-  //         children: [],
-  //         deleted: false,
-  //         pinned: false,
-  //       },
-  //     ],
-  //   };
-  //
-  //   service.pinItem(node);
-  //
-  //   expect(service.pinnedNode.children.length).toBe(1);
-  //   expect(service.pinnedNode.children[0].id).toBe('doc1');
-  // });
+  it('should pin a node', () => {
+    let nodeToPin: DocumentFlatNode | undefined;
+    service.flatNodeMap.forEach((value, key) => {
+      console.log(key, value);
+      if (value.id === 'doc1') {
+        nodeToPin = key;
+      }
+    });
+    service.pinItem(nodeToPin);
+
+    expect(service.pinnedNode.children.length).toBe(2);
+    expect(service.pinnedNode.children[1].id).toBe('doc1');
+    expect(service.pinnedNode.children[0].id).toBe('pin1');
+  });
 });
