@@ -75,7 +75,7 @@ describe('DocumentTree', () => {
     ],
   };
 
-  beforeEach(() => {
+  beforeEach(async () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [
@@ -90,17 +90,7 @@ describe('DocumentTree', () => {
     basicRestService = TestBed.inject(
       BasicRestService,
     ) as unknown as MockBasicRestService;
-  });
 
-  afterEach(() => {
-    httpMock.verify();
-  });
-
-  it('should be created', () => {
-    expect(service).toBeTruthy();
-  });
-
-  it('should initialize document tree in production environment', async () => {
     environment.production = true;
     spyOn(Auth, 'currentAuthenticatedUser').and.returnValue(
       Promise.resolve({ username: 'testuser' }),
@@ -113,7 +103,17 @@ describe('DocumentTree', () => {
     );
     expect(req.request.method).toBe('GET');
     req.flush(mockDocumentTreeResponse);
+  });
 
+  afterEach(() => {
+    httpMock.verify();
+  });
+
+  it('should be created', () => {
+    expect(service).toBeTruthy();
+  });
+
+  it('should initialize document tree in production environment', async () => {
     expect(service.rootNode).toEqual(<DocumentNode>{
       id: ROOT_ID,
       name: ROOT_ID,
@@ -159,20 +159,7 @@ describe('DocumentTree', () => {
   //   });
   // });
 
-  it('should add a new item to root node', async () => {
-    environment.production = true;
-    spyOn(Auth, 'currentAuthenticatedUser').and.returnValue(
-      Promise.resolve({ username: 'testuser' }),
-    );
-
-    await service.initialize();
-
-    const req = httpMock.expectOne(
-      `${service.backend_url}/documentTree/testuser`,
-    );
-    expect(req.request.method).toBe('GET');
-    req.flush(mockDocumentTreeResponse);
-
+  it('should add a new item to root node and delete the newly created item', async () => {
     expect(service.rootNode!.children!.length).toBe(1);
     expect(service.rootNode!.children![0].name).toBe('Document 1');
 
