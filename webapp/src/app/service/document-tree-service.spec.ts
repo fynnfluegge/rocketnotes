@@ -23,11 +23,11 @@ class MockBasicRestService {
       content: 'mock content',
       title: 'mock title',
       isPublic: true,
-    }); // Mock the response of the get method
+    });
   }
 
   post(url: string, body: any) {
-    return of({}); // Mock the response of the post method
+    return of({});
   }
 }
 
@@ -162,9 +162,6 @@ describe('DocumentTree', () => {
   it('should add a new item', () => {
     const parentNode = new DocumentFlatNode();
     parentNode.id = ROOT_ID;
-    parentNode.name = 'Root';
-    parentNode.level = 0;
-    parentNode.expandable = true;
 
     service.addNewItem(parentNode);
 
@@ -177,24 +174,13 @@ describe('DocumentTree', () => {
   //   node.id = 'doc1';
   //   node.parent = ROOT_ID;
   //
-  //   service.rootNode = <DocumentNode>{
-  //     id: ROOT_ID,
-  //     name: ROOT_ID,
-  //     children: [
-  //       {
-  //         id: 'doc1',
-  //         name: 'Document 1',
-  //         parent: ROOT_ID,
-  //         children: [],
-  //         deleted: false,
-  //         pinned: false,
-  //       },
-  //     ],
-  //   };
+  //   service.addNewItem(node);
+  //
+  //   expect(service.rootNode!.children!.length).toBe(1);
   //
   //   service.deleteEmptyItem(node);
   //
-  //   expect(service.rootNode.children.length).toBe(0);
+  //   expect(service.rootNode.children).toEqual(null);
   // });
 
   // it('should move a node to trash', () => {
