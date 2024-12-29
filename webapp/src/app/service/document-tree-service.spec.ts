@@ -131,7 +131,7 @@ describe('DocumentTree', () => {
     });
   });
 
-  it('should add a new item to root node and delete the newly created item', () => {
+  it('should add a new node to root node and delete the newly created node', () => {
     expect(service.rootNode!.children!.length).toBe(1);
     expect(service.rootNode!.children![0].name).toBe('Document 1');
 
@@ -154,7 +154,7 @@ describe('DocumentTree', () => {
     expect(service.rootNode!.children![0].name).toBe('Document 1');
   });
 
-  it('should move a node to trash', () => {
+  it('should move a node to trash and restore the node', () => {
     let nodeToMoveToTrash: DocumentFlatNode | undefined;
     service.flatNodeMap.forEach((value, key) => {
       console.log(key, value);
@@ -164,8 +164,14 @@ describe('DocumentTree', () => {
     });
 
     service.moveToTrash(nodeToMoveToTrash);
+    expect(service.rootNode.children).toBe(null);
     expect(service.trashNode.children.length).toBe(2);
     expect(service.trashNode.children[1].id).toBe('doc1');
+    expect(service.trashNode.children[0].id).toBe('trash1');
+
+    service.restoreItem(nodeToMoveToTrash);
+    expect(service.rootNode.children.length).toBe(1);
+    expect(service.trashNode.children.length).toBe(1);
     expect(service.trashNode.children[0].id).toBe('trash1');
   });
 
