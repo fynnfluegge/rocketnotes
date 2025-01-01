@@ -146,11 +146,7 @@
           class="icon-button-chevron"
         >
           <mat-icon>
-            {{
-              documentTree.treeControl.isExpanded(node)
-                ? "expand_more"
-                : "chevron_right"
-            }}
+            {{ isExpanded(node) ? "expand_more" : "chevron_right" }}
           </mat-icon>
         </button>
         Pinned
@@ -169,11 +165,7 @@
           class="icon-button-chevron"
         >
           <mat-icon>
-            {{
-              documentTree.treeControl.isExpanded(node)
-                ? "expand_more"
-                : "chevron_right"
-            }}
+            {{ isExpanded(node) ? "expand_more" : "chevron_right" }}
           </mat-icon>
         </button>
         <span>Documents</span>
@@ -192,11 +184,7 @@
           class="icon-button-chevron"
         >
           <mat-icon>
-            {{
-              documentTree.treeControl.isExpanded(node)
-                ? "expand_more"
-                : "chevron_right"
-            }}
+            {{ isExpanded(node) ? "expand_more" : "chevron_right" }}
           </mat-icon>
         </button>
         Trash
@@ -365,11 +353,7 @@
       >
         <button mat-icon-button matTreeNodeToggle class="icon-button-chevron">
           <mat-icon>
-            {{
-              documentTree.treeControl.isExpanded(node)
-                ? "expand_more"
-                : "chevron_right"
-            }}
+            {{ isExpanded(node) ? "expand_more" : "chevron_right" }}
           </mat-icon>
         </button>
         <span

@@ -244,6 +244,10 @@ export class SidenavComponent implements OnInit, AfterViewInit {
     Auth.signOut();
   }
 
+  isExpanded(node: DocumentFlatNode): boolean {
+    return this.documentTree.isExpanded(node);
+  }
+
   // Drag & Drop
   dragStart() {
     this.dragging = true;

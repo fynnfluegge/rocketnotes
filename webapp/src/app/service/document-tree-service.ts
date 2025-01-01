@@ -823,6 +823,10 @@ export class DocumentTree {
     return node.lastModified;
   }
 
+  isExpanded(node: DocumentFlatNode) {
+    return this.treeControl.isExpanded(node);
+  }
+
   /*
     find all visible nodes regardless of the level, except the dragged node, and return it as a flat list
   */
