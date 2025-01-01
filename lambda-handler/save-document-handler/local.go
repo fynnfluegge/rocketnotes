@@ -15,8 +15,9 @@ import (
 )
 
 type Body struct {
-	Document     *Document `json:"document"`
-	OpenAiApiKey string    `json:"openAiApiKey"`
+	Document     *Document     `json:"document"`
+	DocumentTree *DocumentTree `json:"documentTree"`
+	OpenAiApiKey string        `json:"openAiApiKey"`
 }
 
 type Document struct {
@@ -29,6 +30,22 @@ type Document struct {
 	LastModified  time.Time `json:"lastModified"`
 	Deleted       bool      `json:"deleted"`
 	IsPublic      bool      `json:"isPublic"`
+}
+
+type DocumentTreeItem struct {
+	ID           string      `json:"id"`
+	Name         string      `json:"name"`
+	Parent       string      `json:"parent"`
+	Pinned       bool        `json:"pinned"`
+	LastModified time.Time   `json:"lastModified"`
+	Children     []*Document `json:"children"`
+}
+
+type DocumentTree struct {
+	ID        string      `json:"id"`
+	Documents []*Document `json:"documents"`
+	Trash     []*Document `json:"trash"`
+	Pinned    []*Document `json:"pinned"`
 }
 
 func init() {
@@ -68,6 +85,25 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		return events.APIGatewayProxyResponse{
 			StatusCode: 404,
 		}, nil
+	}
+
+	av, err := dynamodbattribute.MarshalMap(item.DocumentTree)
+	if err != nil {
+		return events.APIGatewayProxyResponse{
+			StatusCode: 404,
+		}, nil
+	}
+
+	tableName := "tnn-Tree"
+
+	input := &dynamodb.PutItemInput{
+		Item:      av,
+		TableName: aws.String(tableName),
+	}
+
+	_, err = svc.PutItem(input)
+	if err != nil {
+		log.Fatalf("Got error calling PutItem: %s", err)
 	}
 
 	return events.APIGatewayProxyResponse{
