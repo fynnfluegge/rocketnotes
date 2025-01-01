@@ -26,7 +26,7 @@ export class DocumentNode {
   parent: string;
   deleted: boolean;
   pinned: boolean;
-  lastModified: Date;
+  lastModified?: Date;
   children?: DocumentNode[];
 }
 
@@ -39,7 +39,6 @@ export class DocumentFlatNode {
   parent: string;
   deleted: boolean;
   pinned: boolean;
-  lastModified: Date;
   editNode: boolean;
   level: number;
   expandable: boolean;
@@ -462,9 +461,9 @@ export class DocumentTree {
       });
   }
 
-  saveItem(node: DocumentFlatNode, itemValue: string, newItem: boolean) {
+  saveItem(node: DocumentFlatNode, itemName: string, newItem: boolean) {
     const nestedNode = this.flatNodeMap.get(node);
-    this.saveNode(nestedNode!, itemValue, newItem);
+    this.saveNode(nestedNode!, itemName, newItem);
     this.treeControl.collapse(this.nestedNodeMap.get(this.rootNode));
     this.treeControl.expand(this.nestedNodeMap.get(this.rootNode));
   }
@@ -692,10 +691,6 @@ export class DocumentTree {
     return node.expandable;
   };
 
-  getChildren = (node: DocumentNode): Observable<DocumentNode[]> => {
-    return ofObservable(node.children);
-  };
-
   expandNode(node: DocumentFlatNode) {
     this.treeControl.expand(node);
   }
@@ -815,10 +810,23 @@ export class DocumentTree {
     this.rebuildTreeForData(changedData);
   }
 
+  updateLastModifiedDate(id: string) {
+    const node = this.rootNodeMap.get(id);
+    node.lastModified = new Date();
+
+    if (node.pinned) {
+      const pinnedNode = this.pinnedNodeMap.get(id);
+      pinnedNode.lastModified = node.lastModified;
+    }
+
+    this.dataChange.next(this.data);
+    return node.lastModified;
+  }
+
   /*
     find all visible nodes regardless of the level, except the dragged node, and return it as a flat list
   */
-  visibleNodes(inPinned: boolean, deleted: boolean): DocumentNode[] {
+  private visibleNodes(inPinned: boolean, deleted: boolean): DocumentNode[] {
     const result = [];
     this.dataSource.data.forEach((node) => {
       this.addExpandedChildren(
@@ -832,7 +840,7 @@ export class DocumentTree {
     return result;
   }
 
-  addExpandedChildren(
+  private addExpandedChildren(
     node: DocumentNode,
     expanded: boolean,
     inPinned: boolean,
@@ -859,7 +867,7 @@ export class DocumentTree {
     }
   }
 
-  rebuildTreeForData(data: any) {
+  private rebuildTreeForData(data: any) {
     this.dataSource.data = data;
     this.refreshTree();
     this.basicRestService
@@ -871,4 +879,8 @@ export class DocumentTree {
       })
       .subscribe();
   }
+
+  private getChildren = (node: DocumentNode): Observable<DocumentNode[]> => {
+    return ofObservable(node.children);
+  };
 }

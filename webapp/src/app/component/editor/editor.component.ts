@@ -506,15 +506,7 @@ export class EditorComponent {
   }
 
   submit(): void {
-    const node = this.documentTree.rootNodeMap.get(this.id);
-    node.lastModified = new Date();
-
-    if (node.pinned) {
-      const pinnedNode = this.documentTree.pinnedNodeMap.get(this.id);
-      pinnedNode.lastModified = node.lastModified;
-    }
-
-    this.documentTree.dataChange.next(this.documentTree.data);
+    const lastModified = this.documentTree.updateLastModifiedDate(this.id);
 
     this.basicRestService
       .post('saveDocument', {
@@ -524,7 +516,7 @@ export class EditorComponent {
           title: this.title,
           content: this.content,
           deleted: this.isDeleted,
-          lastModified: node.lastModified,
+          lastModified: lastModified,
         },
         documentTree: {
           id: localStorage.getItem('currentUserId'),
