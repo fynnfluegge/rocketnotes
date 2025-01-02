@@ -39,19 +39,19 @@ type Document struct {
 }
 
 type DocumentTreeItem struct {
-	ID           string      `json:"id"`
-	Name         string      `json:"name"`
-	Parent       string      `json:"parent"`
-	Pinned       bool        `json:"pinned"`
-	LastModified time.Time   `json:"lastModified"`
-	Children     []*Document `json:"children"`
+	ID           string              `json:"id"`
+	Name         string              `json:"name"`
+	Parent       string              `json:"parent"`
+	Pinned       bool                `json:"pinned"`
+	LastModified time.Time           `json:"lastModified"`
+	Children     []*DocumentTreeItem `json:"children"`
 }
 
 type DocumentTree struct {
-	ID        string      `json:"id"`
-	Documents []*Document `json:"documents"`
-	Trash     []*Document `json:"trash"`
-	Pinned    []*Document `json:"pinned"`
+	ID        string              `json:"id"`
+	Documents []*DocumentTreeItem `json:"documents"`
+	Trash     []*DocumentTreeItem `json:"trash"`
+	Pinned    []*DocumentTreeItem `json:"pinned"`
 }
 
 type SqsMessage struct {
