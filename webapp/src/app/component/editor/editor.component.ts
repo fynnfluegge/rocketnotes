@@ -518,18 +518,7 @@ export class EditorComponent {
           deleted: this.isDeleted,
           lastModified: lastModified,
         },
-        documentTree: {
-          id: localStorage.getItem('currentUserId'),
-          documents: JSON.parse(
-            JSON.stringify(this.documentTree.rootNode.children),
-          ),
-          trash: JSON.parse(
-            JSON.stringify(this.documentTree.trashNode.children),
-          ),
-          pinned: JSON.parse(
-            JSON.stringify(this.documentTree.pinnedNode.children),
-          ),
-        },
+        documentTree: this.documentTree.getDocumentTree(),
       })
       .subscribe(() => {
         if (this.timer) {
