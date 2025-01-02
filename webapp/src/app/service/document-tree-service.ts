@@ -425,12 +425,7 @@ export class DocumentTree {
 
     this.dataChange.next(this.data);
     this.basicRestService
-      .post('saveDocumentTree', {
-        id: localStorage.getItem('currentUserId'),
-        documents: JSON.parse(JSON.stringify(this.rootNode.children)),
-        trash: JSON.parse(JSON.stringify(this.trashNode.children)),
-        pinned: JSON.parse(JSON.stringify(this.pinnedNode.children)),
-      })
+      .post('saveDocumentTree', this.getDocumentTree())
       .subscribe(() => {
         // TODO here delete post
       });
