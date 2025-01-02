@@ -87,23 +87,25 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		}, nil
 	}
 
-	av, err := dynamodbattribute.MarshalMap(item.DocumentTree)
+	av, err = dynamodbattribute.MarshalMap(item.DocumentTree)
 	if err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: 404,
 		}, nil
 	}
 
-	tableName := "tnn-Tree"
+	tableName = "tnn-Tree"
 
-	input := &dynamodb.PutItemInput{
+	input = &dynamodb.PutItemInput{
 		Item:      av,
 		TableName: aws.String(tableName),
 	}
 
 	_, err = svc.PutItem(input)
 	if err != nil {
-		log.Fatalf("Got error calling PutItem: %s", err)
+		return events.APIGatewayProxyResponse{
+			StatusCode: 404,
+		}, nil
 	}
 
 	return events.APIGatewayProxyResponse{
