@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"os"
+	"time"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -14,27 +15,27 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 )
 
-type Document struct {
-	ID       string      `json:"id"`
-	Name     string      `json:"name"`
-	Parent   string      `json:"parent"`
-	Pinned   bool        `json:"pinned"`
-	Children []*Document `json:"children"`
+type DocumentTreeItem struct {
+	ID           string              `json:"id"`
+	Name         string              `json:"name"`
+	Parent       string              `json:"parent"`
+	Pinned       bool                `json:"pinned"`
+	LastModified time.Time           `json:"lastModified"`
+	Children     []*DocumentTreeItem `json:"children"`
 }
 
-type Item struct {
-	ID        string      `json:"id"`
-	Documents []*Document `json:"documents"`
-	Trash     []*Document `json:"trash"`
-	Pinned    []*Document `json:"pinned"`
+type DocumentTree struct {
+	ID        string              `json:"id"`
+	Documents []*DocumentTreeItem `json:"documents"`
+	Trash     []*DocumentTreeItem `json:"trash"`
+	Pinned    []*DocumentTreeItem `json:"pinned"`
 }
 
 func init() {
 }
 
 func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-
-	item := Item{}
+	item := DocumentTree{}
 
 	json.Unmarshal([]byte(request.Body), &item)
 

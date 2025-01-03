@@ -185,6 +185,7 @@ export class SidenavComponent implements OnInit, AfterViewInit {
           title: document.title,
           content: document.content,
           isPublic: document.isPublic,
+          deleted: document.deleted,
         });
       });
     }
@@ -241,6 +242,10 @@ export class SidenavComponent implements OnInit, AfterViewInit {
 
   onLogout(): void {
     Auth.signOut();
+  }
+
+  isExpanded(node: DocumentFlatNode): boolean {
+    return this.documentTree.isExpanded(node);
   }
 
   // Drag & Drop

@@ -24,9 +24,10 @@ export class DocumentNode {
   id: string;
   name: string;
   parent: string;
-  children?: DocumentNode[];
   deleted: boolean;
   pinned: boolean;
+  lastModified?: Date;
+  children?: DocumentNode[];
 }
 
 /**
@@ -187,6 +188,7 @@ export class DocumentTree {
                           title: document.title,
                           content: document.content,
                           isPublic: document.isPublic,
+                          deleted: document.deleted,
                         });
                       });
                   } else if (this.rootNode.children) {
@@ -199,6 +201,7 @@ export class DocumentTree {
                           title: document.title,
                           content: document.content,
                           isPublic: document.isPublic,
+                          deleted: document.deleted,
                         });
                       });
                   }
@@ -276,6 +279,7 @@ export class DocumentTree {
                         title: document.title,
                         content: document.content,
                         isPublic: document.isPublic,
+                        deleted: document.deleted,
                       });
                     });
                 } else if (this.rootNode.children) {
@@ -288,6 +292,7 @@ export class DocumentTree {
                         title: document.title,
                         content: document.content,
                         isPublic: document.isPublic,
+                        deleted: document.deleted,
                       });
                     });
                 }
@@ -373,12 +378,7 @@ export class DocumentTree {
 
     this.dataChange.next(this.data);
     this.basicRestService
-      .post('saveDocumentTree', {
-        id: localStorage.getItem('currentUserId'),
-        documents: JSON.parse(JSON.stringify(this.rootNode.children)),
-        trash: JSON.parse(JSON.stringify(this.trashNode.children)),
-        pinned: JSON.parse(JSON.stringify(this.pinnedNode.children)),
-      })
+      .post('saveDocumentTree', this.getDocumentTree())
       .subscribe();
 
     this.treeControl.collapse(this.nestedNodeMap.get(this.rootNode));
@@ -411,12 +411,7 @@ export class DocumentTree {
 
     this.dataChange.next(this.data);
     this.basicRestService
-      .post('saveDocumentTree', {
-        id: localStorage.getItem('currentUserId'),
-        documents: JSON.parse(JSON.stringify(this.rootNode.children)),
-        trash: JSON.parse(JSON.stringify(this.trashNode.children)),
-        pinned: JSON.parse(JSON.stringify(this.pinnedNode.children)),
-      })
+      .post('saveDocumentTree', this.getDocumentTree())
       .subscribe();
 
     this.refreshTree();
@@ -430,12 +425,7 @@ export class DocumentTree {
 
     this.dataChange.next(this.data);
     this.basicRestService
-      .post('saveDocumentTree', {
-        id: localStorage.getItem('currentUserId'),
-        documents: JSON.parse(JSON.stringify(this.rootNode.children)),
-        trash: JSON.parse(JSON.stringify(this.trashNode.children)),
-        pinned: JSON.parse(JSON.stringify(this.pinnedNode.children)),
-      })
+      .post('saveDocumentTree', this.getDocumentTree())
       .subscribe(() => {
         // TODO here delete post
       });
@@ -451,13 +441,14 @@ export class DocumentTree {
           title: document.title,
           content: document.content,
           isPublic: document.isPublic,
+          deleted: document.deleted,
         });
       });
   }
 
-  saveItem(node: DocumentFlatNode, itemValue: string, newItem: boolean) {
+  saveItem(node: DocumentFlatNode, itemName: string, newItem: boolean) {
     const nestedNode = this.flatNodeMap.get(node);
-    this.saveNode(nestedNode!, itemValue, newItem);
+    this.saveNode(nestedNode!, itemName, newItem);
     this.treeControl.collapse(this.nestedNodeMap.get(this.rootNode));
     this.treeControl.expand(this.nestedNodeMap.get(this.rootNode));
   }
@@ -465,10 +456,12 @@ export class DocumentTree {
   saveNode(node: DocumentNode, newName: string, newItem: boolean) {
     const node_ = this.rootNodeMap.get(node.id);
     node_.name = newName;
+    node_.lastModified = new Date();
 
     if (node.pinned) {
       const pinnedNode = this.pinnedNodeMap.get(node.id);
       pinnedNode.name = newName;
+      pinnedNode.lastModified = node_.lastModified;
     }
 
     if (newItem) this.rootNodeMap.set(node.id, node);
@@ -476,12 +469,7 @@ export class DocumentTree {
     this.dataChange.next(this.data);
 
     this.basicRestService
-      .post('saveDocumentTree', {
-        id: localStorage.getItem('currentUserId'),
-        documents: JSON.parse(JSON.stringify(this.rootNode.children)),
-        trash: JSON.parse(JSON.stringify(this.trashNode.children)),
-        pinned: JSON.parse(JSON.stringify(this.pinnedNode.children)),
-      })
+      .post('saveDocumentTree', this.getDocumentTree())
       .subscribe(() => {
         if (newItem) {
           this.basicRestService
@@ -491,6 +479,7 @@ export class DocumentTree {
                 userId: localStorage.getItem('currentUserId'),
                 title: newName,
                 content: 'new document',
+                lastModified: node_.lastModified,
               },
             })
             .subscribe(() => {
@@ -580,12 +569,7 @@ export class DocumentTree {
     this.dataChange.next(this.data);
 
     this.basicRestService
-      .post('saveDocumentTree', {
-        id: localStorage.getItem('currentUserId'),
-        documents: JSON.parse(JSON.stringify(this.rootNode.children)),
-        trash: JSON.parse(JSON.stringify(this.trashNode.children)),
-        pinned: JSON.parse(JSON.stringify(this.pinnedNode.children)),
-      })
+      .post('saveDocumentTree', this.getDocumentTree())
       .subscribe();
   }
 
@@ -633,12 +617,7 @@ export class DocumentTree {
 
     this.dataChange.next(this.data);
     this.basicRestService
-      .post('saveDocumentTree', {
-        id: localStorage.getItem('currentUserId'),
-        documents: JSON.parse(JSON.stringify(this.rootNode.children)),
-        trash: JSON.parse(JSON.stringify(this.trashNode.children)),
-        pinned: JSON.parse(JSON.stringify(this.pinnedNode.children)),
-      })
+      .post('saveDocumentTree', this.getDocumentTree())
       .subscribe();
   }
 
@@ -680,10 +659,6 @@ export class DocumentTree {
 
   isExpandable = (node: DocumentFlatNode) => {
     return node.expandable;
-  };
-
-  getChildren = (node: DocumentNode): Observable<DocumentNode[]> => {
-    return ofObservable(node.children);
   };
 
   expandNode(node: DocumentFlatNode) {
@@ -805,10 +780,36 @@ export class DocumentTree {
     this.rebuildTreeForData(changedData);
   }
 
+  updateLastModifiedDate(id: string) {
+    const node = this.rootNodeMap.get(id);
+    node.lastModified = new Date();
+
+    if (node.pinned) {
+      const pinnedNode = this.pinnedNodeMap.get(id);
+      pinnedNode.lastModified = node.lastModified;
+    }
+
+    this.dataChange.next(this.data);
+    return node.lastModified;
+  }
+
+  isExpanded(node: DocumentFlatNode) {
+    return this.treeControl.isExpanded(node);
+  }
+
+  getDocumentTree() {
+    return {
+      id: localStorage.getItem('currentUserId'),
+      documents: JSON.parse(JSON.stringify(this.rootNode.children)),
+      trash: JSON.parse(JSON.stringify(this.trashNode.children)),
+      pinned: JSON.parse(JSON.stringify(this.pinnedNode.children)),
+    };
+  }
+
   /*
     find all visible nodes regardless of the level, except the dragged node, and return it as a flat list
   */
-  visibleNodes(inPinned: boolean, deleted: boolean): DocumentNode[] {
+  private visibleNodes(inPinned: boolean, deleted: boolean): DocumentNode[] {
     const result = [];
     this.dataSource.data.forEach((node) => {
       this.addExpandedChildren(
@@ -822,7 +823,7 @@ export class DocumentTree {
     return result;
   }
 
-  addExpandedChildren(
+  private addExpandedChildren(
     node: DocumentNode,
     expanded: boolean,
     inPinned: boolean,
@@ -849,16 +850,15 @@ export class DocumentTree {
     }
   }
 
-  rebuildTreeForData(data: any) {
+  private rebuildTreeForData(data: any) {
     this.dataSource.data = data;
     this.refreshTree();
     this.basicRestService
-      .post('saveDocumentTree', {
-        id: localStorage.getItem('currentUserId'),
-        documents: JSON.parse(JSON.stringify(this.rootNode.children)),
-        trash: JSON.parse(JSON.stringify(this.trashNode.children)),
-        pinned: JSON.parse(JSON.stringify(this.pinnedNode.children)),
-      })
+      .post('saveDocumentTree', this.getDocumentTree())
       .subscribe();
   }
+
+  private getChildren = (node: DocumentNode): Observable<DocumentNode[]> => {
+    return ofObservable(node.children);
+  };
 }

@@ -15,8 +15,9 @@ import (
 )
 
 type Body struct {
-	Document     *Document `json:"document"`
-	OpenAiApiKey string    `json:"openAiApiKey"`
+	Document     *Document     `json:"document"`
+	DocumentTree *DocumentTree `json:"documentTree"`
+	OpenAiApiKey string        `json:"openAiApiKey"`
 }
 
 type Document struct {
@@ -31,18 +32,31 @@ type Document struct {
 	IsPublic      bool      `json:"isPublic"`
 }
 
+type DocumentTreeItem struct {
+	ID           string              `json:"id"`
+	Name         string              `json:"name"`
+	Parent       string              `json:"parent"`
+	Pinned       bool                `json:"pinned"`
+	LastModified time.Time           `json:"lastModified"`
+	Children     []*DocumentTreeItem `json:"children"`
+}
+
+type DocumentTree struct {
+	ID        string              `json:"id"`
+	Documents []*DocumentTreeItem `json:"documents"`
+	Trash     []*DocumentTreeItem `json:"trash"`
+	Pinned    []*DocumentTreeItem `json:"pinned"`
+}
+
 func init() {
 }
 
 func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-
 	item := Body{}
 
 	json.Unmarshal([]byte(request.Body), &item)
 
 	item.Document.Searchcontent = strings.ToLower(item.Document.Title + "\n" + item.Document.Content)
-
-	item.Document.LastModified = time.Now()
 
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
@@ -62,6 +76,27 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 	tableName := "tnn-Documents"
 
 	input := &dynamodb.PutItemInput{
+		Item:      av,
+		TableName: aws.String(tableName),
+	}
+
+	_, err = svc.PutItem(input)
+	if err != nil {
+		return events.APIGatewayProxyResponse{
+			StatusCode: 404,
+		}, nil
+	}
+
+	av, err = dynamodbattribute.MarshalMap(item.DocumentTree)
+	if err != nil {
+		return events.APIGatewayProxyResponse{
+			StatusCode: 404,
+		}, nil
+	}
+
+	tableName = "tnn-Tree"
+
+	input = &dynamodb.PutItemInput{
 		Item:      av,
 		TableName: aws.String(tableName),
 	}

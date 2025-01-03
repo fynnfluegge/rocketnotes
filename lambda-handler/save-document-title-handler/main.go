@@ -38,7 +38,6 @@ func init() {
 }
 
 func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-
 	requestBody := RequestBody{}
 
 	json.Unmarshal([]byte(request.Body), &requestBody)
@@ -84,7 +83,6 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 
 	item.Title = requestBody.Title
 	item.Searchcontent = strings.ToLower(item.Title + "\n" + item.Content)
-	item.LastModified = time.Now()
 
 	av, err := dynamodbattribute.MarshalMap(item)
 	if err != nil {
