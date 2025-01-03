@@ -92,7 +92,7 @@ func handleRequest(ctx context.Context, event events.SQSEvent) {
 		log.Fatalf("Got error calling PutItem: %s", err)
 	}
 
-	av, err = dynamodbattribute.MarshalMap(item.DocumentTree)
+	av, err = dynamodbattribute.MarshalMap(item.Body.DocumentTree)
 	if err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: 404,
