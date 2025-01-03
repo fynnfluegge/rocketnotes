@@ -92,16 +92,16 @@ func handleRequest(ctx context.Context, event events.SQSEvent) {
 		log.Fatalf("Got error calling PutItem: %s", err)
 	}
 
-	av, err := dynamodbattribute.MarshalMap(item.DocumentTree)
+	av, err = dynamodbattribute.MarshalMap(item.DocumentTree)
 	if err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: 404,
 		}, nil
 	}
 
-	tableName := "tnn-Tree"
+	tableName = "tnn-Tree"
 
-	input := &dynamodb.PutItemInput{
+	input = &dynamodb.PutItemInput{
 		Item:      av,
 		TableName: aws.String(tableName),
 	}
