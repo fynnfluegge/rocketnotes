@@ -510,13 +510,14 @@ export class EditorComponent {
 
     this.basicRestService
       .post('saveDocument', {
-        document: <Document>{
+        document: {
           id: this.id,
           userId: localStorage.getItem('currentUserId'),
           title: this.title,
           content: this.content,
           deleted: this.isDeleted,
           lastModified: lastModified,
+          isPublic: this.isPublic,
         },
         documentTree: this.documentTree.getDocumentTree(),
       })
