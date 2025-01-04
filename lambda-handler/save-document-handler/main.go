@@ -94,9 +94,7 @@ func handleRequest(ctx context.Context, event events.SQSEvent) {
 
 	av, err = dynamodbattribute.MarshalMap(item.Body.DocumentTree)
 	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 404,
-		}, nil
+		log.Fatalf("Got error marshalling new document item: %s", err)
 	}
 
 	tableName = "tnn-Tree"
