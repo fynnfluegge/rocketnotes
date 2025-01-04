@@ -555,14 +555,12 @@ export class DocumentTree {
     // insert node
     parentToInsert.children.push(node);
 
-    if (!parentToRemoveId) {
-      // parent not deleted, remove node from trash
-      this.removeFromParent(this.trashNode, node.id);
-    } else {
-      const parentToRemove = this.rootNodeMap.get(parentToRemoveId);
+    if (parentToRemoveId) {
       // parent in trash, remove node from parent.children
+      const parentToRemove = this.rootNodeMap.get(parentToRemoveId);
       this.removeFromParent(parentToRemove, node.id);
     }
+    this.removeFromParent(this.trashNode, node.id);
 
     this.rootNodeMap.set(node.id, node);
 

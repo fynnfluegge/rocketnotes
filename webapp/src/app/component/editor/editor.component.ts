@@ -418,8 +418,8 @@ export class EditorComponent {
   }
 
   async aiCompletion(abortSignal: AbortSignal, text: string) {
-    // Check if the signal is aborted
-    if (abortSignal.aborted) {
+    // Check if the signal is aborted or openau api key is not set
+    if (abortSignal.aborted || this.openai === undefined) {
       return;
     }
     const config = JSON.parse(localStorage.getItem('config'));
