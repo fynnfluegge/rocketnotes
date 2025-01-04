@@ -42,7 +42,7 @@ button {
     overflow: hidden;
     border-radius: 3px;
     border-color: transparent;
-    border: 1px solid #666;
+    border: 1px solid var(--focus-color);
   }
   &.cdk-drag-placeholder {
     // potential drop area
