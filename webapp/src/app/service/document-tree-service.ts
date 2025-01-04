@@ -303,44 +303,6 @@ export class DocumentTree {
     }
   }
 
-  addFlatToMap(map: Map<string, DocumentNode>, node: DocumentNode) {
-    if (node.children) {
-      node.children.forEach((v) => {
-        map.set(v.id, v);
-        this.addFlatToMap(map, v);
-      });
-    }
-  }
-
-  setNotDeleted(node: DocumentNode) {
-    node.deleted = false;
-    if (node.children)
-      node.children.forEach((v) => {
-        this.setNotDeleted(v);
-      });
-  }
-
-  setDeletedandUnpin(node: DocumentNode) {
-    node.deleted = true;
-    this.rootNodeMap.set(node.id, node);
-    if (node.pinned) {
-      node.pinned = false;
-      this.pinnedNodeMap.delete(node.id);
-      this.removeFromParent(this.pinnedNode, node.id);
-    }
-    if (node.children)
-      node.children.forEach((v) => {
-        this.setDeletedandUnpin(v);
-      });
-  }
-
-  removeFromParent(parent: DocumentNode, id: string) {
-    if (parent.children) {
-      parent.children = parent.children.filter((c) => c.id !== id);
-      if (parent.children.length === 0) parent.children = null;
-    }
-  }
-
   addNewItem(node: DocumentFlatNode) {
     if (!node) {
       node = this.nestedNodeMap.get(this.rootNode);
@@ -350,7 +312,7 @@ export class DocumentTree {
     this.refreshTree();
   }
 
-  insertItem(parent: DocumentFlatNode, vName: string): DocumentNode {
+  private insertItem(parent: DocumentFlatNode, vName: string): DocumentNode {
     const child = <DocumentNode>{
       id: v4(),
       name: vName,
@@ -385,22 +347,18 @@ export class DocumentTree {
     this.treeControl.expand(this.nestedNodeMap.get(this.rootNode));
   }
 
-  removeFromDocuments(node: DocumentNode) {
+  moveToTrash(node: DocumentFlatNode) {
+    const nestedNode = this.flatNodeMap.get(node);
+    if (!this.trashNode.children) this.trashNode.children = [];
+
+    // remove from parent in documents
+    // this.removeFromDocuments(nestedNode);
     if (node.parent === ROOT_ID) {
       this.removeFromParent(this.rootNode, node.id);
     } else {
       const parent = this.rootNodeMap.get(node.parent);
       this.removeFromParent(parent, node.id);
     }
-    this.dataChange.next(this.data);
-  }
-
-  moveToTrash(node: DocumentFlatNode) {
-    const nestedNode = this.flatNodeMap.get(node);
-    if (!this.trashNode.children) this.trashNode.children = [];
-
-    // remove from parent in documents
-    this.removeFromDocuments(nestedNode);
 
     // set node and children as deleted
     // unpin node and children
@@ -453,7 +411,7 @@ export class DocumentTree {
     this.treeControl.expand(this.nestedNodeMap.get(this.rootNode));
   }
 
-  saveNode(node: DocumentNode, newName: string, newItem: boolean) {
+  private saveNode(node: DocumentNode, newName: string, newItem: boolean) {
     const node_ = this.rootNodeMap.get(node.id);
     node_.name = newName;
     node_.lastModified = new Date();
@@ -525,7 +483,7 @@ export class DocumentTree {
     this.treeControl.expand(this.nestedNodeMap.get(this.trashNode));
   }
 
-  getNearestParentThatIsNotDeleted(node: DocumentNode): DocumentNode {
+  private getNearestParentThatIsNotDeleted(node: DocumentNode): DocumentNode {
     let parentNode;
     for (const element of this.flatNodeMap.values()) {
       if (element.id === node.parent) {
@@ -541,7 +499,7 @@ export class DocumentTree {
     return parentNode;
   }
 
-  restoreNode(
+  private restoreNode(
     node: DocumentNode,
     parentToInsertId: string,
     parentToRemoveId: string = null,
@@ -578,7 +536,7 @@ export class DocumentTree {
     this.treeControl.expand(this.nestedNodeMap.get(this.pinnedNode));
   }
 
-  pinNode(node: DocumentNode) {
+  private pinNode(node: DocumentNode) {
     node.pinned = !node.pinned;
     // pin node
     if (node.pinned) {
@@ -629,35 +587,6 @@ export class DocumentTree {
       this.treeControl.expand(this.nestedNodeMap.get(this.pinnedNode));
     }
   }
-
-  /**
-   * Transformer to convert nested node to flat node. Record the nodes in maps for later use.
-   */
-  transformer = (node: DocumentNode, level: number) => {
-    const flatNode =
-      this.nestedNodeMap.has(node) &&
-      this.nestedNodeMap.get(node)!.name === node.name
-        ? this.nestedNodeMap.get(node)!
-        : new DocumentFlatNode();
-    flatNode.name = node.name;
-    flatNode.id = node.id;
-    flatNode.parent = node.parent;
-    flatNode.level = level;
-    flatNode.deleted = node.deleted;
-    flatNode.pinned = node.pinned;
-    flatNode.expandable = !!node.children;
-    this.flatNodeMap.set(flatNode, node);
-    this.nestedNodeMap.set(node, flatNode);
-    return flatNode;
-  };
-
-  getLevel = (node: DocumentFlatNode) => {
-    return node.level;
-  };
-
-  isExpandable = (node: DocumentFlatNode) => {
-    return node.expandable;
-  };
 
   expandNode(node: DocumentFlatNode) {
     this.treeControl.expand(node);
@@ -804,6 +733,72 @@ export class DocumentTree {
     };
   }
 
+  /**
+   * Transformer to convert nested node to flat node. Record the nodes in maps for later use.
+   */
+  private transformer = (node: DocumentNode, level: number) => {
+    const flatNode =
+      this.nestedNodeMap.has(node) &&
+      this.nestedNodeMap.get(node)!.name === node.name
+        ? this.nestedNodeMap.get(node)!
+        : new DocumentFlatNode();
+    flatNode.name = node.name;
+    flatNode.id = node.id;
+    flatNode.parent = node.parent;
+    flatNode.level = level;
+    flatNode.deleted = node.deleted;
+    flatNode.pinned = node.pinned;
+    flatNode.expandable = !!node.children;
+    this.flatNodeMap.set(flatNode, node);
+    this.nestedNodeMap.set(node, flatNode);
+    return flatNode;
+  };
+
+  private getLevel = (node: DocumentFlatNode) => {
+    return node.level;
+  };
+
+  private isExpandable = (node: DocumentFlatNode) => {
+    return node.expandable;
+  };
+
+  private setNotDeleted(node: DocumentNode) {
+    node.deleted = false;
+    if (node.children)
+      node.children.forEach((v) => {
+        this.setNotDeleted(v);
+      });
+  }
+
+  private addFlatToMap(map: Map<string, DocumentNode>, node: DocumentNode) {
+    if (node.children) {
+      node.children.forEach((v) => {
+        map.set(v.id, v);
+        this.addFlatToMap(map, v);
+      });
+    }
+  }
+
+  private setDeletedandUnpin(node: DocumentNode) {
+    node.deleted = true;
+    this.rootNodeMap.set(node.id, node);
+    if (node.pinned) {
+      node.pinned = false;
+      this.pinnedNodeMap.delete(node.id);
+      this.removeFromParent(this.pinnedNode, node.id);
+    }
+    if (node.children)
+      node.children.forEach((v) => {
+        this.setDeletedandUnpin(v);
+      });
+  }
+
+  private removeFromParent(parent: DocumentNode, id: string) {
+    if (parent.children) {
+      parent.children = parent.children.filter((c) => c.id !== id);
+      if (parent.children.length === 0) parent.children = null;
+    }
+  }
   /*
     find all visible nodes regardless of the level, except the dragged node, and return it as a flat list
   */
