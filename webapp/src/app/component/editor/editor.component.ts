@@ -2,6 +2,7 @@ import { Component, Input, VERSION } from '@angular/core';
 import { Auth } from 'aws-amplify';
 import { BasicRestService } from 'src/app/service/basic-rest.service';
 import { ConfigDialogService } from 'src/app/service/config-dialog-service';
+import { Document } from 'src/app/model/document.model';
 import { DocumentTree } from 'src/app/service/document-tree-service';
 import { ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
@@ -37,6 +38,7 @@ export class EditorComponent {
   public title: string;
   public content: string;
   public isPublic: boolean;
+  public isDeleted: boolean;
   public publicLink: string;
 
   initialContent: string;
@@ -83,6 +85,7 @@ export class EditorComponent {
       this.content = value.content;
       this.titleService.setTitle(value.title);
       this.isPublic = value.isPublic;
+      this.isDeleted = value.deleted;
       this.publicLink = environment.redirectSignIn + '/shared/' + this.id;
       this.location.replaceState('/' + this.id);
     });
@@ -98,6 +101,7 @@ export class EditorComponent {
             this.title = document.title;
             this.titleService.setTitle(document.title);
             this.isPublic = document.isPublic;
+            this.isDeleted = document.deleted;
             this.publicLink = environment.redirectSignIn + '/shared/' + this.id;
           });
       }
@@ -414,8 +418,8 @@ export class EditorComponent {
   }
 
   async aiCompletion(abortSignal: AbortSignal, text: string) {
-    // Check if the signal is aborted
-    if (abortSignal.aborted) {
+    // Check if the signal is aborted or openau api key is not set
+    if (abortSignal.aborted || this.openai === undefined) {
       return;
     }
     const config = JSON.parse(localStorage.getItem('config'));
@@ -502,6 +506,8 @@ export class EditorComponent {
   }
 
   submit(): void {
+    const lastModified = this.documentTree.updateLastModifiedDate(this.id);
+
     this.basicRestService
       .post('saveDocument', {
         document: {
@@ -509,8 +515,11 @@ export class EditorComponent {
           userId: localStorage.getItem('currentUserId'),
           title: this.title,
           content: this.content,
+          deleted: this.isDeleted,
+          lastModified: lastModified,
           isPublic: this.isPublic,
         },
+        documentTree: this.documentTree.getDocumentTree(),
       })
       .subscribe(() => {
         if (this.timer) {
@@ -522,9 +531,8 @@ export class EditorComponent {
         //   this.showSnackbar = false;
         // }, 1000);
 
-        // Explicitly update the vector embeddings after the document has been saved
-        // only in local mode. In deployed production mode, the vector embeddings are updated
-        // via sqs event after the document has been saved
+        // Explicitly update the vector embeddings after the document has been saved only in local mode.
+        // In deployed production mode, the vector embeddings are updated via sqs event after the document has been saved
         if (
           !environment.production &&
           localStorage.getItem('config') !== null

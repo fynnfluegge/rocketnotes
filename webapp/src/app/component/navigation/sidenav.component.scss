@@ -38,6 +38,11 @@ button {
     // while dragging
     background-color: var(--menu-color);
     color: white;
+    box-shadow: 0 0 32px rgba(0, 0, 0, 0.82);
+    overflow: hidden;
+    border-radius: 3px;
+    border-color: transparent;
+    border: 1px solid var(--focus-color);
   }
   &.cdk-drag-placeholder {
     // potential drop area
@@ -78,10 +83,6 @@ mat-tree-node:hover {
 mat-tree-node:hover > .hide {
   visibility: visible;
   opacity: 1;
-}
-
-mat-tree-node:focus {
-  background-color: rgb(44, 81, 91);
 }
 
 .active-node {

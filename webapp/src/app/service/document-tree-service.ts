@@ -24,9 +24,10 @@ export class DocumentNode {
   id: string;
   name: string;
   parent: string;
-  children?: DocumentNode[];
   deleted: boolean;
   pinned: boolean;
+  lastModified?: Date;
+  children?: DocumentNode[];
 }
 
 /**
@@ -187,6 +188,7 @@ export class DocumentTree {
                           title: document.title,
                           content: document.content,
                           isPublic: document.isPublic,
+                          deleted: document.deleted,
                         });
                       });
                   } else if (this.rootNode.children) {
@@ -199,6 +201,7 @@ export class DocumentTree {
                           title: document.title,
                           content: document.content,
                           isPublic: document.isPublic,
+                          deleted: document.deleted,
                         });
                       });
                   }
@@ -276,6 +279,7 @@ export class DocumentTree {
                         title: document.title,
                         content: document.content,
                         isPublic: document.isPublic,
+                        deleted: document.deleted,
                       });
                     });
                 } else if (this.rootNode.children) {
@@ -288,6 +292,7 @@ export class DocumentTree {
                         title: document.title,
                         content: document.content,
                         isPublic: document.isPublic,
+                        deleted: document.deleted,
                       });
                     });
                 }
@@ -295,44 +300,6 @@ export class DocumentTree {
             });
           },
         });
-    }
-  }
-
-  addFlatToMap(map: Map<string, DocumentNode>, node: DocumentNode) {
-    if (node.children) {
-      node.children.forEach((v) => {
-        map.set(v.id, v);
-        this.addFlatToMap(map, v);
-      });
-    }
-  }
-
-  setNotDeleted(node: DocumentNode) {
-    node.deleted = false;
-    if (node.children)
-      node.children.forEach((v) => {
-        this.setNotDeleted(v);
-      });
-  }
-
-  setDeletedandUnpin(node: DocumentNode) {
-    node.deleted = true;
-    this.rootNodeMap.set(node.id, node);
-    if (node.pinned) {
-      node.pinned = false;
-      this.pinnedNodeMap.delete(node.id);
-      this.removeFromParent(this.pinnedNode, node.id);
-    }
-    if (node.children)
-      node.children.forEach((v) => {
-        this.setDeletedandUnpin(v);
-      });
-  }
-
-  removeFromParent(parent: DocumentNode, id: string) {
-    if (parent.children) {
-      parent.children = parent.children.filter((c) => c.id !== id);
-      if (parent.children.length === 0) parent.children = null;
     }
   }
 
@@ -345,7 +312,7 @@ export class DocumentTree {
     this.refreshTree();
   }
 
-  insertItem(parent: DocumentFlatNode, vName: string): DocumentNode {
+  private insertItem(parent: DocumentFlatNode, vName: string): DocumentNode {
     const child = <DocumentNode>{
       id: v4(),
       name: vName,
@@ -373,26 +340,11 @@ export class DocumentTree {
 
     this.dataChange.next(this.data);
     this.basicRestService
-      .post('saveDocumentTree', {
-        id: localStorage.getItem('currentUserId'),
-        documents: JSON.parse(JSON.stringify(this.rootNode.children)),
-        trash: JSON.parse(JSON.stringify(this.trashNode.children)),
-        pinned: JSON.parse(JSON.stringify(this.pinnedNode.children)),
-      })
+      .post('saveDocumentTree', this.getDocumentTree())
       .subscribe();
 
     this.treeControl.collapse(this.nestedNodeMap.get(this.rootNode));
     this.treeControl.expand(this.nestedNodeMap.get(this.rootNode));
-  }
-
-  removeFromDocuments(node: DocumentNode) {
-    if (node.parent === ROOT_ID) {
-      this.removeFromParent(this.rootNode, node.id);
-    } else {
-      const parent = this.rootNodeMap.get(node.parent);
-      this.removeFromParent(parent, node.id);
-    }
-    this.dataChange.next(this.data);
   }
 
   moveToTrash(node: DocumentFlatNode) {
@@ -400,7 +352,13 @@ export class DocumentTree {
     if (!this.trashNode.children) this.trashNode.children = [];
 
     // remove from parent in documents
-    this.removeFromDocuments(nestedNode);
+    // this.removeFromDocuments(nestedNode);
+    if (node.parent === ROOT_ID) {
+      this.removeFromParent(this.rootNode, node.id);
+    } else {
+      const parent = this.rootNodeMap.get(node.parent);
+      this.removeFromParent(parent, node.id);
+    }
 
     // set node and children as deleted
     // unpin node and children
@@ -411,12 +369,7 @@ export class DocumentTree {
 
     this.dataChange.next(this.data);
     this.basicRestService
-      .post('saveDocumentTree', {
-        id: localStorage.getItem('currentUserId'),
-        documents: JSON.parse(JSON.stringify(this.rootNode.children)),
-        trash: JSON.parse(JSON.stringify(this.trashNode.children)),
-        pinned: JSON.parse(JSON.stringify(this.pinnedNode.children)),
-      })
+      .post('saveDocumentTree', this.getDocumentTree())
       .subscribe();
 
     this.refreshTree();
@@ -430,12 +383,7 @@ export class DocumentTree {
 
     this.dataChange.next(this.data);
     this.basicRestService
-      .post('saveDocumentTree', {
-        id: localStorage.getItem('currentUserId'),
-        documents: JSON.parse(JSON.stringify(this.rootNode.children)),
-        trash: JSON.parse(JSON.stringify(this.trashNode.children)),
-        pinned: JSON.parse(JSON.stringify(this.pinnedNode.children)),
-      })
+      .post('saveDocumentTree', this.getDocumentTree())
       .subscribe(() => {
         // TODO here delete post
       });
@@ -451,24 +399,27 @@ export class DocumentTree {
           title: document.title,
           content: document.content,
           isPublic: document.isPublic,
+          deleted: document.deleted,
         });
       });
   }
 
-  saveItem(node: DocumentFlatNode, itemValue: string, newItem: boolean) {
+  saveItem(node: DocumentFlatNode, itemName: string, newItem: boolean) {
     const nestedNode = this.flatNodeMap.get(node);
-    this.saveNode(nestedNode!, itemValue, newItem);
+    this.saveNode(nestedNode!, itemName, newItem);
     this.treeControl.collapse(this.nestedNodeMap.get(this.rootNode));
     this.treeControl.expand(this.nestedNodeMap.get(this.rootNode));
   }
 
-  saveNode(node: DocumentNode, newName: string, newItem: boolean) {
+  private saveNode(node: DocumentNode, newName: string, newItem: boolean) {
     const node_ = this.rootNodeMap.get(node.id);
     node_.name = newName;
+    node_.lastModified = new Date();
 
     if (node.pinned) {
       const pinnedNode = this.pinnedNodeMap.get(node.id);
       pinnedNode.name = newName;
+      pinnedNode.lastModified = node_.lastModified;
     }
 
     if (newItem) this.rootNodeMap.set(node.id, node);
@@ -476,12 +427,7 @@ export class DocumentTree {
     this.dataChange.next(this.data);
 
     this.basicRestService
-      .post('saveDocumentTree', {
-        id: localStorage.getItem('currentUserId'),
-        documents: JSON.parse(JSON.stringify(this.rootNode.children)),
-        trash: JSON.parse(JSON.stringify(this.trashNode.children)),
-        pinned: JSON.parse(JSON.stringify(this.pinnedNode.children)),
-      })
+      .post('saveDocumentTree', this.getDocumentTree())
       .subscribe(() => {
         if (newItem) {
           this.basicRestService
@@ -491,6 +437,7 @@ export class DocumentTree {
                 userId: localStorage.getItem('currentUserId'),
                 title: newName,
                 content: 'new document',
+                lastModified: node_.lastModified,
               },
             })
             .subscribe(() => {
@@ -536,7 +483,7 @@ export class DocumentTree {
     this.treeControl.expand(this.nestedNodeMap.get(this.trashNode));
   }
 
-  getNearestParentThatIsNotDeleted(node: DocumentNode): DocumentNode {
+  private getNearestParentThatIsNotDeleted(node: DocumentNode): DocumentNode {
     let parentNode;
     for (const element of this.flatNodeMap.values()) {
       if (element.id === node.parent) {
@@ -552,7 +499,7 @@ export class DocumentTree {
     return parentNode;
   }
 
-  restoreNode(
+  private restoreNode(
     node: DocumentNode,
     parentToInsertId: string,
     parentToRemoveId: string = null,
@@ -566,26 +513,19 @@ export class DocumentTree {
     // insert node
     parentToInsert.children.push(node);
 
-    if (!parentToRemoveId) {
-      // parent not deleted, remove node from trash
-      this.removeFromParent(this.trashNode, node.id);
-    } else {
-      const parentToRemove = this.rootNodeMap.get(parentToRemoveId);
+    if (parentToRemoveId) {
       // parent in trash, remove node from parent.children
+      const parentToRemove = this.rootNodeMap.get(parentToRemoveId);
       this.removeFromParent(parentToRemove, node.id);
     }
+    this.removeFromParent(this.trashNode, node.id);
 
     this.rootNodeMap.set(node.id, node);
 
     this.dataChange.next(this.data);
 
     this.basicRestService
-      .post('saveDocumentTree', {
-        id: localStorage.getItem('currentUserId'),
-        documents: JSON.parse(JSON.stringify(this.rootNode.children)),
-        trash: JSON.parse(JSON.stringify(this.trashNode.children)),
-        pinned: JSON.parse(JSON.stringify(this.pinnedNode.children)),
-      })
+      .post('saveDocumentTree', this.getDocumentTree())
       .subscribe();
   }
 
@@ -596,7 +536,7 @@ export class DocumentTree {
     this.treeControl.expand(this.nestedNodeMap.get(this.pinnedNode));
   }
 
-  pinNode(node: DocumentNode) {
+  private pinNode(node: DocumentNode) {
     node.pinned = !node.pinned;
     // pin node
     if (node.pinned) {
@@ -633,12 +573,7 @@ export class DocumentTree {
 
     this.dataChange.next(this.data);
     this.basicRestService
-      .post('saveDocumentTree', {
-        id: localStorage.getItem('currentUserId'),
-        documents: JSON.parse(JSON.stringify(this.rootNode.children)),
-        trash: JSON.parse(JSON.stringify(this.trashNode.children)),
-        pinned: JSON.parse(JSON.stringify(this.pinnedNode.children)),
-      })
+      .post('saveDocumentTree', this.getDocumentTree())
       .subscribe();
   }
 
@@ -652,39 +587,6 @@ export class DocumentTree {
       this.treeControl.expand(this.nestedNodeMap.get(this.pinnedNode));
     }
   }
-
-  /**
-   * Transformer to convert nested node to flat node. Record the nodes in maps for later use.
-   */
-  transformer = (node: DocumentNode, level: number) => {
-    const flatNode =
-      this.nestedNodeMap.has(node) &&
-      this.nestedNodeMap.get(node)!.name === node.name
-        ? this.nestedNodeMap.get(node)!
-        : new DocumentFlatNode();
-    flatNode.name = node.name;
-    flatNode.id = node.id;
-    flatNode.parent = node.parent;
-    flatNode.level = level;
-    flatNode.deleted = node.deleted;
-    flatNode.pinned = node.pinned;
-    flatNode.expandable = !!node.children;
-    this.flatNodeMap.set(flatNode, node);
-    this.nestedNodeMap.set(node, flatNode);
-    return flatNode;
-  };
-
-  getLevel = (node: DocumentFlatNode) => {
-    return node.level;
-  };
-
-  isExpandable = (node: DocumentFlatNode) => {
-    return node.expandable;
-  };
-
-  getChildren = (node: DocumentNode): Observable<DocumentNode[]> => {
-    return ofObservable(node.children);
-  };
 
   expandNode(node: DocumentFlatNode) {
     this.treeControl.expand(node);
@@ -805,10 +707,102 @@ export class DocumentTree {
     this.rebuildTreeForData(changedData);
   }
 
+  updateLastModifiedDate(id: string) {
+    const node = this.rootNodeMap.get(id);
+    node.lastModified = new Date();
+
+    if (node.pinned) {
+      const pinnedNode = this.pinnedNodeMap.get(id);
+      pinnedNode.lastModified = node.lastModified;
+    }
+
+    this.dataChange.next(this.data);
+    return node.lastModified;
+  }
+
+  isExpanded(node: DocumentFlatNode) {
+    return this.treeControl.isExpanded(node);
+  }
+
+  getDocumentTree() {
+    return {
+      id: localStorage.getItem('currentUserId'),
+      documents: JSON.parse(JSON.stringify(this.rootNode.children)),
+      trash: JSON.parse(JSON.stringify(this.trashNode.children)),
+      pinned: JSON.parse(JSON.stringify(this.pinnedNode.children)),
+    };
+  }
+
+  /**
+   * Transformer to convert nested node to flat node. Record the nodes in maps for later use.
+   */
+  private transformer = (node: DocumentNode, level: number) => {
+    const flatNode =
+      this.nestedNodeMap.has(node) &&
+      this.nestedNodeMap.get(node)!.name === node.name
+        ? this.nestedNodeMap.get(node)!
+        : new DocumentFlatNode();
+    flatNode.name = node.name;
+    flatNode.id = node.id;
+    flatNode.parent = node.parent;
+    flatNode.level = level;
+    flatNode.deleted = node.deleted;
+    flatNode.pinned = node.pinned;
+    flatNode.expandable = !!node.children;
+    this.flatNodeMap.set(flatNode, node);
+    this.nestedNodeMap.set(node, flatNode);
+    return flatNode;
+  };
+
+  private getLevel = (node: DocumentFlatNode) => {
+    return node.level;
+  };
+
+  private isExpandable = (node: DocumentFlatNode) => {
+    return node.expandable;
+  };
+
+  private setNotDeleted(node: DocumentNode) {
+    node.deleted = false;
+    if (node.children)
+      node.children.forEach((v) => {
+        this.setNotDeleted(v);
+      });
+  }
+
+  private addFlatToMap(map: Map<string, DocumentNode>, node: DocumentNode) {
+    if (node.children) {
+      node.children.forEach((v) => {
+        map.set(v.id, v);
+        this.addFlatToMap(map, v);
+      });
+    }
+  }
+
+  private setDeletedandUnpin(node: DocumentNode) {
+    node.deleted = true;
+    this.rootNodeMap.set(node.id, node);
+    if (node.pinned) {
+      node.pinned = false;
+      this.pinnedNodeMap.delete(node.id);
+      this.removeFromParent(this.pinnedNode, node.id);
+    }
+    if (node.children)
+      node.children.forEach((v) => {
+        this.setDeletedandUnpin(v);
+      });
+  }
+
+  private removeFromParent(parent: DocumentNode, id: string) {
+    if (parent.children) {
+      parent.children = parent.children.filter((c) => c.id !== id);
+      if (parent.children.length === 0) parent.children = null;
+    }
+  }
   /*
     find all visible nodes regardless of the level, except the dragged node, and return it as a flat list
   */
-  visibleNodes(inPinned: boolean, deleted: boolean): DocumentNode[] {
+  private visibleNodes(inPinned: boolean, deleted: boolean): DocumentNode[] {
     const result = [];
     this.dataSource.data.forEach((node) => {
       this.addExpandedChildren(
@@ -822,7 +816,7 @@ export class DocumentTree {
     return result;
   }
 
-  addExpandedChildren(
+  private addExpandedChildren(
     node: DocumentNode,
     expanded: boolean,
     inPinned: boolean,
@@ -849,16 +843,15 @@ export class DocumentTree {
     }
   }
 
-  rebuildTreeForData(data: any) {
+  private rebuildTreeForData(data: any) {
     this.dataSource.data = data;
     this.refreshTree();
     this.basicRestService
-      .post('saveDocumentTree', {
-        id: localStorage.getItem('currentUserId'),
-        documents: JSON.parse(JSON.stringify(this.rootNode.children)),
-        trash: JSON.parse(JSON.stringify(this.trashNode.children)),
-        pinned: JSON.parse(JSON.stringify(this.pinnedNode.children)),
-      })
+      .post('saveDocumentTree', this.getDocumentTree())
       .subscribe();
   }
+
+  private getChildren = (node: DocumentNode): Observable<DocumentNode[]> => {
+    return ofObservable(node.children);
+  };
 }

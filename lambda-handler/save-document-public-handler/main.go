@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -16,15 +17,15 @@ import (
 )
 
 type Document struct {
-	ID            string  `json:"id"`
-	ParentId      string  `json:"parentId"`
-	UserId        string  `json:"userId"`
-	Title         string  `json:"title"`
-	Content       string  `json:"content"`
-	Searchcontent string  `json:"searchContent"`
-	LastModified  string  `json:"lastModified"`
-	Deleted       bool    `json:"deleted"`
-	IsPublic      bool    `json:"isPublic"`
+	ID            string    `json:"id"`
+	ParentId      string    `json:"parentId"`
+	UserId        string    `json:"userId"`
+	Title         string    `json:"title"`
+	Content       string    `json:"content"`
+	Searchcontent string    `json:"searchContent"`
+	LastModified  time.Time `json:"lastModified"`
+	Deleted       bool      `json:"deleted"`
+	IsPublic      bool      `json:"isPublic"`
 }
 
 type RequestBody struct {
@@ -36,7 +37,6 @@ func init() {
 }
 
 func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-
 	requestBody := RequestBody{}
 
 	json.Unmarshal([]byte(request.Body), &requestBody)

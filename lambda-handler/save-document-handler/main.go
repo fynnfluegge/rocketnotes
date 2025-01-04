@@ -22,37 +22,52 @@ type Item struct {
 }
 
 type Body struct {
-	Document *Document `json:"document"`
+	Document     *Document     `json:"document"`
+	DocumentTree *DocumentTree `json:"documentTree"`
 }
 
 type Document struct {
-	ID           string 	 `json:"id"`
-	ParentId     string 	 `json:"parentId"`
-	UserId       string 	 `json:"userId"`
-	Title        string 	 `json:"title"`
-	Content      string 	 `json:"content"`
-	Searchcontent string   `json:"searchContent"`
-	LastModified time.Time `json:"lastModified"`
-	Deleted      bool   	 `json:"deleted"`
-	IsPublic     bool   	 `json:"isPublic"`
+	ID            string    `json:"id"`
+	ParentId      string    `json:"parentId"`
+	UserId        string    `json:"userId"`
+	Title         string    `json:"title"`
+	Content       string    `json:"content"`
+	Searchcontent string    `json:"searchContent"`
+	LastModified  time.Time `json:"lastModified"`
+	Deleted       bool      `json:"deleted"`
+	IsPublic      bool      `json:"isPublic"`
+}
+
+type DocumentTreeItem struct {
+	ID           string              `json:"id"`
+	Name         string              `json:"name"`
+	Parent       string              `json:"parent"`
+	Pinned       bool                `json:"pinned"`
+	LastModified time.Time           `json:"lastModified"`
+	Children     []*DocumentTreeItem `json:"children"`
+}
+
+type DocumentTree struct {
+	ID        string              `json:"id"`
+	Documents []*DocumentTreeItem `json:"documents"`
+	Trash     []*DocumentTreeItem `json:"trash"`
+	Pinned    []*DocumentTreeItem `json:"pinned"`
 }
 
 type SqsMessage struct {
-	UserId       string `json:"userId"`
-	DocumentId   string `json:"documentId"`
+	UserId     string `json:"userId"`
+	DocumentId string `json:"documentId"`
 }
 
 func init() {
 }
 
 func handleRequest(ctx context.Context, event events.SQSEvent) {
-
 	item := Item{}
 
 	json.Unmarshal([]byte(event.Records[0].Body), &item)
 
 	item.Body.Document.Searchcontent = strings.ToLower(item.Body.Document.Title + "\n" + item.Body.Document.Content)
-	item.Body.Document.LastModified = time.Now()
 
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
@@ -77,6 +92,25 @@ func handleRequest(ctx context.Context, event events.SQSEvent) {
 		log.Fatalf("Got error calling PutItem: %s", err)
 	}
 
+	av, err = dynamodbattribute.MarshalMap(item.Body.DocumentTree)
+	if err != nil {
+		return events.APIGatewayProxyResponse{
+			StatusCode: 404,
+		}, nil
+	}
+
+	tableName = "tnn-Tree"
+
+	input = &dynamodb.PutItemInput{
+		Item:      av,
+		TableName: aws.String(tableName),
+	}
+
+	_, err = svc.PutItem(input)
+	if err != nil {
+		log.Fatalf("Got error calling PutItem: %s", err)
+	}
+
 	user_config, err := svc.GetItem(&dynamodb.GetItemInput{
 		TableName: aws.String("tnn-UserConfig"),
 		Key: map[string]*dynamodb.AttributeValue{
@@ -85,7 +119,6 @@ func handleRequest(ctx context.Context, event events.SQSEvent) {
 			},
 		},
 	})
-
 	if err != nil {
 		log.Fatalf("Got error calling GetItem: %s", err)
 	}
