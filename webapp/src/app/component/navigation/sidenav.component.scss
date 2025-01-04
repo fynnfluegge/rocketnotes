@@ -38,6 +38,11 @@ button {
     // while dragging
     background-color: var(--menu-color);
     color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.75);
+    overflow: hidden;
+    border-radius: 3px;
+    border-color: transparent;
+    border: 1px solid #666;
   }
   &.cdk-drag-placeholder {
     // potential drop area
