@@ -214,7 +214,7 @@ code {
 .variable-textarea {
   border-radius: 5px;
   box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
-  padding: 12px;
+  padding: 18px 12px;
   border: none;
 }
 
@@ -227,6 +227,11 @@ code {
   box-shadow:
     0 6px 12px 3px rgba(0, 0, 0, 0.09),
     0 2px 3px 1px rgba(0, 0, 0, 0.06);
+}
+
+.markdown-textarea:focus {
+  outline: none !important;
+  border: none;
 }
 // ------------------------------- //
 

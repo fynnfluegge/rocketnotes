@@ -2,7 +2,6 @@ import { Component, Input, VERSION } from '@angular/core';
 import { Auth } from 'aws-amplify';
 import { BasicRestService } from 'src/app/service/basic-rest.service';
 import { ConfigDialogService } from 'src/app/service/config-dialog-service';
-import { Document } from 'src/app/model/document.model';
 import { DocumentTree } from 'src/app/service/document-tree-service';
 import { ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
@@ -184,10 +183,7 @@ export class EditorComponent {
       if (this.showPreview) {
         const previewPanel = document.getElementById('markdownPreview');
         const markdownTextarea = document.getElementById('markdownTextarea');
-        this.addSynchronizedScrollEventListeners(
-          markdownTextarea,
-          previewPanel,
-        );
+        this.addSynchronizedScrollEventListeners(markdownTextarea);
         previewPanel.scrollTop = markdownTextarea.scrollTop;
       }
     }, 100);
@@ -201,22 +197,15 @@ export class EditorComponent {
         // add synchronize scroll event listener
         if (this.showPreview) {
           const markdownTextarea = document.getElementById('markdownTextarea');
-          const previewPanel = document.getElementById('markdownPreview');
-          this.addSynchronizedScrollEventListeners(
-            markdownTextarea,
-            previewPanel,
-          );
+          this.addSynchronizedScrollEventListeners(markdownTextarea);
         }
       }, 100);
       this.initialContent = (' ' + this.content).slice(1);
     }
   }
 
-  addSynchronizedScrollEventListeners(markdownEditor: any, previewPanel: any) {
+  addSynchronizedScrollEventListeners(markdownEditor: any) {
     markdownEditor.addEventListener('scroll', (event: any) =>
-      this.synchronizeScroll(event),
-    );
-    previewPanel.addEventListener('scroll', (event: any) =>
       this.synchronizeScroll(event),
     );
   }
@@ -274,18 +263,6 @@ export class EditorComponent {
       markdownTextarea.value = newValue;
       markdownTextarea.selectionStart = currentPos + 1;
       markdownTextarea.selectionEnd = currentPos + 1;
-      // if cursor is at the bottom of the textarea, scroll down
-      if (
-        markdownTextarea.scrollTop + markdownTextarea.clientHeight >=
-        markdownTextarea.scrollHeight - 32
-      ) {
-        // Scroll the markdownTextarea down by one line (adjust the value as needed)
-        this.disableSynchronizeScroll = true;
-        markdownTextarea.scrollTop += markdownTextarea.clientHeight;
-        setTimeout(() => {
-          this.disableSynchronizeScroll = false;
-        }, 1000);
-      }
     } else if (event.code !== 'Escape') {
       this.startOrResetTimer();
 

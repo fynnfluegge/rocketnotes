@@ -72,15 +72,32 @@
     </button>
   </div>
 
-  <textarea
-    id="markdownTextarea"
+  <div
+    style="
+      resize: none;
+      margin-top: 4px;
+      display: inline-block;
+      height: 100%;
+      background-color: white;
+    "
     *ngIf="editorMode"
-    [(ngModel)]="content"
     class="variable-textarea"
-    style="resize: none; margin-top: 4px; display: inline-block; height: 100%"
     [style.width]="showPreview ? 'calc(50% - 4px)' : '100%'"
-    (keydown)="onKeydown($event)"
-  ></textarea>
+  >
+    <textarea
+      id="markdownTextarea"
+      class="markdown-textarea"
+      [(ngModel)]="content"
+      (keydown)="onKeydown($event)"
+      style="
+        height: 100%;
+        width: 100%;
+        resize: none;
+        padding: 8px;
+        border: none;
+      "
+    ></textarea>
+  </div>
   <div class="suggestion">{{ suggestion }}</div>
   <markdown
     katex
