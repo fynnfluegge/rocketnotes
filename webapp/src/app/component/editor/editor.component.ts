@@ -411,9 +411,7 @@ export class EditorComponent {
     const config = JSON.parse(localStorage.getItem('config'));
     const prompt = 'Complete the following text with 1 to 5 words: ' + text;
     let message = '';
-    console.log(config['llm']);
     if (config['llm'].startsWith('gpt')) {
-      console.log('gpt');
       const completion = await this.openai.chat.completions.create({
         messages: [
           {
@@ -426,7 +424,6 @@ export class EditorComponent {
       });
       message = completion.choices[0].message.content;
     } else if (config['llm'].startsWith('claude')) {
-      console.log('claude');
       const completion = await this.anthropic.messages.create({
         max_tokens: 1024,
         messages: [{ role: 'user', content: 'Hello, Claude' }],
