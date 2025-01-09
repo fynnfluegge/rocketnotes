@@ -426,7 +426,7 @@ export class EditorComponent {
     } else if (config['llm'].startsWith('claude')) {
       const completion = await this.anthropic.messages.create({
         max_tokens: 1024,
-        messages: [{ role: 'user', content: 'Hello, Claude' }],
+        messages: [{ role: 'user', content: prompt }],
         model: config['llm'],
       });
       message = (completion.content[0] as TextBlock).text;
