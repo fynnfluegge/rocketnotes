@@ -263,6 +263,17 @@ export class EditorComponent {
       markdownTextarea.value = newValue;
       markdownTextarea.selectionStart = currentPos + 1;
       markdownTextarea.selectionEnd = currentPos + 1;
+      // if cursor is at the bottom of the textarea, scroll down
+      if (
+        markdownTextarea.scrollTop + markdownTextarea.clientHeight >=
+        markdownTextarea.scrollHeight - 32
+      ) {
+        this.disableSynchronizeScroll = true;
+        markdownTextarea.scrollTop += markdownTextarea.clientHeight;
+        setTimeout(() => {
+          this.disableSynchronizeScroll = false;
+        }, 1000);
+      }
     } else if (event.code !== 'Escape') {
       this.startOrResetTimer();
 
