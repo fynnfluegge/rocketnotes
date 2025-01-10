@@ -11,7 +11,9 @@ import { HostListener } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { lastValueFrom, retry } from 'rxjs';
 import OpenAI from 'openai';
+import Anthropic from '@anthropic-ai/sdk';
 import '../../../assets/prism-custom.js';
+import { TextBlock } from '@anthropic-ai/sdk/resources/index.js';
 
 @Component({
   selector: 'app-editor',
@@ -43,6 +45,7 @@ export class EditorComponent {
   initialContent: string;
 
   private openai: OpenAI;
+  private anthropic: Anthropic;
   private abortController: AbortController;
   private completionTimeout: NodeJS.Timeout | undefined;
   private suggestionLinebreak: boolean = false;
@@ -117,8 +120,11 @@ export class EditorComponent {
                 apiKey: config['openAiApiKey'],
                 dangerouslyAllowBrowser: true,
               });
-            } else if (config['llm'] === 'claude') {
-              // use lambda proxy
+            } else if (config['llm'].startsWith('claude')) {
+              this.anthropic = new Anthropic({
+                apiKey: config['anthropicApiKey'],
+                dangerouslyAllowBrowser: true,
+              });
             }
           }
         },
@@ -407,7 +413,10 @@ export class EditorComponent {
 
   async aiCompletion(abortSignal: AbortSignal, text: string) {
     // Check if the signal is aborted or openau api key is not set
-    if (abortSignal.aborted || this.openai === undefined) {
+    if (
+      abortSignal.aborted ||
+      (this.openai === undefined && this.anthropic === undefined)
+    ) {
       return;
     }
     const config = JSON.parse(localStorage.getItem('config'));
@@ -426,15 +435,12 @@ export class EditorComponent {
       });
       message = completion.choices[0].message.content;
     } else if (config['llm'].startsWith('claude')) {
-      this.basicRestService
-        .post('text-completion', {
-          prompt: prompt,
-          api_key: config['anthropicApiKey'],
-          model: config['llm'],
-        })
-        .subscribe((response) => {
-          message = JSON.stringify(response);
-        });
+      const completion = await this.anthropic.messages.create({
+        max_tokens: 1024,
+        messages: [{ role: 'user', content: prompt }],
+        model: config['llm'],
+      });
+      message = (completion.content[0] as TextBlock).text;
     } else if (config['llm'].startsWith('Ollama')) {
       await lastValueFrom(
         this.http
@@ -494,6 +500,7 @@ export class EditorComponent {
   }
 
   submit(): void {
+    // TODO if content has not changed don't submit
     const lastModified = this.documentTree.updateLastModifiedDate(this.id);
 
     this.basicRestService
