@@ -191,7 +191,7 @@ export class ZettelkastenComponent implements OnInit {
                 },
               ],
             })
-            .subscribe(() => {});
+            .subscribe();
         }
       });
   }
