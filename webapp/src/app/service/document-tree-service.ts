@@ -385,7 +385,7 @@ export class DocumentTree {
     this.basicRestService
       .post('saveDocumentTree', this.getDocumentTree())
       .subscribe(() => {
-        // TODO here delete post
+        this.basicRestService.delete('deleteDocument/' + node.id).subscribe();
       });
     this.treeControl.collapse(this.nestedNodeMap.get(this.trashNode));
     this.treeControl.expand(this.nestedNodeMap.get(this.trashNode));

@@ -300,7 +300,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
 		Environment: &map[string]*string{"queueUrl": vectorQueue.QueueUrl()},
-		Role: lambdaSqsDynamoDbRole,
+		Role:        lambdaSqsDynamoDbRole,
 	})
 
 	httpApi.AddRoutes(&awscdkapigatewayv2alpha.AddRoutesOptions{
@@ -367,6 +367,25 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("postShareDocumentLambdaIntegration"), postShareDocumentHandler, &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
 	})
 
+	// DELETE Document Api
+
+	deleteZettelHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("DELETE-Document"), &awscdklambdagoalpha.GoFunctionProps{
+		FunctionName: jsii.String("DELETE-Document"),
+		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
+		Entry:        jsii.String("../lambda-handler/delete-delete-handler"),
+		Bundling: &awscdklambdagoalpha.BundlingOptions{
+			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
+		},
+		Role: lambdaSqsDynamoDbRole,
+	})
+
+	httpApi.AddRoutes(&awscdkapigatewayv2alpha.AddRoutesOptions{
+		Path:        jsii.String("/deleteDocument/{id}"),
+		Authorizer:  httpApiAuthorizer,
+		Methods:     &[]awscdkapigatewayv2alpha.HttpMethod{awscdkapigatewayv2alpha.HttpMethod_DELETE},
+		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("deleteDocumentLambdaIntegration"), deleteZettelHandler, &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
+	})
+
 	// Save Vector embeddings
 
 	bucket := awss3.NewBucket(stack, jsii.String("VectorEmbeddingsBucket"), &awss3.BucketProps{
@@ -398,10 +417,10 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		Runtime:      awslambda.Runtime_PYTHON_3_9(),
 		Entry:        jsii.String("../lambda-handler/semantic-search-handler"),
 		Index:        aws.String("main.py"),
-		Environment: &map[string]*string{"BUCKET_NAME": bucket.BucketName()},
-		Role:        lambdaS3DynamoDbRole,
-		MemorySize:  jsii.Number(1024),
-		Timeout:     awscdk.Duration_Millis(jsii.Number(900000)),
+		Environment:  &map[string]*string{"BUCKET_NAME": bucket.BucketName()},
+		Role:         lambdaS3DynamoDbRole,
+		MemorySize:   jsii.Number(1024),
+		Timeout:      awscdk.Duration_Millis(jsii.Number(900000)),
 	})
 
 	httpApi.AddRoutes(&awscdkapigatewayv2alpha.AddRoutesOptions{
@@ -418,10 +437,10 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		Runtime:      awslambda.Runtime_PYTHON_3_9(),
 		Entry:        jsii.String("../lambda-handler/chat-handler"),
 		Index:        aws.String("main.py"),
-		Environment: &map[string]*string{"BUCKET_NAME": bucket.BucketName()},
-		Role:        lambdaS3DynamoDbRole,
-		MemorySize:  jsii.Number(1024),
-		Timeout:     awscdk.Duration_Millis(jsii.Number(900000)),
+		Environment:  &map[string]*string{"BUCKET_NAME": bucket.BucketName()},
+		Role:         lambdaS3DynamoDbRole,
+		MemorySize:   jsii.Number(1024),
+		Timeout:      awscdk.Duration_Millis(jsii.Number(900000)),
 	})
 
 	httpApi.AddRoutes(&awscdkapigatewayv2alpha.AddRoutesOptions{
@@ -438,8 +457,8 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		Runtime:      awslambda.Runtime_PYTHON_3_9(),
 		Entry:        jsii.String("../lambda-handler/text-completion-handler"),
 		Index:        aws.String("main.py"),
-		MemorySize:  jsii.Number(1024),
-		Timeout:     awscdk.Duration_Millis(jsii.Number(900000)),
+		MemorySize:   jsii.Number(1024),
+		Timeout:      awscdk.Duration_Millis(jsii.Number(900000)),
 	})
 
 	httpApi.AddRoutes(&awscdkapigatewayv2alpha.AddRoutesOptions{
@@ -514,7 +533,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
 		Environment: &map[string]*string{"queueUrl": vectorQueue.QueueUrl()},
-		Role: lambdaSqsDynamoDbRole,
+		Role:        lambdaSqsDynamoDbRole,
 	})
 
 	httpApi.AddRoutes(&awscdkapigatewayv2alpha.AddRoutesOptions{
@@ -523,7 +542,6 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		Methods:     &[]awscdkapigatewayv2alpha.HttpMethod{awscdkapigatewayv2alpha.HttpMethod_POST},
 		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("archiveZettelLambdaIntegration"), archiveZettelHandler, &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
 	})
-
 
 	// sign-up confirmation lambda handler
 

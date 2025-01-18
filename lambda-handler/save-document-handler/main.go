@@ -122,7 +122,6 @@ func handleRequest(ctx context.Context, event events.SQSEvent) {
 	}
 
 	if user_config.Item != nil {
-		log.Printf("Recreating index for document %s", item.Body.Document.ID)
 		qsvc := sqs.New(sess)
 
 		m := SqsMessage{item.Body.Document.UserId, item.Body.Document.ID}

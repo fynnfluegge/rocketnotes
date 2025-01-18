@@ -35,7 +35,7 @@ func init() {
 }
 
 func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	id := request.PathParameters["documentId"]
+	id := request.PathParameters["id"]
 
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
@@ -88,7 +88,6 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 	}
 
 	if user_config.Item != nil && os.Getenv("USE_LOCAL_DYNAMODB") != "1" {
-		log.Printf("Recreating index for document %s", item.Body.Document.ID)
 		qsvc := sqs.New(sess)
 
 		m := SqsMessage{item.Body.Document.UserId, item.Body.Document.ID, true}
