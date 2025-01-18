@@ -6,8 +6,11 @@ import boto3
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationSummaryMemory
 from langchain_anthropic import ChatAnthropic
-from langchain_community.embeddings import (HuggingFaceEmbeddings,
-                                            OllamaEmbeddings, VoyageEmbeddings)
+from langchain_community.embeddings import (
+    HuggingFaceEmbeddings,
+    OllamaEmbeddings,
+    VoyageEmbeddings,
+)
 from langchain_community.llms import Ollama
 from langchain_community.vectorstores import FAISS
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
@@ -43,8 +46,8 @@ def handler(event, context):
 
     if "prompt" in request_body:
         prompt = (
-            request_body["prompt"]
-            + "/nSummarize the context I provided and respond with valid markdown syntax."
+            "Based on the context I provided, please answer the following question in valid markdown syntax: "
+            + request_body["prompt"]
         )
     else:
         return {"statusCode": 400, "body": "search_string is missing"}

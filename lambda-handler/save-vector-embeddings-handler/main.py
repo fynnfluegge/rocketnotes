@@ -99,10 +99,17 @@ def handler(event, context):
             f"{file_path}/{file_name}.faiss",
         )
 
+        if deleteVectors:
+            db = load_faiss_index_from_s3(userId, file_path, file_name, embeddings)
+            delete_document_vectors_from_faiss_index(documentId, db)
+            delete_document_vectors_from_dynamodb(documentId)
+            db.save_local(index_name=file_name, folder_path=file_path)
+            save_to_s3(userId + ".faiss", file_path + "/" + file_name + ".faiss")
+            save_to_s3(userId + ".pkl", file_path + "/" + file_name + ".pkl")
         # Vectors already exists and documentId present
         # Update only document vectors
         # --------------------------------------------
-        if faiss_index_exists and documentId and not recreateIndex:
+        elif faiss_index_exists and documentId and not recreateIndex:
             try:
                 db = load_faiss_index_from_s3(userId, file_path, file_name, embeddings)
                 # Update any document vectors that have changed since last index creation
@@ -191,13 +198,6 @@ def handler(event, context):
                 )
                 for documentId, vectors in document_vectors.items():
                     add_vectors_to_dynamodb(documentId, vectors)
-        elif deleteVectors:
-            db = load_faiss_index_from_s3(userId, file_path, file_name, embeddings)
-            delete_document_vectors_from_faiss_index(documentId, db)
-            delete_document_vectors_from_dynamodb(documentId)
-            db.save_local(index_name=file_name, folder_path=file_path)
-            save_to_s3(userId + ".faiss", file_path + "/" + file_name + ".faiss")
-            save_to_s3(userId + ".pkl", file_path + "/" + file_name + ".pkl")
 
     except Exception as e:
         return {

@@ -96,6 +96,8 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: tnn-documents
+        - DynamoDBCrudPolicy:
+            TableName: tnn-tree
       Environment:
         Variables:
           USE_LOCAL_DYNAMODB: 1
@@ -247,6 +249,8 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: tnn-Documents
+        - DynamoDBCrudPolicy:
+            TableName: tnn-userConfig
       Environment:
         Variables:
           USE_LOCAL_DYNAMODB: 1

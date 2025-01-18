@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 	"time"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -12,6 +14,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
+	"github.com/aws/aws-sdk-go/service/sqs"
 )
 
 type Document struct {
@@ -41,7 +44,13 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		SharedConfigState: session.SharedConfigEnable,
 	}))
 
-	svc := dynamodb.New(sess)
+	var svc *dynamodb.DynamoDB
+
+	if os.Getenv("USE_LOCAL_DYNAMODB") == "1" {
+		svc = dynamodb.New(sess, aws.NewConfig().WithEndpoint("http://dynamodb:8000"))
+	} else {
+		svc = dynamodb.New(sess)
+	}
 
 	tableName := "tnn-Documents"
 
@@ -87,10 +96,22 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 		log.Fatalf("Got error calling PutItem: %s", err)
 	}
 
+	user_config, err := svc.GetItem(&dynamodb.GetItemInput{
+		TableName: aws.String("tnn-UserConfig"),
+		Key: map[string]*dynamodb.AttributeValue{
+			"id": {
+				S: aws.String(item.UserId),
+			},
+		},
+	})
+	if err != nil {
+		log.Fatalf("Got error calling GetItem: %s", err)
+	}
+
 	if user_config.Item != nil && os.Getenv("USE_LOCAL_DYNAMODB") != "1" {
 		qsvc := sqs.New(sess)
 
-		m := SqsMessage{item.Body.Document.UserId, item.Body.Document.ID, true}
+		m := SqsMessage{item.UserId, item.ID, true}
 		b, err := json.Marshal(m)
 
 		_, err = qsvc.SendMessage(&sqs.SendMessageInput{
