@@ -291,6 +291,7 @@ export class EditorComponent {
           const adjustedText =
             textBeforeCursor + this.suggestion + textAfterCursor;
           markdownTextarea.value = adjustedText;
+          this.content = markdownTextarea.value;
 
           // Restore the cursor position
           markdownTextarea.selectionStart = start + this.suggestion.length;
