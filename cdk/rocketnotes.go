@@ -369,7 +369,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 
 	// DELETE Document Api
 
-	deleteZettelHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("DELETE-Document"), &awscdklambdagoalpha.GoFunctionProps{
+	deleteDocumentHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("DELETE-Document"), &awscdklambdagoalpha.GoFunctionProps{
 		FunctionName: jsii.String("DELETE-Document"),
 		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
 		Entry:        jsii.String("../lambda-handler/delete-delete-handler"),
@@ -383,7 +383,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		Path:        jsii.String("/deleteDocument/{id}"),
 		Authorizer:  httpApiAuthorizer,
 		Methods:     &[]awscdkapigatewayv2alpha.HttpMethod{awscdkapigatewayv2alpha.HttpMethod_DELETE},
-		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("deleteDocumentLambdaIntegration"), deleteZettelHandler, &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
+		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("deleteDocumentLambdaIntegration"), deleteDocumentHandler, &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
 	})
 
 	// Save Vector embeddings
