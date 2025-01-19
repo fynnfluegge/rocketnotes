@@ -372,7 +372,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 	deleteDocumentHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("DELETE-Document"), &awscdklambdagoalpha.GoFunctionProps{
 		FunctionName: jsii.String("DELETE-Document"),
 		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
-		Entry:        jsii.String("../lambda-handler/delete-delete-handler"),
+		Entry:        jsii.String("../lambda-handler/delete-document-handler"),
 		Bundling: &awscdklambdagoalpha.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
