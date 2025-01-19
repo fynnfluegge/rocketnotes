@@ -396,7 +396,7 @@ export class DocumentTree {
                       body: {
                         userId: localStorage.getItem('currentUserId'),
                         documentId: node.id,
-                        deleteVectors: false,
+                        deleteVectors: true,
                       },
                     },
                   ],
