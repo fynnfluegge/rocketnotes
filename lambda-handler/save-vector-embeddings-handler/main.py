@@ -4,10 +4,15 @@ from pathlib import Path
 
 import boto3
 from langchain.schema import Document
-from langchain.text_splitter import (MarkdownHeaderTextSplitter,
-                                     RecursiveCharacterTextSplitter)
-from langchain_community.embeddings import (HuggingFaceEmbeddings,
-                                            OllamaEmbeddings, VoyageEmbeddings)
+from langchain.text_splitter import (
+    MarkdownHeaderTextSplitter,
+    RecursiveCharacterTextSplitter,
+)
+from langchain_community.embeddings import (
+    HuggingFaceEmbeddings,
+    OllamaEmbeddings,
+    VoyageEmbeddings,
+)
 from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
 
@@ -94,21 +99,19 @@ def handler(event, context):
             f"{file_path}/{file_name}.faiss",
         )
 
+        if deleteVectors:
+            db = load_faiss_index_from_s3(userId, file_path, file_name, embeddings)
+            delete_document_vectors_from_faiss_index(documentId, db)
+            delete_document_vectors_from_dynamodb(documentId)
+            db.save_local(index_name=file_name, folder_path=file_path)
+            save_to_s3(userId + ".faiss", file_path + "/" + file_name + ".faiss")
+            save_to_s3(userId + ".pkl", file_path + "/" + file_name + ".pkl")
         # Vectors already exists and documentId present
         # Update only document vectors
         # --------------------------------------------
-        if faiss_index_exists and documentId and not recreateIndex:
+        elif faiss_index_exists and documentId and not recreateIndex:
             try:
-                load_from_s3(
-                    f"{userId}.pkl",
-                    f"{file_path}/{file_name}.pkl",
-                )
-                print("Updating document vectors for documentId: ", documentId)
-                db = FAISS.load_local(
-                    index_name="faiss_index",
-                    folder_path=file_path,
-                    embeddings=embeddings,
-                )
+                db = load_faiss_index_from_s3(userId, file_path, file_name, embeddings)
                 # Update any document vectors that have changed since last index creation
                 # if recreateIndex:
                 #     metadata = head_object_from_s3(f"{embeddingsModel}_{userId}.faiss")
@@ -139,11 +142,11 @@ def handler(event, context):
 
                 document = document["Item"]
                 delete_document_vectors_from_faiss_index(documentId, db)
+                delete_document_vectors_from_dynamodb(documentId)
                 save_document_vectors_to_faiss_index(document, db)
                 db.save_local(index_name=file_name, folder_path=file_path)
                 save_to_s3(userId + ".faiss", file_path + "/" + file_name + ".faiss")
                 save_to_s3(userId + ".pkl", file_path + "/" + file_name + ".pkl")
-                # TODO update vectors to dynamodb
             except Exception as e:
                 print(f"Error updating document vectors: {e}")
 
@@ -195,10 +198,6 @@ def handler(event, context):
                 )
                 for documentId, vectors in document_vectors.items():
                     add_vectors_to_dynamodb(documentId, vectors)
-        else:
-            # TODO in this case a document has been deleted
-            # delete vectors for documentId
-            pass
 
     except Exception as e:
         return {
@@ -218,6 +217,18 @@ def handler(event, context):
         },
         "body": json.dumps("Success"),
     }
+
+
+def load_faiss_index_from_s3(userId, file_path, file_name, embeddings):
+    load_from_s3(
+        f"{userId}.pkl",
+        f"{file_path}/{file_name}.pkl",
+    )
+    return FAISS.load_local(
+        index_name="faiss_index",
+        folder_path=file_path,
+        embeddings=embeddings,
+    )
 
 
 def save_to_s3(key, file_path):
@@ -347,3 +358,13 @@ def delete_document_vectors_from_faiss_index(documentId, db):
             db.delete(vectors)
         except Exception as e:
             print(f"Error deleting vectors for file {documentId}: {e}")
+
+
+def delete_document_vectors_from_dynamodb(documentId):
+    try:
+        dynamodb.delete_item(
+            TableName="tnn-Vectors",
+            Key={"id": {"S": documentId}},
+        )
+    except Exception as e:
+        print(f"Error deleting vectors for file {documentId}: {e}")

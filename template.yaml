@@ -96,6 +96,8 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: tnn-documents
+        - DynamoDBCrudPolicy:
+            TableName: tnn-tree
       Environment:
         Variables:
           USE_LOCAL_DYNAMODB: 1
@@ -231,6 +233,33 @@ Resources:
           Properties:
             Path: /shared/{documentId}
             Method: GET
+
+  deleteDocumentFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: go1.x
+    Properties:
+      CodeUri: lambda-handler/delete-document-handler
+      Handler: main.go
+      Runtime: provided.al2
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: tnn-Documents
+        - DynamoDBCrudPolicy:
+            TableName: tnn-userConfig
+      Environment:
+        Variables:
+          USE_LOCAL_DYNAMODB: 1
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /deleteDocument/{id}
+            Method: DELETE
 
   saveVectorEmbeddingsFunction:
     Type: AWS::Serverless::Function

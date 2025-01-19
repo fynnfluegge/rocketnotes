@@ -537,7 +537,7 @@ export class EditorComponent {
                 },
               ],
             })
-            .subscribe(() => {});
+            .subscribe();
         }
       });
   }

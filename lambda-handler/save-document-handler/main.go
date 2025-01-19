@@ -92,21 +92,23 @@ func handleRequest(ctx context.Context, event events.SQSEvent) {
 		log.Fatalf("Got error calling PutItem: %s", err)
 	}
 
-	av, err = dynamodbattribute.MarshalMap(item.Body.DocumentTree)
-	if err != nil {
-		log.Fatalf("Got error marshalling new document item: %s", err)
-	}
+	if item.Body.DocumentTree != nil {
+		av, err = dynamodbattribute.MarshalMap(item.Body.DocumentTree)
+		if err != nil {
+			log.Fatalf("Got error marshalling new document item: %s", err)
+		}
 
-	tableName = "tnn-Tree"
+		tableName = "tnn-Tree"
 
-	input = &dynamodb.PutItemInput{
-		Item:      av,
-		TableName: aws.String(tableName),
-	}
+		input = &dynamodb.PutItemInput{
+			Item:      av,
+			TableName: aws.String(tableName),
+		}
 
-	_, err = svc.PutItem(input)
-	if err != nil {
-		log.Fatalf("Got error calling PutItem: %s", err)
+		_, err = svc.PutItem(input)
+		if err != nil {
+			log.Fatalf("Got error calling PutItem: %s", err)
+		}
 	}
 
 	user_config, err := svc.GetItem(&dynamodb.GetItemInput{
@@ -122,7 +124,6 @@ func handleRequest(ctx context.Context, event events.SQSEvent) {
 	}
 
 	if user_config.Item != nil {
-		log.Printf("Recreating index for document %s", item.Body.Document.ID)
 		qsvc := sqs.New(sess)
 
 		m := SqsMessage{item.Body.Document.UserId, item.Body.Document.ID}

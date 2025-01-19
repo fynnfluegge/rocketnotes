@@ -385,7 +385,25 @@ export class DocumentTree {
     this.basicRestService
       .post('saveDocumentTree', this.getDocumentTree())
       .subscribe(() => {
-        // TODO here delete post
+        this.basicRestService
+          .delete('deleteDocument/' + node.id)
+          .subscribe(() => {
+            if (!environment.production) {
+              this.basicRestService
+                .post('vector-embeddings', {
+                  Records: [
+                    {
+                      body: {
+                        userId: localStorage.getItem('currentUserId'),
+                        documentId: node.id,
+                        deleteVectors: true,
+                      },
+                    },
+                  ],
+                })
+                .subscribe();
+            }
+          });
       });
     this.treeControl.collapse(this.nestedNodeMap.get(this.trashNode));
     this.treeControl.expand(this.nestedNodeMap.get(this.trashNode));
