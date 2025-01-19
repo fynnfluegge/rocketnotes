@@ -430,7 +430,10 @@ export class EditorComponent {
         messages: [{ role: 'user', content: prompt }],
         model: config['llm'],
       });
-      message = (completion.content[0] as TextBlock).text;
+      const textOutputs = completion.content
+        .map((content) => (content.type === 'text' ? content.text : null))
+        .filter(Boolean);
+      message = textOutputs[0];
     } else if (config['llm'].startsWith('Ollama')) {
       await lastValueFrom(
         this.http
