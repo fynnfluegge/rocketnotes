@@ -7,10 +7,24 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
         node-version: [18.x]
+        include:
+          - os: macos-latest
+            build-platform: mac
+            build-arch: arm64
+          - os: macos-latest
+            build-platform: mac
+            build-arch: x64
+          - os: windows-latest
+            build-platform: win
+            build-arch: x64
+          - os: ubuntu-latest
+            build-platform: linux
+            build-arch: x64
 
     steps:
       - uses: actions/checkout@v3
@@ -58,8 +72,8 @@ jobs:
       - name: Bundle and Publish electron
         run: |
           cd webapp
-          export BUILD_PLATFORM=mac
-          export BUILD_ARCH=arm64
+          export BUILD_PLATFORM=${{ matrix.build-platform }}
+          export BUILD_ARCH=${{ matrix.build-arch }}
           npm run bundle-electron
         env:
           AWS_ACCOUNT: ${{ secrets.AWS_ACCOUNT }}
