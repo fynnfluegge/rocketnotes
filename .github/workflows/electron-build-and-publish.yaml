@@ -58,6 +58,8 @@ jobs:
       - name: Bundle and Publish electron
         run: |
           cd webapp
+          export BUILD_PLATFORM=mac
+          export BUILD_ARCH=arm64
           npm run bundle-electron
         env:
           AWS_ACCOUNT: ${{ secrets.AWS_ACCOUNT }}

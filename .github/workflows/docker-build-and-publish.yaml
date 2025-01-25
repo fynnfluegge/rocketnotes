@@ -56,9 +56,8 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Extract release tag
-        id: get_tag
-        run: echo "RELEASE_TAG=$GITHUB_REF_NAME" >> $GITHUB_ENV
+      - name: Set output tag to github env
+        run: echo "RELEASE_TAG=${{ github.event.workflow_run.head_branch }}" >> $GITHUB_ENV
 
       - name: Build and push Docker image api
         uses: docker/build-push-action@v5

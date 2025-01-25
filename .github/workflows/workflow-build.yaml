@@ -31,6 +31,9 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
+      - name: Set output release tag
+        run: echo "::set-output name=tag::${GITHUB_REF#refs/tags/}"
+
       - name: npm install webapp
         run: |
           cd webapp
