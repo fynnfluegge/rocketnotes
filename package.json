@@ -1,6 +1,6 @@
 {
   "name": "rocketnotes",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "AI-powered markdown editor - leverage vector embeddings and LLMs with your personal notes - 100% local or in the cloud",
   "scripts": {
     "install": "cd webapp && npm install",
