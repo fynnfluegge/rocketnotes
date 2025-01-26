@@ -12,7 +12,7 @@
     "build": "npm run config-prod && ng build --configuration production",
     "build-local": "export API_URL='http://localhost:3002' && npm run config-dev && ng build",
     "build-electron": "npm run config-prod && ng build --configuration production --base-href ./",
-    "bundle-electron": "./node_modules/.bin/electron-builder --publish always --mac --arm64",
+    "bundle-electron": "electron-builder --publish always --$BUILD_PLATFORM --$BUILD_ARCH",
     "test": "ng test"
   },
   "private": true,
