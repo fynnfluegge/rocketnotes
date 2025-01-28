@@ -95,7 +95,8 @@ pre[class*="language-"] {
 .autocomplete {
   display: flex;
   flex-direction: column;
-  height: 396px;
+  height: 496px;
+  max-height: 75vh;
   overflow-x: hidden;
 }
 
