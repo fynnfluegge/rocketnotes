@@ -335,18 +335,6 @@ input:checked + .slider:before {
   border-radius: 50%;
 }
 
-.overlay {
-  display: none;
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.15);
-  color: black;
-  align-items: center;
-  justify-content: center;
-  z-index: 2;
-}
-
 .open {
   display: flex;
 }
