@@ -6,21 +6,8 @@
   padding: 8px 16px;
 }
 
-.overlay {
-  display: none;
-  position: fixed;
-  top: -20%;
-  left: 0;
-  width: 100%;
-  height: 120%;
-  background-color: rgba(0, 0, 0, 0.15);
-  color: black;
-  align-items: center;
-  justify-content: center;
-  z-index: 2;
-}
-
 .dialog {
+  position: absolute;
   background-color: var(--menu-color);
   color: lightgray;
   border-radius: 6px;
@@ -29,6 +16,7 @@
   padding: 12px;
   width: 800px;
   text-align: center;
+  top: 120px;
 }
 
 .open {
