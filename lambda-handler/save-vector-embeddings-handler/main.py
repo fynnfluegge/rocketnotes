@@ -213,6 +213,7 @@ def handler(event, context):
         "statusCode": 200,
         "headers": {
             "Content-Type": "application/json",
+            # TODO - change this to the actual allowed origins
             "Access-Control-Allow-Origin": "*",
         },
         "body": json.dumps("Success"),
