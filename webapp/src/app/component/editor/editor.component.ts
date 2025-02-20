@@ -13,7 +13,6 @@ import { lastValueFrom, retry } from 'rxjs';
 import OpenAI from 'openai';
 import Anthropic from '@anthropic-ai/sdk';
 import '../../../assets/prism-custom.js';
-import { TextBlock } from '@anthropic-ai/sdk/resources/index.js';
 
 @Component({
   selector: 'app-editor',
