@@ -47,6 +47,10 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
+      - name: Install snapcraft on Ubuntu
+        if: matrix.os == 'ubuntu-latest'
+        run: sudo snap install snap
+
       - name: Build electron app
         run: |
           cd webapp
@@ -72,8 +76,13 @@ jobs:
       - name: Bundle and Publish electron
         run: |
           cd webapp
-          export BUILD_PLATFORM=${{ matrix.build-platform }}
-          export BUILD_ARCH=${{ matrix.build-arch }}
+          if [ "${{ matrix.os }}" == "windows-latest" ]; then
+            set BUILD_PLATFORM=${{ matrix.build-platform }}
+            set BUILD_ARCH=${{ matrix.build-arch }}
+          else
+            export BUILD_PLATFORM=${{ matrix.build-platform }}
+            export BUILD_ARCH=${{ matrix.build-arch }}
+          fi
           npm run bundle-electron
         env:
           AWS_ACCOUNT: ${{ secrets.AWS_ACCOUNT }}
