@@ -1,10 +1,10 @@
 <div align="center">
   <a href="https://www.takeniftynotes.net/">
-    <img src="landing-page/src/assets/128x128.png" height="128">
+    <img src="https://github.com/user-attachments/assets/f4b9cf3f-dd6e-4294-b24e-04b490b19f09" height="384">
   </a>
   
   # Rocketnotes
-  
+
   [![Build](https://github.com/fynnfluegge/rocketnotes/actions/workflows/build-main.yaml/badge.svg)](https://github.com/fynnfluegge/rocketnotes/actions/workflows/build-main.yaml)
   [![Deploy](https://github.com/fynnfluegge/rocketnotes/actions/workflows/deploy.yaml/badge.svg)](https://github.com/fynnfluegge/rocketnotes/actions/workflows/deploy.yaml)
   [![Docker](https://github.com/fynnfluegge/rocketnotes/actions/workflows/docker-build-and-publish.yaml/badge.svg)](https://github.com/fynnfluegge/rocketnotes/actions/workflows/docker-build-and-publish.yaml)
