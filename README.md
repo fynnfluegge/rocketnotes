@@ -1,8 +1,8 @@
 <div align="center">
   <a href="https://www.takeniftynotes.net/">
-    <img src="https://github.com/user-attachments/assets/f4b9cf3f-dd6e-4294-b24e-04b490b19f09" height="384">
+    <img src="https://github.com/user-attachments/assets/633aa06b-6e16-428f-aeb2-e8438438385c" height="256">
   </a>
-  
+
   # Rocketnotes
 
   [![Build](https://github.com/fynnfluegge/rocketnotes/actions/workflows/build-main.yaml/badge.svg)](https://github.com/fynnfluegge/rocketnotes/actions/workflows/build-main.yaml)
