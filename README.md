@@ -1,6 +1,6 @@
 <div align="center">
   <a href="https://www.takeniftynotes.net/">
-    <img src="https://github.com/user-attachments/assets/633aa06b-6e16-428f-aeb2-e8438438385c" height="256">
+    <img src="https://github.com/user-attachments/assets/5a1f80e4-ba6a-4d33-933b-13d0ded023fc" height="384">
   </a>
 
   # Rocketnotes
