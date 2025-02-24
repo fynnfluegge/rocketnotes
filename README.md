@@ -1,8 +1,8 @@
 <div align="center">
   <a href="https://www.takeniftynotes.net/">
-    <img src="https://github.com/user-attachments/assets/f4b9cf3f-dd6e-4294-b24e-04b490b19f09" height="384">
+    <img src="https://github.com/user-attachments/assets/5a1f80e4-ba6a-4d33-933b-13d0ded023fc" height="384">
   </a>
-  
+
   # Rocketnotes
 
   [![Build](https://github.com/fynnfluegge/rocketnotes/actions/workflows/build-main.yaml/badge.svg)](https://github.com/fynnfluegge/rocketnotes/actions/workflows/build-main.yaml)
@@ -24,7 +24,6 @@ It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/ser
 
 - [Sign Up](https://takeniftynotes.auth.eu-central-1.amazoncognito.com/login?response_type=code&client_id=tt3v27pnqqh7elqdvq9tgmr9v&redirect_uri=https://app.takeniftynotes.net) for free and use it in the Browser or as an Electron app.
 - Run it 100% [locally with Docker](INSTALLATION.md#run-with-docker)
-- Host at [AWS](INSTALLATION.md#aws-hosting)
 - Check [Contribution Guide](CONTRIBUTING.md#contributing-guide) how to setup a local development environment
   - If you are interested in contributing, visit [Contributing](#contributing) section for more details
   - [Good first issues](https://github.com/fynnfluegge/rocketnotes/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22) provide a good starting point to become a contributor
