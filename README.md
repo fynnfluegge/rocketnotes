@@ -24,7 +24,6 @@ It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/ser
 
 - [Sign Up](https://takeniftynotes.auth.eu-central-1.amazoncognito.com/login?response_type=code&client_id=tt3v27pnqqh7elqdvq9tgmr9v&redirect_uri=https://app.takeniftynotes.net) for free and use it in the Browser or as an Electron app.
 - Run it 100% [locally with Docker](INSTALLATION.md#run-with-docker)
-- Host at [AWS](INSTALLATION.md#aws-hosting)
 - Check [Contribution Guide](CONTRIBUTING.md#contributing-guide) how to setup a local development environment
   - If you are interested in contributing, visit [Contributing](#contributing) section for more details
   - [Good first issues](https://github.com/fynnfluegge/rocketnotes/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22) provide a good starting point to become a contributor
