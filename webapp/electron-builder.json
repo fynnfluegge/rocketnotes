@@ -2,25 +2,24 @@
   "appId": "rocketnotes",
   "productName": "rocketnotes",
   "copyright": "Copyright © Fynn Flügge",
-  "files": [
-    "build/**/*",
-    "package.json",
-    "electron.js"
-  ],
+  "files": ["build/**/*", "package.json", "electron.js"],
   "directories": {
     "output": "electron-release/"
   },
   "mac": {
     "icon": "src/assets/icons/mac/icon.icns",
-    "target": [
-      "zip",
-      "dmg"
-    ],
+    "target": ["zip", "dmg"],
     "category": "app.category.type"
   },
   "publish": {
     "provider": "s3",
     "bucket": "rocketnotes-electron-releases",
     "region": "eu-central-1"
+  },
+  "snap": {
+    "publish": {
+      "provider": "generic",
+      "url": "https://any-dummyurl.com"
+    }
   }
 }
