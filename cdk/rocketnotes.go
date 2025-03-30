@@ -90,6 +90,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 	httpApi := awscdkapigatewayv2alpha.NewHttpApi(stack, jsii.String("MyHttpApi"), &awscdkapigatewayv2alpha.HttpApiProps{
 		ApiName: jsii.String("MyHttpApi"),
 		CorsPreflight: &awscdkapigatewayv2alpha.CorsPreflightOptions{
+			// TODO - change this to the actual allowed origins
 			AllowOrigins: jsii.Strings("*"),
 			AllowHeaders: jsii.Strings("*"),
 			AllowMethods: &[]awscdkapigatewayv2alpha.CorsHttpMethod{
