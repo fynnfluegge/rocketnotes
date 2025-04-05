@@ -16,7 +16,7 @@ dependencies = [
 ]
 
 [tool.uv.sources]
-mcp-rocketnotes = { workspace = true }
+rocketnotes-mcp = { workspace = true }
 
 [tool.uv.workspace]
 members = ["mcp"]

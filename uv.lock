@@ -8,8 +8,8 @@ resolution-markers = [
 
 [manifest]
 members = [
-    "mcp-rocketnotes",
     "rocketnotes",
+    "rocketnotes-mcp",
 ]
 
 [[package]]
@@ -681,11 +681,6 @@ cli = [
 ]
 
 [[package]]
-name = "mcp-rocketnotes"
-version = "0.1.0"
-source = { virtual = "mcp" }
-
-[[package]]
 name = "mdurl"
 version = "0.1.2"
 source = { registry = "https://pypi.org/simple" }
@@ -1223,6 +1218,11 @@ requires-dist = [
     { name = "langchain-openai", specifier = "==0.0.5" },
     { name = "mcp", extras = ["cli"], specifier = ">=1.6.0" },
 ]
+
+[[package]]
+name = "rocketnotes-mcp"
+version = "0.1.0"
+source = { virtual = "mcp" }
 
 [[package]]
 name = "s3transfer"
