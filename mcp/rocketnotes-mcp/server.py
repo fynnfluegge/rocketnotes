@@ -5,12 +5,10 @@ import sys
 from typing import Any
 
 import httpx
+from auth import decode_token, get_tokens_from_username_and_password, refresh_token
 
 from mcp.server.fastmcp import FastMCP
 
-from .auth import decode_token, get_tokens_from_username_and_password, refresh_token
-
-# Initialize FastMCP server
 mcp = FastMCP("rocketnotes")
 
 ACCESS_TOKEN = None
@@ -24,7 +22,7 @@ REFRESH_TOKEN = None
 
 def run():
     global API_URL, CLIENT_ID, DOMAIN, REGION, ACCESS_TOKEN, REFRESH_TOKEN, ID_TOKEN, USER_ID
-    args = sys.argv[1:]  # Exclude the script name
+    args = sys.argv[1:]
 
     if len(args) < 1:
         print("Error: No arguments provided.")
@@ -34,7 +32,7 @@ def run():
 
     try:
         decoded_bytes = base64.b64decode(base64_encoded_arg)
-        decoded_string = decoded_bytes.decode("utf-8")  # Convert bytes to string
+        decoded_string = decoded_bytes.decode("utf-8")
         parsed_args = json.loads(decoded_string)
         API_URL = parsed_args["apiUrl"]
         CLIENT_ID = parsed_args["clientId"]
@@ -72,14 +70,6 @@ def run():
 
 
 @mcp.tool()
-async def hello_world() -> str:
-    """
-    A simple hello world tool.
-    """
-    return "Hello, world!"
-
-
-@mcp.tool()
 async def exact_search(query: str) -> str | None:
     """
     Perform an exact search with the given query on your knowledge base.
@@ -95,8 +85,8 @@ async def exact_search(query: str) -> str | None:
         )
 
         if response.status_code == 200:
-            match = re.search(r"(?:.{0,128})query(?:.{0,128})", response.text)
-            return match.group(0) if match else None
+            result = find_with_context(response.text, query)
+            return result[0]["context"] if result else None
         elif response.status_code == 401:
             tokens = refresh_token(
                 CLIENT_ID,
@@ -113,8 +103,8 @@ async def exact_search(query: str) -> str | None:
                 headers=headers,
             )
             if response.status_code == 200:
-                match = re.search(r"(?:.{0,128})query(?:.{0,128})", response.text)
-                return match.group(0) if match else None
+                result = find_with_context(response.text, query)
+                return result[0]["context"] if result else None
             else:
                 print(
                     f"Failed to fetch document after refreshing token. Status code: {response.status_code}"
@@ -126,7 +116,6 @@ async def exact_search(query: str) -> str | None:
             print(f"Response: {response.text}")
             return None
     except httpx.RequestError as e:
-        # Handle any exceptions that occur during the request
         print(f"An error occurred while fetching the document: {e}")
         return None
 
@@ -185,6 +174,26 @@ async def documents_similarity_search(query: str) -> list[dict[str, Any]] | None
             print(f"Response: {response.text}")
             return None
     except httpx.RequestError as e:
-        # Handle any exceptions that occur during the request
         print(f"An error occurred while fetching the document: {e}")
         return None
+
+
+def find_with_context(large_string, search_string, context=128):
+    # Escape special characters in search string
+    pattern = re.escape(search_string)
+
+    # Search for all matches
+    matches = []
+    for match in re.finditer(pattern, large_string):
+        start = max(match.start() - context, 0)
+        end = min(match.end() + context, len(large_string))
+        context_snippet = large_string[start:end]
+        matches.append(
+            {
+                "match_start": match.start(),
+                "match_end": match.end(),
+                "context": context_snippet,
+            }
+        )
+
+    return matches
