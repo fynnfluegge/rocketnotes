@@ -1,0 +1,11 @@
+[project]
+name = "rocketnotes-mcp"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+
+dependencies = []
+
+[project.scripts]
+rocketnotes-mcp = "rocketnotes-mcp.__main__:main"

@@ -23,3 +23,9 @@ cdk.out
 .aws-sam
 aws
 cdk.context.json
+
+node_modules
+ollama
+
+.venv
+__pycache__

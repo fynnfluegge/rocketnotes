@@ -44,6 +44,7 @@ It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/ser
 - 📥 Zettelkasten with semantic archiving
   - Use vector index to insert notes into highest semantic-ranked documents
 - 🗣️ Speech-to-text note taking
+- ⚙️ [MCP Server integration](mcp/README.md)
 - 🎮 Neovim plugin [rocketnotes.nvim](https://github.com/fynnfluegge/rocketnotes.nvim)
 
 &nbsp;
