@@ -24,4 +24,4 @@ uv run rocketnotes-mcp <CONFIG_TOKEN> <USERNAME> <PASSWORD>
       ]
     }
   }
-``
+```
