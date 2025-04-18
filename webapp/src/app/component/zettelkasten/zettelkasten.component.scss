@@ -26,3 +26,12 @@
   visibility: visible;
   opacity: 1;
 }
+
+.markdown-hover:hover {
+  border-color: var(--focus-color) !important;
+}
+
+.markdown-border {
+  border: var(--border-width) solid #ccc;
+  padding: 8px;
+}

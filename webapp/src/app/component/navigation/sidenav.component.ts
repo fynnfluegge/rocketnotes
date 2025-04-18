@@ -506,6 +506,10 @@ export class SidenavComponent implements OnInit, AfterViewInit {
         ? 'var(--dark-theme-hyperlink-color)'
         : 'var(--light-theme-hyperlink-color)',
     );
+    document.documentElement.style.setProperty(
+      '--border-width',
+      this.darkmode ? '1px' : '2px',
+    );
   }
 
   openSearchDialog() {

@@ -21,6 +21,7 @@
 
 html,
 body {
+  scroll-behavior: smooth;
   height: 100%;
 }
 
@@ -89,6 +90,7 @@ pre[class*="language-"] {
 .copy:hover {
   color: white;
 }
+
 // -------------------------------------- //
 
 // ------- autocomplete ------------ //
@@ -129,6 +131,7 @@ pre[class*="language-"] {
   background-color: var(--focus-color-low-alpha) !important;
   color: #ffffff;
 }
+
 // -------------------------------------- //
 
 // ------- code block ------------ //
@@ -148,6 +151,7 @@ code {
   transition: opacity 0.3s ease-in-out;
   cursor: pointer;
 }
+
 // ------------------------------- //
 
 // ----- code block tabs---------- //
@@ -183,6 +187,7 @@ code {
   background-color: #d4d1d1 !important;
   color: black !important;
 }
+
 // ------------------------------- //
 
 // ------ markdown tooltip ------- //
@@ -209,14 +214,15 @@ code {
 .tooltip-markdown > h1 {
   font-size: 10px;
 }
+
 // ------------------------------- //
 
 // ------ markdown textarea ------ //
 .variable-textarea {
   border-radius: 5px;
-  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
   padding: 18px 12px;
   border: none;
+  background-color: var(--background-color);
 }
 
 .variable-textarea:focus {
@@ -224,16 +230,16 @@ code {
   border: none;
 }
 
-.variable-textarea:hover {
-  box-shadow:
-    0 6px 12px 3px rgba(0, 0, 0, 0.09),
-    0 2px 3px 1px rgba(0, 0, 0, 0.06);
+.markdown-textarea {
+  background-color: var(--background-color);
+  color: var(--font-color);
 }
 
 .markdown-textarea:focus {
   outline: none !important;
   border: none;
 }
+
 // ------------------------------- //
 
 // ---- Tooltips ---- //
@@ -291,12 +297,14 @@ code {
   pointer-events: none;
   position: absolute;
 }
+
 .tooltip-base:after {
   content: "";
   height: 0;
   left: 20px;
   width: 0;
 }
+
 .tooltip-base:before {
   background: rgba(0, 0, 0, 0.75);
   border-radius: 2px;
@@ -314,14 +322,17 @@ code {
   transform: scale3d(0.2, 0.2, 1);
   transition: all 0.2s ease-in-out;
 }
+
 .tooltip-base.expand:after {
   transition: all 0.1s ease-in-out;
 }
+
 .tooltip-base.expand:hover:before,
 .tooltip-base.expand:hover:after {
   opacity: 1;
   transform: scale3d(1, 1, 1);
 }
+
 .tooltip-base.expand:hover:after {
   transition: all 0.2s 0.1s ease-in-out;
 }
@@ -331,16 +342,18 @@ code {
   text-align: left;
   transform: translateY(-50%);
   font-size: 32px;
-  animation: pulse 1s infinite; /* Example animation */
+  animation: pulse 1s infinite;
 }
 
 @keyframes pulse {
   0% {
     opacity: 0.2;
   }
+
   50% {
     opacity: 1;
   }
+
   100% {
     opacity: 0.2;
   }
@@ -359,6 +372,7 @@ code {
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
@@ -374,4 +388,9 @@ code {
   align-items: center;
   justify-content: center;
   z-index: 2;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--font-color), 0.8) var(--background-color);
 }

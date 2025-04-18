@@ -4,12 +4,12 @@
 >
   <div style="max-width: 800px; margin: auto">
     <p style="font-size: 24px; font-weight: bold; text-align: center">
-      Notebox
+      Inbox
     </p>
     <textarea
       [(ngModel)]="textareaContent"
       [style.width]="'100%'"
-      class="variable-textarea"
+      [ngClass]="['markdown-textarea', 'markdown-hover', 'markdown-border']"
       style="
         resize: none;
         margin-top: 4px;
@@ -47,20 +47,17 @@
     <div *ngFor="let item of contentMap | keyvalue">
       <br />
       <div
+        [ngClass]="['markdown-textarea','markdown-border']"
         style="
           display: flex;
           flex-wrap: wrap;
-          border: 1px solid #ccc;
           border-radius: 4px;
-          border-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-          padding: 8px;
         "
       >
         <markdown
           katex
           mermaid
           *ngIf="!editMap.get(item.key)"
-          class="variable-binding"
           [data]="item.value.content"
           style="
             height: 100%;
@@ -74,7 +71,7 @@
           *ngIf="editMap.get(item.key)"
           [(ngModel)]="item.value.content"
           [style.width]="'100%'"
-          class="variable-textarea"
+          [ngClass]="['markdown-textarea']"
           style="
             resize: none;
             margin-top: 4px;
@@ -82,6 +79,7 @@
             height: 128px;
             border-radius: 4px;
             margin-bottom: 4px;
+            border: none;
           "
         ></textarea>
         <div style="display: flex; gap: 4px; margin-left: auto">

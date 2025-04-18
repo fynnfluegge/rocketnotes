@@ -2,6 +2,8 @@ button {
   color: white;
   background-color: var(--menu-color);
   border: none;
+  font-size: 18px;
+  font-family: monospace;
 }
 
 .mat-button {
@@ -28,10 +30,11 @@ button {
 }
 
 .mat-tree-node {
-  height: 32px;
+  height: 38px;
   border-bottom: 1px solid grey;
-  font-weight: 280;
-  font-size: 16px;
+  font-weight: 320;
+  font-size: 18px;
+  font-family: monospace;
   transition: background-color 0.25s;
 
   &.cdk-drag-preview {
