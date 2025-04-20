@@ -110,17 +110,14 @@
   <button
     (click)="openZettelkasten()"
     style="
-      display: flex;
-      height: 24px;
       width: 100%;
-      text-align: center;
-      font-weight: 280;
       color: lightgrey;
       padding: 0;
       margin-left: 2px;
     "
+    class="mat-tree-node"
   >
-    <mat-icon style="margin-top: 2px; margin-right: 4px; font-size: 20px"
+    <mat-icon style="margin-top: 10px; font-size: 20px"
       >drafts</mat-icon
     >
     Inbox
@@ -216,14 +213,13 @@
         >
         <div
           class="dropdown hide"
-          style="margin-left: auto; position: relative; top: 3px"
+          style="margin-left: auto; position: relative; top: 5px"
         >
           <button class="dropbtn" style="position: relative; top: -4px">
             <i class="fas fa-ellipsis-v"></i>
           </button>
           <div
-            class="dropdown-content"
-            style="width: 42px; padding: 0; margin: 0"
+            class="dropdown-content mat-tree-note-menu"
           >
             <button
               *ngIf="!node.deleted"
@@ -362,14 +358,13 @@
         >
         <div
           class="dropdown hide"
-          style="margin-left: auto; position: relative; top: 3px"
+          style="margin-left: auto; position: relative; top: 5px"
         >
           <button class="dropbtn" style="position: relative; top: -4px">
             <i class="fas fa-ellipsis-v"></i>
           </button>
           <div
-            class="dropdown-content"
-            style="width: 42px; padding: 0; margin: 0"
+            class="dropdown-content mat-tree-note-menu"
           >
             <button
               *ngIf="!node.deleted"

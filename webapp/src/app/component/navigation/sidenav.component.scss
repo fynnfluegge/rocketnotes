@@ -31,7 +31,7 @@ button {
 
 .mat-tree-node {
   height: 38px;
-  border-bottom: 1px solid grey;
+  border-bottom: 1px solid #666560;
   font-weight: 320;
   font-size: 18px;
   font-family: monospace;
@@ -51,6 +51,12 @@ button {
     // potential drop area
     opacity: 0;
   }
+}
+
+.mat-tree-note-menu {
+  width: 42px;
+  padding: 0 !important;
+  margin: 0;
 }
 
 .active,
