@@ -3,9 +3,20 @@
   (document:keydown.esc)="cancelEdit()"
 >
   <div style="max-width: 800px; margin: auto">
-    <p style="font-size: 24px; font-weight: bold; text-align: center">
-      Inbox
-    </p>
+    <div class="header-title-bar">
+      <!-- <button -->
+      <!--   (click)="toggleAiCompletion()" -->
+      <!--   data-title="Disable AI Text Completion" -->
+      <!--   class="btn btn-default btn-primary btn-fade tooltip-bottom expand" -->
+      <!-- > -->
+      <!--   <img -->
+      <!--     src="../../../assets/icons/png/icons8-artificial-intelligence-50.png" -->
+      <!--     class="title-button-icon" -->
+      <!--   /> -->
+      <!--   Agentic Mode -->
+      <!-- </button> -->
+      <p class="title" style="text-indent: -0px">Zettelkasten Inbox</p>
+    </div>
     <textarea
       [(ngModel)]="textareaContent"
       [style.width]="'100%'"
@@ -47,12 +58,8 @@
     <div *ngFor="let item of contentMap | keyvalue">
       <br />
       <div
-        [ngClass]="['markdown-textarea','markdown-border']"
-        style="
-          display: flex;
-          flex-wrap: wrap;
-          border-radius: 4px;
-        "
+        [ngClass]="['markdown-textarea', 'markdown-border']"
+        style="display: flex; flex-wrap: wrap; border-radius: 4px"
       >
         <markdown
           katex

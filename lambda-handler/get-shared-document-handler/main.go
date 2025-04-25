@@ -27,7 +27,6 @@ func init() {
 }
 
 func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-
 	id := request.PathParameters["documentId"]
 
 	sess := session.Must(session.NewSessionWithOptions(session.Options{

@@ -19,20 +19,19 @@ import (
 )
 
 type Document struct {
-	ID           string `json:"id"`
-	ParentId     string `json:"parentId"`
-	UserId       string `json:"userId"`
-	Title        string `json:"title"`
-	Content      string `json:"content"`
+	ID           string    `json:"id"`
+	ParentId     string    `json:"parentId"`
+	UserId       string    `json:"userId"`
+	Title        string    `json:"title"`
+	Content      string    `json:"content"`
 	LastModified time.Time `json:"lastModified"`
-	Deleted      bool   `json:"deleted"`
+	Deleted      bool      `json:"deleted"`
 }
 
 func init() {
 }
 
 func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-
 	userId := request.PathParameters["userId"]
 	searchString := strings.ToLower(request.QueryStringParameters["searchString"])
 
@@ -69,12 +68,11 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 	}
 
 	result, err := svc.Scan(&dynamodb.ScanInput{
-		TableName: aws.String(tableName),
-		ExpressionAttributeNames: expressionAttributeNames,
+		TableName:                 aws.String(tableName),
+		ExpressionAttributeNames:  expressionAttributeNames,
 		ExpressionAttributeValues: expressionAttributeValues,
-		FilterExpression: filterExpression,
+		FilterExpression:          filterExpression,
 	})
-
 	if err != nil {
 		log.Fatalf("Got error calling GetItem: %s", err)
 	}

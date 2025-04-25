@@ -17,21 +17,20 @@ import (
 )
 
 type Document struct {
-	ID           string `json:"id"`
-	ParentId     string `json:"parentId"`
-	UserId       string `json:"userId"`
-	Title        string `json:"title"`
-	Content      string `json:"content"`
+	ID           string    `json:"id"`
+	ParentId     string    `json:"parentId"`
+	UserId       string    `json:"userId"`
+	Title        string    `json:"title"`
+	Content      string    `json:"content"`
 	LastModified time.Time `json:"lastModified"`
-	Deleted      bool   `json:"deleted"`
-	IsPublic     bool   `json:"isPublic"`
+	Deleted      bool      `json:"deleted"`
+	IsPublic     bool      `json:"isPublic"`
 }
 
 func init() {
 }
 
 func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-
 	id := request.PathParameters["documentId"]
 
 	sess := session.Must(session.NewSessionWithOptions(session.Options{

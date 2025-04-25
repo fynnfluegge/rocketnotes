@@ -12,23 +12,21 @@ import (
 )
 
 type Response struct {
-  Message string `json:"message"`
+	Message string `json:"message"`
 }
 
 func init() {
 }
 
 func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-
-  response := Response{
-    Message: "Hello Wooooorld",
-  }
+	response := Response{
+		Message: "Hello Wooooorld",
+	}
 
 	b, err := json.Marshal(response)
 	if err != nil {
 		fmt.Println(err)
 	}
-
 
 	return events.APIGatewayProxyResponse{
 		StatusCode: 200,

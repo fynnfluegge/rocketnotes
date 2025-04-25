@@ -14,17 +14,16 @@ import (
 )
 
 type Zettel struct {
-  ID       string    `json:"id"`
-  UserId   string    `json:"userId"`
-  Content  string    `json:"content"`
-  Created  time.Time `json:"created"`
+	ID      string    `json:"id"`
+	UserId  string    `json:"userId"`
+	Content string    `json:"content"`
+	Created time.Time `json:"created"`
 }
 
 func init() {
 }
 
 func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-
 	id := request.PathParameters["id"]
 
 	sess := session.Must(session.NewSessionWithOptions(session.Options{

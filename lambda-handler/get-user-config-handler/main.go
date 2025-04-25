@@ -16,20 +16,19 @@ import (
 )
 
 type UserConfig struct {
-	Id    string `json:"id"`
-	EmbeddingModel string `json:"embeddingModel"`
-	Llm string `json:"llm"`
+	Id                string `json:"id"`
+	EmbeddingModel    string `json:"embeddingModel"`
+	Llm               string `json:"llm"`
 	SpeechToTextModel string `json:"speechToTextModel"`
-	OpenAiApiKey string `json:"openAiApiKey"`
-	AnthropicApiKey string `json:"anthropicApiKey"`
-	VoyageApiKey string `json:"voyageApiKey"`
+	OpenAiApiKey      string `json:"openAiApiKey"`
+	AnthropicApiKey   string `json:"anthropicApiKey"`
+	VoyageApiKey      string `json:"voyageApiKey"`
 }
 
 func init() {
 }
 
 func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-
 	id := request.PathParameters["userId"]
 
 	sess := session.Must(session.NewSessionWithOptions(session.Options{

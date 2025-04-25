@@ -109,17 +109,11 @@
 >
   <button
     (click)="openZettelkasten()"
-    style="
-      width: 100%;
-      color: lightgrey;
-      padding: 0;
-      margin-left: 2px;
-    "
+    style="width: 100%; color: lightgrey; padding: 0; margin-left: 2px"
     class="mat-tree-node"
+    [ngClass]="{ hide: !showSidebar }"
   >
-    <mat-icon style="margin-top: 10px; font-size: 20px"
-      >drafts</mat-icon
-    >
+    <mat-icon style="margin-top: 10px; font-size: 20px">drafts</mat-icon>
     Inbox
   </button>
   <div [ngClass]="{ hide: !showSidebar }">
@@ -218,9 +212,7 @@
           <button class="dropbtn" style="position: relative; top: -4px">
             <i class="fas fa-ellipsis-v"></i>
           </button>
-          <div
-            class="dropdown-content mat-tree-note-menu"
-          >
+          <div class="dropdown-content mat-tree-note-menu">
             <button
               *ngIf="!node.deleted"
               mat-icon-button
@@ -363,9 +355,7 @@
           <button class="dropbtn" style="position: relative; top: -4px">
             <i class="fas fa-ellipsis-v"></i>
           </button>
-          <div
-            class="dropdown-content mat-tree-note-menu"
-          >
+          <div class="dropdown-content mat-tree-note-menu">
             <button
               *ngIf="!node.deleted"
               mat-icon-button

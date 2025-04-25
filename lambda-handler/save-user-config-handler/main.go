@@ -16,37 +16,35 @@ import (
 )
 
 type RequestBody struct {
-	Id    string `json:"id"`
-	EmbeddingModel string `json:"embeddingModel"`
-	Llm string `json:"llm"`
+	Id                string `json:"id"`
+	EmbeddingModel    string `json:"embeddingModel"`
+	Llm               string `json:"llm"`
 	SpeechToTextModel string `json:"speechToTextModel"`
-	OpenAiApiKey string `json:"openAiApiKey"`
-	AnthropicApiKey string `json:"anthropicApiKey"`
-	VoyageApiKey string `json:"voyageApiKey`
-	RecreateIndex bool `json:"recreateIndex"`
+	OpenAiApiKey      string `json:"openAiApiKey"`
+	AnthropicApiKey   string `json:"anthropicApiKey"`
+	VoyageApiKey      string `json:"voyageApiKey`
+	RecreateIndex     bool   `json:"recreateIndex"`
 }
 
 type UserConfig struct {
-	Id    string `json:"id"`
-	EmbeddingModel string `json:"embeddingModel"`
-	Llm string `json:"llm"`
+	Id                string `json:"id"`
+	EmbeddingModel    string `json:"embeddingModel"`
+	Llm               string `json:"llm"`
 	SpeechToTextModel string `json:"speechToTextModel"`
-	OpenAiApiKey string `json:"openAiApiKey"`
-	AnthropicApiKey string `json:"anthropicApiKey"`
-	VoyageApiKey string `json:"voyageApiKey"`
+	OpenAiApiKey      string `json:"openAiApiKey"`
+	AnthropicApiKey   string `json:"anthropicApiKey"`
+	VoyageApiKey      string `json:"voyageApiKey"`
 }
 
 type SqsMessage struct {
-  UserId string `json:"userId"`
-  RecreateIndex bool `json:"recreateIndex"`
+	UserId        string `json:"userId"`
+	RecreateIndex bool   `json:"recreateIndex"`
 }
-
 
 func init() {
 }
 
 func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-
 	item := RequestBody{}
 
 	json.Unmarshal([]byte(request.Body), &item)
@@ -66,7 +64,6 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 	tableName := "tnn-UserConfig"
 
 	av, err := dynamodbattribute.MarshalMap(UserConfig{item.Id, item.EmbeddingModel, item.Llm, item.SpeechToTextModel, item.OpenAiApiKey, item.AnthropicApiKey, item.VoyageApiKey})
-
 	if err != nil {
 		log.Fatalf("Got error marshalling new document item: %s", err)
 	}
@@ -80,7 +77,6 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 	if err != nil {
 		log.Fatalf("Got error calling PutItem: %s", err)
 	}
-
 
 	if os.Getenv("USE_LOCAL_DYNAMODB") != "1" && item.RecreateIndex {
 		qsvc := sqs.New(sess)

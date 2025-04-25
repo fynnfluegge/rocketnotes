@@ -20,17 +20,16 @@ type Body struct {
 }
 
 type Zettel struct {
-  ID       string    `json:"id"`
-  UserId   string    `json:"userId"`
-  Content  string    `json:"content"`
-  Created  time.Time `json:"created"`
+	ID      string    `json:"id"`
+	UserId  string    `json:"userId"`
+	Content string    `json:"content"`
+	Created time.Time `json:"created"`
 }
 
 func init() {
 }
 
 func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-
 	item := Body{}
 
 	json.Unmarshal([]byte(request.Body), &item)

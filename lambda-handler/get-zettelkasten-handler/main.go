@@ -17,17 +17,16 @@ import (
 )
 
 type Zettel struct {
-  ID       string    `json:"id"`
-  UserId   string    `json:"userId"`
-  Content  string    `json:"content"`
-  Created  time.Time `json:"created"`
+	ID      string    `json:"id"`
+	UserId  string    `json:"userId"`
+	Content string    `json:"content"`
+	Created time.Time `json:"created"`
 }
 
 func init() {
 }
 
 func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-
 	id := request.PathParameters["userId"]
 
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
@@ -45,33 +44,32 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 	tableName := "tnn-Zettelkasten"
 
 	result, err := svc.Query(&dynamodb.QueryInput{
-    TableName: aws.String(tableName),
-    IndexName: aws.String("userId-index"),
-    KeyConditions: map[string]*dynamodb.Condition{
-        "userId": {
-            ComparisonOperator: aws.String("EQ"),
-            AttributeValueList: []*dynamodb.AttributeValue{
-                {
-                    S: aws.String(id),
-                },
-            },
-        },
-    },
+		TableName: aws.String(tableName),
+		IndexName: aws.String("userId-index"),
+		KeyConditions: map[string]*dynamodb.Condition{
+			"userId": {
+				ComparisonOperator: aws.String("EQ"),
+				AttributeValueList: []*dynamodb.AttributeValue{
+					{
+						S: aws.String(id),
+					},
+				},
+			},
+		},
 	})
-
 	if err != nil {
 		log.Fatalf("Got error calling GetItem: %s", err)
 	}
 
 	items := []Zettel{}
 	for _, i := range result.Items {
-      item := Zettel{}
-      err = dynamodbattribute.UnmarshalMap(i, &item)
-      if err != nil {
-          fmt.Println("Error unmarshalling item:", err)
-      }
-      items = append(items, item)
-  }
+		item := Zettel{}
+		err = dynamodbattribute.UnmarshalMap(i, &item)
+		if err != nil {
+			fmt.Println("Error unmarshalling item:", err)
+		}
+		items = append(items, item)
+	}
 
 	b, err := json.Marshal(items)
 	if err != nil {
