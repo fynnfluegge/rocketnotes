@@ -1,21 +1,59 @@
+<div class="overlay" id="agenticDialog">
+  <div class="dialog">
+    <div class="card-grid">
+      <div class="card" *ngFor="let item of data">
+        <div class="card-content">
+          <markdown [data]="item.content"></markdown>
+        </div>
+        <div class="card-footer">
+          <mat-icon style="margin: 2px">note_add</mat-icon>
+          <h4 class="tooltip-trigger">
+            {{ item.document.title }}
+            <div class="tooltip-content">
+              <markdown
+                class="tooltip-markdown"
+                [data]="getTooltip(item.document.id)"
+              ></markdown>
+            </div>
+          </h4>
+        </div>
+      </div>
+    </div>
+    <div style="text-align: right; margin-right: 18px">
+      <button
+        (click)="closeDialogs()"
+        class="btn btn-default btn-primary"
+        style="margin-right: 8px"
+      >
+        Close
+      </button>
+      <button
+        (click)="confirmAgenticFlow()"
+        class="btn btn-default btn-primary"
+      >
+        Confirm
+      </button>
+    </div>
+  </div>
+</div>
 <div
   style="margin-top: 50px; height: calc(100% - 160px)"
   (document:keydown.esc)="cancelEdit()"
 >
   <div style="max-width: 800px; margin: auto">
     <div class="header-title-bar">
-      <!-- <button -->
-      <!--   (click)="toggleAiCompletion()" -->
-      <!--   data-title="Disable AI Text Completion" -->
-      <!--   class="btn btn-default btn-primary btn-fade tooltip-bottom expand" -->
-      <!-- > -->
-      <!--   <img -->
-      <!--     src="../../../assets/icons/png/icons8-artificial-intelligence-50.png" -->
-      <!--     class="title-button-icon" -->
-      <!--   /> -->
-      <!--   Agentic Mode -->
-      <!-- </button> -->
-      <p class="title" style="text-indent: -0px">Zettelkasten Inbox</p>
+      <button
+        (click)="agenticMode()"
+        data-title="Enrich existing documents with inbox notes by agentic AI"
+        class="btn btn-default btn-primary btn-fade tooltip-bottom expand"
+      >
+        <img
+          src="../../../assets/icons/png/icons8-artificial-intelligence-50.png"
+          class="title-button-icon"
+        />
+        Agentic Mode
+      </button>
+      <p class="title" style="text-indent: -128px">Zettelkasten Inbox</p>
     </div>
     <textarea
       [(ngModel)]="textareaContent"

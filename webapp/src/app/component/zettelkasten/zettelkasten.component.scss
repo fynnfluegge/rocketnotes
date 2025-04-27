@@ -5,26 +5,45 @@
 
 .tooltip-trigger .tooltip-content {
   visibility: hidden;
+  opacity: 0;
   width: 320px;
   background-color: #555;
   color: #fff;
   text-align: left;
   border-radius: 6px;
-  padding: 10px;
+  margin: 4px;
   position: absolute;
-  top: 40%;
   right: 100%;
-  transform: translateY(-50%);
   z-index: 2;
   overflow: auto;
+  height: 0px;
+  padding: 0px;
   max-height: 400px;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-  transition: opacity 0.3s;
+  transition:
+    opacity 0.2s,
+    visibility 0.2s;
 }
 
 .tooltip-trigger:hover .tooltip-content {
   visibility: visible;
   opacity: 1;
+  height: auto;
+  padding: 8px;
+}
+
+.tooltip-content.bottom {
+  bottom: -240px;
+}
+
+.tooltip-content.left {
+  right: 100%;
+  transform: translateY(-50%);
+}
+
+.tooltip-content.right {
+  left: 100%;
+  transform: translateY(-50%);
 }
 
 .markdown-hover:hover {
@@ -34,4 +53,67 @@
 .markdown-border {
   border: var(--border-width) solid #ccc;
   padding: 8px;
+}
+
+.markdown-textarea {
+  background-color: rgba(1, 1, 1, 0.025);
+}
+
+.overlay {
+  left: 0px;
+}
+
+.dialog {
+  position: absolute;
+  background-color: var(--menu-color);
+  color: var(--font-color);
+  border-radius: 6px;
+  border: 0.1px solid rgb(63, 66, 65);
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+  padding: 12px;
+  width: 800px;
+  height: 800px;
+  max-width: 75%;
+  max-height: 80%;
+  text-align: center;
+  top: 120px;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 28px;
+  padding: 20px;
+  margin-bottom: 20px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: calc(100% - 60px);
+  height: auto;
+}
+
+.card {
+  background: var(--background-color);
+  color: var(--font-color);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #e0e0e0;
+}
+
+.card-content {
+  padding: 12px;
+  flex-grow: 1;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.card-footer {
+  display: flex;
+  padding: 12px 16px;
+  border-top: 1px solid #e0e0e0;
+  border-radius: 0 0 12px 12px;
+  text-align: right;
+  font-weight: bold;
+  font-size: 0.95rem;
 }

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, HostListener, Input, OnInit } from '@angular/core';
 import { Document } from 'src/app/model/document.model';
 import { Zettel } from 'src/app/model/zettel.model';
 import { AudioRecordingService } from 'src/app/service/audio-recording.service';
@@ -27,6 +27,45 @@ export class ZettelkastenComponent implements OnInit {
   speechToTextEnabled: boolean = false;
 
   isRecording = false;
+
+  data = [
+    {
+      ids: ['a1b2c3', 'd4e5f6'],
+      content:
+        '# Heading 1\nThis is a paragraph with **bold** and *italic* text.',
+      document: {
+        id: '5b6ae09e-c32a-45ee-bb3b-1c65fc943a9c',
+        title: 'Introduction',
+      },
+    },
+    {
+      ids: ['x7y8z9'],
+      content:
+        '## Subheading\n- Item 1\n- Item 2\n\n[Link to example](https://example.com)\n\n![Image](https://via.placeholder.com/150) \n\n> Blockquote \n\nThis is a code block:\n```javascript\nconsole.log("Hello, world!");\n```',
+      document: {
+        id: '5b6ae09e-c32a-45ee-bb3b-1c65fc943a9c',
+        title: 'Details',
+      },
+    },
+    {
+      ids: ['a1b2c3'],
+      content:
+        '## Subheading\n- Item 1\n- Item 2\n\n[Link to example](https://example.com)\n\n![Image](https://via.placeholder.com/150) \n\n> Blockquote \n\nThis is a code block:\n```javascript\nconsole.log("Hello, world!");\n```',
+      document: {
+        id: '5b6ae09e-c32a-45ee-bb3b-1c65fc943a9c',
+        title: 'Details',
+      },
+    },
+    {
+      ids: ['x7y8z9'],
+      content:
+        '## Subheading\n- Item 1\n- Item 2\n\n[Link to example](https://example.com)\n\n![Image](https://via.placeholder.com/150) \n\n> Blockquote \n\nThis is a code block:\n```javascript\nconsole.log("Hello, world!");\n\nThis\nis\nanother\nline\nof\ncode.\n```\naaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+      document: {
+        id: '5b6ae09e-c32a-45ee-bb3b-1c65fc943a9c',
+        title: 'Details',
+      },
+    },
+  ];
 
   constructor(
     private basicRestService: BasicRestService,
@@ -235,5 +274,95 @@ export class ZettelkastenComponent implements OnInit {
 
   ngOnDestroy(): void {
     this.abortRecording();
+  }
+
+  agenticMode(): void {
+    this.data.forEach((item) => {
+      this.basicRestService
+        .get('document/' + item.document.id)
+        .subscribe((result) => {
+          const _document: Document = JSON.parse(JSON.stringify(result));
+          this.tooltips.set(
+            _document.id,
+            _document.title + '\n' + _document.content,
+          );
+        });
+    });
+
+    this.openAgenticModeDialog();
+  }
+
+  handleMouseEnterOnTooltipTrigger = (tooltipTrigger: Element) => {
+    const tooltipContent: HTMLElement =
+      tooltipTrigger.querySelector('.tooltip-content');
+    this.positionTooltip(tooltipContent, tooltipTrigger);
+  };
+
+  openAgenticModeDialog() {
+    const overlay = document.getElementById('agenticDialog');
+    overlay.style.display = 'flex';
+    if (overlay.getAttribute('outsideClickListener') !== 'true') {
+      overlay.addEventListener('click', (event) => {
+        overlay.setAttribute('outsideClickListener', 'true');
+        this.outsideClickHandler(event);
+      });
+
+      const tooltipTriggers = document.querySelectorAll('.tooltip-trigger');
+      tooltipTriggers.forEach((tooltipTrigger) => {
+        tooltipTrigger.addEventListener('mouseenter', () =>
+          this.handleMouseEnterOnTooltipTrigger(tooltipTrigger),
+        );
+      });
+
+      const cardGrid = document.querySelector('.card-grid') as HTMLElement;
+      if (cardGrid) {
+        cardGrid.scrollTop = 0;
+      }
+    }
+  }
+
+  outsideClickHandler(event: MouseEvent) {
+    const overlay = document.getElementById('agenticDialog');
+    if (event.target === overlay) {
+      overlay.style.display = 'none';
+      this.tooltips.clear();
+    }
+  }
+
+  @HostListener('document:keydown.escape', ['$event'])
+  closeDialogs() {
+    const overlay = document.getElementById('agenticDialog');
+    if (overlay) {
+      overlay.style.display = 'none';
+      this.tooltips.clear();
+    }
+  }
+
+  positionTooltip(tooltip: HTMLElement, trigger: Element) {
+    const triggerRect = trigger.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    // Calculate available space
+    const spaceBottom = viewportHeight - triggerRect.bottom;
+    const spaceLeft = triggerRect.left;
+    const spaceRight = viewportWidth - triggerRect.right;
+
+    // Determine the best position
+    let position = 'right';
+    let maxSpace = spaceRight;
+
+    if (spaceLeft > maxSpace) {
+      position = 'left';
+      maxSpace = spaceLeft;
+    }
+
+    // Apply the position class
+    tooltip.classList.remove('top', 'bottom', 'left', 'right');
+    tooltip.classList.add(position);
+
+    if (spaceBottom < 400) {
+      tooltip.classList.add('bottom');
+    }
   }
 }
