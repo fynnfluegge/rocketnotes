@@ -4,17 +4,11 @@ from pathlib import Path
 
 import boto3
 from langchain.schema import Document
-from langchain.text_splitter import (
-    MarkdownHeaderTextSplitter,
-    RecursiveCharacterTextSplitter,
-)
-from langchain_community.embeddings import (
-    HuggingFaceEmbeddings,
-    OllamaEmbeddings,
-    VoyageEmbeddings,
-)
+from langchain_community.embeddings import (HuggingFaceEmbeddings,
+                                            OllamaEmbeddings, VoyageEmbeddings)
 from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
+from langchain_text_splitters import MarkdownHeaderTextSplitter
 
 is_local = os.environ.get("LOCAL", False)
 s3_args = {}
@@ -56,38 +50,18 @@ def handler(event, context):
         }
 
     userConfig = userConfig["Item"]
-    embeddingsModel = userConfig.get("embeddingModel", {}).get("S", None)
-    openAiApiKey = userConfig.get("openAiApiKey", {}).get("S", None)
-    voyageApiKey = userConfig.get("voyageApiKey", {}).get("S", None)
-    if openAiApiKey is not None:
-        os.environ["OPENAI_API_KEY"] = openAiApiKey
-    if voyageApiKey is not None:
-        os.environ["VOYAGE_API_KEY"] = voyageApiKey
-
-    if embeddingsModel == "text-embedding-ada-002":
-        if openAiApiKey is None:
-            return {
-                "statusCode": 400,
-                "body": json.dumps("OpenAI API key not found"),
-            }
-        embeddings = OpenAIEmbeddings(client=None, model=embeddingsModel)
-    elif embeddingsModel == "voyage-2" or embeddingsModel == "voyage-3":
-        if voyageApiKey is None:
-            return {
-                "statusCode": 400,
-                "body": json.dumps("Voyage API key not found"),
-            }
-        embeddings = VoyageEmbeddings(model=embeddingsModel)
-    elif embeddingsModel == "Sentence-Transformers":
-        embeddings = HuggingFaceEmbeddings(model_kwargs={"device": "cpu"})
-    elif embeddingsModel == "Ollama-nomic-embed-text":
-        embeddings = OllamaEmbeddings(
-            base_url="http://ollama:11434", model=embeddingsModel.split("Ollama-")[1]
-        )
+    if "embeddingModel" in userConfig:
+        embeddings_model = userConfig.get("embeddingModel").get("S")
     else:
+        return {"statusCode": 400, "body": "embeddings model is missing"}
+
+
+    try:
+        embeddings = get_embeddings_model(embeddings_model, userConfig)
+    except ValueError as e:
         return {
             "statusCode": 400,
-            "body": json.dumps("Embeddings model not found"),
+            "body": json.dumps(str(e)),
         }
 
     try:
@@ -228,6 +202,7 @@ def load_faiss_index_from_s3(userId, file_path, file_name, embeddings):
         index_name="faiss_index",
         folder_path=file_path,
         embeddings=embeddings,
+        allow_dangerous_deserialization=True,
     )
 
 
@@ -264,14 +239,6 @@ def split_document(document, documentId, title):
         headers_to_split_on=headers_to_split_on, strip_headers=False
     )
     md_header_splits = markdown_splitter.split_text(document)
-
-    chunk_size = 512
-    chunk_overlap = 32
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=chunk_size, chunk_overlap=chunk_overlap
-    )
-
-    # splitted_documents = text_splitter.split_documents(md_header_splits)
 
     documents = []
     for splitted_document in md_header_splits:
@@ -368,3 +335,30 @@ def delete_document_vectors_from_dynamodb(documentId):
         )
     except Exception as e:
         print(f"Error deleting vectors for file {documentId}: {e}")
+
+
+def get_embeddings_model(embeddings_model, userConfig):
+    if embeddings_model == "text-embedding-ada-002":
+        if "openAiApiKey" in userConfig:
+            os.environ["OPENAI_API_KEY"] = userConfig.get("openAiApiKey").get("S")
+        else:
+            raise ValueError(
+                f"OpenAI API key is missing for model {embeddings_model}"
+            )
+        return OpenAIEmbeddings(client=None, model=embeddings_model)
+    elif embeddings_model in ["voyage-2", "voyage-3"]:
+        if "voyageApiKey" in userConfig:
+            os.environ["VOYAGE_API_KEY"] = userConfig.get("voyageApiKey").get("S")
+        else:
+            raise ValueError(
+                f"Voyage API key is missing for model {embeddings_model}"
+            )
+        return VoyageEmbeddings(model=embeddings_model)
+    elif embeddings_model == "Sentence-Transformers":
+        return HuggingFaceEmbeddings(model_kwargs={"device": "cpu"})
+    elif embeddings_model == "Ollama-nomic-embed-text":
+        return OllamaEmbeddings(
+            base_url="http://ollama:11434", model=embeddings_model.split("Ollama-")[1]
+        )
+    else:
+        raise ValueError(f"Embeddings model '{embeddings_model}' not found")

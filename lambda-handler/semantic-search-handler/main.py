@@ -60,28 +60,12 @@ def handler(event, context):
     else:
         return {"statusCode": 400, "body": "embeddings model is missing"}
 
-    if embeddings_model == "text-embedding-ada-002":
-        if "openAiApiKey" in userConfig:
-            os.environ["OPENAI_API_KEY"] = userConfig.get("openAiApiKey").get("S")
-        else:
-            return {"statusCode": 400, "body": "OpenAI API key is missing"}
-        embeddings = OpenAIEmbeddings(client=None, model=embeddings_model)
-    elif embeddings_model == "voyage-2" or embeddings_model == "voyage-3":
-        if "voyageApiKey" in userConfig:
-            os.environ["VOYAGE_API_KEY"] = userConfig.get("voyageApiKey").get("S")
-        else:
-            return {"statusCode": 400, "body": "OpenAI API key is missing"}
-        embeddings = VoyageEmbeddings(model=embeddings_model)
-    elif embeddings_model == "Sentence-Transformers":
-        embeddings = HuggingFaceEmbeddings(model_kwargs={"device": "cpu"})
-    elif embeddings_model == "Ollama-nomic-embed-text":
-        embeddings = OllamaEmbeddings(
-            base_url="http://ollama:11434", model=embeddings_model.split("Ollama-")[1]
-        )
-    else:
+    try:
+        embeddings = get_embeddings_model(embeddings_model, userConfig)
+    except ValueError as e:
         return {
             "statusCode": 400,
-            "body": json.dumps("Embeddings model not found"),
+            "body": json.dumps(str(e)),
         }
 
     file_path = f"/tmp/{userId}"
@@ -93,9 +77,10 @@ def handler(event, context):
         index_name=userId,
         folder_path=file_path,
         embeddings=embeddings,
+        allow_dangerous_deserialization=True,
     )
 
-    similarity_search_result = db.similarity_search(search_string, k=4)
+    similarity_search_result = db.similarity_search(search_string, k=3)
     response = []
     for result in similarity_search_result:
         response.append(
@@ -110,6 +95,32 @@ def handler(event, context):
         "statusCode": 200,
         "body": json.dumps(response),
     }
+
+def get_embeddings_model(embeddings_model, userConfig):
+    if embeddings_model == "text-embedding-ada-002":
+        if "openAiApiKey" in userConfig:
+            os.environ["OPENAI_API_KEY"] = userConfig.get("openAiApiKey").get("S")
+        else:
+            raise ValueError(
+                f"OpenAI API key is missing for model {embeddings_model}"
+            )
+        return OpenAIEmbeddings(client=None, model=embeddings_model)
+    elif embeddings_model in ["voyage-2", "voyage-3"]:
+        if "voyageApiKey" in userConfig:
+            os.environ["VOYAGE_API_KEY"] = userConfig.get("voyageApiKey").get("S")
+        else:
+            raise ValueError(
+                f"Voyage API key is missing for model {embeddings_model}"
+            )
+        return VoyageEmbeddings(model=embeddings_model)
+    elif embeddings_model == "Sentence-Transformers":
+        return HuggingFaceEmbeddings(model_kwargs={"device": "cpu"})
+    elif embeddings_model == "Ollama-nomic-embed-text":
+        return OllamaEmbeddings(
+            base_url="http://ollama:11434", model=embeddings_model.split("Ollama-")[1]
+        )
+    else:
+        raise ValueError(f"Embeddings model '{embeddings_model}' not found")
 
 
 def load_from_s3(key, file_path):
