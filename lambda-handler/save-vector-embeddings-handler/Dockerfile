@@ -1,4 +1,4 @@
-FROM public.ecr.aws/lambda/python:3.9
+FROM public.ecr.aws/lambda/python:3.12
 
 COPY ./requirements.local.txt ${LAMBDA_TASK_ROOT}/
 

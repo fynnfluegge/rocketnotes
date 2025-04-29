@@ -14,6 +14,7 @@ from langchain_community.embeddings import (
 from langchain_community.llms import Ollama
 from langchain_community.vectorstores import FAISS
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain_together import ChatTogether
 
 is_local = os.environ.get("LOCAL", False)
 s3_args = {}
@@ -46,7 +47,7 @@ def handler(event, context):
 
     if "prompt" in request_body:
         prompt = (
-            "Based on the context I provided, please answer the following question in valid markdown syntax: "
+            "Based on the context provided, answer the following question in valid markdown syntax: "
             + request_body["prompt"]
         )
     else:
@@ -70,65 +71,23 @@ def handler(event, context):
     else:
         return {"statusCode": 400, "body": "embeddings model is missing"}
 
-    if embeddings_model == "text-embedding-ada-002":
-        if "openAiApiKey" in userConfig:
-            os.environ["OPENAI_API_KEY"] = userConfig.get("openAiApiKey").get("S")
-        else:
-            return {"statusCode": 400, "body": "OpenAI API key is missing"}
-
-    if embeddings_model == "voyage-2" or embeddings_model == "voyage-3":
-        if "voyageApiKey" in userConfig:
-            os.environ["VOYAGE_API_KEY"] = userConfig.get("voyageApiKey").get("S")
-        else:
-            return {"statusCode": 400, "body": "OpenAI API key is missing"}
+    try:
+        embeddings = get_embeddings_model(embeddings_model, userConfig)
+    except ValueError as e:
+        return {
+            "statusCode": 400,
+            "body": json.dumps(str(e)),
+        }
 
     if "llm" in userConfig:
         llm_model = userConfig.get("llm").get("S")
     else:
         return {"statusCode": 400, "body": "llm model is missing"}
 
-    if llm_model == "gpt-3.5-turbo" or llm_model == "gpt-4":
-        if "openAiApiKey" in userConfig:
-            os.environ["OPENAI_API_KEY"] = userConfig.get("openAiApiKey").get("S")
-        else:
-            return {"statusCode": 400, "body": "OpenAI API key is missing"}
-        chat_model = ChatOpenAI(temperature=0.9, max_tokens=2048, model=llm_model)
-    elif (
-        llm_model == "claude-3-opus-20240229"
-        or llm_model == "claude-3-sonnet-20240229"
-        or llm_model == "claude-3-haiku-20240307"
-    ):
-        if "anthropicApiKey" in userConfig:
-            os.environ["ANTHROPIC_API_KEY"] = userConfig.get("anthropicApiKey").get("S")
-        else:
-            return {"statusCode": 400, "body": "Anthropic API key is missing"}
-        chat_model = ChatAnthropic(temperature=0.9, max_tokens=2048, model=llm_model)
-    elif llm_model.startswith("Ollama"):
-        chat_model = Ollama(
-            base_url="http://ollama:11434",
-            model=llm_model.split("Ollama-")[1],
-        )
-    else:
-        return {
-            "statusCode": 400,
-            "body": "Invalid LLM model. Please use one of the following models: gpt-3.5-turbo, claude-3-opus-20240229, claude-3-sonnet-20240229, claude-3-haiku-20240307",
-        }
-
-    if embeddings_model == "text-embedding-ada-002":
-        embeddings = OpenAIEmbeddings(client=None, model="text-embedding-ada-002")
-    elif embeddings_model == "voyage-2":
-        embeddings = VoyageEmbeddings(model=embeddings_model)
-    elif embeddings_model == "Sentence-Transformers":
-        embeddings = HuggingFaceEmbeddings(model_kwargs={"device": "cpu"})
-    elif embeddings_model == "Ollama-nomic-embed-text":
-        embeddings = OllamaEmbeddings(
-            base_url="http://ollama:11434", model=embeddings_model.split("Ollama-")[1]
-        )
-    else:
-        return {
-            "statusCode": 400,
-            "body": json.dumps("Embeddings model not found"),
-        }
+    try:
+        chat_model = get_chat_model(llm_model, userConfig)
+    except ValueError as e:
+        return {"statusCode": 400, "body": str(e)}
 
     file_path = f"/tmp/{userId}"
     Path(file_path).mkdir(parents=True, exist_ok=True)
@@ -142,15 +101,10 @@ def handler(event, context):
         allow_dangerous_deserialization=True,
     )
 
-    retriever = db.as_retriever(search_type="mmr", search_kwargs={"k": 8})
+    retriever = db.as_retriever(search_type="similarity", search_kwargs={"k": 3})
 
-    memory = ConversationSummaryMemory(
-        llm=chat_model, memory_key="chat_history", return_messages=True
-    )
-    qa = ConversationalRetrievalChain.from_llm(
-        chat_model, retriever=retriever, memory=memory
-    )
-    result = qa(prompt)
+    qa = ConversationalRetrievalChain.from_llm(chat_model, retriever=retriever)
+    result = qa({"question": prompt, "chat_history": []})
 
     return {"statusCode": 200, "body": json.dumps(result["answer"])}
 
@@ -162,3 +116,58 @@ def load_from_s3(key, file_path):
     except Exception as e:
         print(f"Error getting object from S3: {e}")
         return False
+
+
+def get_embeddings_model(embeddings_model, userConfig):
+    if embeddings_model == "text-embedding-ada-002":
+        if "openAiApiKey" in userConfig:
+            os.environ["OPENAI_API_KEY"] = userConfig.get("openAiApiKey").get("S")
+        else:
+            raise ValueError(f"OpenAI API key is missing for model {embeddings_model}")
+        return OpenAIEmbeddings(client=None, model=embeddings_model)
+    elif embeddings_model in ["voyage-2", "voyage-3"]:
+        if "voyageApiKey" in userConfig:
+            os.environ["VOYAGE_API_KEY"] = userConfig.get("voyageApiKey").get("S")
+        else:
+            raise ValueError(f"Voyage API key is missing for model {embeddings_model}")
+        return VoyageEmbeddings(model=embeddings_model)
+    elif embeddings_model == "Sentence-Transformers":
+        return HuggingFaceEmbeddings(model_kwargs={"device": "cpu"})
+    elif embeddings_model == "Ollama-nomic-embed-text":
+        return OllamaEmbeddings(
+            base_url="http://ollama:11434", model=embeddings_model.split("Ollama-")[1]
+        )
+    else:
+        raise ValueError(f"Embeddings model '{embeddings_model}' not found")
+
+
+def get_chat_model(llm_model, userConfig):
+    if llm_model.startswith("gpt"):
+        if "openAiApiKey" in userConfig:
+            os.environ["OPENAI_API_KEY"] = userConfig.get("openAiApiKey").get("S")
+        else:
+            raise ValueError("OpenAI API key is missing")
+        return ChatOpenAI(temperature=0.9, max_tokens=2048, model=llm_model)
+    elif llm_model.startswith("claude"):
+        if "anthropicApiKey" in userConfig:
+            os.environ["ANTHROPIC_API_KEY"] = userConfig.get("anthropicApiKey").get("S")
+        else:
+            raise ValueError("Anthropic API key is missing")
+        return ChatAnthropic(temperature=0.9, max_tokens=2048, model=llm_model)
+    elif llm_model.startswith("together"):
+        if "togetherApiKey" in userConfig:
+            os.environ["TOGETHER_API_KEY"] = userConfig.get("togetherApiKey").get("S")
+        else:
+            raise ValueError("Together API key is missing")
+        return ChatTogether(
+            temperature=0.9, max_tokens=2048, model=llm_model.split("together-")[1]
+        )
+    elif llm_model.startswith("Ollama"):
+        return Ollama(
+            base_url="http://ollama:11434",
+            model=llm_model.split("Ollama-")[1],
+        )
+    else:
+        raise ValueError(
+            "Invalid LLM model. Please use one of the following models: gpt-*, claude-*, Ollama-*"
+        )
