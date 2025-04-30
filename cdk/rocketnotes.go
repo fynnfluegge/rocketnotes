@@ -396,7 +396,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 
 	awscdklambdapythonalpha.NewPythonFunction(stack, jsii.String("VectorEmbeddingsHandler"), &awscdklambdapythonalpha.PythonFunctionProps{
 		FunctionName: jsii.String("VectorEmbeddings"),
-		Runtime:      awslambda.Runtime_PYTHON_3_9(),
+		Runtime:      awslambda.Runtime_PYTHON_3_12(),
 		Entry:        jsii.String("../lambda-handler/save-vector-embeddings-handler"),
 		Index:        aws.String("main.py"),
 		Events: &[]awslambda.IEventSource{
@@ -414,7 +414,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 
 	semanticSearcHandler := awscdklambdapythonalpha.NewPythonFunction(stack, jsii.String("SemanticSearchHandler"), &awscdklambdapythonalpha.PythonFunctionProps{
 		FunctionName: jsii.String("SemanticSearch"),
-		Runtime:      awslambda.Runtime_PYTHON_3_9(),
+		Runtime:      awslambda.Runtime_PYTHON_3_12(),
 		Entry:        jsii.String("../lambda-handler/semantic-search-handler"),
 		Index:        aws.String("main.py"),
 		Environment:  &map[string]*string{"BUCKET_NAME": bucket.BucketName()},
@@ -434,7 +434,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 
 	chatHandler := awscdklambdapythonalpha.NewPythonFunction(stack, jsii.String("ChatHandler"), &awscdklambdapythonalpha.PythonFunctionProps{
 		FunctionName: jsii.String("Chat"),
-		Runtime:      awslambda.Runtime_PYTHON_3_9(),
+		Runtime:      awslambda.Runtime_PYTHON_3_12(),
 		Entry:        jsii.String("../lambda-handler/chat-handler"),
 		Index:        aws.String("main.py"),
 		Environment:  &map[string]*string{"BUCKET_NAME": bucket.BucketName()},
@@ -454,7 +454,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 
 	textCompletionHandler := awscdklambdapythonalpha.NewPythonFunction(stack, jsii.String("TextCompletionHandler"), &awscdklambdapythonalpha.PythonFunctionProps{
 		FunctionName: jsii.String("TextCompletion"),
-		Runtime:      awslambda.Runtime_PYTHON_3_9(),
+		Runtime:      awslambda.Runtime_PYTHON_3_12(),
 		Entry:        jsii.String("../lambda-handler/text-completion-handler"),
 		Index:        aws.String("main.py"),
 		MemorySize:   jsii.Number(1024),

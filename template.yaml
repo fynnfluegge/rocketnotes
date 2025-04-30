@@ -391,7 +391,7 @@ Resources:
     Properties:
       CodeUri: lambda-handler/text-completion-handler
       Handler: main.handler
-      Runtime: python3.9
+      Runtime: python3.12
       Architectures:
         - x86_64
       MemorySize: 128
