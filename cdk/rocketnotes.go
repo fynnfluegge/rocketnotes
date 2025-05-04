@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsapigatewayv2"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awscertificatemanager"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awscloudfront"
+	"github.com/aws/aws-cdk-go/awscdk/v2/awsecrassets"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsevents"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awseventstargets"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsiam"
@@ -394,11 +395,11 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		AccessControl:    awss3.BucketAccessControl_BUCKET_OWNER_FULL_CONTROL,
 	})
 
-	awscdklambdapythonalpha.NewPythonFunction(stack, jsii.String("VectorEmbeddingsHandler"), &awscdklambdapythonalpha.PythonFunctionProps{
-		FunctionName: jsii.String("VectorEmbeddings"),
-		Runtime:      awslambda.Runtime_PYTHON_3_9(),
-		Entry:        jsii.String("../lambda-handler/save-vector-embeddings-handler"),
-		Index:        aws.String("main.py"),
+	awslambda.NewDockerImageFunction(stack, jsii.String("VectorEmbeddingsHandler"), &awslambda.DockerImageFunctionProps{
+		FunctionName: jsii.String("VectorEmbeddings-Docker"),
+		Code: awslambda.DockerImageCode_FromImageAsset(jsii.String("../lambda-handler/save-vector-embeddings-handler"), &awslambda.AssetImageCodeProps{
+			Platform: awsecrassets.Platform_LINUX_AMD64(),
+		}),
 		Events: &[]awslambda.IEventSource{
 			awslambdaeventsources.NewSqsEventSource(vectorQueue, &awslambdaeventsources.SqsEventSourceProps{
 				BatchSize: jsii.Number(1),
@@ -407,40 +408,40 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		Environment: &map[string]*string{"BUCKET_NAME": bucket.BucketName()},
 		Role:        lambdaS3SqsDynamoDbRole,
 		MemorySize:  jsii.Number(1024),
-		Timeout:     awscdk.Duration_Millis(jsii.Number(900000)),
+		Timeout:     awscdk.Duration_Seconds(jsii.Number(900)),
 	})
 
 	// Semantic search handler
 
-	semanticSearcHandler := awscdklambdapythonalpha.NewPythonFunction(stack, jsii.String("SemanticSearchHandler"), &awscdklambdapythonalpha.PythonFunctionProps{
-		FunctionName: jsii.String("SemanticSearch"),
-		Runtime:      awslambda.Runtime_PYTHON_3_9(),
-		Entry:        jsii.String("../lambda-handler/semantic-search-handler"),
-		Index:        aws.String("main.py"),
-		Environment:  &map[string]*string{"BUCKET_NAME": bucket.BucketName()},
-		Role:         lambdaS3DynamoDbRole,
-		MemorySize:   jsii.Number(1024),
-		Timeout:      awscdk.Duration_Millis(jsii.Number(900000)),
+	semanticSearchHandler := awslambda.NewDockerImageFunction(stack, jsii.String("SemanticSearchHandler"), &awslambda.DockerImageFunctionProps{
+		FunctionName: jsii.String("SemanticSearch-Docker"),
+		Code: awslambda.DockerImageCode_FromImageAsset(jsii.String("../lambda-handler/semantic-search-handler"), &awslambda.AssetImageCodeProps{
+			Platform: awsecrassets.Platform_LINUX_AMD64(),
+		}),
+		Environment: &map[string]*string{"BUCKET_NAME": bucket.BucketName()},
+		Role:        lambdaS3DynamoDbRole,
+		MemorySize:  jsii.Number(1024),
+		Timeout:     awscdk.Duration_Seconds(jsii.Number(900)),
 	})
 
 	httpApi.AddRoutes(&awscdkapigatewayv2alpha.AddRoutesOptions{
 		Path:        jsii.String("/semanticSearch"),
 		Authorizer:  httpApiAuthorizer,
 		Methods:     &[]awscdkapigatewayv2alpha.HttpMethod{awscdkapigatewayv2alpha.HttpMethod_POST},
-		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("semanticSearchLambdaIntegration"), semanticSearcHandler, &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
+		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("semanticSearchLambdaIntegration"), semanticSearchHandler, &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
 	})
 
 	// Chat handler
 
-	chatHandler := awscdklambdapythonalpha.NewPythonFunction(stack, jsii.String("ChatHandler"), &awscdklambdapythonalpha.PythonFunctionProps{
-		FunctionName: jsii.String("Chat"),
-		Runtime:      awslambda.Runtime_PYTHON_3_9(),
-		Entry:        jsii.String("../lambda-handler/chat-handler"),
-		Index:        aws.String("main.py"),
-		Environment:  &map[string]*string{"BUCKET_NAME": bucket.BucketName()},
-		Role:         lambdaS3DynamoDbRole,
-		MemorySize:   jsii.Number(1024),
-		Timeout:      awscdk.Duration_Millis(jsii.Number(900000)),
+	chatHandler := awslambda.NewDockerImageFunction(stack, jsii.String("ChatHandler"), &awslambda.DockerImageFunctionProps{
+		FunctionName: jsii.String("Chat-Docker"),
+		Code: awslambda.DockerImageCode_FromImageAsset(jsii.String("../lambda-handler/chat-handler"), &awslambda.AssetImageCodeProps{
+			Platform: awsecrassets.Platform_LINUX_AMD64(),
+		}),
+		Environment: &map[string]*string{"BUCKET_NAME": bucket.BucketName()},
+		Role:        lambdaS3DynamoDbRole,
+		MemorySize:  jsii.Number(1024),
+		Timeout:     awscdk.Duration_Seconds(jsii.Number(900)),
 	})
 
 	httpApi.AddRoutes(&awscdkapigatewayv2alpha.AddRoutesOptions{
@@ -454,7 +455,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 
 	textCompletionHandler := awscdklambdapythonalpha.NewPythonFunction(stack, jsii.String("TextCompletionHandler"), &awscdklambdapythonalpha.PythonFunctionProps{
 		FunctionName: jsii.String("TextCompletion"),
-		Runtime:      awslambda.Runtime_PYTHON_3_9(),
+		Runtime:      awslambda.Runtime_PYTHON_3_12(),
 		Entry:        jsii.String("../lambda-handler/text-completion-handler"),
 		Index:        aws.String("main.py"),
 		MemorySize:   jsii.Number(1024),

@@ -87,7 +87,7 @@ def handler(event, context):
             {
                 "documentId": result.metadata["documentId"],
                 "title": result.metadata["title"],
-                "content": result.page_content,
+                "content": result.metadata["original_content"],
             }
         )
 
@@ -96,22 +96,19 @@ def handler(event, context):
         "body": json.dumps(response),
     }
 
+
 def get_embeddings_model(embeddings_model, userConfig):
     if embeddings_model == "text-embedding-ada-002":
         if "openAiApiKey" in userConfig:
             os.environ["OPENAI_API_KEY"] = userConfig.get("openAiApiKey").get("S")
         else:
-            raise ValueError(
-                f"OpenAI API key is missing for model {embeddings_model}"
-            )
+            raise ValueError(f"OpenAI API key is missing for model {embeddings_model}")
         return OpenAIEmbeddings(client=None, model=embeddings_model)
     elif embeddings_model in ["voyage-2", "voyage-3"]:
         if "voyageApiKey" in userConfig:
             os.environ["VOYAGE_API_KEY"] = userConfig.get("voyageApiKey").get("S")
         else:
-            raise ValueError(
-                f"Voyage API key is missing for model {embeddings_model}"
-            )
+            raise ValueError(f"Voyage API key is missing for model {embeddings_model}")
         return VoyageEmbeddings(model=embeddings_model)
     elif embeddings_model == "Sentence-Transformers":
         return HuggingFaceEmbeddings(model_kwargs={"device": "cpu"})

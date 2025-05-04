@@ -150,6 +150,10 @@ def handler(event, context):
                     try:
                         if document.get("deleted", {}).get("BOOL", False):
                             continue
+                        elif document.get("content", {}).get("S") is None:
+                            continue
+                        elif len(document.get("content", {}).get("S").strip()) <= 12:
+                            continue
                         else:
                             content = document["content"]["S"]
                             documentId = document["id"]["S"]
@@ -242,11 +246,18 @@ def split_document(document, documentId, title):
 
     documents = []
     for splitted_document in md_header_splits:
+        if (
+            not splitted_document.page_content
+            or len(splitted_document.page_content.strip()) <= 12
+        ):
+            continue
+
         document = Document(
-            page_content=splitted_document.page_content,
+            page_content=f"{title}\n{splitted_document.page_content}",
             metadata={
                 "documentId": documentId,
                 "title": title,
+                "original_content": splitted_document.page_content,
             },
         )
         documents.append(document)

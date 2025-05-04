@@ -286,7 +286,7 @@ Resources:
             Method: POST
     Metadata:
       DockerContext: lambda-handler/save-vector-embeddings-handler
-      Dockerfile: Dockerfile
+      Dockerfile: Dockerfile.local
 
   semanticSearchFunction:
     Type: AWS::Serverless::Function
@@ -309,7 +309,7 @@ Resources:
             Method: POST
     Metadata:
       DockerContext: lambda-handler/semantic-search-handler
-      Dockerfile: Dockerfile
+      Dockerfile: Dockerfile.local
 
   chatFunction:
     Type: AWS::Serverless::Function
@@ -334,7 +334,7 @@ Resources:
             Method: POST
     Metadata:
       DockerContext: lambda-handler/chat-handler
-      Dockerfile: Dockerfile
+      Dockerfile: Dockerfile.local
 
   saveUserConfigFunction:
     Type: AWS::Serverless::Function
@@ -391,7 +391,7 @@ Resources:
     Properties:
       CodeUri: lambda-handler/text-completion-handler
       Handler: main.handler
-      Runtime: python3.9
+      Runtime: python3.12
       Architectures:
         - x86_64
       MemorySize: 128
