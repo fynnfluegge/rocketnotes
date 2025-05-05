@@ -8,6 +8,7 @@ Globals:
     Cors:
       AllowMethods: "'GET,POST,DELETE,OPTIONS'"
       AllowHeaders: "'content-type'"
+			// TODO - change this to the actual allowed origins
       AllowOrigin: "'*'"
       AllowCredentials: "'*'"
 
