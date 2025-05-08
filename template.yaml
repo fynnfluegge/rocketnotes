@@ -12,25 +12,6 @@ Globals:
       AllowCredentials: "'*'"
 
 Resources:
-  helloWorldFunction:
-    Type: AWS::Serverless::Function
-    Metadata:
-      BuildMethod: go1.x
-    Properties:
-      CodeUri: lambda-handler/hello-world-handler
-      Handler: local.go
-      Runtime: provided.al2
-      Architectures:
-        - x86_64
-      MemorySize: 128
-      Timeout: 100
-      Events:
-        Api:
-          Type: Api
-          Properties:
-            Path: /hello-world
-            Method: GET
-
   getDocumentFunction:
     Type: AWS::Serverless::Function
     Metadata:
@@ -385,23 +366,6 @@ Resources:
           Properties:
             Path: /userConfig/{userId}
             Method: GET 
-
-  textCompletionFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: lambda-handler/text-completion-handler
-      Handler: main.handler
-      Runtime: python3.12
-      Architectures:
-        - x86_64
-      MemorySize: 128
-      Timeout: 100
-      Events:
-        Api:
-          Type: Api
-          Properties:
-            Path: /text-completion
-            Method: POST
 
   getZettelkastenFunction:
     Type: AWS::Serverless::Function

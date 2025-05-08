@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, HostListener, Input, OnInit } from '@angular/core';
 import { Document } from 'src/app/model/document.model';
 import { Zettel } from 'src/app/model/zettel.model';
 import { AudioRecordingService } from 'src/app/service/audio-recording.service';
@@ -27,6 +27,9 @@ export class ZettelkastenComponent implements OnInit {
   speechToTextEnabled: boolean = false;
 
   isRecording = false;
+  isTooltipVisible = false;
+
+  vibeGenerateResponse = [];
 
   constructor(
     private basicRestService: BasicRestService,
@@ -235,5 +238,110 @@ export class ZettelkastenComponent implements OnInit {
 
   ngOnDestroy(): void {
     this.abortRecording();
+  }
+
+  agenticMode(): void {
+    this.openAgenticModeDialog();
+  }
+
+  handleMouseEnterOnTooltipTrigger = (tooltipTrigger: Element) => {
+    const tooltipContent: HTMLElement =
+      tooltipTrigger.querySelector('.tooltip-content');
+    this.positionTooltip(tooltipContent, tooltipTrigger);
+  };
+
+  openAgenticModeDialog() {
+    const overlay = document.getElementById('agenticDialog');
+    overlay.style.display = 'flex';
+    if (overlay.getAttribute('outsideClickListener') !== 'true') {
+      overlay.addEventListener('click', (event) => {
+        overlay.setAttribute('outsideClickListener', 'true');
+        this.outsideClickHandler(event);
+      });
+
+      const tooltipTriggers = document.querySelectorAll('.tooltip-trigger');
+      tooltipTriggers.forEach((tooltipTrigger) => {
+        tooltipTrigger.addEventListener('mouseenter', () => {
+          this.handleMouseEnterOnTooltipTrigger(tooltipTrigger);
+        });
+      });
+
+      const cardGrid = document.querySelector('.card-grid') as HTMLElement;
+      if (cardGrid) {
+        cardGrid.scrollTop = 0;
+      }
+    }
+    this.basicRestService
+      .get('vibe/generate/' + localStorage.getItem('currentUserId'))
+      .subscribe((result) => {
+        this.vibeGenerateResponse = JSON.parse(JSON.stringify(result));
+        this.vibeGenerateResponse.forEach((item) => {
+          this.basicRestService
+            .get('document/' + item.documentId)
+            .subscribe((result) => {
+              const _document: Document = JSON.parse(JSON.stringify(result));
+              this.tooltips.set(
+                item.documentId,
+                _document.title + '\n' + _document.content,
+              );
+            });
+        });
+      });
+  }
+
+  confirmAgenticFlow() {
+    const overlay = document.getElementById('agenticDialog');
+    if (overlay) {
+      overlay.style.display = 'none';
+      this.tooltips.clear();
+    }
+    this.basicRestService
+      .post('vibe/insert', this.vibeGenerateResponse)
+      .subscribe();
+  }
+
+  outsideClickHandler(event: MouseEvent) {
+    const overlay = document.getElementById('agenticDialog');
+    if (event.target === overlay) {
+      overlay.style.display = 'none';
+      this.tooltips.clear();
+    }
+  }
+
+  @HostListener('document:keydown.escape', ['$event'])
+  closeDialogs() {
+    const overlay = document.getElementById('agenticDialog');
+    if (overlay) {
+      overlay.style.display = 'none';
+      this.tooltips.clear();
+    }
+  }
+
+  positionTooltip(tooltip: HTMLElement, trigger: Element) {
+    const triggerRect = trigger.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    // Calculate available space
+    const spaceBottom = viewportHeight - triggerRect.bottom;
+    const spaceLeft = triggerRect.left;
+    const spaceRight = viewportWidth - triggerRect.right;
+
+    // Determine the best position
+    let position = 'right';
+    let maxSpace = spaceRight;
+
+    if (spaceLeft > maxSpace) {
+      position = 'left';
+      maxSpace = spaceLeft;
+    }
+
+    // Apply the position class
+    tooltip.classList.remove('top', 'bottom', 'left', 'right');
+    tooltip.classList.add(position);
+
+    if (spaceBottom < 400) {
+      tooltip.classList.add('bottom');
+    }
   }
 }
