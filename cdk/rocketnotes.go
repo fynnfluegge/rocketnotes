@@ -23,7 +23,6 @@ import (
 	"github.com/aws/aws-cdk-go/awscdkapigatewayv2alpha/v2"
 	"github.com/aws/aws-cdk-go/awscdkapigatewayv2integrationsalpha/v2"
 	"github.com/aws/aws-cdk-go/awscdklambdagoalpha/v2"
-	"github.com/aws/aws-cdk-go/awscdklambdapythonalpha/v2"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/constructs-go/constructs/v10"
 	"github.com/aws/jsii-runtime-go"
@@ -449,24 +448,6 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		Authorizer:  httpApiAuthorizer,
 		Methods:     &[]awscdkapigatewayv2alpha.HttpMethod{awscdkapigatewayv2alpha.HttpMethod_POST},
 		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("chatLambdaIntegration"), chatHandler, &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
-	})
-
-	// Completion handler
-
-	textCompletionHandler := awscdklambdapythonalpha.NewPythonFunction(stack, jsii.String("TextCompletionHandler"), &awscdklambdapythonalpha.PythonFunctionProps{
-		FunctionName: jsii.String("TextCompletion"),
-		Runtime:      awslambda.Runtime_PYTHON_3_12(),
-		Entry:        jsii.String("../lambda-handler/text-completion-handler"),
-		Index:        aws.String("main.py"),
-		MemorySize:   jsii.Number(1024),
-		Timeout:      awscdk.Duration_Millis(jsii.Number(900000)),
-	})
-
-	httpApi.AddRoutes(&awscdkapigatewayv2alpha.AddRoutesOptions{
-		Path:        jsii.String("/text-completion"),
-		Authorizer:  httpApiAuthorizer,
-		Methods:     &[]awscdkapigatewayv2alpha.HttpMethod{awscdkapigatewayv2alpha.HttpMethod_POST},
-		Integration: awscdkapigatewayv2integrationsalpha.NewHttpLambdaIntegration(jsii.String("textCompletionLambdaIntegration"), textCompletionHandler, &awscdkapigatewayv2integrationsalpha.HttpLambdaIntegrationProps{}),
 	})
 
 	// Zettelkasten handler

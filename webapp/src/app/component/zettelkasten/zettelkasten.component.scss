@@ -81,7 +81,7 @@
 
 .card-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(620px, 1fr));
   gap: 28px;
   padding: 20px;
   margin-bottom: 20px;
@@ -104,8 +104,8 @@
 .card-content {
   padding: 12px;
   flex-grow: 1;
-  max-height: 400px;
-  overflow-y: auto;
+  // max-height: 400px;
+  // overflow-y: auto;
 }
 
 .card-footer {

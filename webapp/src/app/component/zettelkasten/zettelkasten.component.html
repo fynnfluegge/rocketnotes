@@ -1,18 +1,52 @@
 <div class="overlay" id="agenticDialog">
   <div class="dialog">
     <div class="card-grid">
-      <div class="card" *ngFor="let item of data">
+      <div class="card" *ngFor="let item of vibeGenerateResponse">
         <div class="card-content">
           <markdown [data]="item.content"></markdown>
+          <div
+            style="
+              position: relative;
+              left: -12px;
+              width: calc(100% + 24px);
+              height: 48px;
+              margin-top: 16px;
+              margin-bottom: 16px;
+              background: rgba(0, 0, 0, 0.5);
+              padding: 8px;
+              color: white;
+              font-size: 18px;
+              align-items: center;
+            "
+          >
+            <img
+              src="../../../assets/icons/png/icons8-artificial-intelligence-50.png"
+              class="title-button-icon"
+            />
+            Will be inserted into
+          </div>
+          <markdown
+            [data]="item.similaritySearchResult"
+            style="
+              max-height: 180px;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              display: -webkit-box;
+              -webkit-line-clamp: 5;
+              -webkit-box-orient: vertical;
+            "
+          >
+            ></markdown
+          >
         </div>
         <div class="card-footer">
           <mat-icon style="margin: 2px">note_add</mat-icon>
           <h4 class="tooltip-trigger">
-            {{ item.document.title }}
+            {{ item.documentTitle }}
             <div class="tooltip-content">
               <markdown
                 class="tooltip-markdown"
-                [data]="getTooltip(item.document.id)"
+                [data]="getTooltip(item.documentId)"
               ></markdown>
             </div>
           </h4>
@@ -51,7 +85,7 @@
           src="../../../assets/icons/png/icons8-artificial-intelligence-50.png"
           class="title-button-icon"
         />
-        Agentic Mode
+        Vibe Insert
       </button>
       <p class="title" style="text-indent: -128px">Zettelkasten Inbox</p>
     </div>

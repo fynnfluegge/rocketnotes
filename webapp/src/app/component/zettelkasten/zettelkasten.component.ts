@@ -27,43 +27,37 @@ export class ZettelkastenComponent implements OnInit {
   speechToTextEnabled: boolean = false;
 
   isRecording = false;
+  isTooltipVisible = false;
 
-  data = [
+  vibeGenerateResponse = [
     {
-      ids: ['a1b2c3', 'd4e5f6'],
       content:
         '# Heading 1\nThis is a paragraph with **bold** and *italic* text.',
-      document: {
-        id: '5b6ae09e-c32a-45ee-bb3b-1c65fc943a9c',
-        title: 'Introduction',
-      },
+      documentId: '5b6ae09e-c32a-45ee-bb3b-1c65fc943a9c',
+      documentTitle: 'Introduction',
+      similaritySearchResult:
+        'This is a similarity search result sentence that is very long and contains a lot of information. It is meant to be an example of a long sentence that could be used in a similarity search result.\n\nThis is a second paragraph that continues the thought from the first paragraph. It provides additional context and information about the topic being discussed.\n\n\n This is a third paragraph that wraps up the discussion and provides a conclusion or summary of the main points.\n\nThis is a fourth paragraph that adds some final thoughts or reflections on the topic.',
     },
     {
-      ids: ['x7y8z9'],
       content:
         '## Subheading\n- Item 1\n- Item 2\n\n[Link to example](https://example.com)\n\n![Image](https://via.placeholder.com/150) \n\n> Blockquote \n\nThis is a code block:\n```javascript\nconsole.log("Hello, world!");\n```',
-      document: {
-        id: '5b6ae09e-c32a-45ee-bb3b-1c65fc943a9c',
-        title: 'Details',
-      },
+      documentId: '5b6ae09e-c32a-45ee-bb3b-1c65fc943a9c',
+      documentTitle: 'Details',
+      similaritySearchResult: 'This is a similarity search result.',
     },
     {
-      ids: ['a1b2c3'],
       content:
         '## Subheading\n- Item 1\n- Item 2\n\n[Link to example](https://example.com)\n\n![Image](https://via.placeholder.com/150) \n\n> Blockquote \n\nThis is a code block:\n```javascript\nconsole.log("Hello, world!");\n```',
-      document: {
-        id: '5b6ae09e-c32a-45ee-bb3b-1c65fc943a9c',
-        title: 'Details',
-      },
+      documentId: '5b6ae09e-c32a-45ee-bb3b-1c65fc943a9c',
+      documentTitle: 'Summary',
+      similaritySearchResult: 'This is a similarity search result.',
     },
     {
-      ids: ['x7y8z9'],
       content:
         '## Subheading\n- Item 1\n- Item 2\n\n[Link to example](https://example.com)\n\n![Image](https://via.placeholder.com/150) \n\n> Blockquote \n\nThis is a code block:\n```javascript\nconsole.log("Hello, world!");\n\nThis\nis\nanother\nline\nof\ncode.\n```\naaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-      document: {
-        id: '5b6ae09e-c32a-45ee-bb3b-1c65fc943a9c',
-        title: 'Details',
-      },
+      documentId: '5b6ae09e-c32a-45ee-bb3b-1c65fc943a9c',
+      documentTitle: 'Conclusion',
+      similaritySearchResult: 'This is a similarity search result.',
     },
   ];
 
@@ -277,18 +271,6 @@ export class ZettelkastenComponent implements OnInit {
   }
 
   agenticMode(): void {
-    this.data.forEach((item) => {
-      this.basicRestService
-        .get('document/' + item.document.id)
-        .subscribe((result) => {
-          const _document: Document = JSON.parse(JSON.stringify(result));
-          this.tooltips.set(
-            _document.id,
-            _document.title + '\n' + _document.content,
-          );
-        });
-    });
-
     this.openAgenticModeDialog();
   }
 
@@ -309,9 +291,9 @@ export class ZettelkastenComponent implements OnInit {
 
       const tooltipTriggers = document.querySelectorAll('.tooltip-trigger');
       tooltipTriggers.forEach((tooltipTrigger) => {
-        tooltipTrigger.addEventListener('mouseenter', () =>
-          this.handleMouseEnterOnTooltipTrigger(tooltipTrigger),
-        );
+        tooltipTrigger.addEventListener('mouseenter', () => {
+          this.handleMouseEnterOnTooltipTrigger(tooltipTrigger);
+        });
       });
 
       const cardGrid = document.querySelector('.card-grid') as HTMLElement;
@@ -319,6 +301,44 @@ export class ZettelkastenComponent implements OnInit {
         cardGrid.scrollTop = 0;
       }
     }
+    this.vibeGenerateResponse.forEach((item) => {
+      this.basicRestService
+        .get('document/' + item.documentId)
+        .subscribe((result) => {
+          const _document: Document = JSON.parse(JSON.stringify(result));
+          this.tooltips.set(
+            item.documentId,
+            _document.title + '\n' + _document.content,
+          );
+        });
+    });
+    this.basicRestService
+      .get('vibe/generate/' + localStorage.getItem('currentUserId'))
+      .subscribe((result) => {
+        this.vibeGenerateResponse = JSON.parse(JSON.stringify(result));
+        this.vibeGenerateResponse.forEach((item) => {
+          this.basicRestService
+            .get('document/' + item.documentId)
+            .subscribe((result) => {
+              const _document: Document = JSON.parse(JSON.stringify(result));
+              this.tooltips.set(
+                item.documentId,
+                _document.title + '\n' + _document.content,
+              );
+            });
+        });
+      });
+  }
+
+  confirmAgenticFlow() {
+    const overlay = document.getElementById('agenticDialog');
+    if (overlay) {
+      overlay.style.display = 'none';
+      this.tooltips.clear();
+    }
+    this.basicRestService
+      .post('vibe/insert', this.vibeGenerateResponse)
+      .subscribe();
   }
 
   outsideClickHandler(event: MouseEvent) {
