@@ -510,6 +510,12 @@ export class SidenavComponent implements OnInit, AfterViewInit {
       '--border-width',
       this.darkmode ? '1px' : '2px',
     );
+    document.documentElement.style.setProperty(
+      '--post-it-shadow',
+      this.darkmode
+        ? 'var(--dark-theme-post-it-shadow)'
+        : 'var(--light-theme-post-it-shadow)',
+    );
   }
 
   openSearchDialog() {

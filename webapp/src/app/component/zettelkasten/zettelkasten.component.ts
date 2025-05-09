@@ -28,6 +28,7 @@ export class ZettelkastenComponent implements OnInit {
 
   isRecording = false;
   isTooltipVisible = false;
+  isVibeInsertResponseLoading = true;
 
   vibeGenerateResponse = [];
 
@@ -240,17 +241,13 @@ export class ZettelkastenComponent implements OnInit {
     this.abortRecording();
   }
 
-  agenticMode(): void {
-    this.openAgenticModeDialog();
-  }
-
   handleMouseEnterOnTooltipTrigger = (tooltipTrigger: Element) => {
     const tooltipContent: HTMLElement =
       tooltipTrigger.querySelector('.tooltip-content');
     this.positionTooltip(tooltipContent, tooltipTrigger);
   };
 
-  openAgenticModeDialog() {
+  openVibeInsertDialog() {
     const overlay = document.getElementById('agenticDialog');
     overlay.style.display = 'flex';
     if (overlay.getAttribute('outsideClickListener') !== 'true') {
@@ -274,6 +271,7 @@ export class ZettelkastenComponent implements OnInit {
     this.basicRestService
       .get('vibe/generate/' + localStorage.getItem('currentUserId'))
       .subscribe((result) => {
+        this.isVibeInsertResponseLoading = false;
         this.vibeGenerateResponse = JSON.parse(JSON.stringify(result));
         this.vibeGenerateResponse.forEach((item) => {
           this.basicRestService
@@ -289,15 +287,20 @@ export class ZettelkastenComponent implements OnInit {
       });
   }
 
-  confirmAgenticFlow() {
+  confirmVibeInsert() {
     const overlay = document.getElementById('agenticDialog');
     if (overlay) {
       overlay.style.display = 'none';
       this.tooltips.clear();
     }
     this.basicRestService
-      .post('vibe/insert', this.vibeGenerateResponse)
-      .subscribe();
+      .post(
+        'vibe/insert/' + localStorage.getItem('currentUserId'),
+        this.vibeGenerateResponse,
+      )
+      .subscribe(() => {
+        this.vibeGenerateResponse = [];
+      });
   }
 
   outsideClickHandler(event: MouseEvent) {

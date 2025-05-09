@@ -56,7 +56,7 @@
 }
 
 .markdown-textarea {
-  background-color: rgba(1, 1, 1, 0.025);
+  background-color: rgba(0, 0, 0, 0);
 }
 
 .overlay {
@@ -88,6 +88,7 @@
   overflow-y: auto;
   overflow-x: hidden;
   max-height: calc(100% - 60px);
+  min-height: calc(100% - 60px);
   height: auto;
 }
 
@@ -104,8 +105,6 @@
 .card-content {
   padding: 12px;
   flex-grow: 1;
-  // max-height: 400px;
-  // overflow-y: auto;
 }
 
 .card-footer {
@@ -116,4 +115,61 @@
   text-align: right;
   font-weight: bold;
   font-size: 0.95rem;
+}
+
+.waiting-animation .dots::after {
+  content: "";
+  display: inline-block;
+  width: 1.5em;
+  text-align: left;
+  animation: dots 1.5s steps(4, end) infinite;
+}
+
+@keyframes dots {
+  0% {
+    content: "";
+  }
+  25% {
+    content: ".";
+  }
+  50% {
+    content: "..";
+  }
+  75% {
+    content: "...";
+  }
+  100% {
+    content: "";
+  }
+}
+
+.post-it {
+  width: 250px;
+  height: 240px;
+  position: relative;
+  background-color: rgba(255, 236, 139);
+  overflow: hidden;
+  padding: 20px;
+  border-radius: 0 0 0 30px/45px;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+  box-shadow: var(--post-it-shadow);
+  line-height: 1.7em;
+  font-size: 19px;
+  color: #130d6b;
+}
+
+.post-it:before {
+  content: "";
+  display: block;
+  position: absolute;
+  width: 20px;
+  height: 25px;
+  background-color: rgba(255, 236, 139);
+  box-shadow: var(--post-it-shadow);
+  left: 0;
+  bottom: 0;
+  z-index: 1;
+  transform: skewX(25deg);
 }

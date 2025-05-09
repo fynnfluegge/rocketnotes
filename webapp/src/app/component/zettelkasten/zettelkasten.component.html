@@ -1,6 +1,21 @@
 <div class="overlay" id="agenticDialog">
   <div class="dialog">
-    <div class="card-grid">
+    <div
+      *ngIf="isVibeInsertResponseLoading"
+      class="waiting-animation"
+      style="
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font-size: 18px;
+        color: #ffffff80;
+        min-height: calc(100% - 60px);
+      "
+    >
+      Vibe inserting in progress<span class="dots"></span>
+    </div>
+    <div class="card-grid" *ngIf="!isVibeInsertResponseLoading">
       <div class="card" *ngFor="let item of vibeGenerateResponse">
         <div class="card-content">
           <markdown [data]="item.content"></markdown>
@@ -61,23 +76,17 @@
       >
         Close
       </button>
-      <button
-        (click)="confirmAgenticFlow()"
-        class="btn btn-default btn-primary"
-      >
+      <button (click)="confirmVibeInsert()" class="btn btn-default btn-primary">
         Confirm
       </button>
     </div>
   </div>
 </div>
-<div
-  style="margin-top: 50px; height: calc(100% - 160px)"
-  (document:keydown.esc)="cancelEdit()"
->
+<div style="margin-top: 50px; height: calc(100% - 80px); overflow: auto">
   <div style="max-width: 800px; margin: auto">
     <div class="header-title-bar">
       <button
-        (click)="agenticMode()"
+        (click)="openVibeInsertDialog()"
         data-title="Enrich existing documents with inbox notes by agentic AI"
         class="btn btn-default btn-primary btn-fade tooltip-bottom expand"
       >
@@ -89,20 +98,22 @@
       </button>
       <p class="title" style="text-indent: -128px">Zettelkasten Inbox</p>
     </div>
-    <textarea
-      [(ngModel)]="textareaContent"
-      [style.width]="'100%'"
-      [ngClass]="['markdown-textarea', 'markdown-hover', 'markdown-border']"
-      style="
-        resize: none;
-        margin-top: 4px;
-        display: inline-block;
-        height: 128px;
-        border-radius: 4px;
-        margin-bottom: 4px;
-      "
-    ></textarea>
-    <br />
+    <div class="post-it" style="width: 100%; margin-bottom: 16px">
+      <textarea
+        [(ngModel)]="textareaContent"
+        [style.width]="'100%'"
+        [ngClass]="['markdown-textarea']"
+        style="
+          border: none;
+          resize: none;
+          display: inline-block;
+          height: 164px;
+          background: #00000000;
+          color: #000000;
+        "
+      >
+      </textarea>
+    </div>
     <button
       *ngIf="!isRecording && speechToTextEnabled"
       (click)="recordNote()"
@@ -127,11 +138,17 @@
       Save Note
     </button>
     <br />
+    <br />
     <div *ngFor="let item of contentMap | keyvalue">
       <br />
       <div
-        [ngClass]="['markdown-textarea', 'markdown-border']"
-        style="display: flex; flex-wrap: wrap; border-radius: 4px"
+        [ngClass]="['markdown-border']"
+        style="
+          display: flex;
+          flex-wrap: wrap;
+          border-radius: 4px;
+          background-color: rgba(1, 1, 1, 0.025);
+        "
       >
         <markdown
           katex
@@ -159,6 +176,7 @@
             border-radius: 4px;
             margin-bottom: 4px;
             border: none;
+            padding: 16px;
           "
         ></textarea>
         <div style="display: flex; gap: 4px; margin-left: auto">
@@ -216,9 +234,19 @@
         <div style="width: 100%">
           <div
             *ngIf="isLoading(item.key)"
-            class="circle-loading-animation"
-            style="margin: auto"
-          ></div>
+            class="waiting-animation"
+            style="
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              text-align: center;
+              font-size: 18px;
+              color: #ffffff80;
+              min-height: calc(100% - 60px);
+            "
+          >
+            Find suitable documents<span class="dots"></span>
+          </div>
           <div *ngFor="let suggestion of suggestionMap[item.key]">
             <div
               style="
