@@ -248,6 +248,7 @@ export class ZettelkastenComponent implements OnInit {
   };
 
   openVibeInsertDialog() {
+    this.isVibeInsertResponseLoading = true;
     const overlay = document.getElementById('agenticDialog');
     overlay.style.display = 'flex';
     if (overlay.getAttribute('outsideClickListener') !== 'true') {
