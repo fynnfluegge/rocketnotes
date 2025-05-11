@@ -267,7 +267,7 @@ def split_document(document, documentId, title):
             metadata={
                 "documentId": documentId,
                 "title": title,
-                "original_content": splitted_document.page_content,
+                "original_content": splitted_document.page_content.encode("utf-8"),
             },
         )
         documents.append(document)

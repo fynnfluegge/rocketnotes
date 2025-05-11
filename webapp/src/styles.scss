@@ -24,6 +24,9 @@
     inset 0 -20px 40px rgba(0, 0, 0, 0.4), 5px 5px 15px rgba(0, 0, 0, 1),
     inset 0px 0px 5px rgba(255, 255, 255, 1);
   --post-it-shadow: var(--light-theme-post-it-shadow);
+  --dark-theme-inbox-note-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.4);
+  --light-theme-inbox-note-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.05);
+  --inbox-note-box-shadow: var(--light-theme-inbox-note-box-shadow);
 }
 
 html,

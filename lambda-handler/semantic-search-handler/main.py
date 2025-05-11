@@ -87,7 +87,7 @@ def handler(event, context):
             {
                 "documentId": result.metadata["documentId"],
                 "title": result.metadata["title"],
-                "content": result.metadata["original_content"],
+                "content": result.metadata["original_content"].decode("utf-8"),
             }
         )
 

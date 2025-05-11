@@ -51,8 +51,9 @@
 }
 
 .markdown-border {
-  border: var(--border-width) solid #ccc;
-  padding: 8px;
+  border: var(--border-width) solid rgba(204, 204, 204, 0.4);
+  padding: 16px;
+  box-shadow: var(--inbox-note-box-shadow);
 }
 
 .markdown-textarea {
@@ -147,13 +148,13 @@
   width: 250px;
   height: 240px;
   position: relative;
-  background-color: rgba(255, 236, 139);
+  background-color: rgba(255, 249, 222);
   overflow: hidden;
   padding: 20px;
   border-radius: 0 0 0 30px/45px;
-  border-top-left-radius: 4px;
-  border-top-right-radius: 4px;
-  border-bottom-right-radius: 4px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
   box-shadow: var(--post-it-shadow);
   line-height: 1.7em;
   font-size: 19px;
@@ -166,7 +167,7 @@
   position: absolute;
   width: 20px;
   height: 25px;
-  background-color: rgba(255, 236, 139);
+  background-color: rgba(255, 249, 222);
   box-shadow: var(--post-it-shadow);
   left: 0;
   bottom: 0;

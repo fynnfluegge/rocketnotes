@@ -516,6 +516,12 @@ export class SidenavComponent implements OnInit, AfterViewInit {
         ? 'var(--dark-theme-post-it-shadow)'
         : 'var(--light-theme-post-it-shadow)',
     );
+    document.documentElement.style.setProperty(
+      '--inbox-note-box-shadow',
+      this.darkmode
+        ? 'var(--dark-theme-inbox-note-box-shadow)'
+        : 'var(--light-theme-inbox-note-box-shadow)',
+    );
   }
 
   openSearchDialog() {
