@@ -35,9 +35,7 @@ def handler(event, context):
         message = json.loads(message)
     userId = message["userId"]
     documentId = message.get("documentId", None)
-    documentIds = json.loads(
-        message.get("documentIds", "[]")
-    )
+    documentIds = message.get("documentIds", [])
     recreateIndex = message.get("recreateIndex", False)
     deleteVectors = message.get("deleteVectors", False)
 
