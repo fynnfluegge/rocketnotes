@@ -301,6 +301,7 @@ export class ZettelkastenComponent implements OnInit {
       )
       .subscribe(() => {
         this.vibeGenerateResponse = [];
+        this.contentMap = {};
       });
   }
 
