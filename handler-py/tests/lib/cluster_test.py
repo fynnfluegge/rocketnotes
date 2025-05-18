@@ -1,7 +1,7 @@
 import pytest
 
-from rocketnotes_agents.handler.lib.cluster import cluster_text_objects
-from rocketnotes_agents.handler.lib.model import NoteSnippet
+from rocketnotes_handler.lib.cluster import cluster_text_objects
+from rocketnotes_handler.lib.model import NoteSnippet
 
 
 @pytest.fixture

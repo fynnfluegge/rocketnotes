@@ -3,8 +3,7 @@ import os
 
 import aws_cdk as cdk
 
-from rocketnotes_handler.rocketnotes_handler_stack import \
-    RocketnotesHandlerStack
+from rocketnotes_handler.rocketnotes_handler_stack import RocketnotesHandlerStack
 
 app = cdk.App()
 RocketnotesHandlerStack(

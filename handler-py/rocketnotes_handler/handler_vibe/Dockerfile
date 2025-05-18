@@ -4,7 +4,7 @@ COPY handler_vibe/main.py ${LAMBDA_TASK_ROOT}
 
 COPY lib/ ${LAMBDA_TASK_ROOT}/rocketnotes_handler/lib/
 
-COPY agents/requirements.txt.lambda ${LAMBDA_TASK_ROOT}
+COPY handler_vibe/requirements.txt.lambda ${LAMBDA_TASK_ROOT}
 
 RUN pip install --no-cache-dir -r ${LAMBDA_TASK_ROOT}/requirements.txt.lambda -t ${LAMBDA_TASK_ROOT}
 

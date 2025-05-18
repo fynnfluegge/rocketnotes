@@ -1229,7 +1229,7 @@ wheels = [
 ]
 
 [[package]]
-name = "rocketnotes-agents"
+name = "rocketnotes-handler"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
