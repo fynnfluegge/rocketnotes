@@ -7,9 +7,9 @@ from rocketnotes_handler.lib.model import NoteSnippet
 @pytest.fixture
 def sample_snippets():
     return [
-        NoteSnippet(id="1", vector=[0.1, 0.2], text="Snippet 1"),
-        NoteSnippet(id="2", vector=[0.15, 0.25], text="Snippet 2"),
-        NoteSnippet(id="3", vector=[5.0, 5.0], text="Snippet 3"),
+        NoteSnippet(ids=["1"], vector=[0.1, 0.2], text="Snippet 1"),
+        NoteSnippet(ids=["2"], vector=[0.15, 0.25], text="Snippet 2"),
+        NoteSnippet(ids=["3"], vector=[5.0, 5.0], text="Snippet 3"),
     ]
 
 
@@ -26,15 +26,15 @@ def test_single_cluster(sample_snippets):
     assert len(clusters[0].members) == 1
     assert clusters[0].members[0].vector == sample_snippets[0].vector
     assert clusters[0].members[0].text == sample_snippets[0].text
-    assert clusters[0].members[0].id == sample_snippets[0].id
+    assert clusters[0].members[0].ids == sample_snippets[0].ids
     assert len(clusters[1].members) == 1
     assert clusters[1].members[0].vector == sample_snippets[1].vector
     assert clusters[1].members[0].text == sample_snippets[1].text
-    assert clusters[1].members[0].id == sample_snippets[1].id
+    assert clusters[1].members[0].ids == sample_snippets[1].ids
     assert len(clusters[2].members) == 1
     assert clusters[2].members[0].vector == sample_snippets[2].vector
     assert clusters[2].members[0].text == sample_snippets[2].text
-    assert clusters[2].members[0].id == sample_snippets[2].id
+    assert clusters[2].members[0].ids == sample_snippets[2].ids
 
 
 def test_multiple_clusters(sample_snippets):
