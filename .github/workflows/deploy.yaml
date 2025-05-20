@@ -85,3 +85,7 @@ jobs:
           DOMAIN: ${{ vars.DOMAIN }}
           SUBDOMAIN: ${{ vars.SUBDOMAIN }}
           DEPLOY_LANDING_PAGE: ${{ vars.DEPLOY_LANDING_PAGE }}
+          AUTHORIZER_ID: ${{ secrets.AUTHORIZER_ID }}
+          VECTOR_DB_BUCKET_NAME: ${{ secrets.VECTOR_DB_BUCKET_NAME }}
+          VECTOR_QUEUE_URL: ${{ secrets.VECTOR_QUEUE_URL }}
+          API_ID: ${{ secrets.API_ID }}

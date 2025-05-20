@@ -19,8 +19,8 @@ class RocketnotesHandlerStack(Stack):
         authorizer_id = os.getenv("AUTHORIZER_ID")
         cognito_user_pool_id = os.getenv("COGNITO_USER_POOL_ID")
         cognito_app_client_id = os.getenv("COGNITO_APP_CLIENT_ID")
-        bucket_name = os.getenv("BUCKET_NAME")
-        queue_url = os.getenv("QUEUE_URL")
+        bucket_name = os.getenv("VECTOR_DB_BUCKET_NAME")
+        queue_url = os.getenv("VECTOR_QUEUE_URL")
 
         insertion_lambda_function = aws_lambda.DockerImageFunction(
             self,
