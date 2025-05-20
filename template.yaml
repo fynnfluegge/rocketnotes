@@ -266,7 +266,7 @@ Resources:
             Path: /vector-embeddings
             Method: POST
     Metadata:
-      DockerContext: handler-go/save-vector-embeddings-handler
+      DockerContext: handler-py/rocketnotes_handler/handler_vector_embeddings
       Dockerfile: Dockerfile.local
 
   semanticSearchFunction:
@@ -289,7 +289,7 @@ Resources:
             Path: /semanticSearch
             Method: POST
     Metadata:
-      DockerContext: handler-go/semantic-search-handler
+      DockerContext: handler-py/rocketnotes_handler/handler_semantic_search
       Dockerfile: Dockerfile.local
 
   chatFunction:
@@ -314,7 +314,7 @@ Resources:
             Path: /chat
             Method: POST
     Metadata:
-      DockerContext: handler-go/chat-handler
+      DockerContext: handler-py/rocketnotes_handler/handler_chat
       Dockerfile: Dockerfile.local
 
   saveUserConfigFunction:

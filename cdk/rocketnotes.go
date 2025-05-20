@@ -396,7 +396,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 
 	awslambda.NewDockerImageFunction(stack, jsii.String("VectorEmbeddingsHandler"), &awslambda.DockerImageFunctionProps{
 		FunctionName: jsii.String("VectorEmbeddings-Docker"),
-		Code: awslambda.DockerImageCode_FromImageAsset(jsii.String("../handler-go/save-vector-embeddings-handler"), &awslambda.AssetImageCodeProps{
+		Code: awslambda.DockerImageCode_FromImageAsset(jsii.String("../handler-py/rocketnotes_handler/handler_vector_embeddings"), &awslambda.AssetImageCodeProps{
 			Platform: awsecrassets.Platform_LINUX_AMD64(),
 		}),
 		Events: &[]awslambda.IEventSource{
@@ -414,7 +414,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 
 	semanticSearchHandler := awslambda.NewDockerImageFunction(stack, jsii.String("SemanticSearchHandler"), &awslambda.DockerImageFunctionProps{
 		FunctionName: jsii.String("SemanticSearch-Docker"),
-		Code: awslambda.DockerImageCode_FromImageAsset(jsii.String("../handler-go/semantic-search-handler"), &awslambda.AssetImageCodeProps{
+		Code: awslambda.DockerImageCode_FromImageAsset(jsii.String("../handler-py/rocketnotes_handler/handler_semantic_search"), &awslambda.AssetImageCodeProps{
 			Platform: awsecrassets.Platform_LINUX_AMD64(),
 		}),
 		Environment: &map[string]*string{"BUCKET_NAME": bucket.BucketName()},
@@ -434,7 +434,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 
 	chatHandler := awslambda.NewDockerImageFunction(stack, jsii.String("ChatHandler"), &awslambda.DockerImageFunctionProps{
 		FunctionName: jsii.String("Chat-Docker"),
-		Code: awslambda.DockerImageCode_FromImageAsset(jsii.String("../handler-go/chat-handler"), &awslambda.AssetImageCodeProps{
+		Code: awslambda.DockerImageCode_FromImageAsset(jsii.String("../handler-py/rocketnotes_handler/handler_chat"), &awslambda.AssetImageCodeProps{
 			Platform: awsecrassets.Platform_LINUX_AMD64(),
 		}),
 		Environment: &map[string]*string{"BUCKET_NAME": bucket.BucketName()},

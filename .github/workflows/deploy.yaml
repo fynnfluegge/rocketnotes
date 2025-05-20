@@ -58,7 +58,7 @@ jobs:
           path: landing-page/build
           run_id: ${{ github.event.workflow_run.id }}
 
-      - name: Deploy to AWS
+      - name: Deploy go stack to AWS
         run: |
           cd cdk
           cdk diff
@@ -71,3 +71,21 @@ jobs:
           DOMAIN: ${{ vars.DOMAIN }}
           SUBDOMAIN: ${{ vars.SUBDOMAIN }}
           DEPLOY_LANDING_PAGE: ${{ vars.DEPLOY_LANDING_PAGE }}
+
+      - name: Deploy python stack to AWS
+        run: |
+          cd handler-py
+          cdk diff
+          cdk deploy --require-approval=never
+        env:
+          AWS_ACCOUNT: ${{ secrets.AWS_ACCOUNT }}
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          COGNITO_USER_POOL_ID: ${{ vars.COGNITO_USER_POOL_ID }}
+          COGNITO_APP_CLIENT_ID: ${{ vars.COGNITO_APP_CLIENT_ID }}
+          DOMAIN: ${{ vars.DOMAIN }}
+          SUBDOMAIN: ${{ vars.SUBDOMAIN }}
+          DEPLOY_LANDING_PAGE: ${{ vars.DEPLOY_LANDING_PAGE }}
+          AUTHORIZER_ID: ${{ secrets.AUTHORIZER_ID }}
+          VECTOR_DB_BUCKET_NAME: ${{ secrets.VECTOR_DB_BUCKET_NAME }}
+          VECTOR_QUEUE_URL: ${{ secrets.VECTOR_QUEUE_URL }}
+          API_ID: ${{ secrets.API_ID }}

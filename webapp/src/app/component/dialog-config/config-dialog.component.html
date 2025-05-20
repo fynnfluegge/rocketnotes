@@ -15,6 +15,15 @@
           type="radio"
           name="embeddingModel"
           [(ngModel)]="selectedEmbeddingModel"
+          value="text-embedding-3-small"
+        />Text-Embedding-3-small
+      </label>
+      <br />
+      <label class="radio-inline">
+        <input
+          type="radio"
+          name="embeddingModel"
+          [(ngModel)]="selectedEmbeddingModel"
           value="voyage-2"
         />Voyage-2
       </label>
@@ -26,6 +35,7 @@
           value="voyage-3"
         />Voyage-3
       </label>
+      <br />
       <label class="radio-inline" *ngIf="isLocal">
         <input
           type="radio"
@@ -49,24 +59,16 @@
           type="radio"
           name="llm"
           [(ngModel)]="selectedLlm"
-          value="gpt-3.5-turbo"
-        />GPT-3.5-Turbo
-      </label>
-      <label class="radio-inline">
-        <input
-          type="radio"
-          name="llm"
-          [(ngModel)]="selectedLlm"
-          value="gpt-4"
-        />GPT-4
-      </label>
-      <label class="radio-inline">
-        <input
-          type="radio"
-          name="llm"
-          [(ngModel)]="selectedLlm"
           value="gpt-4-turbo"
-        />GPT-4-Turbo
+        />GPT-4-turbo
+      </label>
+      <label class="radio-inline">
+        <input
+          type="radio"
+          name="llm"
+          [(ngModel)]="selectedLlm"
+          value="gpt-4o"
+        />GPT-4o
       </label>
       <label class="radio-inline">
         <input
@@ -74,7 +76,23 @@
           name="llm"
           [(ngModel)]="selectedLlm"
           value="gpt-4o-mini"
-        />GPT-4o-Mini
+        />GPT-4o-mini
+      </label>
+      <label class="radio-inline">
+        <input
+          type="radio"
+          name="llm"
+          [(ngModel)]="selectedLlm"
+          value="gpt-4.1-mini"
+        />GPT-4.1-mini
+      </label>
+      <label class="radio-inline">
+        <input
+          type="radio"
+          name="llm"
+          [(ngModel)]="selectedLlm"
+          value="gpt-4.1-nano"
+        />GPT-4.1-nano
       </label>
       <br />
       <label class="radio-inline">
@@ -214,9 +232,9 @@
       <br />
       <div>
         <span style="text-align: right"
-          ><strong>Note</strong>: Your OpenAI/Anthropic API key is kept secure
-          and is not shared with anyone. You can entirely revoke your API key at
-          any time by clearing the input field and save.
+          ><strong>Note</strong>: Your API key is kept secure and is not shared
+          with anyone. You can entirely revoke your API key at any time by
+          clearing the input field and save.
         </span>
       </div>
     </form>
