@@ -138,7 +138,7 @@ def handler(event, context):
 
 
 def get_embeddings_model(user_config: UserConfig) -> Embeddings:
-    if user_config.embeddingsModel == "text-embedding-ada-002":
+    if user_config.embeddingsModel == "text-embedding-ada-002" or user_config.embeddingsModel == "text-embedding-3-small":
         if user_config.openAiApiKey:
             os.environ["OPENAI_API_KEY"] = user_config.openAiApiKey
         else:

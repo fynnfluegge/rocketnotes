@@ -93,7 +93,7 @@ def handler(event, context):
                         zettel_ids_to_delete.append(id)
             document_content = document_content.replace(
                 item.similaritySearchResult,
-                item.similaritySearchResult + "\n" + item.content + "\n",
+                item.similaritySearchResult + "\n\n" + item.content + "\n",
             )
         else:
             result = find_normalized_substring(document_content, item.similaritySearchResult)

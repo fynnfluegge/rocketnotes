@@ -357,7 +357,7 @@ def delete_document_vectors_from_dynamodb(documentId):
 
 
 def get_embeddings_model(embeddings_model, userConfig):
-    if embeddings_model == "text-embedding-ada-002":
+    if embeddings_model == "text-embedding-ada-002" or embeddings_model == "text-embedding-3-small":
         if "openAiApiKey" in userConfig:
             os.environ["OPENAI_API_KEY"] = userConfig.get("openAiApiKey").get("S")
         else:

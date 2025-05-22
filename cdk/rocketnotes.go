@@ -435,7 +435,9 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 	chatHandler := awslambda.NewDockerImageFunction(stack, jsii.String("ChatHandler"), &awslambda.DockerImageFunctionProps{
 		FunctionName: jsii.String("Chat-Docker"),
 		Code: awslambda.DockerImageCode_FromImageAsset(jsii.String("../handler-py/rocketnotes_handler/handler_chat"), &awslambda.AssetImageCodeProps{
-			Platform: awsecrassets.Platform_LINUX_AMD64(),
+			Directory: jsii.String("../handler-py/rocketnotes_handler"),
+			File:      jsii.String("handler_chat/Dockerfile"),
+			Platform:  awsecrassets.Platform_LINUX_AMD64(),
 		}),
 		Environment: &map[string]*string{"BUCKET_NAME": bucket.BucketName()},
 		Role:        lambdaS3DynamoDbRole,
