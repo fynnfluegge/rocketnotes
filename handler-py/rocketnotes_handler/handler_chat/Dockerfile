@@ -6,6 +6,6 @@ COPY handler_chat/requirements.lambda.txt ${LAMBDA_TASK_ROOT}
 
 COPY lib/ ${LAMBDA_TASK_ROOT}/rocketnotes_handler/lib/
 
-RUN pip install --no-cache-dir -r ${LAMBDA_TASK_ROOT}/requirements.txt.lambda -t ${LAMBDA_TASK_ROOT}
+RUN pip install --no-cache-dir -r ${LAMBDA_TASK_ROOT}/requirements.lambda.txt -t ${LAMBDA_TASK_ROOT}
 
 CMD [ "main.handler" ]
