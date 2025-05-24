@@ -13,6 +13,8 @@
 
 </div>
 
+<a href="https://trendshift.io/repositories/12090" target="_blank"><img src="https://trendshift.io/api/badge/repositories/12090" alt="fynnfluegge%2Frocketnotes | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+
 Rocketnotes is a web-based Markdown note taking app with LLM-powered text completion, chat and semantic search.
 It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/serverless-rag-on-aws-bf8029f8bffd) built with
 [langchain](https://github.com/langchain-ai/langchain),
