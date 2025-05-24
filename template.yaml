@@ -466,3 +466,53 @@ Resources:
           Properties:
             Path: /archiveZettel/{documentId}
             Method: POST
+
+  vibeGenerateFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+      MemorySize: 1024
+      Timeout: 100
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: tnn-documents
+        - DynamoDBCrudPolicy:
+            TableName: tnn-userConfig
+      Environment:
+        Variables:
+          LOCAL: 1
+          BUCKET_NAME: faissIndexBucket
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /vibe/generate/{userId}
+            Method: GET
+    Metadata:
+      DockerContext: handler-py/rocketnotes_handler
+      Dockerfile: handler_vibe/Dockerfile
+
+  vibeInsightsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+      MemorySize: 1024
+      Timeout: 100
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: tnn-documents
+        - DynamoDBCrudPolicy:
+            TableName: tnn-userConfig
+      Environment:
+        Variables:
+          LOCAL: 1
+          BUCKET_NAME: faissIndexBucket
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /vibe/insert/{userId}
+            Method: POST
+    Metadata:
+      DockerContext: handler-py/rocketnotes_handler
+      Dockerfile: handler_insert/Dockerfile

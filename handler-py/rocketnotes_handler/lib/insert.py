@@ -53,16 +53,38 @@ def find_insert_position(
                     "content": item.metadata["original_content"].decode("utf-8"),
                 }
             )
-        ## TODO use llm to get the best result
-        result.append(
-            AgenticResult(
-                id=search_result[0]["documentId"],
-                documentTitle=search_result[0]["title"],
-                content=note.text,
-                similaritySearchResult=search_result[0]["content"],
-                zettelIds=note.ids,
-            )
+
+        search_results_formatted = "\n".join(
+            f"{doc['documentId']}: {doc['content'][:512]}" for doc in search_result
         )
+        chat_model_response = chat_model.invoke(
+            f"Given the following search results, which one is the most relevant to the note content? Respond only with the documentId of the most relevant document.\n\n"
+            + f"Note: {note.text}\n\n"
+            + f"Search Results:\n{search_results_formatted}"
+        )
+
+        matched_item = next((item for item in search_result if item["documentId"] in chat_model_response.content), None)
+        if matched_item:
+            result.append(
+                AgenticResult(
+                    id=matched_item["documentId"],
+                    documentTitle=matched_item["title"],
+                    content=note.text,
+                    similaritySearchResult=matched_item["content"],
+                    zettelIds=note.ids,
+                )
+            )
+        elif search_result:
+            first_item = search_result[0]
+            result.append(
+                AgenticResult(
+                    id=first_item["documentId"],
+                    documentTitle=first_item["title"],
+                    content=note.text,
+                    similaritySearchResult=first_item["content"],
+                    zettelIds=note.ids,
+                )
+            )
 
     return result
 
