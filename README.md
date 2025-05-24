@@ -13,20 +13,24 @@
 
 </div>
 
+<div align="center">
+<a href="https://trendshift.io/repositories/12090" target="_blank"><img src="https://trendshift.io/api/badge/repositories/12090" alt="fynnfluegge%2Frocketnotes | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+</div>
+
+&nbsp;
+
 Rocketnotes is a web-based Markdown note taking app with LLM-powered text completion, chat and semantic search.
-It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/serverless-rag-on-aws-bf8029f8bffd) built with
+It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/serverless-rag-on-aws-bf8029f8bffd) and is built with
 [langchain](https://github.com/langchain-ai/langchain),
-[sentence-transformers](https://github.com/UKPLab/sentence-transformers),
 [faiss](https://github.com/facebookresearch/faiss),
-[Ollama](https://github.com/jmorganca/ollama), OpenAI, Anthropic and Voyage.
+[sentence-transformers](https://github.com/UKPLab/sentence-transformers),
+[Ollama](https://github.com/jmorganca/ollama).
 
 ## How to use
 
-- [Sign Up](https://takeniftynotes.auth.eu-central-1.amazoncognito.com/login?response_type=code&client_id=tt3v27pnqqh7elqdvq9tgmr9v&redirect_uri=https://app.takeniftynotes.net) for free and use it in the Browser or as an Electron app.
+- [Sign Up](https://takeniftynotes.auth.eu-central-1.amazoncognito.com/login?response_type=code&client_id=tt3v27pnqqh7elqdvq9tgmr9v&redirect_uri=https://app.takeniftynotes.net) for free and use it as a web or Electron app.
 - Run it 100% [locally with Docker](INSTALLATION.md#run-with-docker)
-- Check [Contribution Guide](CONTRIBUTING.md#contributing-guide) how to setup a local development environment
-  - If you are interested in contributing, visit [Contributing](#contributing) section for more details
-  - [Good first issues](https://github.com/fynnfluegge/rocketnotes/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22) provide a good starting point to become a contributor
+- Check [Contribution Guide](CONTRIBUTING.md#contributing-guide) how to setup a local dev environment
 
 ## ✨ Features
 
