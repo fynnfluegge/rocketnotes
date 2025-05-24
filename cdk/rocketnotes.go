@@ -396,7 +396,8 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 
 	awslambda.NewDockerImageFunction(stack, jsii.String("VectorEmbeddingsHandler"), &awslambda.DockerImageFunctionProps{
 		FunctionName: jsii.String("VectorEmbeddings-Docker"),
-		Code: awslambda.DockerImageCode_FromImageAsset(jsii.String("../handler-py/rocketnotes_handler/handler_vector_embeddings"), &awslambda.AssetImageCodeProps{
+		Code: awslambda.DockerImageCode_FromImageAsset(jsii.String("../handler-py/rocketnotes_handler"), &awslambda.AssetImageCodeProps{
+			File:     jsii.String("handler_vector_embeddings/Dockerfile"),
 			Platform: awsecrassets.Platform_LINUX_AMD64(),
 		}),
 		Events: &[]awslambda.IEventSource{
@@ -414,7 +415,8 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 
 	semanticSearchHandler := awslambda.NewDockerImageFunction(stack, jsii.String("SemanticSearchHandler"), &awslambda.DockerImageFunctionProps{
 		FunctionName: jsii.String("SemanticSearch-Docker"),
-		Code: awslambda.DockerImageCode_FromImageAsset(jsii.String("../handler-py/rocketnotes_handler/handler_semantic_search"), &awslambda.AssetImageCodeProps{
+		Code: awslambda.DockerImageCode_FromImageAsset(jsii.String("../handler-py/rocketnotes_handler"), &awslambda.AssetImageCodeProps{
+			File:     jsii.String("handler_semantic_search/Dockerfile"),
 			Platform: awsecrassets.Platform_LINUX_AMD64(),
 		}),
 		Environment: &map[string]*string{"BUCKET_NAME": bucket.BucketName()},

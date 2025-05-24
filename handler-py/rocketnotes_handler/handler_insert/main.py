@@ -5,7 +5,8 @@ import re
 
 import boto3
 
-from rocketnotes_handler.lib.model import AgenticResult, UserConfig
+from rocketnotes_handler.lib.model import AgenticResult
+from rocketnotes_handler.lib.util import get_user_config
 
 is_local = os.environ.get("LOCAL", False)
 s3_args = {}
@@ -54,25 +55,7 @@ def handler(event, context):
             "body": json.dumps("User not found"),
         }
 
-    user_config = UserConfig(
-        id=user_id,
-        embeddingsModel=user_config_search_result["Item"]
-        .get("embeddingModel", {})
-        .get("S", None),
-        llm=user_config_search_result["Item"].get("llm", {}).get("S", None),
-        openAiApiKey=user_config_search_result["Item"]
-        .get("openAiApiKey", {})
-        .get("S", None),
-        anthropicApiKey=user_config_search_result["Item"]
-        .get("anthropicApiKey", {})
-        .get("S", None),
-        voyageApiKey=user_config_search_result["Item"]
-        .get("voyageApiKey", {})
-        .get("S", None),
-        togetherApiKey=user_config_search_result["Item"]
-        .get("togetherApiKey", {})
-        .get("S", None),
-    )
+    user_config = get_user_config(user_config_search_result)
 
     zettel_ids_to_delete = []
     for item in input:

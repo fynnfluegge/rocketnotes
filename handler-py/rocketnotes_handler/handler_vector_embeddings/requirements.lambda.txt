@@ -2,5 +2,7 @@ boto3==1.34.0
 langchain==0.3.24
 langchain-community==0.3.23
 langchain-openai==0.3.14
+langchain-anthropic==0.3.12
+langchain-together==0.3.0
 langchain-text-splitters==0.3.8
 faiss-cpu==1.11.0

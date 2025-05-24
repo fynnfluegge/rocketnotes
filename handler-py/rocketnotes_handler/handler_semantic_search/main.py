@@ -1,12 +1,12 @@
+
 import json
 import os
 from pathlib import Path
 
 import boto3
-from langchain_community.embeddings import (HuggingFaceEmbeddings,
-                                            OllamaEmbeddings, VoyageEmbeddings)
 from langchain_community.vectorstores import FAISS
-from langchain_openai import OpenAIEmbeddings
+
+from rocketnotes_handler.lib.util import get_embeddings_model, get_user_config
 
 is_local = os.environ.get("LOCAL", False)
 s3_args = {}
@@ -21,7 +21,6 @@ dynamodb = boto3.client("dynamodb", **dynamodb_args)
 
 userConfig_table_name = "tnn-UserConfig"
 bucket_name = os.environ["BUCKET_NAME"]
-
 
 def handler(event, context):
     if "body" in event:
@@ -42,31 +41,26 @@ def handler(event, context):
     else:
         return {"statusCode": 400, "body": "search_string is missing"}
 
-    userConfig = dynamodb.get_item(
+    user_config_search_result = dynamodb.get_item(
         TableName=userConfig_table_name,
         Key={"id": {"S": userId}},
     )
 
-    if "Item" not in userConfig:
+    if "Item" not in user_config_search_result:
         return {
             "statusCode": 404,
             "body": json.dumps("User not found"),
         }
 
-    userConfig = userConfig["Item"]
+    user_config = get_user_config(user_config_search_result)
 
-    if "embeddingModel" in userConfig:
-        embeddings_model = userConfig.get("embeddingModel").get("S")
-    else:
-        return {"statusCode": 400, "body": "embeddings model is missing"}
-
-    try:
-        embeddings = get_embeddings_model(embeddings_model, userConfig)
-    except ValueError as e:
+    if user_config.embeddingsModel is None:
         return {
             "statusCode": 400,
-            "body": json.dumps(str(e)),
+            "body": json.dumps("Embeddings model is missing"),
         }
+    else:
+        embeddings = get_embeddings_model(user_config)
 
     file_path = f"/tmp/{userId}"
     Path(file_path).mkdir(parents=True, exist_ok=True)
@@ -95,30 +89,6 @@ def handler(event, context):
         "statusCode": 200,
         "body": json.dumps(response),
     }
-
-
-def get_embeddings_model(embeddings_model, userConfig):
-    if embeddings_model == "text-embedding-ada-002" or embeddings_model == "text-embedding-3-small":
-        if "openAiApiKey" in userConfig:
-            os.environ["OPENAI_API_KEY"] = userConfig.get("openAiApiKey").get("S")
-        else:
-            raise ValueError(f"OpenAI API key is missing for model {embeddings_model}")
-        return OpenAIEmbeddings(client=None, model=embeddings_model)
-    elif embeddings_model in ["voyage-2", "voyage-3"]:
-        if "voyageApiKey" in userConfig:
-            os.environ["VOYAGE_API_KEY"] = userConfig.get("voyageApiKey").get("S")
-        else:
-            raise ValueError(f"Voyage API key is missing for model {embeddings_model}")
-        return VoyageEmbeddings(model=embeddings_model)
-    elif embeddings_model == "Sentence-Transformers":
-        return HuggingFaceEmbeddings(model_kwargs={"device": "cpu"})
-    elif embeddings_model == "Ollama-nomic-embed-text":
-        return OllamaEmbeddings(
-            base_url="http://ollama:11434", model=embeddings_model.split("Ollama-")[1]
-        )
-    else:
-        raise ValueError(f"Embeddings model '{embeddings_model}' not found")
-
 
 def load_from_s3(key, file_path):
     try:

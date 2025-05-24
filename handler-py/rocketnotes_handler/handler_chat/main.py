@@ -4,16 +4,10 @@ from pathlib import Path
 
 import boto3
 from langchain.chains import ConversationalRetrievalChain
-from langchain.memory import ConversationSummaryMemory
-from langchain_anthropic import ChatAnthropic
-from langchain_community.embeddings import (HuggingFaceEmbeddings,
-                                            OllamaEmbeddings, VoyageEmbeddings)
-from langchain_community.llms import Ollama
 from langchain_community.vectorstores import FAISS
-from langchain_openai import ChatOpenAI, OpenAIEmbeddings
-from langchain_together import ChatTogether
 
-from rocketnotes_handler.lib.util import get_chat_model, get_embeddings_model
+from rocketnotes_handler.lib.util import (get_chat_model, get_embeddings_model,
+                                          get_user_config)
 
 is_local = os.environ.get("LOCAL", False)
 s3_args = {}
@@ -52,41 +46,35 @@ def handler(event, context):
     else:
         return {"statusCode": 400, "body": "search_string is missing"}
 
-    userConfig = dynamodb.get_item(
+
+    user_config_search_result = dynamodb.get_item(
         TableName=userConfig_table_name,
         Key={"id": {"S": userId}},
     )
 
-    if "Item" not in userConfig:
+    if "Item" not in user_config_search_result:
         return {
             "statusCode": 404,
             "body": json.dumps("User not found"),
         }
 
-    userConfig = userConfig["Item"]
+    user_config = get_user_config(user_config_search_result)
 
-    if "embeddingModel" in userConfig:
-        embeddings_model = userConfig.get("embeddingModel").get("S")
-    else:
-        return {"statusCode": 400, "body": "embeddings model is missing"}
-
-    try:
-        embeddings = get_embeddings_model(embeddings_model, userConfig)
-    except ValueError as e:
+    if user_config.embeddingsModel is None:
         return {
             "statusCode": 400,
-            "body": json.dumps(str(e)),
+            "body": json.dumps("Embeddings model is missing"),
         }
-
-    if "llm" in userConfig:
-        llm_model = userConfig.get("llm").get("S")
     else:
-        return {"statusCode": 400, "body": "llm model is missing"}
+        embeddings = get_embeddings_model(user_config)
 
-    try:
-        chat_model = get_chat_model(llm_model, userConfig)
-    except ValueError as e:
-        return {"statusCode": 400, "body": str(e)}
+    if user_config.llm is None:
+        return {
+            "statusCode": 400,
+            "body": json.dumps("LLM model is missing"),
+        }
+    else:
+        llm = get_chat_model(user_config)
 
     file_path = f"/tmp/{userId}"
     Path(file_path).mkdir(parents=True, exist_ok=True)
@@ -102,7 +90,7 @@ def handler(event, context):
 
     retriever = db.as_retriever(search_type="similarity", search_kwargs={"k": 3})
 
-    qa = ConversationalRetrievalChain.from_llm(chat_model, retriever=retriever)
+    qa = ConversationalRetrievalChain.from_llm(llm, retriever=retriever)
     result = qa({"question": prompt, "chat_history": []})
 
     return {"statusCode": 200, "body": json.dumps(result["answer"])}

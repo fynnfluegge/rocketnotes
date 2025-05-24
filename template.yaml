@@ -266,8 +266,8 @@ Resources:
             Path: /vector-embeddings
             Method: POST
     Metadata:
-      DockerContext: handler-py/rocketnotes_handler/handler_vector_embeddings
-      Dockerfile: Dockerfile.local
+      DockerContext: handler-py/rocketnotes_handler
+      Dockerfile: handler_vector_embeddings/Dockerfile.local
 
   semanticSearchFunction:
     Type: AWS::Serverless::Function
@@ -289,8 +289,8 @@ Resources:
             Path: /semanticSearch
             Method: POST
     Metadata:
-      DockerContext: handler-py/rocketnotes_handler/handler_semantic_search
-      Dockerfile: Dockerfile.local
+      DockerContext: handler-py/rocketnotes_handler
+      Dockerfile: handler_semantic_search/Dockerfile.local
 
   chatFunction:
     Type: AWS::Serverless::Function
@@ -314,8 +314,8 @@ Resources:
             Path: /chat
             Method: POST
     Metadata:
-      DockerContext: handler-py/rocketnotes_handler/handler_chat
-      Dockerfile: Dockerfile.local
+      DockerContext: handler-py/rocketnotes_handler
+      Dockerfile: handler_chat/Dockerfile.local
 
   saveUserConfigFunction:
     Type: AWS::Serverless::Function
