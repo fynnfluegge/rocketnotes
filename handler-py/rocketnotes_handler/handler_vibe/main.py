@@ -3,12 +3,16 @@ import os
 
 import boto3
 
-from rocketnotes_handler.lib.cluster import cluster_text_objects
-from rocketnotes_handler.lib.insert import find_insert_position
-from rocketnotes_handler.lib.merge import merge_document_clusters
+from rocketnotes_handler.lib.graph import (
+    create_clustering_workflow,
+    run_clustering_workflow,
+)
 from rocketnotes_handler.lib.model import NoteSnippet, Zettel
-from rocketnotes_handler.lib.util import (get_chat_model, get_embeddings_model,
-                                          get_user_config)
+from rocketnotes_handler.lib.util import (
+    get_chat_model,
+    get_embeddings_model,
+    get_user_config,
+)
 
 is_local = os.environ.get("LOCAL", False)
 s3_args = {}
@@ -27,11 +31,13 @@ userConfig_table_name = "tnn-UserConfig"
 zettel_table_name = "tnn-Zettelkasten"
 bucket_name = os.environ["BUCKET_NAME"]
 
+graph = create_clustering_workflow()
+
 
 def handler(event, context):
 
     if "pathParameters" in event and "userId" in event["pathParameters"]:
-        user_id:str = event["pathParameters"]["userId"]
+        user_id: str = event["pathParameters"]["userId"]
     else:
         return {"statusCode": 400, "body": "userId is missing in the URL path"}
 
@@ -95,18 +101,25 @@ def handler(event, context):
             )
         )
 
-    note_clusters = cluster_text_objects(note_snippets)
+    try:
+        result = run_clustering_workflow(
+            graph=graph,
+            input_objects=note_snippets,
+            embeddings=embeddings,
+            user_config=user_config,
+            chat_model=llm,
+            bucket_name=bucket_name,
+            min_cluster_size=1,
+            cluster_selection_epsilon=0.1,
+        )
 
-    merged_documents = merge_document_clusters(note_clusters, embeddings)
+        return {
+            "statusCode": 200,
+            "body": json.dumps([obj.to_dict() for obj in result]),
+        }
 
-    reponse = find_insert_position(
-        user_config=user_config,
-        embeddings=embeddings,
-        chat_model=llm,
-        notes=merged_documents,
-        bucket_name=bucket_name,
-    )
-
-    return {"statusCode": 200, "body": json.dumps([obj.to_dict() for obj in reponse])}
-
-
+    except Exception as e:
+        print(f"Error running workflow: {e}")
+        print(
+            "Make sure to implement the required methods and classes with your actual logic"
+        )

@@ -6,7 +6,7 @@ from langchain.embeddings.base import Embeddings
 from langchain_community.vectorstores import FAISS
 from langchain_core.language_models import BaseChatModel
 
-from .model import AgenticResult, NoteSnippet, UserConfig
+from .model import InsertSuggestion, NoteSnippet, UserConfig
 
 is_local = os.environ.get("LOCAL", False)
 s3_args = {}
@@ -23,7 +23,7 @@ def find_insert_position(
     chat_model: BaseChatModel,
     notes: list[NoteSnippet],
     bucket_name: str,
-) -> list[AgenticResult]:
+) -> list[InsertSuggestion]:
 
     file_path = f"/tmp/{user_config.id}"
     Path(file_path).mkdir(parents=True, exist_ok=True)
@@ -41,9 +41,9 @@ def find_insert_position(
         allow_dangerous_deserialization=True,
     )
 
-    result: list[AgenticResult] = []
+    result: list[InsertSuggestion] = []
     for note in notes:
-        similarity_search_result = db.similarity_search(note.text, k=3)
+        similarity_search_result = db.similarity_search(note.text, k=5)
         search_result = []
         for item in similarity_search_result:
             search_result.append(
@@ -63,10 +63,17 @@ def find_insert_position(
             + f"Search Results:\n{search_results_formatted}"
         )
 
-        matched_item = next((item for item in search_result if item["documentId"] in chat_model_response.content), None)
+        matched_item = next(
+            (
+                item
+                for item in search_result
+                if item["documentId"] in chat_model_response.content
+            ),
+            None,
+        )
         if matched_item:
             result.append(
-                AgenticResult(
+                InsertSuggestion(
                     id=matched_item["documentId"],
                     documentTitle=matched_item["title"],
                     content=note.text,
@@ -77,7 +84,7 @@ def find_insert_position(
         elif search_result:
             first_item = search_result[0]
             result.append(
-                AgenticResult(
+                InsertSuggestion(
                     id=first_item["documentId"],
                     documentTitle=first_item["title"],
                     content=note.text,

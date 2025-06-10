@@ -62,14 +62,3 @@ jobs:
         with:
           name: webapp-build
           path: webapp/build
-
-      - name: build landing-page
-        run: |
-          cd landing-page
-          npm ci
-          npm run build
-
-      - uses: actions/upload-artifact@master
-        with:
-          name: landing-page-build
-          path: landing-page/build

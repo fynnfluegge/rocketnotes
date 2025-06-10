@@ -5,7 +5,7 @@ import re
 
 import boto3
 
-from rocketnotes_handler.lib.model import AgenticResult
+from rocketnotes_handler.lib.model import InsertSuggestion
 from rocketnotes_handler.lib.util import get_user_config
 
 is_local = os.environ.get("LOCAL", False)
@@ -34,7 +34,7 @@ def handler(event, context):
 
     body = json.loads(event["body"])
     input = [
-        AgenticResult(
+        InsertSuggestion(
             id=item["documentId"],
             documentTitle=item["documentTitle"],
             content=item["content"],

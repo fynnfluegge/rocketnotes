@@ -257,13 +257,6 @@ export class ZettelkastenComponent implements OnInit {
         this.outsideClickHandler(event);
       });
 
-      const tooltipTriggers = document.querySelectorAll('.tooltip-trigger');
-      tooltipTriggers.forEach((tooltipTrigger) => {
-        tooltipTrigger.addEventListener('mouseenter', () => {
-          this.handleMouseEnterOnTooltipTrigger(tooltipTrigger);
-        });
-      });
-
       const cardGrid = document.querySelector('.card-grid') as HTMLElement;
       if (cardGrid) {
         cardGrid.scrollTop = 0;
@@ -324,29 +317,23 @@ export class ZettelkastenComponent implements OnInit {
 
   positionTooltip(tooltip: HTMLElement, trigger: Element) {
     const triggerRect = trigger.getBoundingClientRect();
-    const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
 
     // Calculate available space
     const spaceBottom = viewportHeight - triggerRect.bottom;
-    const spaceLeft = triggerRect.left;
-    const spaceRight = viewportWidth - triggerRect.right;
 
     // Determine the best position
     let position = 'right';
-    let maxSpace = spaceRight;
-
-    if (spaceLeft > maxSpace) {
-      position = 'left';
-      maxSpace = spaceLeft;
-    }
 
     // Apply the position class
-    tooltip.classList.remove('top', 'bottom', 'left', 'right');
     tooltip.classList.add(position);
 
     if (spaceBottom < 400) {
       tooltip.classList.add('bottom');
     }
+  }
+
+  onTooltipMouseEnter(event: MouseEvent) {
+    this.handleMouseEnterOnTooltipTrigger(event.currentTarget as Element);
   }
 }

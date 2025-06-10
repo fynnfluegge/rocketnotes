@@ -56,7 +56,10 @@
         </div>
         <div class="card-footer">
           <mat-icon style="margin: 2px">note_add</mat-icon>
-          <h4 class="tooltip-trigger">
+          <h4
+            class="tooltip-trigger"
+            (mouseenter)="onTooltipMouseEnter($event)"
+          >
             {{ item.documentTitle }}
             <div class="tooltip-content">
               <markdown
@@ -94,7 +97,7 @@
           src="../../../assets/icons/png/icons8-artificial-intelligence-50.png"
           class="title-button-icon"
         />
-        Vibe Insert
+        Insert Agent
       </button>
       <p class="title" style="text-indent: -128px">Zettelkasten Inbox</p>
     </div>
@@ -278,7 +281,7 @@
                 style="float: right; height: 36px"
                 class="btn btn-default btn-primary tooltip-bottom expand"
               >
-                Insert
+                Append
               </button>
             </div>
           </div>
