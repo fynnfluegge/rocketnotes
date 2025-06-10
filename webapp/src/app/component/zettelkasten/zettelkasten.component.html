@@ -56,7 +56,10 @@
         </div>
         <div class="card-footer">
           <mat-icon style="margin: 2px">note_add</mat-icon>
-          <h4 class="tooltip-trigger">
+          <h4
+            class="tooltip-trigger"
+            (mouseenter)="onTooltipMouseEnter($event)"
+          >
             {{ item.documentTitle }}
             <div class="tooltip-content">
               <markdown
