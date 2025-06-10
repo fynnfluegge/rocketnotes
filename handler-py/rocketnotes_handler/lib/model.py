@@ -37,7 +37,7 @@ class Zettel:
         self.content: str = content
 
 
-class AgenticResult:
+class InsertSuggestion:
     def __init__(
         self,
         id: str,

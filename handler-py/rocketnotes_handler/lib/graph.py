@@ -7,19 +7,15 @@ from langgraph.graph import END, StateGraph
 from rocketnotes_handler.lib.cluster import cluster_text_objects
 from rocketnotes_handler.lib.insert import find_insert_position
 from rocketnotes_handler.lib.merge import merge_document_clusters
-from rocketnotes_handler.lib.model import (
-    AgenticResult,
-    NoteCluster,
-    NoteSnippet,
-    UserConfig,
-)
+from rocketnotes_handler.lib.model import (InsertSuggestion, NoteCluster,
+                                           NoteSnippet, UserConfig)
 
 
 class ClusteringState(TypedDict):
     input_objects: list[NoteSnippet]
     clusters: list[NoteCluster]
     merged_documents: list[NoteSnippet]
-    agentic_results: list[AgenticResult]
+    insert_results: list[InsertSuggestion]
     min_cluster_size: int
     cluster_selection_epsilon: float
     embeddings: Embeddings
@@ -29,9 +25,6 @@ class ClusteringState(TypedDict):
 
 
 def clustering_node(state: ClusteringState) -> ClusteringState:
-    """First state: Cluster text objects"""
-    print("Starting clustering process...")
-
     clusters = cluster_text_objects(
         objects=state["input_objects"],
         min_cluster_size=state.get("min_cluster_size", 1),
@@ -39,30 +32,22 @@ def clustering_node(state: ClusteringState) -> ClusteringState:
     )
 
     state["clusters"] = clusters
-    print(f"Created {len(clusters)} clusters")
 
     return state
 
 
 def merging_node(state: ClusteringState) -> ClusteringState:
-    """Second state: Merge document clusters"""
-    print("Starting merging process...")
-
     merged_documents = merge_document_clusters(
         document_clusters=state["clusters"], embeddings=state["embeddings"]
     )
 
     state["merged_documents"] = merged_documents
-    print(f"Merged into {len(merged_documents)} documents")
 
     return state
 
 
 def find_insert_position_node(state: ClusteringState) -> ClusteringState:
-    """Third state: Find insert positions for merged documents"""
-    print("Starting find insert position process...")
-
-    agentic_results = find_insert_position(
+    insert_results = find_insert_position(
         user_config=state["user_config"],
         embeddings=state["embeddings"],
         chat_model=state["chat_model"],
@@ -70,15 +55,12 @@ def find_insert_position_node(state: ClusteringState) -> ClusteringState:
         bucket_name=state["bucket_name"],
     )
 
-    state["agentic_results"] = agentic_results
-    print(f"Generated {len(agentic_results)} agentic results")
+    state["insert_results"] = insert_results
 
     return state
 
 
-# Create the LangGraph workflow
 def create_clustering_workflow():
-    """Create and return the compiled LangGraph workflow"""
 
     # Initialize the graph
     workflow = StateGraph(ClusteringState)
@@ -118,7 +100,7 @@ def run_clustering_workflow(
         "input_objects": input_objects,
         "clusters": [],
         "merged_documents": [],
-        "agentic_results": [],
+        "insert_results": [],
         "min_cluster_size": min_cluster_size,
         "cluster_selection_epsilon": cluster_selection_epsilon,
         "embeddings": embeddings,
@@ -130,4 +112,4 @@ def run_clustering_workflow(
     # Run the workflow
     final_state = app.invoke(initial_state)
 
-    return final_state["agentic_results"]
+    return final_state["insert_results"]
