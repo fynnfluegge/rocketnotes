@@ -43,7 +43,7 @@ def find_insert_position(
 
     result: list[AgenticResult] = []
     for note in notes:
-        similarity_search_result = db.similarity_search(note.text, k=3)
+        similarity_search_result = db.similarity_search(note.text, k=5)
         search_result = []
         for item in similarity_search_result:
             search_result.append(
@@ -63,7 +63,14 @@ def find_insert_position(
             + f"Search Results:\n{search_results_formatted}"
         )
 
-        matched_item = next((item for item in search_result if item["documentId"] in chat_model_response.content), None)
+        matched_item = next(
+            (
+                item
+                for item in search_result
+                if item["documentId"] in chat_model_response.content
+            ),
+            None,
+        )
         if matched_item:
             result.append(
                 AgenticResult(
