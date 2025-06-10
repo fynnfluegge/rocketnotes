@@ -3,10 +3,16 @@ import os
 
 import boto3
 
-from rocketnotes_handler.lib.graph import run_clustering_workflow
+from rocketnotes_handler.lib.graph import (
+    create_clustering_workflow,
+    run_clustering_workflow,
+)
 from rocketnotes_handler.lib.model import NoteSnippet, Zettel
-from rocketnotes_handler.lib.util import (get_chat_model, get_embeddings_model,
-                                          get_user_config)
+from rocketnotes_handler.lib.util import (
+    get_chat_model,
+    get_embeddings_model,
+    get_user_config,
+)
 
 is_local = os.environ.get("LOCAL", False)
 s3_args = {}
@@ -24,6 +30,8 @@ vector_table_name = "tnn-Vectors"
 userConfig_table_name = "tnn-UserConfig"
 zettel_table_name = "tnn-Zettelkasten"
 bucket_name = os.environ["BUCKET_NAME"]
+
+graph = create_clustering_workflow()
 
 
 def handler(event, context):
@@ -95,6 +103,7 @@ def handler(event, context):
 
     try:
         result = run_clustering_workflow(
+            graph=graph,
             input_objects=note_snippets,
             embeddings=embeddings,
             user_config=user_config,

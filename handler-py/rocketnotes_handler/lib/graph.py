@@ -3,12 +3,17 @@ from typing import TypedDict
 from langchain.embeddings.base import Embeddings
 from langchain_core.language_models import BaseChatModel
 from langgraph.graph import END, StateGraph
+from langgraph.graph.state import CompiledStateGraph
 
 from rocketnotes_handler.lib.cluster import cluster_text_objects
 from rocketnotes_handler.lib.insert import find_insert_position
 from rocketnotes_handler.lib.merge import merge_document_clusters
-from rocketnotes_handler.lib.model import (InsertSuggestion, NoteCluster,
-                                           NoteSnippet, UserConfig)
+from rocketnotes_handler.lib.model import (
+    InsertSuggestion,
+    NoteCluster,
+    NoteSnippet,
+    UserConfig,
+)
 
 
 class ClusteringState(TypedDict):
@@ -82,6 +87,7 @@ def create_clustering_workflow():
 
 
 def run_clustering_workflow(
+    graph: CompiledStateGraph,
     input_objects: list[NoteSnippet],
     embeddings: Embeddings,
     user_config: UserConfig,
@@ -90,11 +96,6 @@ def run_clustering_workflow(
     min_cluster_size: int = 1,
     cluster_selection_epsilon: float = 0.1,
 ):
-    """Run the complete clustering workflow"""
-
-    # Create the workflow
-    app = create_clustering_workflow()
-
     # Initial state
     initial_state = {
         "input_objects": input_objects,
@@ -110,6 +111,6 @@ def run_clustering_workflow(
     }
 
     # Run the workflow
-    final_state = app.invoke(initial_state)
+    final_state = graph.invoke(initial_state)
 
     return final_state["insert_results"]
