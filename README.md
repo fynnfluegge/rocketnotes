@@ -22,6 +22,7 @@
 Rocketnotes is a web-based Markdown note taking app with LLM-powered text completion, chat and semantic search.
 It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/serverless-rag-on-aws-bf8029f8bffd) and is built with
 [langchain](https://github.com/langchain-ai/langchain),
+[langgraph](https://langchain-ai.github.io/langgraph),
 [faiss](https://github.com/facebookresearch/faiss),
 [sentence-transformers](https://github.com/UKPLab/sentence-transformers),
 [Ollama](https://github.com/jmorganca/ollama).
