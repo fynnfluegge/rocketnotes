@@ -44,13 +44,15 @@ class AgenticResult:
         documentTitle: str,
         content: str,
         similaritySearchResult: str,
-        zettelIds: list[str] = [],
+        zettelIds: list[str] | None,
     ):
         self.documentId: str = id
-        self.zettelIds: list[str] = zettelIds,
         self.documentTitle: str = documentTitle
         self.content: str = content
         self.similaritySearchResult: str = similaritySearchResult
+        if zettelIds is None:
+            zettelIds = []
+        self.zettelIds: list[str] = zettelIds
 
     def to_dict(self):
         return {
