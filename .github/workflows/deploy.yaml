@@ -61,12 +61,6 @@ jobs:
           path: webapp/build
           run_id: ${{ github.event.workflow_run.id }}
 
-      - uses: dawidd6/action-download-artifact@v6
-        with:
-          name: landing-page-build
-          path: landing-page/build
-          run_id: ${{ github.event.workflow_run.id }}
-
       - name: Deploy go stack to AWS
         run: |
           cd cdk
