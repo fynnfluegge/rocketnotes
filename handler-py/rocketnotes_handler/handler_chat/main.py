@@ -40,12 +40,12 @@ def handler(event, context):
 
     if "prompt" in request_body:
         prompt = (
-            "Based on the context provided, answer the following question in valid markdown syntax: "
+            "Based on the context provided, answer the following question and respond in markdown format: "
             + request_body["prompt"]
+            + "\n\nDon't return a markdown code block, just return the answer in markdown syntax."
         )
     else:
         return {"statusCode": 400, "body": "search_string is missing"}
-
 
     user_config_search_result = dynamodb.get_item(
         TableName=userConfig_table_name,
