@@ -102,8 +102,7 @@ export class LlmDialogComponent implements OnDestroy, OnInit {
         const resultString = JSON.stringify(result);
         const formattedResult = resultString
           .substring(1, resultString.length - 1)
-          .split('\\n')
-          .join('<br>');
+          .replace(/\\n/g, '\n');
         this.messages.push({ text: formattedResult, isUser: false });
         setTimeout(() => {
           this.scrollToBottom();
