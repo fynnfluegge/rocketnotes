@@ -432,3 +432,34 @@ code {
   scrollbar-width: thin;
   scrollbar-color: #666560 var(--background-color);
 }
+
+.llm-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background-image: linear-gradient(to right, #00ff7f, #00d4ff, #405bff) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+  font-weight: 480 !important;
+  border-style: solid !important;
+  border-color: #777 !important;
+  background-color: transparent !important;
+}
+
+.llm-icon {
+  display: inline-block;
+  width: 20px !important;
+  height: 20px !important;
+  margin-right: 8px;
+  background-color: #00ff7f !important;
+  -webkit-mask: url("assets/icons/png/icons8-artificial-intelligence-50.png")
+    no-repeat center;
+  mask: url("assets/icons/png/icons8-artificial-intelligence-50.png")
+    no-repeat center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}

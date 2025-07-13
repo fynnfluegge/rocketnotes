@@ -8,24 +8,18 @@
       *ngIf="aiCompletionEnabled && !isMobileDevice"
       (click)="toggleAiCompletion()"
       data-title="Disable AI Text Completion"
-      class="btn btn-default btn-primary btn-fade tooltip-bottom expand"
+      class="btn btn-default btn-primary btn-fade tooltip-bottom expand llm-button"
     >
-      <img
-        src="../../../assets/icons/png/icons8-artificial-intelligence-50.png"
-        class="title-button-icon"
-      />
+      <span class="llm-icon"></span>
       Disbale text completion
     </button>
     <button
       *ngIf="!aiCompletionEnabled && !isMobileDevice"
       (click)="toggleAiCompletion()"
       data-title="Enable AI text completion ayto suggestions"
-      class="btn btn-default btn-primary btn-fade tooltip-bottom expand"
+      class="btn btn-default btn-primary btn-fade tooltip-bottom expand llm-button"
     >
-      <img
-        src="../../../assets/icons/png/icons8-artificial-intelligence-50.png"
-        class="title-button-icon"
-      />
+      <span class="llm-icon"></span>
       Enable text completion
     </button>
     <span class="title" style="text-indent: -96px">{{ title }}</span>

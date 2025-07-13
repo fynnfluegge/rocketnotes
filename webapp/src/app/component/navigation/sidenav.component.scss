@@ -388,30 +388,3 @@ kbd {
     transform 0.1s ease-in-out,
     box-shadow 0.1s ease-in-out;
 }
-
-.llm-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-image: linear-gradient(to right, #00ff7f, #00d4ff, #405bff);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  font-weight: 480;
-  border-style: solid;
-  border-color: #777;
-}
-
-.llm-icon {
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  margin-right: 8px;
-  background-color: #00ff7f;
-  -webkit-mask: url("../../../assets/icons/png/icons8-artificial-intelligence-50.png")
-    no-repeat center;
-  mask: url("../../../assets/icons/png/icons8-artificial-intelligence-50.png")
-    no-repeat center;
-  -webkit-mask-size: contain;
-  mask-size: contain;
-}
