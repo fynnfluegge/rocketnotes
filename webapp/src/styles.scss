@@ -437,17 +437,26 @@ code {
   display: flex;
   align-items: center;
   justify-content: center;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  background-image: linear-gradient(to right, #00ff7f, #00d4ff, #405bff) !important;
+  border-style: solid !important;
+  border-color: #777 !important;
+  border-width: 1px !important;
+  background-color: var(--warning-color) !important;
+}
+
+.llm-button-text {
+  background-image: linear-gradient(
+    to right,
+    #00ff7f,
+    #00d4ff,
+    #405bff
+  ) !important;
   -webkit-background-clip: text !important;
   background-clip: text !important;
   color: transparent !important;
   font-weight: 480 !important;
-  border-style: solid !important;
-  border-color: #777 !important;
-  background-color: transparent !important;
+  font-family: "system-ui", sans-serif !important;
+  line-height: 1;
+  cursor: pointer !important;
 }
 
 .llm-icon {
@@ -458,8 +467,8 @@ code {
   background-color: #00ff7f !important;
   -webkit-mask: url("assets/icons/png/icons8-artificial-intelligence-50.png")
     no-repeat center;
-  mask: url("assets/icons/png/icons8-artificial-intelligence-50.png")
-    no-repeat center;
+  mask: url("assets/icons/png/icons8-artificial-intelligence-50.png") no-repeat
+    center;
   -webkit-mask-size: contain;
   mask-size: contain;
 }

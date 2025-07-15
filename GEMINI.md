@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This is a monorepo for Rocketnotes, a note-taking application. It consists of a web frontend, several Go backend services, Python-based AI/ML handlers, and a master control program (MCP).
+This is a monorepo for Rocketnotes, a note-taking application. It consists of a web frontend, several Go backend services, Python-based AI/ML handlers, and a model context protocol (MCP).
 
 ## Global Commands
 
@@ -56,7 +56,7 @@ This section details the individual projects within the monorepo.
 
 ---
 
-### 4. `mcp` (Master Control Program)
+### 4. `mcp` (Model Context Protocol)
 
 - **Description:** A central Python server or tool for managing the system.
 - **Path:** `/mcp`
