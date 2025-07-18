@@ -441,6 +441,7 @@ code {
   border-color: #777 !important;
   border-width: 1px !important;
   background-color: var(--warning-color) !important;
+  padding: 0 !important;
 }
 
 .llm-button-text {
@@ -455,20 +456,21 @@ code {
   color: transparent !important;
   font-weight: 480 !important;
   font-family: "system-ui", sans-serif !important;
+  font-size: 16px !important;
   line-height: 1;
   cursor: pointer !important;
+  margin-right: 8px !important;
 }
 
 .llm-icon {
   display: inline-block;
-  width: 20px !important;
-  height: 20px !important;
-  margin-right: 8px;
+  width: 32px !important;
+  height: 32px !important;
+  margin-right: 2px !important;
+  margin-left: 4px;
   background-color: #00ff7f !important;
-  -webkit-mask: url("assets/icons/png/icons8-artificial-intelligence-50.png")
-    no-repeat center;
-  mask: url("assets/icons/png/icons8-artificial-intelligence-50.png") no-repeat
-    center;
+  -webkit-mask: url("assets/icons/png/ai-stars-icon_256.png") no-repeat center;
+  mask: url("assets/icons/png/ai-stars-icon_256.png") no-repeat center;
   -webkit-mask-size: contain;
   mask-size: contain;
 }

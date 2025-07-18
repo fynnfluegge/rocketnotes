@@ -13,7 +13,7 @@
     style="margin-left: auto"
   >
     <span class="llm-icon"></span>
-    <span class="llm-button-text">LLM Chat & Search</span>
+    <span class="llm-button-text">Chat & Search</span>
   </button>
   <button type="submit" id="searchButton" (click)="openSearchDialog()">
     <i class="fa-solid fa-magnifying-glass"></i> Search
@@ -34,10 +34,11 @@
       <button
         (click)="openConfigDialog()"
         *ngIf="!isMobileDevice"
-        style="padding: 8px; margin-top: 4px; border-radius: 4px"
-        class="btn-primary"
+        style="margin-top: 4px; border-radius: 4px"
+        class="btn-primary llm-button"
       >
-        LLM Config
+        <span class="llm-icon"></span>
+        <span class="llm-button-text">AI Config</span>
       </button>
       <div style="width: 80%; margin: auto; margin-top: 12px">
         <label class="switch">

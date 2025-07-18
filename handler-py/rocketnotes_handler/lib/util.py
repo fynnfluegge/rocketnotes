@@ -4,6 +4,7 @@ from langchain.embeddings.base import Embeddings
 from langchain_anthropic import ChatAnthropic
 from langchain_community.embeddings import (HuggingFaceEmbeddings,
                                             OllamaEmbeddings, VoyageEmbeddings)
+from langchain_together import TogetherEmbeddings
 from langchain_community.llms import Ollama
 from langchain_core.language_models import BaseChatModel
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
@@ -59,6 +60,14 @@ def get_embeddings_model(user_config: UserConfig) -> Embeddings:
             base_url="http://ollama:11434",
             model=user_config.embeddingsModel.split("Ollama-")[1],
         )
+    elif user_config.embeddingsModel == "together-m2-bert-80M":
+        if user_config.togetherApiKey:
+            os.environ["TOGETHER_API_KEY"] = user_config.togetherApiKey
+        else:
+            raise ValueError(
+                f"Together AI API key is missing for model {user_config.embeddingsModel}"
+            )
+        return TogetherEmbeddings(model=user_config.embeddingsModel)
     else:
         raise ValueError(f"Embeddings model '{user_config.embeddingsModel}' not found")
 
