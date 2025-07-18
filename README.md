@@ -1,6 +1,6 @@
 <div align="center">
   <a href="https://www.takeniftynotes.net/">
-    <img src="https://github.com/user-attachments/assets/5a1f80e4-ba6a-4d33-933b-13d0ded023fc" height="384">
+    <img src="https://github.com/user-attachments/assets/82041555-ba66-400e-a899-8f9c1bc70bcf" height="384">
   </a>
 
   # Rocketnotes
@@ -9,7 +9,7 @@
   [![Deploy](https://github.com/fynnfluegge/rocketnotes/actions/workflows/deploy.yaml/badge.svg)](https://github.com/fynnfluegge/rocketnotes/actions/workflows/deploy.yaml)
   [![Docker](https://github.com/fynnfluegge/rocketnotes/actions/workflows/docker-build-and-publish.yaml/badge.svg)](https://github.com/fynnfluegge/rocketnotes/actions/workflows/docker-build-and-publish.yaml)
   [![Electron](https://github.com/fynnfluegge/rocketnotes/actions/workflows/electron-build-and-publish.yaml/badge.svg)](https://github.com/fynnfluegge/rocketnotes/actions/workflows/electron-build-and-publish.yaml)
-  [![License](https://img.shields.io/badge/License-MIT%20-green.svg)](https://opensource.org/licenses/MIT)
+  [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 </div>
 
@@ -117,6 +117,11 @@ It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/ser
   <img width="640" alt="Screenshot 2025-07-08 at 22 18 07" src="https://github.com/user-attachments/assets/bd5e7a7b-17fb-48eb-861d-da7241a02fc2" />
 </div>
 
+## ⭐️ Star History
+
+<div align="center">
+  <img src="https://api.star-history.com/svg?repos=fynnfluegge/rocketnotes&type=Date" width="600" />
+</div>
 
 ## Contributing
 
