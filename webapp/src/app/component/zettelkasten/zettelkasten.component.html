@@ -117,10 +117,11 @@
     <button
       *ngIf="!isRecording && speechToTextEnabled"
       (click)="recordNote()"
+      data-title="Record a note using speech-to-text"
       style="float: left"
-      class="btn btn-default btn-primary btn-fade expand llm-button"
+      class="btn btn-default btn-primary btn-fade tooltip-bottom expand llm-button"
     >
-      <mat-icon>mic</mat-icon>
+      <span class="llm-icon"></span>
       <span class="llm-button-text">Record Note</span>
     </button>
     <button
@@ -129,9 +130,7 @@
       style="float: left"
       class="btn btn-default btn-primary btn-fade expand llm-button"
     >
-      <span class="llm-icon">
-        <mat-icon>mic</mat-icon>
-      </span>
+      <span class="llm-icon"></span>
       <span class="llm-button-text">Stop Recording</span>
     </button>
     <button
