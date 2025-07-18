@@ -73,3 +73,4 @@ This section details the individual projects within the monorepo.
 - **Go:** Run `gofmt` before committing.
 - **Python:** Adhere to PEP 8. Use `ruff` for linting and formatting.
 - **TypeScript/Angular:** Follow the standard Angular style guide.
+- **CSS:** Do NOT add any kind of CSS comments for readability.

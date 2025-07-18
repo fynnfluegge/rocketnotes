@@ -14,11 +14,32 @@ export class ConfigDialogComponent implements OnDestroy, OnInit {
   isOpen: boolean = false;
   currentEmbeddingModel: string;
   selectedEmbeddingModel: string = 'text-embedding-ada-002';
+  embeddingModels: string[] = [
+    'text-embedding-ada-002',
+    'text-embedding-3-small',
+    'voyage-2',
+    'voyage-3',
+    'together-m2-bert-80M',
+  ];
   selectedSpeechToTextModel: string = 'none';
-  selectedLlm: string = 'gpt-3.5-turbo';
+  speechToTextModels: string[] = ['Whisper', 'none'];
+  selectedLlm: string = 'gpt-4-turbo';
+  llms: string[] = [
+    'gpt-4-turbo',
+    'gpt-4o',
+    'gpt-4o-mini',
+    'gpt-4.1-mini',
+    'gpt-4.1-nano',
+    'claude-sonnet-4-20250514',
+    'claude-3-7-sonnet-20250219',
+    'claude-3-5-haiku-20241022',
+    'together-meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8',
+    'together-Qwen/QwQ-32B',
+  ];
   openAiApiKey: string;
   anthropicApiKey: string;
   voyageApiKey: string;
+  togetherApiKey: string;
   isLocal: boolean = !environment.production;
 
   constructor(
@@ -27,6 +48,14 @@ export class ConfigDialogComponent implements OnDestroy, OnInit {
   ) {}
 
   ngOnInit(): void {
+    if (this.isLocal) {
+      this.embeddingModels.push('Sentence-Transformers');
+      this.embeddingModels.push('Ollama-nomic-embed-text');
+      this.llms.push('Ollama-llama3');
+      this.llms.push('Ollama-llama2');
+      this.llms.push('Ollama-mistral');
+      this.llms.push('Ollama-orca-mini');
+    }
     this.subscription = this.configDialogService.isOpen$.subscribe((isOpen) => {
       this.isOpen = isOpen;
       if (isOpen) {
@@ -48,6 +77,7 @@ export class ConfigDialogComponent implements OnDestroy, OnInit {
               this.openAiApiKey = config['openAiApiKey'] ?? '';
               this.anthropicApiKey = config['anthropicApiKey'] ?? '';
               this.voyageApiKey = config['voyageApiKey'] ?? '';
+              this.togetherApiKey = config['togetherApiKey'] ?? '';
             },
             (error) => {
               if (error.status === 404) {
@@ -113,6 +143,23 @@ export class ConfigDialogComponent implements OnDestroy, OnInit {
         voyageApiKeyRequiredWarning.style.display = 'none';
       }
 
+      if (
+        (this.selectedEmbeddingModel === 'together-m2-bert-80M' ||
+          this.selectedLlm.startsWith('together-')) &&
+        !this.togetherApiKey
+      ) {
+        const togetherApiKeyRequiredWarning = document.getElementById(
+          'togetherApiKeyRequired',
+        );
+        togetherApiKeyRequiredWarning.style.display = 'block';
+        return;
+      } else {
+        const togetherApiKeyRequiredWarning = document.getElementById(
+          'togetherApiKeyRequired',
+        );
+        togetherApiKeyRequiredWarning.style.display = 'none';
+      }
+
       this.restService
         .post('userConfig', {
           id: localStorage.getItem('currentUserId'),
@@ -122,6 +169,7 @@ export class ConfigDialogComponent implements OnDestroy, OnInit {
           openAiApiKey: this.openAiApiKey,
           anthropicApiKey: this.anthropicApiKey,
           voyageApiKey: this.voyageApiKey,
+          togetherApiKey: this.togetherApiKey,
           recreateIndex:
             this.currentEmbeddingModel !== this.selectedEmbeddingModel,
         })
@@ -135,6 +183,7 @@ export class ConfigDialogComponent implements OnDestroy, OnInit {
               openAiApiKey: this.openAiApiKey,
               anthropicApiKey: this.anthropicApiKey,
               voyageApiKey: this.voyageApiKey,
+              togetherApiKey: this.togetherApiKey,
             }),
           );
           if (

@@ -22,7 +22,8 @@ type RequestBody struct {
 	SpeechToTextModel string `json:"speechToTextModel"`
 	OpenAiApiKey      string `json:"openAiApiKey"`
 	AnthropicApiKey   string `json:"anthropicApiKey"`
-	VoyageApiKey      string `json:"voyageApiKey`
+	VoyageApiKey      string `json:"voyageApiKey"`
+	TogetherApiKey    string `json:"togetherApiKey"`
 	RecreateIndex     bool   `json:"recreateIndex"`
 }
 
@@ -34,6 +35,7 @@ type UserConfig struct {
 	OpenAiApiKey      string `json:"openAiApiKey"`
 	AnthropicApiKey   string `json:"anthropicApiKey"`
 	VoyageApiKey      string `json:"voyageApiKey"`
+	TogetherApiKey    string `json:"togetherApiKey"`
 }
 
 type SqsMessage struct {
@@ -63,7 +65,7 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 
 	tableName := "tnn-UserConfig"
 
-	av, err := dynamodbattribute.MarshalMap(UserConfig{item.Id, item.EmbeddingModel, item.Llm, item.SpeechToTextModel, item.OpenAiApiKey, item.AnthropicApiKey, item.VoyageApiKey})
+	av, err := dynamodbattribute.MarshalMap(UserConfig{item.Id, item.EmbeddingModel, item.Llm, item.SpeechToTextModel, item.OpenAiApiKey, item.AnthropicApiKey, item.VoyageApiKey, item.TogetherApiKey})
 	if err != nil {
 		log.Fatalf("Got error marshalling new document item: %s", err)
 	}

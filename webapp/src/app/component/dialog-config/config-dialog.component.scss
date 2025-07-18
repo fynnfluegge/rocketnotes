@@ -9,6 +9,27 @@
   width: 700px;
   text-align: center;
   top: 120px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.scrollable-content {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding-bottom: 20px; /* Add some padding to prevent content from being hidden behind the fixed footer */
+}
+
+.dialog-actions {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgb(63, 66, 65); /* Optional: Add a separator line */
+  background-color: var(--menu-color); /* Ensure background matches dialog */
+  position: sticky;
+  bottom: 0;
+  width: 100%;
+  z-index: 1; /* Ensure it stays on top of scrolling content */
 }
 
 .open {
@@ -20,6 +41,34 @@
   margin-right: 10px;
 }
 
-input[type="radio"] {
+input[type='radio'] {
   margin-right: 5px;
+}
+
+select {
+  width: 60%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  color: #333;
+  font-size: 16px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  display: block;
+  margin: 0 auto;
+}
+
+select:hover {
+  border-color: #888;
+}
+
+select:focus {
+  outline: none;
+  border-color: #555;
+  box-shadow: 0 0 5px rgba(81, 203, 238, 1);
 }
