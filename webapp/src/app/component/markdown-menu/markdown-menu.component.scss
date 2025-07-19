@@ -4,7 +4,8 @@
 
 .markdown-menu button {
   margin-right: 4px;
-  background-color: transparent;
+  background-color: transparent !important;
+  background-image: none !important;
   border: none;
   color: var(--font-color);
   padding: 6px 10px;
