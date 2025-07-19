@@ -35,22 +35,28 @@ It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/ser
 
 ## ✨ Features
 
-- 📝 Code syntax highlighting
-- 📊 Katex and Mermaid support
-- 🌳 Hierarchical document tree with draggable nodes
-- 🌐 Document sharing
-- 🔍 Content search
-- 🔦 Semantic search
-- ✍️ Copilot-like text completion
-- 🤖 Chat with your documents
-  - Serverless RAG with faiss, OpenAI, Anthropic, Voyage
-- 📦 Local mode with Docker
-  - use Ollama and/or Sentence Transformers for 100% local RAG
-- 📥 Zettelkasten with agentic archiving
-  - insert note snippets into most relevant documents by AI agent workflows
-- 🗣️ Speech-to-text note taking
-- ⚙️ [MCP Server integration](mcp/README.md)
-- 🎮 Neovim plugin [rocketnotes.nvim](https://github.com/fynnfluegge/rocketnotes.nvim)
+- 📝 **Code Syntax Highlighting**: For developers and technical users to save and read code snippets in a clean, readable format.
+- 📊 **Katex and Mermaid Support**: Embed complex mathematical formulas (Katex) and create diagrams or flowcharts (Mermaid) directly within your notes.
+- 🌳 **Hierarchical Document Tree**: Organize notes in a nested structure with drag-and-drop functionality to easily restructure your knowledge base.
+- 🌐 **Document Sharing**: Collaborate by sharing specific notes with others.
+- 🔍 **Content Search**: A fast and efficient way to find specific notes by searching for keywords within their content.
+- 🔦 **Semantic Search**: Goes beyond keyword search to understand the meaning behind your query and find the most conceptually related notes.
+- ✍️ **Copilot-like Text Completion**: The AI suggests ways to complete your sentences or paragraphs, speeding up the writing process.
+- 🤖 **Chat with Your Documents**: Ask questions in natural language and get answers synthesized from your own documents.
+- 📥 **Zettelkasten with Agentic Archiving**: An AI agent analyzes snippets from your "inbox" and intelligently files them into the most relevant existing document.
+- 🗣️ **Speech-to-Text Note Taking**: Dictate your notes instead of typing them.
+- 📦 **Local Mode with Docker**: Run the entire application on your own machine using Ollama for 100% local and private AI processing.
+- ⚙️ **MCP Server Integration**: Allows for advanced configurations and system administration.
+- 🎮 **Neovim Plugin**: Integrate your note-taking directly into the Neovim code editor.
+
+## 🚀 Tech Stack
+
+- **Frontend**: Angular, TypeScript, Electron
+- **Backend**: Go, Python
+- **AI**: Langchain, Langgraph, Faiss
+- **Infrastructure**: AWS, Docker
+- **Database**: DynamoDB
+- **Storage**: S3
 
 &nbsp;
 

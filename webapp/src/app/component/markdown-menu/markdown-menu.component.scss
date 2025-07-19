@@ -1,0 +1,17 @@
+.markdown-menu {
+  margin-bottom: 8px;
+}
+
+.markdown-menu button {
+  margin-right: 4px;
+  background-color: transparent;
+  border: none;
+  color: var(--font-color);
+  padding: 6px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.markdown-menu button:hover {
+  background-color: var(--hover-color);
+}

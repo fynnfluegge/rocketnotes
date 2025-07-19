@@ -54,8 +54,8 @@
     style="resize: none; margin-top: 4px; display: inline-block; height: 100%"
     *ngIf="editorMode"
     class="variable-textarea"
-    [style.width]="showPreview ? 'calc(50% - 4px)' : '100%'"
-  >
+    [style.width]="showPreview ? 'calc(50% - 4px)' : '100%'">
+    <app-markdown-menu (applyMarkdown)="applyMarkdown($event)"></app-markdown-menu>
     <textarea
       id="markdownTextarea"
       class="markdown-textarea"
