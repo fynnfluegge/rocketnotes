@@ -9,4 +9,6 @@
   <button (click)="applyStyle('ul')" class="btn btn-default btn-primary btn-fade"><i class="fas fa-list-ul"></i></button>
   <button (click)="applyStyle('ol')" class="btn btn-default btn-primary btn-fade"><i class="fas fa-list-ol"></i></button>
   <button (click)="applyStyle('link')" class="btn btn-default btn-primary btn-fade"><i class="fas fa-link"></i></button>
+  <button *ngIf="!isRecording && speechToTextEnabled" (click)="recordNote()" class="btn btn-default btn-primary btn-fade"><i class="fas fa-microphone"></i></button>
+  <button *ngIf="isRecording && speechToTextEnabled" (click)="stopRecord()" class="btn btn-default btn-primary btn-fade"><i class="fas fa-stop"></i></button>
 </div>

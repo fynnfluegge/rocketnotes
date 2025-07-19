@@ -795,6 +795,10 @@ export class EditorComponent {
     textarea.selectionEnd = start + markdownText.length;
   }
 
+  appendToContent(text: string) {
+    this.content += text;
+  }
+
   suggestionFitsInLine(suggestion: string, position: number, width: number) {
     const suggestionLength = suggestion.length * 6;
     const spaceLeftAfterSuggestion = width - position - suggestionLength;

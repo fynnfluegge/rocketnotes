@@ -55,7 +55,7 @@
     *ngIf="editorMode"
     class="variable-textarea"
     [style.width]="showPreview ? 'calc(50% - 4px)' : '100%'">
-    <app-markdown-menu (applyMarkdown)="applyMarkdown($event)"></app-markdown-menu>
+    <app-markdown-menu (applyMarkdown)="applyMarkdown($event)" (transcribedText)="appendToContent($event)"></app-markdown-menu>
     <textarea
       id="markdownTextarea"
       class="markdown-textarea"
