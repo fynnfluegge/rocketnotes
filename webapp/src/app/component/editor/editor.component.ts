@@ -751,7 +751,9 @@ export class EditorComponent {
   }
 
   applyMarkdown(style: string) {
-    const textarea = document.getElementById('markdownTextarea') as HTMLTextAreaElement;
+    const textarea = document.getElementById(
+      'markdownTextarea',
+    ) as HTMLTextAreaElement;
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
     const selectedText = this.content.substring(start, end);
@@ -777,7 +779,7 @@ export class EditorComponent {
         markdownText = `> ${selectedText}`;
         break;
       case 'code':
-        markdownText = '`${selectedText}`';
+        markdownText = `\`\`\`\n${selectedText + '\n\`\`\`'}`;
         break;
       case 'ul':
         markdownText = `- ${selectedText}`;
@@ -790,9 +792,16 @@ export class EditorComponent {
         break;
     }
 
-    this.content = this.content.substring(0, start) + markdownText + this.content.substring(end);
-    textarea.focus();
-    textarea.selectionEnd = start + markdownText.length;
+    this.content =
+      this.content.substring(0, start) +
+      markdownText +
+      this.content.substring(end);
+    // After updating the content, set the cursor position
+    setTimeout(() => {
+      textarea.focus();
+      textarea.selectionStart = start + markdownText.length;
+      textarea.selectionEnd = start + markdownText.length;
+    }, 0);
   }
 
   appendToContent(text: string) {
