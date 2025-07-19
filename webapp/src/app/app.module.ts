@@ -24,6 +24,7 @@ import { ConfigDialogComponent } from './component/dialog-config/config-dialog.c
 import { ZettelkastenComponent } from './component/zettelkasten/zettelkasten.component';
 import { AudioRecordingService } from './service/audio-recording.service';
 import { DocumentTree } from './service/document-tree-service';
+import { MarkdownMenuComponent } from './component/markdown-menu/markdown-menu.component';
 
 @NgModule({
   declarations: [
@@ -34,6 +35,7 @@ import { DocumentTree } from './service/document-tree-service';
     LlmDialogComponent,
     ConfigDialogComponent,
     ZettelkastenComponent,
+    MarkdownMenuComponent,
   ],
   imports: [
     BrowserModule,
