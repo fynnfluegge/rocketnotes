@@ -62,7 +62,7 @@
   <button
     *ngIf="!isRecording && speechToTextEnabled"
     (click)="recordNote()"
-    data-title="Record a note using speech-to-text"
+    data-title="Record using speech-to-text"
     class="btn btn-default btn-primary btn-fade tooltip-bottom expand llm-button"
   >
     <span class="llm-icon"></span>
@@ -77,7 +77,7 @@
   >
     <span class="llm-icon"></span>
     <span class="llm-button-text">
-      <i class="fas fa-stop"></i>
+      <i class="far fa-stop-circle blinking-button"></i>
     </span>
   </button>
 </div>

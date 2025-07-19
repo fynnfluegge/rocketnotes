@@ -122,7 +122,10 @@
       class="btn btn-default btn-primary btn-fade tooltip-bottom expand llm-button"
     >
       <span class="llm-icon"></span>
-      <span class="llm-button-text">Record Note</span>
+      <span class="llm-button-text"
+        >Record Note
+        <i class="fas fa-microphone"></i>
+      </span>
     </button>
     <button
       *ngIf="isRecording && speechToTextEnabled"
@@ -131,7 +134,10 @@
       class="btn btn-default btn-primary btn-fade expand llm-button"
     >
       <span class="llm-icon"></span>
-      <span class="llm-button-text">Stop Recording</span>
+      <span class="llm-button-text">
+        Stop Recording
+        <i class="far fa-stop-circle blinking-button"></i>
+      </span>
     </button>
     <button
       (click)="saveNote()"
