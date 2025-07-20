@@ -1,6 +1,6 @@
 const { app, dialog, Menu, BrowserWindow } = require("electron");
 // const { autoUpdater } = require("electron-updater");
-const log = require("electron-log");
+// const log = require("electron-log");
 const url = require("url");
 const path = require("path");
 
@@ -8,7 +8,7 @@ const isMac = process.platform === "darwin";
 
 // autoUpdater.logger = log;
 // autoUpdater.logger.transports.file.level = "info";
-log.info("App starting...");
+// log.info("App starting...");
 
 let template = [];
 if (isMac) {
