@@ -54,7 +54,7 @@
     "@types/jasmine": "~3.10.0",
     "@types/marked": "^4.0.8",
     "@types/node": "^18.11.9",
-    "electron": "^24.8.5",
+    "electron": "^28.3.2",
     "electron-builder": "^24.13.3",
     "electron-icon-maker": "^0.0.5",
     "electron-installer-dmg": "^4.0.0",
