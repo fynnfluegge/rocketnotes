@@ -74,13 +74,13 @@ It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/ser
 
 - 🤖 Use LLMs together with vector embeddings to chat with your documents or do semantic search.
 <div align="center">
-  <img width="1024" alt="Screenshot 2025-06-14 at 16 40 53" src="https://github.com/user-attachments/assets/5051be74-9e7d-41c4-bc2b-a1d9d5c75606" />
+  <img width="812" alt="Screenshot 2025-06-14 at 16 40 53" src="https://github.com/user-attachments/assets/5051be74-9e7d-41c4-bc2b-a1d9d5c75606" />
 </div>
 
 ## ✍️ LLM-powered text completions
 
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/4785ec34-676f-46b0-96b7-c8761f96bd24" width="800">
+  <img src="https://github.com/user-attachments/assets/4785ec34-676f-46b0-96b7-c8761f96bd24" width="680">
 </div>
 
 &nbsp;
