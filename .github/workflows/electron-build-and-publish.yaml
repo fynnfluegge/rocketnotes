@@ -74,17 +74,25 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
           aws-region: ${{ vars.AWS_REGION }}
 
-      - name: Bundle and Publish electron
+      - name: Bundle and Publish electron (Linux/macOS)
+        if: runner.os != 'Windows'
         run: |
           cd webapp
-          if [ "${{ matrix.os }}" == "windows-latest" ]; then
-            set BUILD_PLATFORM=${{ matrix.build-platform }}
-            set BUILD_ARCH=${{ matrix.build-arch }}
-          else
-            export BUILD_PLATFORM=${{ matrix.build-platform }}
-            export BUILD_ARCH=${{ matrix.build-arch }}
-          fi
+          export BUILD_PLATFORM=${{ matrix.build-platform }}
+          export BUILD_ARCH=${{ matrix.build-arch }}
           npm run bundle-electron
+        env:
+          AWS_ACCOUNT: ${{ secrets.AWS_ACCOUNT }}
+          AWS_REGION: ${{ vars.AWS_REGION }}
+
+      - name: Bundle and Publish electron (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          cd webapp
+          set BUILD_PLATFORM=${{ matrix.build-platform }}
+          set BUILD_ARCH=${{ matrix.build-arch }}
+          npm run bundle-electron
+        shell: cmd
         env:
           AWS_ACCOUNT: ${{ secrets.AWS_ACCOUNT }}
           AWS_REGION: ${{ vars.AWS_REGION }}
