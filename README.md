@@ -150,3 +150,5 @@ If you prefer to setup the project on your local machine see [Contributing Guide
 Don't hesitate to open an issue for getting some feedback about a potential bug or if you desire a missing feature.
 It is appreciated to check over current [issues](https://github.com/fynnfluegge/rocketnotes/issues) and provide feedback to existing ones or even raise a PR which solves an issue.
 Any contribution is welcome!
+
+## 🛟 Troubleshooting
