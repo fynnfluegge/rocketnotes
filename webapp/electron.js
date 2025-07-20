@@ -1,13 +1,13 @@
 const { app, dialog, Menu, BrowserWindow } = require("electron");
-const { autoUpdater } = require("electron-updater");
+// const { autoUpdater } = require("electron-updater");
 const log = require("electron-log");
 const url = require("url");
 const path = require("path");
 
 const isMac = process.platform === "darwin";
 
-autoUpdater.logger = log;
-autoUpdater.logger.transports.file.level = "info";
+// autoUpdater.logger = log;
+// autoUpdater.logger.transports.file.level = "info";
 log.info("App starting...");
 
 let template = [];
@@ -26,7 +26,7 @@ if (isMac) {
         label: "Check for updates",
         enabled: true,
         click() {
-          autoUpdater.checkForUpdatesAndNotify();
+          // autoUpdater.checkForUpdatesAndNotify();
         },
       },
       { type: "separator" },
@@ -61,7 +61,7 @@ function createWindow() {
     }),
   );
 
-  mainWindow.on("closed", function() {
+  mainWindow.on("closed", function () {
     mainWindow = null;
   });
 }
