@@ -1,0 +1,35 @@
+.markdown-menu {
+  margin-bottom: 8px;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.markdown-menu button {
+  margin-right: 4px;
+  background-color: transparent !important;
+  background-image: none !important;
+  border: none;
+  color: var(--font-color);
+  padding: 6px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.llm-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.llm-icon {
+  margin-right: 5px; /* Adjust as needed for spacing */
+}
+
+.llm-button-text {
+  display: flex;
+  align-items: center;
+}
+
+.markdown-menu button:hover {
+  background-color: var(--hover-color);
+}

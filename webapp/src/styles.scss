@@ -474,3 +474,37 @@ code {
   -webkit-mask-size: contain;
   mask-size: contain;
 }
+
+@-webkit-keyframes blink {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes blink {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.blinking-button {
+  display: inline-block;
+  background: transparent;
+  color: #fff;
+  margin-left: 4px;
+  font-size: 16px;
+  -webkit-animation: blink 1s linear infinite;
+  animation: blink 1s linear infinite;
+}

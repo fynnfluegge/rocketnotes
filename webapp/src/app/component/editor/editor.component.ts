@@ -750,6 +750,64 @@ export class EditorComponent {
     return coordinates;
   }
 
+  applyMarkdown(style: string) {
+    const textarea = document.getElementById(
+      'markdownTextarea',
+    ) as HTMLTextAreaElement;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = this.content.substring(start, end);
+    let markdownText = '';
+
+    switch (style) {
+      case 'h1':
+        markdownText = `# ${selectedText}`;
+        break;
+      case 'h2':
+        markdownText = `## ${selectedText}`;
+        break;
+      case 'h3':
+        markdownText = `### ${selectedText}`;
+        break;
+      case 'bold':
+        markdownText = `**${selectedText}**`;
+        break;
+      case 'italic':
+        markdownText = `*${selectedText}*`;
+        break;
+      case 'blockquote':
+        markdownText = `> ${selectedText}`;
+        break;
+      case 'code':
+        markdownText = `\`\`\`\n${selectedText + '\n\`\`\`'}`;
+        break;
+      case 'ul':
+        markdownText = `- ${selectedText}`;
+        break;
+      case 'ol':
+        markdownText = `1. ${selectedText}`;
+        break;
+      case 'link':
+        markdownText = `[${selectedText}](url)`;
+        break;
+    }
+
+    this.content =
+      this.content.substring(0, start) +
+      markdownText +
+      this.content.substring(end);
+    // After updating the content, set the cursor position
+    setTimeout(() => {
+      textarea.focus();
+      textarea.selectionStart = start + markdownText.length;
+      textarea.selectionEnd = start + markdownText.length;
+    }, 0);
+  }
+
+  appendToContent(text: string) {
+    this.content += text;
+  }
+
   suggestionFitsInLine(suggestion: string, position: number, width: number) {
     const suggestionLength = suggestion.length * 6;
     const spaceLeftAfterSuggestion = width - position - suggestionLength;
