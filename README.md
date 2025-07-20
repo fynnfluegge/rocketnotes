@@ -36,9 +36,9 @@ It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/ser
 ## ✨ Features
 
 - 📝 **Code Syntax Highlighting**: For developers and technical users to save and read code snippets in a clean, readable format.
-- 📊 **Katex and Mermaid Support**: Embed complex mathematical formulas (Katex) and create diagrams or flowcharts (Mermaid) directly within your notes.
-- 🌳 **Hierarchical Document Tree**: Organize notes in a nested structure with drag-and-drop functionality to easily restructure your knowledge base.
-- 🌐 **Document Sharing**: Collaborate by sharing specific notes with others.
+- 📊 **Katex and Mermaid Support**: Embed complex mathematical formulas (Katex) and create diagrams or flowcharts (Mermaid) directly within your documents.
+- 🌳 **Hierarchical Document Tree**: Organize documents in a nested structure with drag-and-drop functionality to easily restructure your knowledge base.
+- 🌐 **Document Sharing**: Collaborate by sharing specific documents with others.
 - 🔍 **Content Search**: A fast and efficient way to find specific notes by searching for keywords within their content.
 - 🔦 **Semantic Search**: Goes beyond keyword search to understand the meaning behind your query and find the most conceptually related notes.
 - ✍️ **Copilot-like Text Completion**: The AI suggests ways to complete your sentences or paragraphs, speeding up the writing process.
