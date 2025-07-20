@@ -33,7 +33,7 @@ It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/ser
 - Run it 100% [locally with Docker](INSTALLATION.md#run-with-docker)
 - Check [Contribution Guide](CONTRIBUTING.md#contributing-guide) how to setup a local dev environment
 
-## ✨ Features
+##  Features
 
 - 📝 **Code Syntax Highlighting**: For developers and technical users to save and read code snippets in a clean, readable format.
 - 📊 **Katex and Mermaid Support**: Embed complex mathematical formulas (Katex) and create diagrams or flowcharts (Mermaid) directly within your documents.
@@ -43,6 +43,7 @@ It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/ser
 - 🔦 **Semantic Search**: Goes beyond keyword search to understand the meaning behind your query and find the most conceptually related notes.
 - ✍️ **Copilot-like Text Completion**: The AI suggests ways to complete your sentences or paragraphs, speeding up the writing process.
 - 🤖 **Chat with Your Documents**: Ask questions in natural language and get answers synthesized from your own documents.
+- ✨ **Multi-LLM Support**: Seamlessly switch between different Large Language Models, with current support for OpenAI, Anthropic and Together AI models.
 - 📥 **Zettelkasten with Agentic Archiving**: An AI agent analyzes snippets from your "inbox" and intelligently files them into the most relevant existing document.
 - 🗣️ **Speech-to-Text Note Taking**: Dictate your notes instead of typing them.
 - 📦 **Local Mode with Docker**: Run the entire application on your own machine using Ollama for 100% local and private AI processing.
