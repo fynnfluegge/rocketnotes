@@ -152,3 +152,6 @@ It is appreciated to check over current [issues](https://github.com/fynnfluegge/
 Any contribution is welcome!
 
 ## 🛟 Troubleshooting
+
+- ### Apple could not verify “rocketnotes” is free of malware that may harm your Mac or compromise your privacy.
+  - This happens since the `dmg` file was not build with an official Apple developer license. To circumvent this, open Settings -> Privacy & Security -> Security -> "rocketnotes" was blocked to protect your Mac -> Open Anyway
