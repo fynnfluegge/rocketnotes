@@ -50,7 +50,7 @@ It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/ser
 - ⚙️ **MCP Server Integration**: Allows for advanced configurations and system administration.
 - 🎮 **Neovim Plugin**: Integrate your note-taking directly into the Neovim code editor.
 
-## 🚀 Tech Stack
+## Tech Stack
 
 - **Frontend**: Angular, TypeScript, Electron
 - **Backend**: Go, Python
