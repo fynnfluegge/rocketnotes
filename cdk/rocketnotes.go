@@ -444,6 +444,12 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		Role:        lambdaS3DynamoDbRole,
 		MemorySize:  jsii.Number(1024),
 		Timeout:     awscdk.Duration_Seconds(jsii.Number(900)),
+		chatHandlerVersion := chatHandler.CurrentVersion()
+		chatHandlerAlias := awslambda.NewAlias(stack, jsii.String("ChatHandlerAlias"), &awslambda.AliasProps{
+			AliasName: jsii.String("chatHandlerAliasProd"),
+			Version:   chatHandlerVersion,
+			ProvisionedConcurrentExecutions: jsii.Number(1),
+		})
 	})
 
 	httpApi.AddRoutes(&awscdkapigatewayv2alpha.AddRoutesOptions{
