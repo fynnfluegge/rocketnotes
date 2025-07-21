@@ -48,7 +48,7 @@ It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/ser
 - 📥 **Zettelkasten with Agentic Archiving**: An AI agent analyzes snippets from your "inbox" and intelligently files them into the most relevant existing document.
 - 🗣️ **Speech-to-Text Note Taking**: Dictate your notes instead of typing them.
 - 📦 **Local Mode with Docker**: Run the entire application on your own machine using Ollama for 100% local and private AI processing.
-- ⚙️ **MCP Server Integration**: Allows for advanced configurations and system administration.
+- ⚙️ **MCP Server Integration**: Integrate your knowledge base as MCP to use it with any LLM application.
 - 🎮 **Neovim Plugin**: Integrate your note-taking directly into the Neovim code editor.
 
 ## 🛠️ Tech Stack
@@ -80,7 +80,7 @@ It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/ser
 ## ✍️ LLM-powered text completions
 
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/4785ec34-676f-46b0-96b7-c8761f96bd24" width="680">
+  <img src="https://github.com/user-attachments/assets/ee8bc520-71fd-498d-b7f1-042a28884446" width="680">
 </div>
 
 &nbsp;

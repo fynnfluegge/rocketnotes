@@ -2,7 +2,6 @@ package main
 
 import (
 	"os"
-	"strconv"
 
 	"github.com/aws/aws-cdk-go/awscdk/v2"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsapigatewayv2"
@@ -34,7 +33,6 @@ type RocketnotesStackProps struct {
 	CognitoUserPoolId  string
 	Domain             string
 	Subdomain          string
-	DeployLandingPage  string
 }
 
 func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesStackProps) awscdk.Stack {
@@ -446,6 +444,13 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		Timeout:     awscdk.Duration_Seconds(jsii.Number(900)),
 	})
 
+	chatHandlerVersion := chatHandler.CurrentVersion()
+	awslambda.NewAlias(stack, jsii.String("ChatHandlerAlias"), &awslambda.AliasProps{
+		AliasName:                       jsii.String("chatHandlerAliasProd"),
+		Version:                         chatHandlerVersion,
+		ProvisionedConcurrentExecutions: jsii.Number(1),
+	})
+
 	httpApi.AddRoutes(&awscdkapigatewayv2alpha.AddRoutesOptions{
 		Path:        jsii.String("/chat"),
 		Authorizer:  httpApiAuthorizer,
@@ -631,89 +636,6 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		})
 	}
 
-	// Deploy landing page and electron installer if explicitly specified in environment variables
-	if _, err := strconv.ParseBool(props.DeployLandingPage); err == nil {
-
-		// landing page
-
-		landingPageViewerCertificate := awscloudfront.ViewerCertificate_FromAcmCertificate(
-			certificateArn,
-			&awscloudfront.ViewerCertificateOptions{
-				SslMethod:      awscloudfront.SSLMethod_SNI,
-				SecurityPolicy: awscloudfront.SecurityPolicyProtocol_TLS_V1_1_2016,
-				Aliases:        jsii.Strings("www." + props.Domain),
-			},
-		)
-
-		landingPageBucket := awss3.NewBucket(stack, jsii.String("LandingPageS3Bucket"), &awss3.BucketProps{
-			BucketName:           jsii.String(props.Domain),
-			WebsiteIndexDocument: jsii.String("index.html"),
-			WebsiteErrorDocument: jsii.String("index.html"),
-			PublicReadAccess:     jsii.Bool(true),
-			BlockPublicAccess:    awss3.BlockPublicAccess_BLOCK_ACLS(),
-			AccessControl:        awss3.BucketAccessControl_BUCKET_OWNER_FULL_CONTROL,
-		})
-
-		landingPageBucket.AddToResourcePolicy(awsiam.NewPolicyStatement(&awsiam.PolicyStatementProps{
-			Actions:   jsii.Strings("s3:GetObject"),
-			Resources: jsii.Strings(*landingPageBucket.ArnForObjects(jsii.String("*"))),
-			Principals: &[]awsiam.IPrincipal{
-				awsiam.NewCanonicalUserPrincipal(cloudfrontOAI.CloudFrontOriginAccessIdentityS3CanonicalUserId()),
-			},
-		}))
-
-		landingPageCloudFrontDistribution := awscloudfront.NewCloudFrontWebDistribution(stack, jsii.String("MyCloudFrontDistribution"), &awscloudfront.CloudFrontWebDistributionProps{
-			ViewerCertificate: landingPageViewerCertificate,
-			ErrorConfigurations: &[]*awscloudfront.CfnDistribution_CustomErrorResponseProperty{
-				{
-					ErrorCode:          jsii.Number(403),
-					ResponseCode:       jsii.Number(200),
-					ErrorCachingMinTtl: jsii.Number(300),
-					ResponsePagePath:   jsii.String("/index.html"),
-				},
-			},
-			OriginConfigs: &[]*awscloudfront.SourceConfiguration{
-				{
-					S3OriginSource: &awscloudfront.S3OriginConfig{
-						S3BucketSource:       landingPageBucket,
-						OriginAccessIdentity: cloudfrontOAI,
-					},
-					Behaviors: &[]*awscloudfront.Behavior{
-						{
-							IsDefaultBehavior: jsii.Bool(true),
-							Compress:          jsii.Bool(true),
-							AllowedMethods:    awscloudfront.CloudFrontAllowedMethods_GET_HEAD_OPTIONS,
-						},
-					},
-				},
-			},
-		})
-
-		awsroute53.NewARecord(stack, jsii.String("LaningPageSiteAliasRecord"), &awsroute53.ARecordProps{
-			RecordName: jsii.String("www." + props.Domain),
-			Target:     awsroute53.RecordTarget_FromAlias(awsroute53targets.NewCloudFrontTarget(landingPageCloudFrontDistribution)),
-			Zone:       zone,
-		})
-
-		awss3deployment.NewBucketDeployment(stack, jsii.String("LaningPageS3BucketDeployment"), &awss3deployment.BucketDeploymentProps{
-			Sources: &[]awss3deployment.ISource{
-				awss3deployment.Source_Asset(jsii.String("../landing-page/build"), &awss3assets.AssetOptions{}),
-			},
-			DestinationBucket: landingPageBucket,
-			Distribution:      landingPageCloudFrontDistribution,
-			DistributionPaths: jsii.Strings("/*"),
-		})
-
-		// Electron installer bucket
-
-		awss3.NewBucket(stack, jsii.String("ElectronReleaseS3Bucket"), &awss3.BucketProps{
-			BucketName:        jsii.String("rocketnotes-electron-releases"),
-			PublicReadAccess:  jsii.Bool(true),
-			BlockPublicAccess: awss3.BlockPublicAccess_BLOCK_ACLS(),
-			AccessControl:     awss3.BucketAccessControl_BUCKET_OWNER_FULL_CONTROL,
-		})
-	}
-
 	awscdk.NewCfnOutput(stack, jsii.String("apiUrl"), &awscdk.CfnOutputProps{
 		Value:       httpApi.Url(),
 		Description: jsii.String("HTTP API endpoint URL"),
@@ -733,7 +655,6 @@ func main() {
 		os.Getenv("COGNITO_USER_POOL_ID"),
 		os.Getenv("DOMAIN"),
 		os.Getenv("SUBDOMAIN"),
-		os.Getenv("DEPLOY_LANDING_PAGE"),
 	})
 
 	app.Synth(nil)
