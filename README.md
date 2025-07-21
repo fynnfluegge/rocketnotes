@@ -80,7 +80,7 @@ It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/ser
 ## ✍️ LLM-powered text completions
 
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/4785ec34-676f-46b0-96b7-c8761f96bd24" width="680">
+  <img src="https://github.com/user-attachments/assets/ee8bc520-71fd-498d-b7f1-042a28884446" width="680">
 </div>
 
 &nbsp;
