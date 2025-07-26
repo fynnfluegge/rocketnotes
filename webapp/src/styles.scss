@@ -402,9 +402,11 @@ code {
 
 .header-title-bar {
   display: flex;
-  justify-content: center;
+  flex-wrap: wrap;
+  justify-content: space-between;
   align-items: center;
-  position: relative;
+  margin-bottom: 16px;
+  gap: 16px;
 }
 
 .title {
@@ -412,6 +414,13 @@ code {
   margin: 6px 0px 6px 0px;
   text-align: center;
   flex-grow: 1;
+}
+
+.zettel-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
 }
 
 .title-button-icon {

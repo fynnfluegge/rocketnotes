@@ -88,15 +88,7 @@
 <div style="margin-top: 50px; height: calc(100% - 80px); overflow: auto">
   <div style="max-width: 800px; margin: auto">
     <div class="header-title-bar">
-      <button
-        (click)="openVibeInsertDialog()"
-        data-title="Enrich existing documents with inbox notes by agentic AI"
-        class="btn btn-default btn-primary btn-fade tooltip-bottom expand llm-button"
-      >
-        <span class="llm-icon"></span>
-        <span class="llm-button-text">Insert Agent</span>
-      </button>
-      <p class="title" style="text-indent: -128px">Zettelkasten Inbox</p>
+      <p class="title">Zettelkasten Inbox</p>
     </div>
     <div class="post-it" style="width: 100%; margin-bottom: 16px">
       <textarea
@@ -114,40 +106,46 @@
       >
       </textarea>
     </div>
-    <button
-      *ngIf="!isRecording && speechToTextEnabled"
-      (click)="recordNote()"
-      data-title="Record a note using speech-to-text"
-      style="float: left"
-      class="btn btn-default btn-primary btn-fade tooltip-bottom expand llm-button"
-    >
-      <span class="llm-icon"></span>
-      <span class="llm-button-text"
-        >Record Note
-        <i class="fas fa-microphone"></i>
-      </span>
-    </button>
-    <button
-      *ngIf="isRecording && speechToTextEnabled"
-      (click)="stopRecord()"
-      style="float: left"
-      class="btn btn-default btn-primary btn-fade expand llm-button"
-    >
-      <span class="llm-icon"></span>
-      <span class="llm-button-text">
-        Stop Recording
-        <i class="far fa-stop-circle blinking-button"></i>
-      </span>
-    </button>
-    <button
-      (click)="saveNote()"
-      style="float: right"
-      class="btn btn-default btn-primary"
-    >
-      Save Note
-    </button>
-    <br />
-    <br />
+    <div class="zettel-actions">
+      <button
+        *ngIf="!isRecording && speechToTextEnabled"
+        (click)="recordNote()"
+        data-title="Record a note using speech-to-text"
+        class="btn btn-default btn-primary btn-fade tooltip-bottom expand llm-button"
+      >
+        <span class="llm-icon"></span>
+        <span class="llm-button-text"
+          >Record Note
+          <i class="fas fa-microphone"></i>
+        </span>
+      </button>
+      <button
+        *ngIf="isRecording && speechToTextEnabled"
+        (click)="stopRecord()"
+        class="btn btn-default btn-primary btn-fade expand llm-button"
+      >
+        <span class="llm-icon"></span>
+        <span class="llm-button-text">
+          Stop Recording
+          <i class="far fa-stop-circle blinking-button"></i>
+        </span>
+      </button>
+      <button
+        (click)="openVibeInsertDialog()"
+        data-title="Enrich existing documents with inbox notes by agentic AI"
+        class="btn btn-default btn-primary btn-fade tooltip-bottom expand llm-button"
+      >
+        <span class="llm-icon"></span>
+        <span class="llm-button-text">Insert Agent</span>
+      </button>
+      <button
+        (click)="saveNote()"
+        style="margin-left: auto"
+        class="btn btn-default btn-primary"
+      >
+        Save Note
+      </button>
+    </div>
     <div *ngFor="let item of contentMap | keyvalue">
       <br />
       <div

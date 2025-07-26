@@ -4,25 +4,7 @@
   (document:keydown.esc)="cancelEdit()"
 >
   <div class="header-title-bar">
-    <button
-      *ngIf="aiCompletionEnabled && !isMobileDevice"
-      (click)="toggleAiCompletion()"
-      data-title="Disable AI Text Completion"
-      class="btn btn-default btn-primary btn-fade tooltip-bottom expand llm-button"
-    >
-      <span class="llm-icon"></span>
-      <span class="llm-button-text">Disable text completion</span>
-    </button>
-    <button
-      *ngIf="!aiCompletionEnabled && !isMobileDevice"
-      (click)="toggleAiCompletion()"
-      data-title="Enable AI text completion ayto suggestions"
-      class="btn btn-default btn-primary btn-fade tooltip-bottom expand llm-button"
-    >
-      <span class="llm-icon"></span>
-      <span class="llm-button-text">Enable text completion</span>
-    </button>
-    <span class="title" style="text-indent: -96px">{{ title }}</span>
+    <span class="title">{{ title }}</span>
     <button
       *ngIf="!isPublic"
       id="share-button"
@@ -51,18 +33,22 @@
   </div>
 
   <div
-    style="resize: none; margin-top: 4px; display: inline-block; height: 100%"
+    style="resize: none; display: inline-block; height: 100%"
     *ngIf="editorMode"
     class="variable-textarea"
-    [style.width]="showPreview ? 'calc(50% - 4px)' : '100%'">
-    <app-markdown-menu (applyMarkdown)="applyMarkdown($event)" (transcribedText)="appendToContent($event)"></app-markdown-menu>
+    [style.width]="showPreview ? 'calc(50% - 4px)' : '100%'"
+  >
+    <app-markdown-menu
+      (applyMarkdown)="applyMarkdown($event)"
+      (transcribedText)="appendToContent($event)"
+    ></app-markdown-menu>
     <textarea
       id="markdownTextarea"
       class="markdown-textarea"
       [(ngModel)]="content"
       (keydown)="onKeydown($event)"
       style="
-        height: calc(100% - 40px);
+        height: calc(100% - 84px);
         width: 100%;
         resize: none;
         padding: 8px;
@@ -79,7 +65,7 @@
     class="variable-binding"
     [data]="content"
     style="
-      height: calc(100% - 8px);
+      height: calc(100% - 24px);
       overflow-y: scroll;
       margin-top: 8px;
       padding: 12px;
@@ -96,7 +82,7 @@
     [data]="content"
     style="
       width: 100%;
-      height: 100%;
+      height: calc(100% - 16px);
       max-width: 1320px;
       float: none;
       margin: auto;
@@ -145,6 +131,23 @@
   >
     <i [ngClass]="'fa-solid fa-save'"></i>
     Save
+  </button>
+  &nbsp;&nbsp;
+  <button
+    *ngIf="aiCompletionEnabled && !isMobileDevice && editorMode"
+    (click)="toggleAiCompletion()"
+    class="btn btn-default btn-primary btn-fade llm-button"
+  >
+    <span class="llm-icon"></span>
+    <span class="llm-button-text">Disable text completion</span>
+  </button>
+  <button
+    *ngIf="!aiCompletionEnabled && !isMobileDevice && editorMode"
+    (click)="toggleAiCompletion()"
+    class="btn btn-default btn-primary btn-fade llm-button"
+  >
+    <span class="llm-icon"></span>
+    <span class="llm-button-text">Enable text completion</span>
   </button>
   &nbsp;&nbsp;
 </div>
