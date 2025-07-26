@@ -19,7 +19,7 @@
 
 &nbsp;
 
-Rocketnotes is a web-based Markdown note taking app with native AI feature integrations like chat, text completion, voice-to-text transcriptions and agentic document archiving.
+Rocketnotes is a web-based Markdown note taking app with native AI feature integrations like chat, text completion, voice-to-text transcriptions and agentic document archiving.  
 It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/serverless-rag-on-aws-bf8029f8bffd) built with
 [langchain](https://github.com/langchain-ai/langchain),
 [langgraph](https://langchain-ai.github.io/langgraph),
@@ -32,9 +32,8 @@ It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/ser
 - [Sign Up](https://takeniftynotes.auth.eu-central-1.amazoncognito.com/login?response_type=code&client_id=tt3v27pnqqh7elqdvq9tgmr9v&redirect_uri=https://app.takeniftynotes.net) for free and use it as a web or Electron app
 - Run it 100% [locally with Docker](INSTALLATION.md#run-with-docker)
 - Check [Contribution Guide](CONTRIBUTING.md#contributing-guide) how to setup a local dev environment
-- Host yourself on AWS
+- Self-hosting on AWS
 
-&nbsp;
 
 <div align="center">
   
