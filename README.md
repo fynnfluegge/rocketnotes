@@ -19,8 +19,7 @@
 
 &nbsp;
 
-
-Rocketnotes is a web-based Markdown note taking app with LLM-powered chat, text completion and agentic document archiving.  
+Rocketnotes is a web-based Markdown note taking app with native AI feature integrations like chat, text completion, voice-to-text transcriptions and agentic document archiving.
 It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/serverless-rag-on-aws-bf8029f8bffd) built with
 [langchain](https://github.com/langchain-ai/langchain),
 [langgraph](https://langchain-ai.github.io/langgraph),
@@ -28,11 +27,21 @@ It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/ser
 [sentence-transformers](https://github.com/UKPLab/sentence-transformers),
 [Ollama](https://github.com/jmorganca/ollama).
 
-## 🚀 How to use
+## How to use
 
 - [Sign Up](https://takeniftynotes.auth.eu-central-1.amazoncognito.com/login?response_type=code&client_id=tt3v27pnqqh7elqdvq9tgmr9v&redirect_uri=https://app.takeniftynotes.net) for free and use it as a web or Electron app
 - Run it 100% [locally with Docker](INSTALLATION.md#run-with-docker)
 - Check [Contribution Guide](CONTRIBUTING.md#contributing-guide) how to setup a local dev environment
+- Host yourself on AWS
+
+&nbsp;
+
+<div align="center">
+  
+![rocketnotes_theme](https://github.com/user-attachments/assets/cccfba22-803a-4135-8c08-eca1bd229768)
+
+</div>
+
 
 ## ✨ Features
 
@@ -46,7 +55,7 @@ It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/ser
 - 🤖 **Chat with Your Documents**: Ask questions in natural language and get answers synthesized from your own documents.
 - ✨ **Multi-LLM Support**: Seamlessly switch between different Large Language Models, with current support for OpenAI, Anthropic and Together AI models.
 - 📥 **Zettelkasten with Agentic Archiving**: An AI agent analyzes snippets from your "inbox" and intelligently files them into the most relevant existing document.
-- 🗣️ **Speech-to-Text Note Taking**: Dictate your notes instead of typing them.
+- 🗣️ **Voice-to-Text Note Taking**: Dictate your notes instead of typing them.
 - 📦 **Local Mode with Docker**: Run the entire application on your own machine using Ollama for 100% local and private AI processing.
 - ⚙️ **MCP Server Integration**: Integrate your knowledge base as MCP to use it with any LLM application.
 - 🎮 **Neovim Plugin**: Integrate your note-taking directly into the Neovim code editor.
@@ -60,19 +69,9 @@ It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/ser
 - **Database**: DynamoDB
 - **Storage**: S3
 
-&nbsp;
-
-<div align="center">
-  
-![rocketnotes_theme](https://github.com/fynnfluegge/rocketnotes/assets/16321871/6f5cf350-4560-4262-896e-44bd059b2f93)
-
-</div>
-
-&nbsp;
-
 ## 💬 Chat with your documents
 
-- 🤖 Use LLMs together with vector embeddings to chat with your documents or do semantic search.
+- 🤖 Use LLMs together with vector embeddings to chat with your documents.
 <div align="center">
   <img width="812" alt="Screenshot 2025-06-14 at 16 40 53" src="https://github.com/user-attachments/assets/5051be74-9e7d-41c4-bc2b-a1d9d5c75606" />
 </div>
@@ -85,10 +84,9 @@ It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/ser
 
 &nbsp;
 
-## 💻 Create code documents with syntax highlighting
+## 💻 Code documents with syntax highlighting
 
-- 💻 Create useful code snippets in your favourite programming language with syntax highlighting.
-- 🌐 Share documents with external users.
+- Create useful code snippets in your favourite programming language with syntax highlighting.
 <div align="center">
   <img width="812" alt="Screenshot 2025-06-14 at 15 11 32" src="https://github.com/user-attachments/assets/c0bf47bd-644d-4a34-83dd-2344905bff5f" />
 </div>
@@ -115,12 +113,12 @@ It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/ser
 
 ## 📥 Zettelkasten inbox with agentic archiving
 
-- ✍️ Save your daily note snippets into zettelkasten inbox.
+- ✍️ Save your daily note snippets into zettelkasten inbox by typing or voice recording.
 <div align="center">
   <img width="640" alt="Screenshot 2025-07-08 at 22 15 47" src="https://github.com/user-attachments/assets/6fbf86ce-4e2f-42b2-b6dc-fd32ce2ffe2f" />
 </div>
 
-- 📥 Insert note snippets into most relevant documents by AI agent workflows.
+- 🤖 Insert note snippets into most relevant documents by AI agent workflows.
 <div align="center">
   <img width="640" alt="Screenshot 2025-07-08 at 22 18 07" src="https://github.com/user-attachments/assets/bd5e7a7b-17fb-48eb-861d-da7241a02fc2" />
 </div>
