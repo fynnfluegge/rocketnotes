@@ -10,7 +10,7 @@ dependencies = [
 	"faiss-cpu==1.11.0",
 	"langchain==0.3.24",
 	"langchain-anthropic==0.3.12",
-	"langchain-community==0.3.23",
+	"langchain-community==0.3.27",
 	"langchain-core==0.3.56",
 	"langchain-openai==0.3.14",
 	"langchain-text-splitters==0.3.8",
