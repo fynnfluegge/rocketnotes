@@ -1,4 +1,10 @@
-import { Component, HostListener, Input, OnInit } from '@angular/core';
+import {
+  Component,
+  HostListener,
+  Input,
+  OnInit,
+  ChangeDetectorRef,
+} from '@angular/core';
 import { Document } from 'src/app/model/document.model';
 import { Zettel } from 'src/app/model/zettel.model';
 import { AudioRecordingService } from 'src/app/service/audio-recording.service';
@@ -23,6 +29,8 @@ export class ZettelkastenComponent implements OnInit {
   suggestionMap: Map<string, Document[]> = new Map();
   isLoadingMap: Map<string, boolean> = new Map();
   tooltips: Map<string, string> = new Map();
+  dropdownOpenMap: Map<string, boolean> = new Map();
+  openDropdownId: string | null = null;
   llmEnabled: boolean = false;
   speechToTextEnabled: boolean = false;
 
@@ -35,6 +43,7 @@ export class ZettelkastenComponent implements OnInit {
   constructor(
     private basicRestService: BasicRestService,
     private audioRecordingService: AudioRecordingService,
+    private cdr: ChangeDetectorRef,
   ) {
     this.llmEnabled = localStorage.getItem('config') !== null;
     const config = JSON.parse(localStorage.getItem('config'));
@@ -77,6 +86,7 @@ export class ZettelkastenComponent implements OnInit {
           );
           this.editMap.set(element.id, false);
           this.isLoadingMap.set(element.id, false);
+          this.dropdownOpenMap.set(element.id, false);
         });
       });
   }
@@ -90,6 +100,9 @@ export class ZettelkastenComponent implements OnInit {
         this.textareaContent,
         new Date(),
       );
+      this.editMap.set(id, false);
+      this.isLoadingMap.set(id, false);
+      this.dropdownOpenMap.set(id, false);
       this.textareaContent = '';
     }
     this.basicRestService
@@ -125,6 +138,9 @@ export class ZettelkastenComponent implements OnInit {
   }
 
   async archive(id: string) {
+    // Close the dropdown
+    this.openDropdownId = null;
+
     this.isLoadingMap.set(id, true);
     this.basicRestService
       .post('semanticSearch', {
@@ -335,5 +351,35 @@ export class ZettelkastenComponent implements OnInit {
 
   onTooltipMouseEnter(event: MouseEvent) {
     this.handleMouseEnterOnTooltipTrigger(event.currentTarget as Element);
+  }
+
+  toggleDropdown(id: string, event?: Event) {
+    if (event) {
+      event.stopPropagation();
+      event.preventDefault();
+    }
+
+    // Toggle logic
+    if (this.openDropdownId === id) {
+      this.openDropdownId = null; // Close if already open
+    } else {
+      this.openDropdownId = id; // Open this dropdown, close others
+    }
+
+    // Force change detection
+    this.cdr.detectChanges();
+  }
+
+  isDropdownOpen(id: string): boolean {
+    return this.openDropdownId === id;
+  }
+
+  @HostListener('document:click', ['$event'])
+  closeDropdownsOnOutsideClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    // Don't close if clicking on the three-dots button or dropdown content
+    if (!target.closest('.dropdown-container')) {
+      this.openDropdownId = null;
+    }
   }
 }

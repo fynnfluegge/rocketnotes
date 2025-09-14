@@ -444,13 +444,6 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 		Timeout:     awscdk.Duration_Seconds(jsii.Number(900)),
 	})
 
-	// chatHandlerVersion := chatHandler.CurrentVersion()
-	// awslambda.NewAlias(stack, jsii.String("ChatHandlerAlias"), &awslambda.AliasProps{
-	// 	AliasName:                       jsii.String("chatHandlerAliasProd"),
-	// 	Version:                         chatHandlerVersion,
-	// 	ProvisionedConcurrentExecutions: jsii.Number(1),
-	// })
-
 	httpApi.AddRoutes(&awscdkapigatewayv2alpha.AddRoutesOptions{
 		Path:        jsii.String("/chat"),
 		Authorizer:  httpApiAuthorizer,

@@ -420,7 +420,7 @@ code {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 16px;
+  margin-bottom: 4px;
 }
 
 .title-button-icon {
@@ -478,8 +478,8 @@ code {
   margin-right: 2px !important;
   margin-left: 4px;
   background-color: #00ff7f !important;
-  -webkit-mask: url("./assets/icons/png/ai-stars-icon_256.png") no-repeat center;
-  mask: url("./assets/icons/png/ai-stars-icon_256.png") no-repeat center;
+  -webkit-mask: url("assets/icons/png/ai-stars-icon_256.png") no-repeat center;
+  mask: url("assets/icons/png/ai-stars-icon_256.png") no-repeat center;
   -webkit-mask-size: contain;
   mask-size: contain;
 }
