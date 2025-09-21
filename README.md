@@ -34,10 +34,9 @@ It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/ser
 - Check [Contribution Guide](CONTRIBUTING.md#contributing-guide) how to setup a local dev environment
 - Self-hosting on AWS
 
-
 <div align="center">
   
-![rocketnotes_theme](https://github.com/user-attachments/assets/cccfba22-803a-4135-8c08-eca1bd229768)
+![rocketnotes_theme](https://github.com/user-attachments/assets/0f7c4017-3833-428f-8a1a-67fb0c76220a)
 
 </div>
 
