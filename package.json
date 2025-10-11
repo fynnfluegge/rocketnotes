@@ -4,7 +4,7 @@
   "description": "AI-powered markdown editor - leverage vector embeddings and LLMs with your personal notes - 100% local or in the cloud",
   "scripts": {
     "install": "cd webapp && npm install",
-    "start-services": "docker-compose up dynamodb s3 -d",
+    "start-services": "docker-compose up dynamodb s3 chroma -d",
     "init-db": "sh ./dynamodb-init.sh",
     "build-api": "sam build",
     "start-api": "sam local start-api --docker-network rocketnotes_local-serverless-network --warm-containers EAGER",

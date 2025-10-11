@@ -1,12 +1,10 @@
 import os
-from pathlib import Path
-
 import boto3
 from langchain.embeddings.base import Embeddings
-from langchain_community.vectorstores import FAISS
 from langchain_core.language_models import BaseChatModel
 
 from .model import InsertSuggestion, NoteSnippet, UserConfig
+from .vector_store_factory import get_vector_store_factory
 
 is_local = os.environ.get("LOCAL", False)
 s3_args = {}
@@ -17,6 +15,7 @@ if is_local:
 s3 = boto3.client("s3", **s3_args)
 
 
+
 def find_insert_position(
     user_config: UserConfig,
     embeddings: Embeddings,
@@ -25,21 +24,8 @@ def find_insert_position(
     bucket_name: str,
 ) -> list[InsertSuggestion]:
 
-    file_path = f"/tmp/{user_config.id}"
-    Path(file_path).mkdir(parents=True, exist_ok=True)
-    load_from_s3(
-        user_config.id + ".faiss", f"{file_path}/{user_config.id}.faiss", bucket_name
-    )
-    load_from_s3(
-        user_config.id + ".pkl", f"{file_path}/{user_config.id}.pkl", bucket_name
-    )
-
-    db = FAISS.load_local(
-        index_name=user_config.id,
-        folder_path=file_path,
-        embeddings=embeddings,
-        allow_dangerous_deserialization=True,
-    )
+    # Get vector store for the user (S3 for prod, Chroma for local)
+    db = get_vector_store_factory(user_config.id, embeddings)
 
     result: list[InsertSuggestion] = []
     for note in notes:
@@ -50,7 +36,7 @@ def find_insert_position(
                 {
                     "documentId": item.metadata["documentId"],
                     "title": item.metadata["title"],
-                    "content": item.metadata["original_content"].decode("utf-8"),
+                    "content": item.metadata["original_content"],  # Now stored as string, no decode needed
                 }
             )
 
@@ -94,12 +80,3 @@ def find_insert_position(
             )
 
     return result
-
-
-def load_from_s3(key, file_path, bucket_name):
-    try:
-        s3.download_file(Bucket=bucket_name, Key=key, Filename=file_path)
-        return True
-    except Exception as e:
-        print(f"Error getting object from S3: {e}")
-        return False

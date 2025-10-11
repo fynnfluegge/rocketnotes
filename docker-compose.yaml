@@ -62,10 +62,25 @@ services:
     networks:
       - local-serverless-network
 
+  chroma:
+    image: chromadb/chroma:0.4.24
+    container_name: rocketnotes-chroma
+    ports:
+      - "8000:8000"
+    volumes:
+      - chroma-volume:/chroma/chroma
+    environment:
+      - IS_PERSISTENT=TRUE
+      - ANONYMIZED_TELEMETRY=TRUE
+    networks:
+      - local-serverless-network
+
 volumes:
   dynamodb-volume:
     driver: local
   s3-volume:
+    driver: local
+  chroma-volume:
     driver: local
 
 networks:

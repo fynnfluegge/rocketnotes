@@ -1,29 +1,44 @@
 import json
+import logging
 import os
-from pathlib import Path
-
 import boto3
 from langchain.schema import Document
-from langchain_community.vectorstores import FAISS
 from langchain_text_splitters import MarkdownHeaderTextSplitter
 
 from rocketnotes_handler.lib.util import get_embeddings_model, get_user_config
+from rocketnotes_handler.lib.vector_store_factory import (
+    get_vector_store_factory,
+    create_vector_store_from_documents,
+    delete_document_vectors
+)
 
 is_local = os.environ.get("LOCAL", False)
-s3_args = {}
-dynamodb_args = {}
 
-if is_local:
-    s3_args["endpoint_url"] = "http://s3:9090"
-    dynamodb_args["endpoint_url"] = "http://dynamodb:8000"
 
-s3 = boto3.client("s3", **s3_args)
-dynamodb = boto3.client("dynamodb", **dynamodb_args)
+def get_boto3_clients():
+    """Get configured boto3 clients"""
+    s3_args = {}
+    dynamodb_args = {}
+
+    # Set default region if not specified
+    if not os.environ.get("AWS_DEFAULT_REGION"):
+        s3_args["region_name"] = "us-east-1"
+        dynamodb_args["region_name"] = "us-east-1"
+
+    if is_local:
+        s3_args["endpoint_url"] = "http://s3:9090"
+        dynamodb_args["endpoint_url"] = "http://dynamodb:8000"
+
+    s3 = boto3.client("s3", **s3_args)
+    dynamodb = boto3.client("dynamodb", **dynamodb_args)
+
+    return s3, dynamodb
 
 documents_table_name = "tnn-Documents"
 vector_table_name = "tnn-Vectors"
 userConfig_table_name = "tnn-UserConfig"
-bucket_name = os.environ["BUCKET_NAME"]
+bucket_name = os.environ.get("BUCKET_NAME", "default-bucket")
+vector_bucket_name = os.environ.get("VECTOR_BUCKET_NAME", bucket_name)
 
 
 def handler(event, context):
@@ -37,6 +52,9 @@ def handler(event, context):
     documentIds = message.get("documentIds", [])
     recreateIndex = message.get("recreateIndex", False)
     deleteVectors = message.get("deleteVectors", False)
+
+    # Get boto3 clients
+    s3, dynamodb = get_boto3_clients()
 
     user_config_search_result = dynamodb.get_item(
         TableName=userConfig_table_name,
@@ -60,27 +78,14 @@ def handler(event, context):
         embeddings = get_embeddings_model(user_config)
 
     try:
-        file_path = f"/tmp/{userId}"
-        file_name = "faiss_index"
-        Path(file_path).mkdir(parents=True, exist_ok=True)
-        faiss_index_exists = load_from_s3(
-            f"{userId}.faiss",
-            f"{file_path}/{file_name}.faiss",
-        )
+        # Get vector store for the user (S3 for prod, Chroma for local)
+        vector_store = get_vector_store_factory(userId, embeddings)
 
         if deleteVectors:
-            db = load_faiss_index_from_s3(userId, file_path, file_name, embeddings)
-            delete_document_vectors_from_faiss_index(documentId, db)
-            delete_document_vectors_from_dynamodb(documentId)
-            db.save_local(index_name=file_name, folder_path=file_path)
-            save_to_s3(userId + ".faiss", file_path + "/" + file_name + ".faiss")
-            save_to_s3(userId + ".pkl", file_path + "/" + file_name + ".pkl")
-        # Vectors already exists and documentId present
-        # Update only document vectors
-        # --------------------------------------------
-        elif faiss_index_exists and documentId and not recreateIndex:
+            delete_document_vectors(documentId, vector_store)
+        # Update single document vectors
+        elif documentId and not recreateIndex:
             try:
-                db = load_faiss_index_from_s3(userId, file_path, file_name, embeddings)
                 document = dynamodb.get_item(
                     TableName="tnn-Documents",
                     Key={"id": {"S": documentId}},
@@ -92,18 +97,16 @@ def handler(event, context):
                     }
 
                 document = document["Item"]
-                delete_document_vectors_from_faiss_index(documentId, db)
-                delete_document_vectors_from_dynamodb(documentId)
-                save_document_vectors_to_faiss_index(document, db)
-                db.save_local(index_name=file_name, folder_path=file_path)
-                save_to_s3(userId + ".faiss", file_path + "/" + file_name + ".faiss")
-                save_to_s3(userId + ".pkl", file_path + "/" + file_name + ".pkl")
+                # Delete existing vectors for this document
+                delete_document_vectors(documentId, vector_store)
+                # Add updated vectors
+                save_document_vectors(document, vector_store)
             except Exception as e:
                 print(f"Error updating document vectors: {e}")
 
-        elif faiss_index_exists and documentIds and not recreateIndex:
+        # Update multiple document vectors
+        elif documentIds and not recreateIndex:
             try:
-                db = load_faiss_index_from_s3(userId, file_path, file_name, embeddings)
                 for documentId in documentIds:
                     document = dynamodb.get_item(
                         TableName="tnn-Documents",
@@ -116,20 +119,16 @@ def handler(event, context):
                         }
 
                     document = document["Item"]
-                    delete_document_vectors_from_faiss_index(documentId, db)
-                    delete_document_vectors_from_dynamodb(documentId)
-                    save_document_vectors_to_faiss_index(document, db)
-                db.save_local(index_name=file_name, folder_path=file_path)
-                save_to_s3(userId + ".faiss", file_path + "/" + file_name + ".faiss")
-                save_to_s3(userId + ".pkl", file_path + "/" + file_name + ".pkl")
+                    # Delete existing vectors for this document
+                    delete_document_vectors(documentId, vector_store)
+                    # Add updated vectors
+                    save_document_vectors(document, vector_store)
             except Exception as e:
                 print(f"Error updating document vectors: {e}")
 
 
-        # Faiss index does not exist or should be recreated
-        # Recreate all vectors for all documents
-        # ---------------------------------------------------------
-        elif not faiss_index_exists or recreateIndex:
+        # Recreate all vectors for all documents (or initial creation)
+        elif recreateIndex:
             print("Recreating index for userId: ", userId)
             filter_expression = "userId = :user_value"
             expression_attribute_values = {
@@ -167,19 +166,22 @@ def handler(event, context):
                         print(
                             f"Error processing document {document['id']['S']}: ", str(e)
                         )
-                db = FAISS.from_documents(split_documents, embeddings)
-                Path(file_path).mkdir(parents=True, exist_ok=True)
-                db.save_local(index_name=file_name, folder_path=file_path)
-                save_to_s3(userId + ".faiss", file_path + "/" + file_name + ".faiss")
-                save_to_s3(userId + ".pkl", file_path + "/" + file_name + ".pkl")
-                index_to_docstore_id = db.index_to_docstore_id
-                document_vectors = get_vectors_from_faiss_index(
-                    split_documents, db, index_to_docstore_id
-                )
-                for documentId, vectors in document_vectors.items():
-                    add_vectors_to_dynamodb(documentId, vectors)
+
+                # Create new vector store with all documents
+                if split_documents:
+                    print(f"About to create vector store with {len(split_documents)} documents")
+                    vector_store = create_vector_store_from_documents(
+                        split_documents, userId, embeddings
+                    )
+                    print(f"Successfully completed create_vector_store_from_documents")
+                else:
+                    print("No split_documents found, skipping vector store creation")
 
     except Exception as e:
+        print(f"Exception caught in handler: {str(e)}")
+        print(f"Exception type: {type(e).__name__}")
+        import traceback
+        print(f"Traceback: {traceback.format_exc()}")
         return {
             "statusCode": 500,
             "headers": {
@@ -189,6 +191,7 @@ def handler(event, context):
             "body": json.dumps(f"Internal server error, {e}"),
         }
 
+    print("About to return success response")
     return {
         "statusCode": 200,
         "headers": {
@@ -199,40 +202,9 @@ def handler(event, context):
     }
 
 
-def load_faiss_index_from_s3(userId, file_path, file_name, embeddings):
-    load_from_s3(
-        f"{userId}.pkl",
-        f"{file_path}/{file_name}.pkl",
-    )
-    return FAISS.load_local(
-        index_name="faiss_index",
-        folder_path=file_path,
-        embeddings=embeddings,
-        allow_dangerous_deserialization=True,
-    )
 
 
-def save_to_s3(key, file_path):
-    try:
-        s3.upload_file(Filename=file_path, Bucket=bucket_name, Key=key)
-    except Exception as e:
-        print(f"Error saving object to S3: {e}")
-
-
-def load_from_s3(key, file_path):
-    try:
-        s3.download_file(Bucket=bucket_name, Key=key, Filename=file_path)
-        return True
-    except Exception as e:
-        return False
-
-
-def head_object_from_s3(key):
-    try:
-        response = s3.head_object(Bucket=bucket_name, Key=key)
-        return response
-    except Exception as e:
-        return None
+# S3 Vector operations no longer need file operations
 
 
 def split_document(document, documentId, title):
@@ -259,7 +231,7 @@ def split_document(document, documentId, title):
             metadata={
                 "documentId": documentId,
                 "title": title,
-                "original_content": splitted_document.page_content.encode("utf-8"),
+                "original_content": splitted_document.page_content,  # Store as string, not bytes
             },
         )
         documents.append(document)
@@ -267,85 +239,29 @@ def split_document(document, documentId, title):
     return documents
 
 
-def get_vectors_from_faiss_index(documents, db, index_to_docstore_id):
-    document_vectors = {}
-    for i in range(len(documents)):
-        document = db.docstore.search(index_to_docstore_id[i])
-        if document:
-            if document.metadata["documentId"] not in document_vectors:
-                document_vectors[document.metadata["documentId"]] = [
-                    index_to_docstore_id[i]
-                ]
-            else:
-                document_vectors[document.metadata["documentId"]].append(
-                    index_to_docstore_id[i]
-                )
-    return document_vectors
+# With S3 Vectors, we don't need to manually track vector IDs in DynamoDB
+# The vector store handles document management internally
 
 
-def add_vectors_to_dynamodb(documentId, vectors):
-    try:
-        newItem = {"id": {}, "vectors": {}}
-        newItem["id"]["S"] = documentId
-        newItem["vectors"]["SS"] = vectors
-        dynamodb.put_item(TableName=vector_table_name, Item=newItem)
-    except Exception as e:
-        print(f"Error adding vectors to DynamoDB: {e}")
-        return False
-    return True
-
-
-def save_document_vectors_to_faiss_index(document, db):
+def save_document_vectors(document, vector_store):
+    """Add document vectors to vector store (works for both S3 and Chroma)"""
     try:
         content = document["content"]["S"]
         documentId = document["id"]["S"]
         title = document["title"]["S"]
-    except Exception:
-        return {
-            "statusCode": 500,
-            "body": json.dumps("Error getting content from DynamoDB"),
-        }
-    document_splits = split_document(content, documentId, title)
-
-    if not document_splits:
-        return {
-            "statusCode": 500,
-            "body": json.dumps("Error splitting document"),
-        }
-
-    document_vectors = {}
-    for document in document_splits:
-        db.add_documents([document])
-        if document.metadata["documentId"] not in document_vectors:
-            document_vectors[document.metadata["documentId"]] = [
-                db.index_to_docstore_id[len(db.index_to_docstore_id) - 1]
-            ]
-        else:
-            document_vectors[document.metadata["documentId"]].append(
-                db.index_to_docstore_id[len(db.index_to_docstore_id) - 1]
-            )
-    add_vectors_to_dynamodb(documentId, document_vectors[documentId])
-
-
-def delete_document_vectors_from_faiss_index(documentId, db):
-    vectors = dynamodb.get_item(
-        TableName="tnn-Vectors",
-        Key={"id": {"S": documentId}},
-    )
-    if "Item" in vectors:
-        vectors = vectors["Item"]["vectors"]["SS"]
-        try:
-            db.delete(vectors)
-        except Exception as e:
-            print(f"Error deleting vectors for file {documentId}: {e}")
-
-
-def delete_document_vectors_from_dynamodb(documentId):
-    try:
-        dynamodb.delete_item(
-            TableName="tnn-Vectors",
-            Key={"id": {"S": documentId}},
-        )
+        print(f"Processing document: {documentId}, title: {title[:50]}...")
     except Exception as e:
-        print(f"Error deleting vectors for file {documentId}: {e}")
+        print(f"Error extracting document data: {e}")
+        raise Exception("Error getting content from DynamoDB")
+
+    document_splits = split_document(content, documentId, title)
+    if not document_splits:
+        raise Exception("Error splitting document")
+
+    print(f"Adding {len(document_splits)} document splits to vector store")
+    # Add documents to vector store (works for both S3 and Chroma)
+    vector_store.add_documents(document_splits)
+    print(f"Successfully added document vectors for: {documentId}")
+
+
 
