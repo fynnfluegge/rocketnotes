@@ -18,6 +18,9 @@ except ImportError as e:
     chromadb = None
     Settings = None
 
+
+from langchain_aws.vectorstores.s3_vectors import AmazonS3Vectors
+
 is_local = os.environ.get("LOCAL", False)
 
 
