@@ -71,7 +71,9 @@ services:
       - chroma-volume:/chroma/chroma
     environment:
       - IS_PERSISTENT=TRUE
-      - ANONYMIZED_TELEMETRY=TRUE
+      - ANONYMIZED_TELEMETRY=FALSE
+      - CHROMA_TELEMETRY_ENABLED=FALSE
+      - DO_NOT_TRACK=1
     networks:
       - local-serverless-network
 

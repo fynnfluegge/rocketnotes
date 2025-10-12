@@ -1,11 +1,12 @@
 import os
 from typing import Mapping
 
-from aws_cdk import Duration, Stack
+from aws_cdk import Duration, RemovalPolicy, Stack
 from aws_cdk import aws_apigatewayv2 as apigatewayv2
 from aws_cdk import aws_ecr_assets
 from aws_cdk import aws_iam as iam
 from aws_cdk import aws_lambda
+from aws_cdk import aws_s3 as s3
 from aws_cdk.aws_apigatewayv2_integrations import HttpLambdaIntegration
 from constructs import Construct
 
@@ -19,8 +20,20 @@ class RocketnotesHandlerStack(Stack):
         authorizer_id = os.getenv("AUTHORIZER_ID")
         cognito_user_pool_id = os.getenv("COGNITO_USER_POOL_ID")
         cognito_app_client_id = os.getenv("COGNITO_APP_CLIENT_ID")
-        bucket_name = os.getenv("VECTOR_DB_BUCKET_NAME")
         queue_url = os.getenv("VECTOR_QUEUE_URL")
+
+        # Create S3 bucket for vector storage
+        vector_bucket = s3.Bucket(
+            self,
+            "VectorStorageBucket",
+            bucket_name="rocketnotes-vectors",
+            versioned=False,
+            removal_policy=RemovalPolicy.RETAIN,  # Keep bucket on stack deletion
+            auto_delete_objects=False,  # Don't auto-delete objects for safety
+            public_read_access=False,
+            block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
+            encryption=s3.BucketEncryption.S3_MANAGED,
+        )
 
         insertion_lambda_function = aws_lambda.DockerImageFunction(
             self,
@@ -45,12 +58,32 @@ class RocketnotesHandlerStack(Stack):
                         "AmazonSQSFullAccess"
                     ),
                 ],
+                inline_policies={
+                    "VectorBucketAccess": iam.PolicyDocument(
+                        statements=[
+                            iam.PolicyStatement(
+                                effect=iam.Effect.ALLOW,
+                                actions=[
+                                    "s3:GetObject",
+                                    "s3:PutObject",
+                                    "s3:DeleteObject",
+                                    "s3:ListBucket",
+                                ],
+                                resources=[
+                                    vector_bucket.bucket_arn,
+                                    f"{vector_bucket.bucket_arn}/*",
+                                ],
+                            )
+                        ]
+                    )
+                },
             ),
             timeout=Duration.seconds(300),
             memory_size=1024,
             environment={
                 "QUEUE_URL": queue_url,
                 "BUCKET_NAME": bucket_name,
+                "VECTOR_BUCKET_NAME": vector_bucket.bucket_name,
             },
         )
 
@@ -73,15 +106,32 @@ class RocketnotesHandlerStack(Stack):
                     iam.ManagedPolicy.from_aws_managed_policy_name(
                         "AmazonDynamoDBReadOnlyAccess"
                     ),
-                    iam.ManagedPolicy.from_aws_managed_policy_name(
-                        "AmazonS3ReadOnlyAccess"
-                    ),
                 ],
+                inline_policies={
+                    "VectorBucketAccess": iam.PolicyDocument(
+                        statements=[
+                            iam.PolicyStatement(
+                                effect=iam.Effect.ALLOW,
+                                actions=[
+                                    "s3:GetObject",
+                                    "s3:PutObject",
+                                    "s3:DeleteObject",
+                                    "s3:ListBucket",
+                                ],
+                                resources=[
+                                    vector_bucket.bucket_arn,
+                                    f"{vector_bucket.bucket_arn}/*",
+                                ],
+                            )
+                        ]
+                    )
+                },
             ),
             timeout=Duration.seconds(300),
             memory_size=1024,
             environment={
                 "BUCKET_NAME": bucket_name,
+                "VECTOR_BUCKET_NAME": vector_bucket.bucket_name,
             },
         )
 

@@ -1,43 +1,10 @@
 import os
 
-# AGGRESSIVE telemetry disabling - try every possible environment variable
-os.environ["ANONYMIZED_TELEMETRY"] = "False"
-os.environ["ANONYMIZED_TELEMETRY"] = "0"
-os.environ["CHROMA_TELEMETRY_ENABLED"] = "False"
-os.environ["CHROMA_TELEMETRY"] = "False"
-os.environ["CHROMA_ANONYMIZED_TELEMETRY"] = "False"
-os.environ["DO_NOT_TRACK"] = "1"
-os.environ["POSTHOG_DISABLED"] = "1"
-
-# Additional approach - disable telemetry at import time
-import sys
-import warnings
-warnings.filterwarnings("ignore", category=DeprecationWarning)
-
-# Try to disable telemetry by setting it in the runtime environment
-import builtins
-original_import = builtins.__import__
-
-def patched_import(name, *args, **kwargs):
-    if name == 'posthog':
-        # Create a fake posthog module that does nothing
-        import types
-        fake_posthog = types.ModuleType('posthog')
-        fake_posthog.capture = lambda *args, **kwargs: None
-        fake_posthog.Posthog = type('Posthog', (), {'capture': lambda *args, **kwargs: None})
-        sys.modules['posthog'] = fake_posthog
-        return fake_posthog
-    return original_import(name, *args, **kwargs)
-
-builtins.__import__ = patched_import
-
-from langchain_aws.vectorstores.s3_vectors import AmazonS3Vectors
-
 # Import chromadb and langchain_chroma only for local development
 try:
-    from langchain_chroma import Chroma
     import chromadb
     from chromadb.config import Settings
+    from langchain_chroma import Chroma
 
     # ChromaDB is available - telemetry will be disabled via client_settings
     print("Shared ChromaDB vector store factory - telemetry disabled")
@@ -112,12 +79,8 @@ def get_chroma_vector_store(userId, embeddings, context=""):
 
 def get_s3_vector_store(userId, embeddings):
     """Get or create an S3 vector store for the user"""
-    # Get bucket names from environment
-    bucket_name = os.environ.get("BUCKET_NAME", "default-bucket")
-    vector_bucket_name = os.environ.get("VECTOR_BUCKET_NAME", bucket_name)
-
     return AmazonS3Vectors(
-        vector_bucket_name=vector_bucket_name,
+        vector_bucket_name="rocketnotes-vectors",
         index_name=userId,
         embeddings=embeddings
     )
