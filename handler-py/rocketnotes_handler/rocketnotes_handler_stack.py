@@ -22,19 +22,6 @@ class RocketnotesHandlerStack(Stack):
         cognito_app_client_id = os.getenv("COGNITO_APP_CLIENT_ID")
         queue_url = os.getenv("VECTOR_QUEUE_URL")
 
-        # Create S3 bucket for vector storage
-        vector_bucket = s3.Bucket(
-            self,
-            "VectorStorageBucket",
-            bucket_name="rocketnotes-vectors",
-            versioned=False,
-            removal_policy=RemovalPolicy.RETAIN,  # Keep bucket on stack deletion
-            auto_delete_objects=False,  # Don't auto-delete objects for safety
-            public_read_access=False,
-            block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
-            encryption=s3.BucketEncryption.S3_MANAGED,
-        )
-
         insertion_lambda_function = aws_lambda.DockerImageFunction(
             self,
             "VibeInsertionLambdaFunction",
