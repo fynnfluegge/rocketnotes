@@ -65,7 +65,7 @@ jobs:
       - name: Install Python dependencies and run tests
         run: |
           cd handler-py
-          uv sync --dev
+          uv sync --extra dev
           uv run python -m pytest tests/unit -v
 
       - name: build webapp
