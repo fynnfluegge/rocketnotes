@@ -113,13 +113,9 @@ def create_vector_store_from_documents(split_documents, userId, embeddings):
         return vector_store
     else:
         print(f"Creating S3 vector store with {len(split_documents)} documents")
-        # Get bucket names from environment
-        bucket_name = os.environ.get("BUCKET_NAME", "default-bucket")
-        vector_bucket_name = os.environ.get("VECTOR_BUCKET_NAME", bucket_name)
-
         vector_store = AmazonS3Vectors.from_documents(
             split_documents,
-            vector_bucket_name=vector_bucket_name,
+            vector_bucket_name="rocketnotes-vectors",
             index_name=userId,
             embedding=embeddings
         )

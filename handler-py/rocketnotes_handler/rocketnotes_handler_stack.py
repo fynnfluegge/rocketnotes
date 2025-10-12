@@ -44,33 +44,15 @@ class RocketnotesHandlerStack(Stack):
                     iam.ManagedPolicy.from_aws_managed_policy_name(
                         "AmazonSQSFullAccess"
                     ),
+                    iam.ManagedPolicy.from_aws_managed_policy_name(
+                        "AmazonS3FullAccess"
+                    ),
                 ],
-                inline_policies={
-                    "VectorBucketAccess": iam.PolicyDocument(
-                        statements=[
-                            iam.PolicyStatement(
-                                effect=iam.Effect.ALLOW,
-                                actions=[
-                                    "s3:GetObject",
-                                    "s3:PutObject",
-                                    "s3:DeleteObject",
-                                    "s3:ListBucket",
-                                ],
-                                resources=[
-                                    vector_bucket.bucket_arn,
-                                    f"{vector_bucket.bucket_arn}/*",
-                                ],
-                            )
-                        ]
-                    )
-                },
             ),
             timeout=Duration.seconds(300),
             memory_size=1024,
             environment={
                 "QUEUE_URL": queue_url,
-                "BUCKET_NAME": bucket_name,
-                "VECTOR_BUCKET_NAME": vector_bucket.bucket_name,
             },
         )
 
@@ -93,32 +75,14 @@ class RocketnotesHandlerStack(Stack):
                     iam.ManagedPolicy.from_aws_managed_policy_name(
                         "AmazonDynamoDBReadOnlyAccess"
                     ),
+                    iam.ManagedPolicy.from_aws_managed_policy_name(
+                        "AmazonS3FullAccess"
+                    ),
                 ],
-                inline_policies={
-                    "VectorBucketAccess": iam.PolicyDocument(
-                        statements=[
-                            iam.PolicyStatement(
-                                effect=iam.Effect.ALLOW,
-                                actions=[
-                                    "s3:GetObject",
-                                    "s3:PutObject",
-                                    "s3:DeleteObject",
-                                    "s3:ListBucket",
-                                ],
-                                resources=[
-                                    vector_bucket.bucket_arn,
-                                    f"{vector_bucket.bucket_arn}/*",
-                                ],
-                            )
-                        ]
-                    )
-                },
             ),
             timeout=Duration.seconds(300),
             memory_size=1024,
             environment={
-                "BUCKET_NAME": bucket_name,
-                "VECTOR_BUCKET_NAME": vector_bucket.bucket_name,
             },
         )
 
