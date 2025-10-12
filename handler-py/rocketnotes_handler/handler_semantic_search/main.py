@@ -1,26 +1,34 @@
 
 import json
 import os
-from pathlib import Path
-
 import boto3
-from langchain_community.vectorstores import FAISS
 
 from rocketnotes_handler.lib.util import get_embeddings_model, get_user_config
+from rocketnotes_handler.lib.vector_store_factory import get_vector_store_factory
 
 is_local = os.environ.get("LOCAL", False)
-s3_args = {}
-dynamodb_args = {}
 
-if is_local:
-    s3_args["endpoint_url"] = "http://s3:9090"
-    dynamodb_args["endpoint_url"] = "http://dynamodb:8000"
+def get_boto3_clients():
+    """Get configured boto3 clients"""
+    s3_args = {}
+    dynamodb_args = {}
 
-s3 = boto3.client("s3", **s3_args)
-dynamodb = boto3.client("dynamodb", **dynamodb_args)
+    # Set default region if not specified
+    if not os.environ.get("AWS_DEFAULT_REGION"):
+        s3_args["region_name"] = "us-east-1"
+        dynamodb_args["region_name"] = "us-east-1"
+
+    if is_local:
+        s3_args["endpoint_url"] = "http://s3:9090"
+        dynamodb_args["endpoint_url"] = "http://dynamodb:8000"
+
+    s3 = boto3.client("s3", **s3_args)
+    dynamodb = boto3.client("dynamodb", **dynamodb_args)
+
+    return s3, dynamodb
 
 userConfig_table_name = "tnn-UserConfig"
-bucket_name = os.environ["BUCKET_NAME"]
+
 
 def handler(event, context):
     if "body" in event:
@@ -40,6 +48,9 @@ def handler(event, context):
         search_string = request_body["searchString"]
     else:
         return {"statusCode": 400, "body": "search_string is missing"}
+
+    # Get boto3 clients
+    s3, dynamodb = get_boto3_clients()
 
     user_config_search_result = dynamodb.get_item(
         TableName=userConfig_table_name,
@@ -62,17 +73,8 @@ def handler(event, context):
     else:
         embeddings = get_embeddings_model(user_config)
 
-    file_path = f"/tmp/{userId}"
-    Path(file_path).mkdir(parents=True, exist_ok=True)
-    load_from_s3(userId + ".faiss", f"{file_path}/{userId}.faiss")
-    load_from_s3(userId + ".pkl", f"{file_path}/{userId}.pkl")
-
-    db = FAISS.load_local(
-        index_name=userId,
-        folder_path=file_path,
-        embeddings=embeddings,
-        allow_dangerous_deserialization=True,
-    )
+    # Get vector store for the user (S3 for prod, Chroma for local)
+    db = get_vector_store_factory(userId, embeddings)
 
     similarity_search_result = db.similarity_search(search_string, k=3)
     response = []
@@ -81,7 +83,7 @@ def handler(event, context):
             {
                 "documentId": result.metadata["documentId"],
                 "title": result.metadata["title"],
-                "content": result.metadata["original_content"].decode("utf-8"),
+                "content": result.metadata["original_content"],  # Now stored as string, no decode needed
             }
         )
 
@@ -90,10 +92,3 @@ def handler(event, context):
         "body": json.dumps(response),
     }
 
-def load_from_s3(key, file_path):
-    try:
-        s3.download_file(Bucket=bucket_name, Key=key, Filename=file_path)
-        return True
-    except Exception as e:
-        print(f"Error getting object from S3: {e}")
-        return False

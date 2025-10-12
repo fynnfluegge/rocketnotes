@@ -1,11 +1,11 @@
-boto3==1.38.8
-langchain==0.3.24
-langchain-community==0.3.23
+boto3==1.39.7
+langchain==0.3.26
+langchain-community==0.3.27
+langchain-aws==0.2.35
 langchain-openai==0.3.14
-langchain-core==0.3.56
+langchain-core==0.3.76
 langchain-anthropic==0.3.12
 langchain-together==0.3.0
 langgraph==0.4.8
-faiss-cpu==1.11.0
 numpy==2.2.5
 scikit-learn==1.6.1

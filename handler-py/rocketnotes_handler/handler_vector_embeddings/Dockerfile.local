@@ -1,4 +1,10 @@
-FROM public.ecr.aws/lambda/python:3.12
+FROM --platform=linux/amd64 public.ecr.aws/lambda/python:3.12
+
+# Install build tools required for chromadb compilation
+# Try microdnf first (minimal package manager in Lambda images)
+RUN microdnf update -y && \
+    microdnf install -y gcc gcc-c++ make python3-devel && \
+    microdnf clean all
 
 COPY handler_vector_embeddings/requirements.local.txt ${LAMBDA_TASK_ROOT}
 
