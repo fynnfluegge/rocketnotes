@@ -2,7 +2,7 @@ name: Deploy
 
 on:
   workflow_run:
-    workflows: ["Main Build"]
+    workflows: ["Main Build and Test"]
     types: [completed]
 
 concurrency:
