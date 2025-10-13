@@ -50,7 +50,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 	// Custom S3 Vectors policy for vector embeddings functionality
 	s3VectorsPolicy := awsiam.NewManagedPolicy(stack, aws.String("S3VectorsPolicy"), &awsiam.ManagedPolicyProps{
 		Description: aws.String("Policy for S3 Vectors operations"),
-		PolicyDocument: awsiam.NewPolicyDocument(&awsiam.PolicyDocumentProps{
+		Document: awsiam.NewPolicyDocument(&awsiam.PolicyDocumentProps{
 			Statements: &[]awsiam.PolicyStatement{
 				awsiam.NewPolicyStatement(&awsiam.PolicyStatementProps{
 					Effect: awsiam.Effect_ALLOW,
