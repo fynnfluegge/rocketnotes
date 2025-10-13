@@ -47,6 +47,37 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 	sqsFullAccessPolicy := awsiam.ManagedPolicy_FromManagedPolicyArn(stack, aws.String("AmazonSQSFullAccess"), aws.String("arn:aws:iam::aws:policy/AmazonSQSFullAccess"))
 	s3FullAccessPolicy := awsiam.ManagedPolicy_FromManagedPolicyArn(stack, aws.String("AmazonS3FullAccess"), aws.String("arn:aws:iam::aws:policy/AmazonS3FullAccess"))
 
+	// Custom S3 Vectors policy for vector embeddings functionality
+	s3VectorsPolicy := awsiam.NewManagedPolicy(stack, aws.String("S3VectorsPolicy"), &awsiam.ManagedPolicyProps{
+		Description: aws.String("Policy for S3 Vectors operations"),
+		PolicyDocument: awsiam.NewPolicyDocument(&awsiam.PolicyDocumentProps{
+			Statements: &[]awsiam.PolicyStatement{
+				awsiam.NewPolicyStatement(&awsiam.PolicyStatementProps{
+					Effect: awsiam.Effect_ALLOW,
+					Actions: &[]*string{
+						jsii.String("s3vectors:CreateVectorBucket"),
+						jsii.String("s3vectors:PutVectorBucketPolicy"),
+						jsii.String("s3vectors:DeleteVectorBucket"),
+						jsii.String("s3vectors:DeleteVectorBucketPolicy"),
+						jsii.String("s3vectors:GetVectorBucket"),
+						jsii.String("s3vectors:GetVectorBucketPolicy"),
+						jsii.String("s3vectors:ListVectorBuckets"),
+						jsii.String("s3vectors:CreateIndex"),
+						jsii.String("s3vectors:DeleteIndex"),
+						jsii.String("s3vectors:GetIndex"),
+						jsii.String("s3vectors:ListIndexes"),
+						jsii.String("s3vectors:DeleteVectors"),
+						jsii.String("s3vectors:GetVectors"),
+						jsii.String("s3vectors:ListVectors"),
+						jsii.String("s3vectors:PutVectors"),
+						jsii.String("s3vectors:QueryVectors"),
+					},
+					Resources: &[]*string{jsii.String("*")},
+				}),
+			},
+		}),
+	})
+
 	lambdaSqsDynamoDbRole := awsiam.NewRole(stack, aws.String("lambdaSqsDynamoDbRole"), &awsiam.RoleProps{
 		AssumedBy: awsiam.NewServicePrincipal(aws.String("lambda.amazonaws.com"), &awsiam.ServicePrincipalOpts{}),
 		ManagedPolicies: &[]awsiam.IManagedPolicy{
@@ -71,6 +102,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 			sqsFullAccessPolicy,
 			lambdaBasicExecutionPolicy,
 			s3FullAccessPolicy,
+			s3VectorsPolicy,
 		},
 	})
 
@@ -80,6 +112,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 			lambdaBasicExecutionPolicy,
 			s3FullAccessPolicy,
 			dynamoDbFullAccessPolicy,
+			s3VectorsPolicy,
 		},
 	})
 
