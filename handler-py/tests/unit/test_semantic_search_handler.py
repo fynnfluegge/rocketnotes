@@ -45,16 +45,12 @@ def mock_search_results():
     """Mock search results from vector store"""
     result1 = Mock()
     result1.metadata = {
-        "documentId": "doc-123",
-        "title": "Test Document 1",
-        "original_content": "This is the content of document 1"
+        "documentId": "doc-123"
     }
 
     result2 = Mock()
     result2.metadata = {
-        "documentId": "doc-456",
-        "title": "Test Document 2",
-        "original_content": "This is the content of document 2"
+        "documentId": "doc-456"
     }
 
     return [result1, result2]
@@ -88,10 +84,36 @@ class TestSemanticSearchHandler:
             BillingMode='PAY_PER_REQUEST'
         )
 
+        dynamodb.create_table(
+            TableName='tnn-Documents',
+            KeySchema=[{'AttributeName': 'id', 'KeyType': 'HASH'}],
+            AttributeDefinitions=[{'AttributeName': 'id', 'AttributeType': 'S'}],
+            BillingMode='PAY_PER_REQUEST'
+        )
+
         # Add user config
         dynamodb.put_item(
             TableName='tnn-UserConfig',
             Item={'id': {'S': 'test-user'}}
+        )
+
+        # Add test documents
+        dynamodb.put_item(
+            TableName='tnn-Documents',
+            Item={
+                'id': {'S': 'doc-123'},
+                'title': {'S': 'Test Document 1'},
+                'content': {'S': 'This is the content of document 1'}
+            }
+        )
+
+        dynamodb.put_item(
+            TableName='tnn-Documents',
+            Item={
+                'id': {'S': 'doc-456'},
+                'title': {'S': 'Test Document 2'},
+                'content': {'S': 'This is the content of document 2'}
+            }
         )
 
         # Setup mocks

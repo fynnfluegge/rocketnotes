@@ -72,9 +72,10 @@ class TestDocumentOperations:
         assert len(result) == 2
         assert all(isinstance(doc, Document) for doc in result)
         assert all(doc.metadata["documentId"] == doc_id for doc in result)
-        assert all(doc.metadata["title"] == title for doc in result)
-        # Verify content is stored as string, not bytes
-        assert all(isinstance(doc.metadata["original_content"], str) for doc in result)
+        # Verify metadata only contains documentId (title and original_content removed to avoid S3 Vectors limit)
+        for doc in result:
+            assert "documentId" in doc.metadata
+            assert len(doc.metadata) == 1  # Only documentId should be present
 
 
 class TestVectorEmbeddingsHandler:

@@ -28,6 +28,7 @@ def get_boto3_clients():
     return s3, dynamodb
 
 userConfig_table_name = "tnn-UserConfig"
+documents_table_name = "tnn-Documents"
 
 
 def handler(event, context):
@@ -79,11 +80,26 @@ def handler(event, context):
     similarity_search_result = db.similarity_search(search_string, k=3)
     response = []
     for result in similarity_search_result:
+        # Fetch document content from DynamoDB using documentId
+        document_id = result.metadata["documentId"]
+        try:
+            document = dynamodb.get_item(
+                TableName=documents_table_name,
+                Key={"id": {"S": document_id}},
+            )
+            if "Item" in document:
+                content = document["Item"]["content"]["S"]
+            else:
+                content = "Document not found"
+        except Exception as e:
+            print(f"Error fetching document {document_id}: {e}")
+            content = "Error retrieving content"
+
         response.append(
             {
-                "documentId": result.metadata["documentId"],
-                "title": result.metadata["title"],
-                "content": result.metadata["original_content"],  # Now stored as string, no decode needed
+                "documentId": document_id,
+                "title": document["Item"]["title"]["S"] if "Item" in document else "Unknown Title",
+                "content": content,
             }
         )
 
