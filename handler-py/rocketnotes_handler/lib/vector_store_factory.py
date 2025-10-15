@@ -85,7 +85,8 @@ def get_s3_vector_store(userId, embeddings):
     return AmazonS3Vectors(
         vector_bucket_name="rocketnotes-vectors",
         index_name=userId,
-        embeddings=embeddings
+        embeddings=embeddings,
+        non_filterable_metadata_keys=["_page_content", "AMAZON_BEDROCK_TEXT", "AMAZON_BEDROCK_METADATA"]
     )
 
 
@@ -117,7 +118,8 @@ def create_vector_store_from_documents(split_documents, userId, embeddings):
             split_documents,
             vector_bucket_name="rocketnotes-vectors",
             index_name=userId,
-            embedding=embeddings
+            embedding=embeddings,
+            non_filterable_metadata_keys=["_page_content", "AMAZON_BEDROCK_TEXT", "AMAZON_BEDROCK_METADATA"]
         )
         print(f"Successfully created S3 vector store")
         return vector_store

@@ -230,6 +230,7 @@ def split_document(document, documentId, title):
             page_content=f"{title}\n{splitted_document.page_content}",
             metadata={
                 "documentId": documentId,
+                "title": title,
             },
         )
         documents.append(document)

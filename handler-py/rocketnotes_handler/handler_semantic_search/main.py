@@ -80,25 +80,22 @@ def handler(event, context):
     similarity_search_result = db.similarity_search(search_string, k=3)
     response = []
     for result in similarity_search_result:
-        # Fetch document content from DynamoDB using documentId
         document_id = result.metadata["documentId"]
-        try:
-            document = dynamodb.get_item(
-                TableName=documents_table_name,
-                Key={"id": {"S": document_id}},
-            )
-            if "Item" in document:
-                content = document["Item"]["content"]["S"]
-            else:
-                content = "Document not found"
-        except Exception as e:
-            print(f"Error fetching document {document_id}: {e}")
-            content = "Error retrieving content"
+        title = result.metadata["title"]
+
+        # Extract original content from metadata _page_content by removing title prefix
+        # _page_content format is: "{title}\n{original_content}"
+        page_content = result.metadata.get("_page_content", "")
+        if page_content.startswith(f"{title}\n"):
+            content = page_content[len(title) + 1:]  # +1 for the newline
+        else:
+            # Fallback if format is different
+            content = page_content
 
         response.append(
             {
                 "documentId": document_id,
-                "title": document["Item"]["title"]["S"] if "Item" in document else "Unknown Title",
+                "title": title,
                 "content": content,
             }
         )

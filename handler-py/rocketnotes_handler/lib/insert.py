@@ -23,11 +23,6 @@ def find_insert_position(
     notes: list[NoteSnippet],
     bucket_name: str,
 ) -> list[InsertSuggestion]:
-    # Create DynamoDB client to reuse for document fetching
-    dynamodb_args = {}
-    if is_local:
-        dynamodb_args["endpoint_url"] = "http://dynamodb:8000"
-    dynamodb = boto3.client("dynamodb", **dynamodb_args)
 
     # Get vector store for the user (S3 for prod, Chroma for local)
     db = get_vector_store_factory(user_config.id, embeddings)
@@ -37,25 +32,22 @@ def find_insert_position(
         similarity_search_result = db.similarity_search(note.text, k=5)
         search_result = []
         for item in similarity_search_result:
-            # Fetch document content from DynamoDB using documentId
             document_id = item.metadata["documentId"]
-            try:
-                document = dynamodb.get_item(
-                    TableName="tnn-Documents",
-                    Key={"id": {"S": document_id}},
-                )
-                if "Item" in document:
-                    content = document["Item"]["content"]["S"]
-                else:
-                    content = "Document not found"
-            except Exception as e:
-                print(f"Error fetching document {document_id}: {e}")
-                content = "Error retrieving content"
+            title = item.metadata["title"]
+
+            # Extract original content from metadata _page_content by removing title prefix
+            # _page_content format is: "{title}\n{original_content}"
+            page_content = item.metadata.get("_page_content", "")
+            if page_content.startswith(f"{title}\n"):
+                content = page_content[len(title) + 1:]  # +1 for the newline
+            else:
+                # Fallback if format is different
+                content = page_content
 
             search_result.append(
                 {
                     "documentId": document_id,
-                    "title": document["Item"]["title"]["S"] if "Item" in document else "Unknown Title",
+                    "title": title,
                     "content": content,
                 }
             )
