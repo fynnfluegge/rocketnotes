@@ -45,12 +45,16 @@ def mock_search_results():
     """Mock search results from vector store"""
     result1 = Mock()
     result1.metadata = {
-        "documentId": "doc-123"
+        "documentId": "doc-123",
+        "title": "Test Document 1",
+        "_page_content": "Test Document 1\nThis is the content of document 1"
     }
 
     result2 = Mock()
     result2.metadata = {
-        "documentId": "doc-456"
+        "documentId": "doc-456",
+        "title": "Test Document 2",
+        "_page_content": "Test Document 2\nThis is the content of document 2"
     }
 
     return [result1, result2]
