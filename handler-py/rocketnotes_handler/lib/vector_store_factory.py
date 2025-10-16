@@ -85,7 +85,7 @@ def get_s3_vector_store(userId, embeddings):
     return AmazonS3Vectors(
         vector_bucket_name="rocketnotes-vectors",
         index_name=userId,
-        embeddings=embeddings,
+        embedding=embeddings,
         non_filterable_metadata_keys=["_page_content", "AMAZON_BEDROCK_TEXT", "AMAZON_BEDROCK_METADATA"]
     )
 
