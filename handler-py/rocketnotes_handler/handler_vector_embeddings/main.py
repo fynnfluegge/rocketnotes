@@ -53,7 +53,6 @@ def handler(event, context):
     recreateIndex = message.get("recreateIndex", False)
     deleteVectors = message.get("deleteVectors", False)
 
-    # Get boto3 clients
     s3, dynamodb = get_boto3_clients()
 
     user_config_search_result = dynamodb.get_item(
@@ -201,12 +200,6 @@ def handler(event, context):
         "body": json.dumps("Success"),
     }
 
-
-
-
-# S3 Vector operations no longer need file operations
-
-
 def split_document(document, documentId, title):
     headers_to_split_on = [
         ("#", "Header 1"),
@@ -236,11 +229,6 @@ def split_document(document, documentId, title):
         documents.append(document)
 
     return documents
-
-
-# With S3 Vectors, we don't need to manually track vector IDs in DynamoDB
-# The vector store handles document management internally
-
 
 def save_document_vectors(document, vector_store):
     """Add document vectors to vector store (works for both S3 and Chroma)"""

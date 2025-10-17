@@ -35,9 +35,9 @@ def find_insert_position(
             document_id = item.metadata["documentId"]
             title = item.metadata["title"]
 
-            # Extract original content from metadata _page_content by removing title prefix
-            # _page_content format is: "{title}\n{original_content}"
-            page_content = item.metadata.get("_page_content", "")
+            # Extract original content from page_content by removing title prefix
+            # page_content format is: "{title}\n{original_content}"
+            page_content = item.page_content
             if page_content.startswith(f"{title}\n"):
                 content = page_content[len(title) + 1:]  # +1 for the newline
             else:
