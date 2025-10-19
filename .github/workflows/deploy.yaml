@@ -77,7 +77,7 @@ jobs:
 
       - name: Deploy python stack to AWS
         run: |
-          cd handler-py
+          cd handler-ai
           cdk diff
           cdk deploy --require-approval=never
         env:
