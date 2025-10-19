@@ -35,8 +35,8 @@ Built with
 
 <div align="center">
   
-![rocketnotes_theme](https://github.com/user-attachments/assets/0f7c4017-3833-428f-8a1a-67fb0c76220a)
-
+  ![theme](https://github.com/user-attachments/assets/108bfe0d-47f6-4d53-a97b-40a2f311dcd4)
+  
 </div>
 
 
