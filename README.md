@@ -23,7 +23,7 @@ Rocketnotes is a web-based Markdown note taking app with native AI feature integ
 Built with
 [langchain](https://github.com/langchain-ai/langchain),
 [langgraph](https://langchain-ai.github.io/langgraph),
-[S3 Vectors](https://python.langchain.com/docs/integrations/vectorstores/s3/) (cloud) / [ChromaDB](https://github.com/chroma-core/chroma) (local),
+[S3 Vectors](https://python.langchain.com/docs/integrations/vectorstores/s3/), [ChromaDB](https://github.com/chroma-core/chroma),
 [sentence-transformers](https://github.com/UKPLab/sentence-transformers),
 [Ollama](https://github.com/jmorganca/ollama).
 
