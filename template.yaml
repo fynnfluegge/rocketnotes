@@ -17,7 +17,7 @@ Resources:
     Metadata:
       BuildMethod: go1.x
     Properties:
-      CodeUri: handler-go/get-document-handler
+      CodeUri: handler-crud/get-document-handler
       Handler: get-document-handler
       Runtime: provided.al2
       Architectures:
@@ -42,7 +42,7 @@ Resources:
     Metadata:
       BuildMethod: go1.x
     Properties:
-      CodeUri: handler-go/get-document-tree-handler
+      CodeUri: handler-crud/get-document-tree-handler
       Handler: get-document-tree-handler
       Runtime: provided.al2
       Architectures:
@@ -67,7 +67,7 @@ Resources:
     Metadata:
       BuildMethod: go1.x
     Properties:
-      CodeUri: handler-go/save-document-handler
+      CodeUri: handler-crud/save-document-handler
       Handler: local.go
       Runtime: provided.al2
       Architectures:
@@ -94,7 +94,7 @@ Resources:
     Metadata:
       BuildMethod: go1.x
     Properties:
-      CodeUri: handler-go/save-document-tree-handler
+      CodeUri: handler-crud/save-document-tree-handler
       Handler: save-document-tree-handler
       Runtime: provided.al2
       Architectures:
@@ -119,7 +119,7 @@ Resources:
     Metadata:
       BuildMethod: go1.x
     Properties:
-      CodeUri: handler-go/save-document-public-handler
+      CodeUri: handler-crud/save-document-public-handler
       Handler: save-document-public-handler
       Runtime: provided.al2
       Architectures:
@@ -144,7 +144,7 @@ Resources:
     Metadata:
       BuildMethod: go1.x
     Properties:
-      CodeUri: handler-go/save-document-title-handler
+      CodeUri: handler-crud/save-document-title-handler
       Handler: save-document-title-handler
       Runtime: go1.x
       Runtime: provided.al2
@@ -170,7 +170,7 @@ Resources:
     Metadata:
       BuildMethod: go1.x
     Properties:
-      CodeUri: handler-go/search-document-handler
+      CodeUri: handler-crud/search-document-handler
       Handler: search-document-handler
       Runtime: provided.al2
       Architectures:
@@ -195,7 +195,7 @@ Resources:
     Metadata:
       BuildMethod: go1.x
     Properties:
-      CodeUri: handler-go/get-shared-document-handler
+      CodeUri: handler-crud/get-shared-document-handler
       Handler: get-shared-document-handler
       Runtime: provided.al2
       Architectures:
@@ -220,7 +220,7 @@ Resources:
     Metadata:
       BuildMethod: go1.x
     Properties:
-      CodeUri: handler-go/delete-document-handler
+      CodeUri: handler-crud/delete-document-handler
       Handler: main.go
       Runtime: provided.al2
       Architectures:
@@ -266,7 +266,7 @@ Resources:
             Path: /vector-embeddings
             Method: POST
     Metadata:
-      DockerContext: handler-py/rocketnotes_handler
+      DockerContext: handler-ai/rocketnotes_handler
       Dockerfile: handler_vector_embeddings/Dockerfile.local
 
   semanticSearchFunction:
@@ -289,7 +289,7 @@ Resources:
             Path: /semanticSearch
             Method: POST
     Metadata:
-      DockerContext: handler-py/rocketnotes_handler
+      DockerContext: handler-ai/rocketnotes_handler
       Dockerfile: handler_semantic_search/Dockerfile.local
 
   chatFunction:
@@ -314,7 +314,7 @@ Resources:
             Path: /chat
             Method: POST
     Metadata:
-      DockerContext: handler-py/rocketnotes_handler
+      DockerContext: handler-ai/rocketnotes_handler
       Dockerfile: handler_chat/Dockerfile.local
 
   saveUserConfigFunction:
@@ -322,7 +322,7 @@ Resources:
     Metadata:
       BuildMethod: go1.x
     Properties:
-      CodeUri: handler-go/save-user-config-handler
+      CodeUri: handler-crud/save-user-config-handler
       Handler: main.go
       Runtime: provided.al2
       Architectures:
@@ -347,7 +347,7 @@ Resources:
     Metadata:
       BuildMethod: go1.x
     Properties:
-      CodeUri: handler-go/get-user-config-handler
+      CodeUri: handler-crud/get-user-config-handler
       Handler: main.go
       Runtime: provided.al2
       Architectures:
@@ -372,7 +372,7 @@ Resources:
     Metadata:
       BuildMethod: go1.x
     Properties:
-      CodeUri: handler-go/get-zettelkasten-handler
+      CodeUri: handler-crud/get-zettelkasten-handler
       Handler: main.go
       Runtime: provided.al2
       Architectures:
@@ -397,7 +397,7 @@ Resources:
     Metadata:
       BuildMethod: go1.x
     Properties:
-      CodeUri: handler-go/save-zettel-handler
+      CodeUri: handler-crud/save-zettel-handler
       Handler: main.go
       Runtime: provided.al2
       Architectures:
@@ -422,7 +422,7 @@ Resources:
     Metadata:
       BuildMethod: go1.x
     Properties:
-      CodeUri: handler-go/delete-zettel-handler
+      CodeUri: handler-crud/delete-zettel-handler
       Handler: main.go
       Runtime: provided.al2
       Architectures:
@@ -447,7 +447,7 @@ Resources:
     Metadata:
       BuildMethod: go1.x
     Properties:
-      CodeUri: handler-go/archive-zettel-handler
+      CodeUri: handler-crud/archive-zettel-handler
       Handler: main.go
       Runtime: provided.al2
       Architectures:
@@ -489,7 +489,7 @@ Resources:
             Path: /vibe/generate/{userId}
             Method: GET
     Metadata:
-      DockerContext: handler-py/rocketnotes_handler
+      DockerContext: handler-ai/rocketnotes_handler
       Dockerfile: handler_vibe/Dockerfile
 
   vibeInsightsFunction:
@@ -514,5 +514,5 @@ Resources:
             Path: /vibe/insert/{userId}
             Method: POST
     Metadata:
-      DockerContext: handler-py/rocketnotes_handler
+      DockerContext: handler-ai/rocketnotes_handler
       Dockerfile: handler_insert/Dockerfile

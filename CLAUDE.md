@@ -11,16 +11,16 @@ Rocketnotes is an AI-powered markdown note-taking application with semantic sear
 The project follows a microservices architecture with three main components:
 
 - **Frontend (webapp/)**: Angular 18 + TypeScript application with Electron support
-- **Go Handlers (handler-go/)**: Lambda functions for document CRUD operations, user management, and search
-- **Python Handlers (handler-py/)**: AI-powered features including semantic search, chat, vector embeddings, and agentic archiving
+- **Go Handlers (handler-crud/)**: Lambda functions for document CRUD operations, user management, and search
+- **Python Handlers (handler-ai/)**: AI-powered features including semantic search, chat, vector embeddings, and agentic archiving
 - **Infrastructure**: AWS SAM template with DynamoDB, S3, and Lambda functions
 
 ### Key Directories
 
 - `webapp/src/app/component/`: Angular components (editor, navigation, zettelkasten, dialogs)
 - `webapp/src/app/service/`: Angular services for API communication
-- `handler-go/`: Individual Go Lambda handlers for basic CRUD operations
-- `handler-py/rocketnotes_handler/`: Python modules for AI functionality
+- `handler-crud/`: Individual Go Lambda handlers for basic CRUD operations
+- `handler-ai/rocketnotes_handler/`: Python modules for AI functionality
 - `mcp/`: Model Context Protocol server integration
 
 ## Development Commands
@@ -67,7 +67,7 @@ npm run build-electron
 
 ### Python Handler Testing
 ```bash
-cd handler-py
+cd handler-ai
 
 # Create and activate virtual environment
 uv env

@@ -5,8 +5,8 @@ WORKDIR /var/task
 COPY template.yaml .
 COPY go.mod .
 COPY go.sum .
-COPY handler-go ./handler-go
-COPY handler-py ./handler-py
+COPY handler-crud ./handler-crud
+COPY handler-ai ./handler-ai
 COPY .aws-sam ./.aws-sam
 
 EXPOSE 3002

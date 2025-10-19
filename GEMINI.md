@@ -8,7 +8,7 @@ This is a monorepo for Rocketnotes, a note-taking application. It consists of a 
 
 Use these commands from the project root directory (`/Users/fynn/workspace/rocketnotes`).
 
-- **Install all dependencies:** `npm install && (cd handler-py && uv pip sync) && (cd mcp && uv pip sync)`
+- **Install all dependencies:** `npm install && (cd handler-ai && uv pip sync) && (cd mcp && uv pip sync)`
 - **Run linting across all projects:** `... (if applicable)`
 - **Run all tests:** `... (if applicable)`
 
@@ -32,24 +32,24 @@ This section details the individual projects within the monorepo.
 
 ---
 
-### 2. `handler-go`
+### 2. `handler-crud`
 
 - **Description:** Go-based serverless functions (AWS Lambda) for core backend logic.
-- **Path:** `/handler-go`
+- **Path:** `/handler-crud`
 - **Tech Stack:** Go
-- **Key Commands (run from `/handler-go`):**
+- **Key Commands (run from `/handler-crud`):**
   - **Build:** `go build ./...`
   - **Test:** `go test ./...`
   - **Tidy modules:** `go mod tidy`
 
 ---
 
-### 3. `handler-py`
+### 3. `handler-ai`
 
 - **Description:** Python-based handlers for AI/ML features like semantic search and embeddings.
-- **Path:** `/handler-py`
+- **Path:** `/handler-ai`
 - **Tech Stack:** Python, Pytest, UV
-- **Key Commands (run from `/handler-py`):**
+- **Key Commands (run from `/handler-ai`):**
   - **Install:** `uv pip sync`
   - **Test:** `pytest`
   - **Activate venv:** `source .venv/bin/activate`

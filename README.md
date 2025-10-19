@@ -20,10 +20,10 @@
 &nbsp;
 
 Rocketnotes is a web-based Markdown note taking app with native AI feature integrations like chat, text completion, voice-to-text transcriptions and agentic document archiving.  
-It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/serverless-rag-on-aws-bf8029f8bffd) built with
+Built with
 [langchain](https://github.com/langchain-ai/langchain),
 [langgraph](https://langchain-ai.github.io/langgraph),
-[faiss](https://github.com/facebookresearch/faiss),
+[S3 Vectors](https://python.langchain.com/docs/integrations/vectorstores/s3/) (cloud) / [ChromaDB](https://github.com/chroma-core/chroma) (local),
 [sentence-transformers](https://github.com/UKPLab/sentence-transformers),
 [Ollama](https://github.com/jmorganca/ollama).
 
@@ -32,7 +32,6 @@ It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/ser
 - [Sign Up](https://takeniftynotes.auth.eu-central-1.amazoncognito.com/login?response_type=code&client_id=tt3v27pnqqh7elqdvq9tgmr9v&redirect_uri=https://app.takeniftynotes.net) for free and use it as a web or Electron app
 - Run it 100% [locally with Docker](INSTALLATION.md#run-with-docker)
 - Check [Contribution Guide](CONTRIBUTING.md#contributing-guide) how to setup a local dev environment
-- Self-hosting on AWS
 
 <div align="center">
   
@@ -62,7 +61,7 @@ It utilizes a [100% Serverless RAG pipeline](https://medium.com/@fynnfluegge/ser
 
 - **Frontend**: Angular, TypeScript, Electron
 - **Backend**: Go, Python
-- **AI**: Langchain, Langgraph, Faiss
+- **AI**: Langchain, Langgraph, S3 Vectors (cloud) / ChromaDB (local)
 - **Infrastructure**: AWS, Docker
 - **Database**: DynamoDB
 - **Storage**: S3
