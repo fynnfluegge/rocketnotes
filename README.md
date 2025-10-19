@@ -68,7 +68,6 @@ Built with
 
 ## 💬 Chat with your documents
 
-- 🤖 Use LLMs together with vector embeddings to chat with your documents.
 <div align="center">
   <img width="812" alt="Screenshot 2025-06-14 at 16 40 53" src="https://github.com/user-attachments/assets/5051be74-9e7d-41c4-bc2b-a1d9d5c75606" />
 </div>
