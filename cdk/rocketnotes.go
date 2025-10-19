@@ -151,7 +151,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 	getDocumentHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("GET-Document"), &awscdklambdagoalpha.GoFunctionProps{
 		FunctionName: jsii.String("GET-Document"),
 		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
-		Entry:        jsii.String("../handler-go/get-document-handler"),
+		Entry:        jsii.String("../handler-crud/get-document-handler"),
 		Bundling: &awscdklambdagoalpha.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
@@ -169,7 +169,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 	getUserConfigHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("GET-UserConfig"), &awscdklambdagoalpha.GoFunctionProps{
 		FunctionName: jsii.String("GET-UserConfig"),
 		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
-		Entry:        jsii.String("../handler-go/get-user-config-handler"),
+		Entry:        jsii.String("../handler-crud/get-user-config-handler"),
 		Bundling: &awscdklambdagoalpha.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
@@ -188,7 +188,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 	getSharedDocumentHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("GET-Shared-Document"), &awscdklambdagoalpha.GoFunctionProps{
 		FunctionName: jsii.String("GET-Shared-Document"),
 		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
-		Entry:        jsii.String("../handler-go/get-shared-document-handler"),
+		Entry:        jsii.String("../handler-crud/get-shared-document-handler"),
 		Bundling: &awscdklambdagoalpha.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
@@ -206,7 +206,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 	getDocumentTreeHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("GET-DocumentTree"), &awscdklambdagoalpha.GoFunctionProps{
 		FunctionName: jsii.String("GET-DocumentTree"),
 		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
-		Entry:        jsii.String("../handler-go/get-document-tree-handler"),
+		Entry:        jsii.String("../handler-crud/get-document-tree-handler"),
 		Bundling: &awscdklambdagoalpha.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
@@ -225,7 +225,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 	searchDocumentHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("GET-search-Documents"), &awscdklambdagoalpha.GoFunctionProps{
 		FunctionName: jsii.String("GET-search-Documents"),
 		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
-		Entry:        jsii.String("../handler-go/search-document-handler"),
+		Entry:        jsii.String("../handler-crud/search-document-handler"),
 		Bundling: &awscdklambdagoalpha.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
@@ -309,7 +309,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 	awscdklambdagoalpha.NewGoFunction(stack, jsii.String("POST-Document"), &awscdklambdagoalpha.GoFunctionProps{
 		FunctionName: jsii.String("POST-Document"),
 		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
-		Entry:        jsii.String("../handler-go/save-document-handler/main.go"),
+		Entry:        jsii.String("../handler-crud/save-document-handler/main.go"),
 		Events: &[]awslambda.IEventSource{
 			awslambdaeventsources.NewSqsEventSource(queue, &awslambdaeventsources.SqsEventSourceProps{
 				BatchSize: jsii.Number(1),
@@ -326,7 +326,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 	postUserConfigHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("POST-UserConfig"), &awscdklambdagoalpha.GoFunctionProps{
 		FunctionName: jsii.String("POST-UserConfig"),
 		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
-		Entry:        jsii.String("../handler-go/save-user-config-handler"),
+		Entry:        jsii.String("../handler-crud/save-user-config-handler"),
 		Bundling: &awscdklambdagoalpha.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
@@ -346,7 +346,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 	postDocumentTreeHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("POST-DocumentTree"), &awscdklambdagoalpha.GoFunctionProps{
 		FunctionName: jsii.String("POST-DocumentTree"),
 		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
-		Entry:        jsii.String("../handler-go/save-document-tree-handler"),
+		Entry:        jsii.String("../handler-crud/save-document-tree-handler"),
 		Bundling: &awscdklambdagoalpha.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
@@ -365,7 +365,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 	postDocumentTitleHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("POST-DocumentTitle"), &awscdklambdagoalpha.GoFunctionProps{
 		FunctionName: jsii.String("POST-DocumentTitle"),
 		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
-		Entry:        jsii.String("../handler-go/save-document-title-handler"),
+		Entry:        jsii.String("../handler-crud/save-document-title-handler"),
 		Bundling: &awscdklambdagoalpha.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
@@ -384,7 +384,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 	postShareDocumentHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("POST-share-Document"), &awscdklambdagoalpha.GoFunctionProps{
 		FunctionName: jsii.String("POST-share-Document"),
 		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
-		Entry:        jsii.String("../handler-go/save-document-public-handler"),
+		Entry:        jsii.String("../handler-crud/save-document-public-handler"),
 		Bundling: &awscdklambdagoalpha.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
@@ -403,7 +403,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 	deleteDocumentHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("DELETE-Document"), &awscdklambdagoalpha.GoFunctionProps{
 		FunctionName: jsii.String("DELETE-Document"),
 		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
-		Entry:        jsii.String("../handler-go/delete-document-handler"),
+		Entry:        jsii.String("../handler-crud/delete-document-handler"),
 		Bundling: &awscdklambdagoalpha.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
@@ -427,7 +427,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 
 	awslambda.NewDockerImageFunction(stack, jsii.String("VectorEmbeddingsHandler"), &awslambda.DockerImageFunctionProps{
 		FunctionName: jsii.String("VectorEmbeddings-Docker"),
-		Code: awslambda.DockerImageCode_FromImageAsset(jsii.String("../handler-py/rocketnotes_handler"), &awslambda.AssetImageCodeProps{
+		Code: awslambda.DockerImageCode_FromImageAsset(jsii.String("../handler-ai/rocketnotes_handler"), &awslambda.AssetImageCodeProps{
 			File:     jsii.String("handler_vector_embeddings/Dockerfile"),
 			Platform: awsecrassets.Platform_LINUX_AMD64(),
 		}),
@@ -446,7 +446,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 
 	semanticSearchHandler := awslambda.NewDockerImageFunction(stack, jsii.String("SemanticSearchHandler"), &awslambda.DockerImageFunctionProps{
 		FunctionName: jsii.String("SemanticSearch-Docker"),
-		Code: awslambda.DockerImageCode_FromImageAsset(jsii.String("../handler-py/rocketnotes_handler"), &awslambda.AssetImageCodeProps{
+		Code: awslambda.DockerImageCode_FromImageAsset(jsii.String("../handler-ai/rocketnotes_handler"), &awslambda.AssetImageCodeProps{
 			File:     jsii.String("handler_semantic_search/Dockerfile"),
 			Platform: awsecrassets.Platform_LINUX_AMD64(),
 		}),
@@ -467,7 +467,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 
 	chatHandler := awslambda.NewDockerImageFunction(stack, jsii.String("ChatHandler"), &awslambda.DockerImageFunctionProps{
 		FunctionName: jsii.String("Chat-Docker"),
-		Code: awslambda.DockerImageCode_FromImageAsset(jsii.String("../handler-py/rocketnotes_handler"), &awslambda.AssetImageCodeProps{
+		Code: awslambda.DockerImageCode_FromImageAsset(jsii.String("../handler-ai/rocketnotes_handler"), &awslambda.AssetImageCodeProps{
 			File:     jsii.String("handler_chat/Dockerfile"),
 			Platform: awsecrassets.Platform_LINUX_AMD64(),
 		}),
@@ -490,7 +490,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 	getZettelKastenHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("GET-ZettelKasten"), &awscdklambdagoalpha.GoFunctionProps{
 		FunctionName: jsii.String("GET-ZettelKasten"),
 		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
-		Entry:        jsii.String("../handler-go/get-zettelkasten-handler"),
+		Entry:        jsii.String("../handler-crud/get-zettelkasten-handler"),
 		Bundling: &awscdklambdagoalpha.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
@@ -508,7 +508,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 	saveZettelHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("POST-save-Zettel"), &awscdklambdagoalpha.GoFunctionProps{
 		FunctionName: jsii.String("POST-save-Zettel"),
 		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
-		Entry:        jsii.String("../handler-go/save-zettel-handler"),
+		Entry:        jsii.String("../handler-crud/save-zettel-handler"),
 		Bundling: &awscdklambdagoalpha.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
@@ -526,7 +526,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 	deleteZettelHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("DELETE-Zettel"), &awscdklambdagoalpha.GoFunctionProps{
 		FunctionName: jsii.String("DELETE-Zettel"),
 		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
-		Entry:        jsii.String("../handler-go/delete-zettel-handler"),
+		Entry:        jsii.String("../handler-crud/delete-zettel-handler"),
 		Bundling: &awscdklambdagoalpha.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
@@ -544,7 +544,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 	archiveZettelHandler := awscdklambdagoalpha.NewGoFunction(stack, jsii.String("POST-archive-Zettel"), &awscdklambdagoalpha.GoFunctionProps{
 		FunctionName: jsii.String("POST-archive-Zettel"),
 		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
-		Entry:        jsii.String("../handler-go/archive-zettel-handler"),
+		Entry:        jsii.String("../handler-crud/archive-zettel-handler"),
 		Bundling: &awscdklambdagoalpha.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},
@@ -564,7 +564,7 @@ func RocketnotesStack(scope constructs.Construct, id string, props *RocketnotesS
 	awscdklambdagoalpha.NewGoFunction(stack, jsii.String("Sign-up-confirmation-handler"), &awscdklambdagoalpha.GoFunctionProps{
 		FunctionName: jsii.String("Sign-up-confirmation-handler"),
 		Runtime:      awslambda.Runtime_PROVIDED_AL2(),
-		Entry:        jsii.String("../handler-go/sign-up-confirmation-handler"),
+		Entry:        jsii.String("../handler-crud/sign-up-confirmation-handler"),
 		Bundling: &awscdklambdagoalpha.BundlingOptions{
 			GoBuildFlags: &[]*string{jsii.String(`-ldflags "-s -w"`)},
 		},

@@ -44,7 +44,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.cache/uv
-          key: ${{ runner.os }}-python-${{ matrix.python-version }}-${{ hashFiles('handler-py/uv.lock') }}
+          key: ${{ runner.os }}-python-${{ matrix.python-version }}-${{ hashFiles('handler-ai/uv.lock') }}
           restore-keys: |
             ${{ runner.os }}-python-${{ matrix.python-version }}-
             ${{ runner.os }}-python-
@@ -64,7 +64,7 @@ jobs:
 
       - name: Install Python dependencies and run tests
         run: |
-          cd handler-py
+          cd handler-ai
           uv sync --extra dev
           uv run python -m pytest tests/unit -v
 

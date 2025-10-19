@@ -7,6 +7,7 @@ First, the following tools and frameworks need to be installed on your system:
 - [Docker](https://docs.docker.com/get-docker/)
 - [Node.js >= 18.x](https://nodejs.org/download/release/latest-v18.x/)
 - [Go 1.x](https://go.dev/doc/install)
+- [Python >= 3.12](https://www.python.org/downloads/)
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 - [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html)
 
