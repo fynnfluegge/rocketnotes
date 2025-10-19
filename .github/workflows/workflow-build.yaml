@@ -64,7 +64,7 @@ jobs:
 
       - name: Install Python dependencies and run tests
         run: |
-          cd handler-py
+          cd handler-ai
           uv sync --extra dev
           uv run python -m pytest tests/unit -v
 
