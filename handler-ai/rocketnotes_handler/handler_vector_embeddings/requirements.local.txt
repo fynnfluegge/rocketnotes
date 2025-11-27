@@ -6,6 +6,6 @@ langchain-aws==0.2.35
 langchain-community==0.3.27
 langchain-chroma==0.1.4
 langchain-openai==0.3.14
-langchain-core==0.3.76
+langchain-core==0.3.80
 langchain-anthropic==0.3.12
 langchain-together==0.3.0
