@@ -3,6 +3,6 @@ langchain==0.3.26
 langchain-aws==0.2.35
 langchain-community==0.3.27
 langchain-openai==0.3.14
-langchain-core==0.3.80
+langchain-core==0.3.81
 langchain-anthropic==0.3.12
 langchain-together==0.3.0
