@@ -1,6 +1,6 @@
 ### Create virtual environment
 ```bash
-uv env
+uv venv
 ```
 
 ### Activate virtual environment
