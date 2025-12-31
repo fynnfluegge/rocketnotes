@@ -1,16 +1,15 @@
 import json
 import logging
 import os
+
 import boto3
 from langchain.schema import Document
 from langchain_text_splitters import MarkdownHeaderTextSplitter
 
 from rocketnotes_handler.lib.util import get_embeddings_model, get_user_config
 from rocketnotes_handler.lib.vector_store_factory import (
-    get_vector_store_factory,
-    create_vector_store_from_documents,
-    delete_document_vectors
-)
+    create_vector_store_from_documents, delete_document_vectors,
+    get_vector_store_factory)
 
 is_local = os.environ.get("LOCAL", False)
 
@@ -37,8 +36,6 @@ def get_boto3_clients():
 documents_table_name = "tnn-Documents"
 vector_table_name = "tnn-Vectors"
 userConfig_table_name = "tnn-UserConfig"
-bucket_name = os.environ.get("BUCKET_NAME", "default-bucket")
-vector_bucket_name = os.environ.get("VECTOR_BUCKET_NAME", bucket_name)
 
 
 def handler(event, context):

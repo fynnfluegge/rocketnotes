@@ -1,4 +1,5 @@
 import os
+
 import boto3
 from langchain.embeddings.base import Embeddings
 from langchain_core.language_models import BaseChatModel
@@ -15,13 +16,11 @@ if is_local:
 s3 = boto3.client("s3", **s3_args)
 
 
-
 def find_insert_position(
     user_config: UserConfig,
     embeddings: Embeddings,
     chat_model: BaseChatModel,
     notes: list[NoteSnippet],
-    bucket_name: str,
 ) -> list[InsertSuggestion]:
 
     # Get vector store for the user (S3 for prod, Chroma for local)
@@ -39,7 +38,7 @@ def find_insert_position(
             # page_content format is: "{title}\n{original_content}"
             page_content = item.page_content
             if page_content.startswith(f"{title}\n"):
-                content = page_content[len(title) + 1:]  # +1 for the newline
+                content = page_content[len(title) + 1 :]  # +1 for the newline
             else:
                 # Fallback if format is different
                 content = page_content

@@ -24,7 +24,6 @@ sqs = boto3.client("sqs", **sqs_args)
 documents_table_name = "tnn-Documents"
 userConfig_table_name = "tnn-UserConfig"
 zettel_table_name = "tnn-Zettelkasten"
-bucket_name = os.environ["BUCKET_NAME"]
 queue_url = os.environ["QUEUE_URL"]
 
 

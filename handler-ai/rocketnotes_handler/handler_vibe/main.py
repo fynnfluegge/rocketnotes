@@ -29,7 +29,6 @@ documents_table_name = "tnn-Documents"
 vector_table_name = "tnn-Vectors"
 userConfig_table_name = "tnn-UserConfig"
 zettel_table_name = "tnn-Zettelkasten"
-bucket_name = os.environ["BUCKET_NAME"]
 
 graph = create_clustering_workflow()
 
@@ -108,7 +107,6 @@ def handler(event, context):
             embeddings=embeddings,
             user_config=user_config,
             chat_model=llm,
-            bucket_name=bucket_name,
             min_cluster_size=1,
             cluster_selection_epsilon=0.1,
         )

@@ -26,7 +26,6 @@ class ClusteringState(TypedDict):
     embeddings: Embeddings
     user_config: UserConfig
     chat_model: BaseChatModel
-    bucket_name: str
 
 
 def clustering_node(state: ClusteringState) -> ClusteringState:
@@ -57,7 +56,6 @@ def find_insert_position_node(state: ClusteringState) -> ClusteringState:
         embeddings=state["embeddings"],
         chat_model=state["chat_model"],
         notes=state["merged_documents"],
-        bucket_name=state["bucket_name"],
     )
 
     state["insert_results"] = insert_results
@@ -92,7 +90,6 @@ def run_clustering_workflow(
     embeddings: Embeddings,
     user_config: UserConfig,
     chat_model: BaseChatModel,
-    bucket_name: str,
     min_cluster_size: int = 1,
     cluster_selection_epsilon: float = 0.1,
 ):
@@ -107,7 +104,6 @@ def run_clustering_workflow(
         "embeddings": embeddings,
         "user_config": user_config,
         "chat_model": chat_model,
-        "bucket_name": bucket_name,
     }
 
     # Run the workflow
