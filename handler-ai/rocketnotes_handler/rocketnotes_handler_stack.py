@@ -83,7 +83,12 @@ class RocketnotesHandlerStack(Stack):
                     "S3VectorsQueryPolicy": iam.PolicyDocument(
                         statements=[
                             iam.PolicyStatement(
-                                actions=["s3vectors:QueryVectors"],
+                                actions=[
+                                    "s3vectors:QueryVectors",
+                                    "s3vectors:GetVectors",
+                                    "s3vectors:PutVectors",
+                                    "s3vectors:DeleteVectors",
+                                ],
                                 resources=["*"],
                             )
                         ]
