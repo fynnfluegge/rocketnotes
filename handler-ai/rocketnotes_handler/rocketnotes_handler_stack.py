@@ -79,6 +79,16 @@ class RocketnotesHandlerStack(Stack):
                         "AmazonS3FullAccess"
                     ),
                 ],
+                inline_policies={
+                    "S3VectorsQueryPolicy": iam.PolicyDocument(
+                        statements=[
+                            iam.PolicyStatement(
+                                actions=["s3vectors:QueryVectors"],
+                                resources=["*"],
+                            )
+                        ]
+                    )
+                },
             ),
             timeout=Duration.seconds(300),
             memory_size=1024,
