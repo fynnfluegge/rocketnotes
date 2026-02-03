@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/fynnfluegge-rocketnotes-badge.png)](https://mseep.ai/app/fynnfluegge-rocketnotes)
+
 <div align="center">
   <a href="https://www.takeniftynotes.net/">
     <img src="https://github.com/user-attachments/assets/82041555-ba66-400e-a899-8f9c1bc70bcf" height="384">
