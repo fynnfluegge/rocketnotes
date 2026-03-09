@@ -6,6 +6,6 @@ langchain-openai==0.3.14
 langchain-core==0.3.81
 langchain-anthropic==0.3.12
 langchain-together==0.3.0
-langgraph==0.4.8
+langgraph==1.0.10rc1
 numpy==2.2.5
 scikit-learn==1.6.1
