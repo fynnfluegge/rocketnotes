@@ -13,6 +13,20 @@
       </button>
     </div>
     <div class="tabcontent" id="tab1">
+      <div class="chat-options">
+        <label>
+          Context
+          <select [(ngModel)]="searchContext" [disabled]="isLoading">
+            <option value="notes">My notes</option>
+            <option value="web">Web</option>
+          </select>
+        </label>
+        <button (click)="newChat()" [disabled]="isLoading">New chat</button>
+      </div>
+      <small *ngIf="searchContext === 'web'">
+        Your question and any URLs in it are sent to Parallel for web context.
+        Private notes are not included. No Parallel account or API key is needed.
+      </small>
       <div class="result" #chatHistory>
         <div *ngFor="let message of messages">
           <div *ngIf="message.isUser">
@@ -40,7 +54,6 @@
           (keydown.enter)="onKeydown($event)"
           (keyup.enter)="sendChatMessage()"
           placeholder="Type your question..."
-          (keyup)="resizeTextarea($event)"
         ></textarea>
         <button (click)="sendChatMessage()">
           <i class="fa fa-paper-plane" aria-hidden="true"></i>
@@ -55,7 +68,6 @@
           (keydown.enter)="onKeydown($event)"
           (keyup.enter)="sendSearchMessage()"
           placeholder="Type your search pattern..."
-          (keyup)="resizeTextarea($event)"
         ></textarea>
         <button (click)="sendSearchMessage()">
           <i class="fa fa-paper-plane" aria-hidden="true"></i>

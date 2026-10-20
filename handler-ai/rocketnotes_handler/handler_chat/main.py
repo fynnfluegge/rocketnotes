@@ -1,13 +1,24 @@
 import json
 import os
+from uuid import UUID, uuid4
+
 import boto3
 from langchain.chains import ConversationalRetrievalChain
 
-from rocketnotes_handler.lib.util import (get_chat_model, get_embeddings_model,
-                                          get_user_config)
+from rocketnotes_handler.lib.util import (
+    get_chat_model,
+    get_embeddings_model,
+    get_user_config,
+)
 from rocketnotes_handler.lib.vector_store_factory import get_vector_store_factory
+from rocketnotes_handler.lib.web_search import (
+    WebSearchError,
+    answer_from_web,
+    web_search_enabled,
+)
 
-is_local = os.environ.get("LOCAL", False)
+is_local = os.environ.get("LOCAL", "")
+
 
 def get_boto3_clients():
     """Get configured boto3 clients"""
@@ -28,8 +39,8 @@ def get_boto3_clients():
 
     return s3, dynamodb
 
-userConfig_table_name = "tnn-UserConfig"
 
+userConfig_table_name = "tnn-UserConfig"
 
 
 def handler(event, context):
@@ -40,6 +51,32 @@ def handler(event, context):
             return {"statusCode": 400, "body": "Invalid JSON format in request body"}
     else:
         return {"statusCode": 400, "body": "Request body is missing"}
+
+    if not isinstance(request_body, dict):
+        return {"statusCode": 400, "body": json.dumps("Expected a JSON object")}
+
+    search_context = request_body.get("searchContext", "notes")
+    if search_context not in ("notes", "web"):
+        return {"statusCode": 400, "body": json.dumps("Unknown search context")}
+    if search_context == "web":
+        if not web_search_enabled():
+            return {"statusCode": 403, "body": json.dumps("Web search is disabled")}
+        question = request_body.get("prompt")
+        if (
+            not isinstance(question, str)
+            or not question.strip()
+            or len(question) > 8000
+        ):
+            return {"statusCode": 400, "body": json.dumps("Invalid web question")}
+        try:
+            # API clients may omit this for a standalone run. Never cache it in Lambda.
+            conversation_id = (
+                str(UUID(request_body["conversationId"]))
+                if ("conversationId" in request_body)
+                else str(uuid4())
+            )
+        except (ValueError, TypeError, AttributeError):
+            return {"statusCode": 400, "body": json.dumps("Invalid conversationId")}
 
     if "userId" in request_body:
         userId = request_body["userId"]
@@ -56,7 +93,7 @@ def handler(event, context):
         return {"statusCode": 400, "body": "search_string is missing"}
 
     # Get boto3 clients
-    s3, dynamodb = get_boto3_clients()
+    _s3, dynamodb = get_boto3_clients()
 
     user_config_search_result = dynamodb.get_item(
         TableName=userConfig_table_name,
@@ -70,6 +107,16 @@ def handler(event, context):
         }
 
     user_config = get_user_config(user_config_search_result)
+
+    if search_context == "web":
+        if user_config.llm is None:
+            return {"statusCode": 400, "body": json.dumps("LLM model is missing")}
+        llm = get_chat_model(user_config)
+        try:
+            answer = answer_from_web(question, conversation_id, llm)
+        except WebSearchError as exc:
+            return {"statusCode": 503, "body": json.dumps(str(exc))}
+        return {"statusCode": 200, "body": json.dumps(answer)}
 
     if user_config.embeddingsModel is None:
         return {

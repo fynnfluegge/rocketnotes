@@ -68,6 +68,13 @@ Built with
 
 ## 💬 Chat with your documents
 
+Select **Context → Web** in the chat dialog to use public web sources with
+[Parallel Search MCP](https://docs.parallel.ai/integrations/mcp/search-mcp).
+Search uses Fast mode with no Parallel account or API key required. Include a
+URL in Web mode to read that page. **My notes** remains the initial context; Web sends your
+question to Parallel without including private notes. See the
+[web chat setup and API](handler-ai/README.md#web-context-in-chat).
+
 <div align="center">
   <img width="812" alt="Screenshot 2025-06-14 at 16 40 53" src="https://github.com/user-attachments/assets/5051be74-9e7d-41c4-bc2b-a1d9d5c75606" />
 </div>
